@@ -1,7 +1,7 @@
 {
   "hosting": {
-    "public": "public",
     "site": "destiny-credit",
+    "public": "out",
     "ignore": [
       "firebase.json",
       "**/.*",

@@ -26,3 +26,4 @@ dist-ssr
 .next
 pnpm-lock.yaml
 vite.config.js
+.firebase
