@@ -1,3 +1,4 @@
+import Link from "next/link";
 import React, { useState, useEffect } from "react";
 import {
   BsArrowRight,
@@ -8,7 +9,7 @@ import {
   BsHash,
 } from "react-icons/bs";
 import { FaChevronDown, FaChevronRight, FaPlus } from "react-icons/fa";
-import { HashRouter as Router, NavLink } from "react-router-dom";
+import { BrowserRouter as Router, NavLink, useNavigate } from "react-router-dom";
 
 type LinkProps = {
   title: string;
@@ -25,69 +26,70 @@ type LinkProps = {
 const members = [
   {
     name: 'New Member',
-    url: '/member/create-member',
+    url: '/members/create-member',
   },
   {
     name: 'All Members',
-    url: '/member/',
+    url: '/members/',
   },
 ];
 const groups = [
   {
     name: 'New Group',
-    url: '/group/create-group',
+    url: '/groups/create-group',
   },
   {
     name: 'All Groups',
-    url: '/group/groups',
+    url: '/groups/',
   },
 ];
 const products = [
   {
     name: 'New Product',
-    url: '/loan/new-product',
+    url: '/products/new-product',
   },
   {
     name: 'All Products',
-    url: '/loan/products',
+    url: '/products',
   },
 ];
 
 const loans = [
   {
     name: 'New Loan',
-    url: '/loan/create-loan',
+    url: '/loans/create-loan',
   },
   {
     name: 'Approvals',
-    url: '/loan/approvals',
+    url: '/loans/approvals',
   },
   {
     name: 'Disbursments',
-    url: '/loan/disbursements',
+    url: '/loans/disbursements',
   },
   {
     name: 'Payments',
-    url: '/loan/payments',
+    url: '/loans/payments',
   },
   {
     name: 'All Loans',
-    url: '/loan/',
+    url: '/loans/',
   },
 ];
 const reports = [
   {
     name: 'PAR Report',
-    url: '/report/par-report',
+    url: '/reports/par-report',
   },
   {
     name: 'Schedules',
-    url: '/report/schedule-report',
+    url: '/reports/schedule-report',
   },
 ];
 
 const LinkDropDown = ({ title, data }: LinkProps) => {
   const [expanded, setExpanded] = useState(true);
+  const navigate = useNavigate();
 
   type ChevProps = {
     expand: boolean;
@@ -155,12 +157,13 @@ const LinkDropDown = ({ title, data }: LinkProps) => {
             <BsArrowRight size="8" className="text-gray-400 m-2" />
             <NavLink
               to={item.url}
-              // onClick={handleCloseSideBar}
               className={({ isActive }) =>
                 isActive ? isActiveStyle : isNotActiveStyle
               }
             >
+            <Link href={item.url}>
               {item.name}
+            </Link>
             </NavLink>
           </div>
         ))}
