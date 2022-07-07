@@ -1,4 +1,5 @@
 import Link from "next/link";
+import {useRouter} from "next/router";
 import React, { useState, useEffect } from "react";
 import {
   BsArrowRight,
@@ -26,7 +27,7 @@ type LinkProps = {
 const members = [
   {
     name: 'New Member',
-    url: '/members/create-member',
+    url: '/members/create-member/',
   },
   {
     name: 'All Members',
@@ -36,7 +37,7 @@ const members = [
 const groups = [
   {
     name: 'New Group',
-    url: '/groups/create-group',
+    url: '/groups/create-group/',
   },
   {
     name: 'All Groups',
@@ -46,30 +47,30 @@ const groups = [
 const products = [
   {
     name: 'New Product',
-    url: '/products/new-product',
+    url: '/products/create-product/',
   },
   {
     name: 'All Products',
-    url: '/products',
+    url: '/products/',
   },
 ];
 
 const loans = [
   {
     name: 'New Loan',
-    url: '/loans/create-loan',
+    url: '/loans/create-loan/',
   },
   {
     name: 'Approvals',
-    url: '/loans/approvals',
+    url: '/loans/approvals/',
   },
   {
     name: 'Disbursments',
-    url: '/loans/disbursements',
+    url: '/loans/disbursements/',
   },
   {
     name: 'Payments',
-    url: '/loans/payments',
+    url: '/loans/payments/',
   },
   {
     name: 'All Loans',
@@ -79,16 +80,17 @@ const loans = [
 const reports = [
   {
     name: 'PAR Report',
-    url: '/reports/par-report',
+    url: '/reports/par-report/',
   },
   {
     name: 'Schedules',
-    url: '/reports/schedule-report',
+    url: '/reports/schedule-report/',
   },
 ];
 
 const LinkDropDown = ({ title, data }: LinkProps) => {
   const [expanded, setExpanded] = useState(true);
+  const router = useRouter();
   const navigate = useNavigate();
 
   type ChevProps = {
@@ -155,16 +157,18 @@ const LinkDropDown = ({ title, data }: LinkProps) => {
         data.slice(0, data.length - 0).map((item: any) => (
           <div key={item.name} className="dropdown-selection">
             <BsArrowRight size="8" className="text-gray-400 m-2" />
-            <NavLink
-              to={item.url}
-              className={({ isActive }) =>
-                isActive ? isActiveStyle : isNotActiveStyle
-              }
-            >
-            <Link href={item.url}>
+            {/* <NavLink */}
+            {/*   to={item.url} */}
+            {/*   className={({ isActive }) => */}
+            {/*     isActive ? isActiveStyle : isNotActiveStyle */}
+            {/*   } */}
+            {/* > */}
+            <Link href={item.url} passHref>
+            <a className={router.pathname == `${item.url}` ? isActiveStyle : isNotActiveStyle}>
               {item.name}
+            </a>
             </Link>
-            </NavLink>
+            {/* </NavLink> */}
           </div>
         ))}
     </div>
@@ -173,7 +177,7 @@ const LinkDropDown = ({ title, data }: LinkProps) => {
 
 const SideBar = () => {
   return (
-    <div className="w-full h-full mr-0 m-0 ml-12 bg-gray-200 dark:bg-gray-800 overflow-hidden shadow-lg">
+    <div className="w-full h-full mr-0 m-0 ml-14 bg-gray-200 dark:bg-gray-800 overflow-hidden shadow-lg">
       <div className="channel-container">
       <Router>
         <LinkDropDown title="Home" data={dashboard} />
