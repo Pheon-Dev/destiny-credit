@@ -9,19 +9,7 @@ import {
 } from "react-icons/bs";
 import { AiOutlineHome, AiOutlineUsergroupAdd } from "react-icons/ai";
 import { GiPayMoney, GiReceiveMoney } from "react-icons/gi";
-import { IoMdLogOut } from 'react-icons/io';
-
-type IconProps = {
-  icon: any;
-  text: string;
-};
-
-const NavBarIcon = ({ icon, text }: IconProps) => (
-  <div className="sidebar-icon group">
-    {icon}
-    <span className="sidebar-tooltip group-hover:scale-100">{text}</span>
-  </div>
-);
+import { IoMdLogOut } from "react-icons/io";
 
 const Divider = () => <hr className="sidebar-hr" />;
 
@@ -30,47 +18,74 @@ const Navbar = () => {
     <div className="fixed p-1 hide-scrollbar top-0 left-0 h-screen w-18 flex flex-col bg-white dark:bg-gray-900 shadow-lg justify-between">
       <div>
         <Link href="/">
-          <NavBarIcon icon={<AiOutlineHome size="24" />} text="Home" />
+          <div className="sidebar-icon group">
+            <AiOutlineHome size="24" />
+            <span className="sidebar-tooltip group-hover:scale-100">Home</span>
+          </div>
         </Link>
         <Divider />
         <Link href="/loan/create-loan">
-          <NavBarIcon icon={<BsPlus size="24" />} text="New Loan" />
+          <div className="sidebar-icon group">
+            <BsPlus size="24" />
+            <span className="sidebar-tooltip group-hover:scale-100">New Loan</span>
+          </div>
         </Link>
         <Link href="/member/create-member">
-          <NavBarIcon icon={<BsPersonPlus size="24" />} text="New Member" />
+          <div className="sidebar-icon group">
+            <BsPersonPlus size="24" />
+            <span className="sidebar-tooltip group-hover:scale-100">New Member</span>
+          </div>
         </Link>
         <Link href="/group/create-group">
-          <NavBarIcon
-            icon={<AiOutlineUsergroupAdd size="24" />}
-            text="New Group"
-          />
+          <div className="sidebar-icon group">
+            <AiOutlineUsergroupAdd size="24" />
+            <span className="sidebar-tooltip group-hover:scale-100">New Group</span>
+          </div>
         </Link>
         <Link href="/loan/new-product">
-          <NavBarIcon icon={<BsFilePlus size="24" />} text="New Product" />
+          <div className="sidebar-icon group">
+            <BsFilePlus size="24" />
+            <span className="sidebar-tooltip group-hover:scale-100">New Product</span>
+          </div>
         </Link>
       </div>
       <div>
         <Divider />
         <Link href="/loan">
-          <NavBarIcon icon={<BsFileCheck size="24" />} text="All Loans" />
+          <div className="sidebar-icon group">
+            <BsFileCheck size="24" />
+            <span className="sidebar-tooltip group-hover:scale-100">All Loans</span>
+          </div>
         </Link>
         <Link href="/report/general-report">
-          <NavBarIcon icon={<BsFileBarGraph size="24" />} text="Report" />
+          <div className="sidebar-icon group">
+            <BsFileBarGraph size="24" />
+            <span className="sidebar-tooltip group-hover:scale-100">Report</span>
+          </div>
         </Link>
       </div>
       <div>
         <Divider />
         <Link href="/loan/disbursements">
-          <NavBarIcon icon={<GiPayMoney size="24" />} text="Disbursements" />
+          <div className="sidebar-icon group">
+            <GiPayMoney size="24" />
+            <span className="sidebar-tooltip group-hover:scale-100">Disbursements</span>
+          </div>
         </Link>
         <Link href="/loan/payments">
-          <NavBarIcon icon={<GiReceiveMoney size="24" />} text="Payments" />
+          <div className="sidebar-icon group">
+            <GiReceiveMoney size="24" />
+            <span className="sidebar-tooltip group-hover:scale-100">Payments</span>
+          </div>
         </Link>
       </div>
       <div>
         <Divider />
         <Link href="/sign-in">
-          <NavBarIcon icon={<IoMdLogOut size="24" />} text="Sign Out" />
+          <div className="sidebar-icon group">
+            <IoMdLogOut size="24" />
+            <span className="sidebar-tooltip group-hover:scale-100">Sign Out</span>
+          </div>
         </Link>
       </div>
     </div>
