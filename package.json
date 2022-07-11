@@ -1,0 +1,5 @@
+{
+  "dependencies": {
+    "mpesa-api": "^3.0.2"
+  }
+}
