@@ -45,8 +45,6 @@ const MyApp = ({ Component, pageProps }: AppProps) => {
         {toggleSidebar && (
           <>
             <div className="fixed w-3/5 bg-white h-screen shadow-md z-10 animate-slide-in animate-slide-out">
-              {/* <NavBar closeToggle={setToggleSidebar} /> */}
-              {/* <SideBar closeToggle={setToggleSidebar} /> */}
               <NavBar />
               <SideBar />
             </div>
