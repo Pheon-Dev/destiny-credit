@@ -11,5 +11,6 @@ export const routes = {
   reversal: '/mpesa/reversal/v1/request',
   stkpush: '/mpesa/stkpush/v1/processrequest',
   stkquery: '/mpesa/stkpushquery/v1/query',
+  stkurl: "//developer.safaricom.co.ke/lipa-na-m-pesa-online/apis/post/stkpush/v1/processrequest",
 };
 

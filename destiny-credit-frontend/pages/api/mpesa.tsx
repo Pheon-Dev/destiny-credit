@@ -1,86 +1,55 @@
-import {
-  StkQueryInterface,
-  StkQueryResponseInterface,
-  CredentialInterface,
-} from "../../models/interfaces";
-import { routes } from "./routes";
-import axios from "axios";
+import { Mpesa } from "mpesa-api";
 
-const baseUrl =
-  "https://developer.safaricom.co.ke/lipa-na-m-pesa-online/apis/post/stkpush/v1/processrequest";
+const credentials = {
+  clientKey: `${process.env.consumer_key}`,
+  clientSecret: `${process.env.consumer_secret}`,
+  initiatorPassword: `${process.env.security_credential}`,
+  // securityCredential: `${process.env.security_credential}`,
+  // certificatePath: './SandboxCertificate.cer',
+}
+
 const environment = "sandbox";
 
-export class Mpesa {
-  environment: string;
-  clientKey: string;
-  clientSecret: string;
-  // securityCredential: string;
+const mpesa = new Mpesa(credentials, environment);
 
-  constructor(
-    {
-      clientKey,
-      clientSecret,
-      // securityCredential,
-      initiatorPassword,
-      certificatePath,
-    }: CredentialInterface,
-    environment: "sandbox"
-  ) {
-    this.clientKey = clientKey;
-    this.clientSecret = clientSecret;
-    // this.clientKey = `${process.env.customer_key}`;
-    // this.clientSecret = `${process.env.customer_secret}`;
-    // this.initiatorPassword= process.env.initiator_password,
-    this.environment = "sandbox";
+// mpesa.lipaNaMpesaQuery({
+//   // mpesa.fetchApi({
+//   BusinessShortCode: 4085055,
+//   CheckoutRequestID: "Checkout Request ID",
+//   passKey: "Lipa Na M-PESA Pass Key",
+// })
+//   .then((response) => {
+//     console.log(response);
+//   })
+//   .catch((error) => {
+//     console.log(error);
+//   });
 
-    // if (!securityCredential) {
-    //    null;
-    // } else {
-    //   this.securityCredential = securityCredential;
-    // }
-  }
-}
+// mpesa.lipaNaMpesaOnline({
+//   BusinessShortCode: 123456,
+//   Amount: 1000,
+//   PartyA: "Party A",
+//   PhoneNumber: "Phone Number",
+//   CallBackURL: "CallBack URL",
+//   AccountReference: "Account Reference",
+//   passKey: "Lipa Na M-PESA Pass Key",
+//   TransactionType: "CustomerPayBillOnline",
+//   TransactionDesc: "Transaction Desc",
+// })
+//   .then((response) => {
+//     console.log(response);
+//   })
+//   .catch((error) => {
+//     console.log(error);
+//   });
 
-async function FetchApi({
-  BusinessShortCode,
-  passKey,
-  CheckoutRequestID,
-}: StkQueryInterface): Promise<StkQueryResponseInterface> {
-  const TimeStamp = new Date()
-    .toISOString()
-    .replace(/[^0-9]/g, "")
-    .slice(0, -3);
 
-  const Password = Buffer.from(
-    BusinessShortCode + passKey + TimeStamp
-  ).toString("base64");
-
-  // class token = await this.authenicate()
-
-  const response = await axios.post<StkQueryResponseInterface>(
-    routes.stkquery,
-    {
-      BusinessShortCode,
-      Password,
-      TimeStamp,
-      CheckoutRequestID,
-    },
-    {
-      headers: {
-        Authorization: "Bearer" + process.env.security_credential,
-      },
-    }
-  );
-
-  console.log(JSON.stringify(response.data, null, 4));
-
-  return response.data;
-}
-
-FetchApi({
-  BusinessShortCode: 123456,
-  CheckoutRequestID: "Checkout Request ID",
-  passKey: "Lipa Na M-PESA Pass Key",
+mpesa.c2bSimulate({
+  ShortCode: 4085055,
+  Amount: 1000,
+  Msisdn: 254768858280,
+  CommandID: "CustomerPayBillOnline",
+  BillRefNumber: ""
 })
   .then((response) => {
     console.log(response);
@@ -88,3 +57,4 @@ FetchApi({
   .catch((error) => {
     console.log(error);
   });
+
