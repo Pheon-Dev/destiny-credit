@@ -2,4 +2,3 @@ node_modules
 destiny-credit-frontend/pnpm-lock.yaml
 
 destiny-credit-frontend/.env
-destiny-credit-frontend/pages/api/mpesa.tsx
