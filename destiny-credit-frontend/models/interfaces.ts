@@ -26,6 +26,27 @@ export interface StkQueryInterface {
   passKey: any;
 }
 
+export interface StkPushInterface {
+  BusinessShortCode: number;
+  Amount: number;
+  PartyA: string;
+  PartyB: string;
+  PhoneNumber: string;
+  CallBackURL: string;
+  AccountReference: string;
+  passKey: string;
+  TransactionType?: TransactionType;
+  TransactionDesc?: string;
+}
+
+export interface StkPushResponseInterface {
+  MerchantRequestID: string;
+  CheckoutRequestID: string;
+  ResponseCode: string;
+  ResponseDescription: string;
+  CustomerMessage: string;
+}
+
 export interface StkQueryResponseInterface {
   ResponseCode: string;
   ResponseDescription: string;
@@ -35,7 +56,7 @@ export interface StkQueryResponseInterface {
   ResultDesc: string;
 }
 
-export interface CredentialInterface {
+export interface CredentialsInterface {
   clientKey: string;
   clientSecret: string;
   initiatorPassword: string;
@@ -52,6 +73,12 @@ export interface C2BSimulateInterface {
 }
 
 export interface C2BSimulateResponseInterface {
+  ConversationID: string;
+  OriginatorCoversationID: string;
+  ResponseDescription: string;
+}
+
+export interface C2BRegisterResponseInterface {
   ConversationID: string;
   OriginatorCoversationID: string;
   ResponseDescription: string;

@@ -2,14 +2,17 @@ import type { NextApiRequest, NextApiResponse } from "next";
 import { Mpesa } from "mpesa-api";
 import axios from "axios";
 import {
-  CredentialInterface,
+  CredentialsInterface,
   StkQueryInterface,
   StkQueryResponseInterface,
+  StkPushInterface,
+  StkPushResponseInterface,
   HttpServiceConfig,
   HttpServiceResponse,
   C2BSimulateInterface,
   C2BSimulateResponseInterface,
   AuthorizeResponseInterface,
+  C2BRegisterResponseInterface,
 } from "../../models/interfaces";
 import { routes } from "./routes";
 import { request as httpsRequest } from "https";
@@ -19,7 +22,19 @@ import { publicEncrypt } from "crypto";
 import { RSA_PKCS1_PADDING } from "constants";
 import { promises } from "fs";
 import { resolve } from "path";
-import { C2BRegisterResponseInterface } from "mpesa-api/lib/models/interfaces";
+// import {
+//   CredentialsInterface,
+//   StkQueryInterface,
+//   StkQueryResponseInterface,
+//   StkPushInterface,
+//   StkPushResponseInterface,
+//   HttpServiceConfig,
+//   HttpServiceResponse,
+//   C2BSimulateInterface,
+//   C2BSimulateResponseInterface,
+//   AuthorizeResponseInterface,
+//   C2BRegisterResponseInterface,
+// } from "mpesa-api/lib/models/interfaces";
 
 type Data = {
   name: string;
@@ -212,7 +227,7 @@ export class MpesaApi {
       securityCredential,
       initiatorPassword,
       certificatePath,
-    }: CredentialInterface,
+    }: CredentialsInterface,
     environment: "production" | "sandbox"
   ) {
     this.clientKey = clientKey;
@@ -346,6 +361,55 @@ export class MpesaApi {
 
     return response.data;
   }
+
+  async lipaNaMpesaOnline({
+    BusinessShortCode,
+    passKey,
+    TransactionDesc,
+    TransactionType,
+    PartyA,
+    PartyB,
+    Amount,
+    AccountReference,
+    CallBackURL,
+    PhoneNumber,
+  }: StkPushInterface): Promise<StkPushResponseInterface>{
+    const Timestamp = new Date()
+    .toISOString()
+    .replace(/[^0-9]/g, '')
+    .slice(0, -3);
+
+    const Password = Buffer.from(
+      BusinessShortCode + passKey + Timestamp,
+    ).toString('base64');
+
+    const token = await this.authenticate();
+
+    const response = await axios.post<StkPushResponseInterface>(
+      routes.stkpush,
+      {
+        BusinessShortCode,
+        Password,
+        Timestamp,
+        TransactionType: TransactionType ?? 'CustomerPayBillOnline',
+        Amount,
+        PartyA,
+        PartyB,
+        PhoneNumber,
+        CallBackURL,
+        AccountReference,
+        TransactionDesc: TransactionDesc ?? 'Lipa na M-PESA Online',
+      },
+      {
+        headers: {
+          Authorization: 'Bearer ' + process.env.security_credential,
+          // Authorization: 'Bearer ' + token,
+        },
+      },
+    );
+
+    return response.data;
+  }
 }
 
 export default function handler(
@@ -380,43 +444,44 @@ export default function handler(
   //     res.status(400).json({ name: `${JSON.stringify(error, null, 2)}` });
   //   });
 
-  // mpesa.lipaNaMpesaOnline({
-  //   BusinessShortCode: Number(4085055),
-  //   Amount: 1000,
-  //   PartyA: "Party A",
-  //   PartyB: "Party B",
-  //   PhoneNumber: "Phone Number",
-  //   CallBackURL: "CallBack URL",
-  //   AccountReference: "Account Reference",
-  //   passKey: "Lipa Na M-PESA Pass Key",
-  //   TransactionType: "CustomerPayBillOnline",
-  //   TransactionDesc: "Transaction Desc",
-  // })
-  //   .then((response) => {
-  //     console.log(response);
-  //   res.status(200).json({ name: `${JSON.stringify(response, undefined, 2)}`})
-  //   })
-  //   .catch((error) => {
-  //     console.log(error);
-  //   res.status(400).json({ name: `${JSON.stringify(error, undefined, 2)}`})
-  //   });
-
   mpesa
-    .c2bSimulate({
-      ShortCode: 4085055,
+    .lipaNaMpesaOnline({
+      BusinessShortCode: 4085055,
+      passKey: "Lipa Na M-PESA Pass Key",
+      TransactionDesc: "Transaction Desc",
+      TransactionType: "CustomerPayBillOnline",
+      PartyA: "Party A",
+      PartyB: "Party B",
       Amount: 1000,
-      Msisdn: 254768858280,
-      CommandID: "CustomerPayBillOnline",
-      BillRefNumber: "8986987",
+      PhoneNumber: "Phone Number",
+      CallBackURL: "CallBack URL",
+      AccountReference: "Account Reference",
     })
     .then((response) => {
       console.log(response);
-      res
-        .status(200)
-        .json({ name: `${JSON.stringify(response, undefined, 2)}` });
+    res.status(200).json({ name: `${JSON.stringify(response, undefined, 2)}`})
     })
     .catch((error) => {
       console.log(error);
-      res.status(400).json({ name: `${JSON.stringify(error, undefined, 2)}` });
+    res.status(400).json({ name: `${JSON.stringify(error, undefined, 2)}`})
     });
+
+  // mpesa
+  //   .c2bSimulate({
+  //     ShortCode: 4085055,
+  //     Amount: 1000,
+  //     Msisdn: 254768858280,
+  //     CommandID: "CustomerPayBillOnline",
+  //     BillRefNumber: "8986987",
+  //   })
+  //   .then((response) => {
+  //     console.log(response);
+  //     res
+  //       .status(200)
+  //       .json({ name: `${JSON.stringify(response, undefined, 2)}` });
+  //   })
+  //   .catch((error) => {
+  //     console.log(error);
+  //     res.status(400).json({ name: `${JSON.stringify(error, undefined, 2)}` });
+  //   });
 }
