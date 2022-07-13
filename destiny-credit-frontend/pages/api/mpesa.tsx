@@ -9,7 +9,7 @@ import {
   HttpServiceResponse,
   C2BSimulateInterface,
   C2BSimulateResponseInterface,
-  AuthorizeResponseInterface
+  AuthorizeResponseInterface,
 } from "../../models/interfaces";
 import { routes } from "./routes";
 import { request as httpsRequest } from "https";
@@ -18,18 +18,18 @@ import { parse, UrlWithStringQuery } from "url";
 import { publicEncrypt } from "crypto";
 import { RSA_PKCS1_PADDING } from "constants";
 import { promises } from "fs";
-import { resolve } from 'path'
+import { resolve } from "path";
 import { C2BRegisterResponseInterface } from "mpesa-api/lib/models/interfaces";
 
 type Data = {
   name: string;
 };
 
-export class HttpService{
+export class HttpService {
   uri: UrlWithStringQuery;
   headers: Record<string, any>;
 
-  constructor({baseURL, headers}: HttpServiceConfig) {
+  constructor({ baseURL, headers }: HttpServiceConfig) {
     // const {baseURL, headers} = config;
 
     this.uri = parse(baseURL);
@@ -38,18 +38,19 @@ export class HttpService{
 
   get<T = unknown>(
     path: string,
-    { headers }: HttpServiceConfig,
+    { headers }: HttpServiceConfig
   ): Promise<HttpServiceResponse<T>> {
     return new Promise<HttpServiceResponse<T>>((resolve, reject) => {
       try {
-        const request = this.uri.protocol === 'https:' ? httpsRequest : httpRequest;
+        const request =
+          this.uri.protocol === "https:" ? httpsRequest : httpRequest;
 
         const clientRequest = request(
           {
             protocol: this.uri.protocol,
             hostname: this.uri.hostname,
             path,
-            method: 'GET',
+            method: "GET",
             headers: {
               ...this.headers,
               ...headers,
@@ -57,13 +58,13 @@ export class HttpService{
           },
           (response) => {
             const { headers, statusCode, statusMessage } = response;
-            let dataChunks = '';
+            let dataChunks = "";
 
-            response.on('data', (chunk) => {
+            response.on("data", (chunk) => {
               dataChunks += chunk;
             });
 
-            response.on('end', () => {
+            response.on("end", () => {
               let data: any;
 
               try {
@@ -76,7 +77,7 @@ export class HttpService{
                 protocol: this.uri.protocol,
                 hostname: this.uri.hostname,
                 path: path,
-                method: 'GET',
+                method: "GET",
                 headers,
                 statusCode,
                 statusMessage,
@@ -85,22 +86,22 @@ export class HttpService{
 
               if (Number(statusCode) >= 200 && Number(statusCode) < 300) {
                 return resolve({
-                protocol: `${this.uri.protocol}`,
-                hostname: `${this.uri.hostname}`,
-                path: path,
-                method: 'GET',
-                headers,
-                statusCode: Number(statusCode),
-                statusMessage: `${statusMessage}`,
-                data,
+                  protocol: `${this.uri.protocol}`,
+                  hostname: `${this.uri.hostname}`,
+                  path: path,
+                  method: "GET",
+                  headers,
+                  statusCode: Number(statusCode),
+                  statusMessage: `${statusMessage}`,
+                  data,
                 });
               }
 
               reject(result);
             });
-          },
+          }
         );
-        clientRequest.on('error', (error) => {
+        clientRequest.on("error", (error) => {
           reject(error);
         });
 
@@ -114,11 +115,12 @@ export class HttpService{
   post<T = unknown, K extends any = any>(
     path: string,
     payload: K,
-    { headers }: HttpServiceConfig,
+    { headers }: HttpServiceConfig
   ): Promise<HttpServiceResponse<T>> {
     return new Promise<HttpServiceResponse<T>>((resolve, reject) => {
       try {
-        const request = this.uri.protocol === 'https:' ? httpsRequest : httpRequest;
+        const request =
+          this.uri.protocol === "https:" ? httpsRequest : httpRequest;
 
         const data = JSON.stringify(payload);
 
@@ -127,10 +129,10 @@ export class HttpService{
             protocol: this.uri.protocol,
             hostname: this.uri.hostname,
             path,
-            method: 'POST',
+            method: "POST",
             headers: {
-              'Content-Type': 'application/json',
-              'Content-Length': data.length,
+              "Content-Type": "application/json",
+              "Content-Length": data.length,
               ...this.headers,
               ...headers,
             },
@@ -138,13 +140,13 @@ export class HttpService{
           (response) => {
             const { headers, statusCode, statusMessage } = response;
 
-            let dataChunks = '';
+            let dataChunks = "";
 
-            response.on('data', (chunk) => {
+            response.on("data", (chunk) => {
               dataChunks += chunk;
             });
 
-            response.on('data', () => {
+            response.on("data", () => {
               let data: any;
 
               try {
@@ -157,7 +159,7 @@ export class HttpService{
                 protocol: this.uri.protocol,
                 hostname: this.uri.hostname,
                 path: path,
-                method: 'POST',
+                method: "POST",
                 headers,
                 statusCode,
                 statusMessage,
@@ -169,20 +171,20 @@ export class HttpService{
                   protocol: `${this.uri.protocol}`,
                   hostname: `${this.uri.hostname}`,
                   path: path,
-                  method: 'POST',
+                  method: "POST",
                   headers,
                   statusCode: Number(statusCode),
                   statusMessage: `${statusMessage}`,
                   data,
                 });
-              };
+              }
 
               reject(result);
             });
-          },
+          }
         );
 
-        clientRequest.on('error', (error) => {
+        clientRequest.on("error", (error) => {
           reject(error);
         });
 
@@ -191,17 +193,17 @@ export class HttpService{
       } catch (error) {
         reject(error);
       }
-    })
+    });
   }
 }
 
 export class MpesaApi {
-  http: HttpService;
-  environment: string;
-  clientKey: string;
-  clientSecret: string;
-  securityCredential: string;
-  certificatePath: string;
+  private http: HttpService;
+  private environment: string;
+  private clientKey: string;
+  private clientSecret: string;
+  private securityCredential: string;
+  private certificatePath: string;
 
   constructor(
     {
@@ -211,22 +213,23 @@ export class MpesaApi {
       initiatorPassword,
       certificatePath,
     }: CredentialInterface,
-    environment: "production" | "sandbox",
+    environment: "production" | "sandbox"
   ) {
     this.clientKey = clientKey;
     this.clientSecret = clientSecret;
     this.securityCredential = `${securityCredential}`;
-    this.environment = 'sandbox';
-    this.certificatePath = '../../keys/sandbox-cert.cer';
+    this.environment = "sandbox";
+    this.certificatePath = "../../keys/sandbox-cert.cer";
 
     this.http = new HttpService({
-      baseURL: environment === 'production' ? routes.production : routes.sandbox,
-      headers: { 'Content-Type': 'application/json' },
-    })
+      baseURL:
+        environment === "production" ? routes.production : routes.sandbox,
+      headers: { "Content-Type": "application/json" },
+    });
 
     if (!securityCredential && !initiatorPassword) {
       throw new Error(
-        'You must provide either the security credential or initiator password. Both cannot be null.',
+        "You must provide either the security credential or initiator password. Both cannot be null."
       );
     }
 
@@ -237,10 +240,7 @@ export class MpesaApi {
     }
   }
 
-  async generateSecurityCredential(
-    password: string,
-    certificatePath: string,
-  ) {
+  async generateSecurityCredential(password: string, certificatePath: string) {
     let certificate: string;
 
     if (certificatePath != null) {
@@ -251,32 +251,33 @@ export class MpesaApi {
       const certificateBuffer = await promises.readFile(
         resolve(
           __dirname,
-          this.environment === 'production'
-          ? '../../keys/production-cert.cer'
-          : '../../keys/sandbox-cert.cer',
-        ),
+          this.environment === "production"
+            ? "../../keys/production-cert.cer"
+            : "../../keys/sandbox-cert.cer"
+        )
       );
       certificate = String(certificateBuffer);
     }
 
     this.securityCredential = publicEncrypt(
       {
-      key: certificate,
-      padding: RSA_PKCS1_PADDING,
-    },
-    Buffer.from(password),
-    ).toString('base64');
+        key: certificate,
+        padding: RSA_PKCS1_PADDING,
+      },
+      Buffer.from(password)
+    ).toString("base64");
   }
 
-  async authenticate(): Promise<string>{
-    const response = await axios.get<AuthorizeResponseInterface> (
-      routes.oauth,
-      {
-        headers: {
-          Authorization: 'Basic ' + Buffer.from(this.clientKey + ':' + this.clientSecret).toString('base64',),
-        },
+  async authenticate(): Promise<string> {
+    const response = await axios.get<AuthorizeResponseInterface>(routes.oauth, {
+      headers: {
+        Authorization:
+          "Basic " +
+          Buffer.from(this.clientKey + ":" + this.clientSecret).toString(
+            "base64"
+          ),
       },
-    );
+    });
 
     return response.data.access_token;
   }
@@ -321,8 +322,9 @@ export class MpesaApi {
     ShortCode,
     CommandID,
     Amount,
-    Msisdn,BillRefNumber,
-  }: C2BSimulateInterface): Promise<C2BRegisterResponseInterface>{
+    Msisdn,
+    BillRefNumber,
+  }: C2BSimulateInterface): Promise<C2BRegisterResponseInterface> {
     const token = await this.authenticate();
 
     const response = await axios.post<C2BSimulateResponseInterface>(
@@ -332,14 +334,14 @@ export class MpesaApi {
         CommandID,
         Amount,
         Msisdn,
-        BillRefNumber: BillRefNumber ?? 'account',
+        BillRefNumber: BillRefNumber ?? "account",
       },
       {
         headers: {
-          // Authorization: 'Bearer ' + token
-          Authorization: "Bearer " + process.env.security_credential,
+          Authorization: "Bearer " + token,
+          // Authorization: "Bearer " + process.env.security_credential,
         },
-      },
+      }
     );
 
     return response.data;
@@ -360,8 +362,8 @@ export default function handler(
 
   const environment = "sandbox";
 
-  const mpesa = new Mpesa(credentials, environment);
-  // const mpesa = new MpesaApi(credentials, environment);
+  // const mpesa = new Mpesa(credentials, environment);
+  const mpesa = new MpesaApi(credentials, environment);
 
   // mpesa
   //   .lipaNaMpesaQuery({
@@ -399,19 +401,22 @@ export default function handler(
   //   res.status(400).json({ name: `${JSON.stringify(error, undefined, 2)}`})
   //   });
 
-  mpesa.c2bSimulate({
-    ShortCode: 4085055,
-    Amount: 1000,
-    Msisdn: 254768858280,
-    CommandID: "CustomerPayBillOnline",
-    BillRefNumber: '8986987'
-  })
+  mpesa
+    .c2bSimulate({
+      ShortCode: 4085055,
+      Amount: 1000,
+      Msisdn: 254768858280,
+      CommandID: "CustomerPayBillOnline",
+      BillRefNumber: "8986987",
+    })
     .then((response) => {
       console.log(response);
-    res.status(200).json({ name: `${JSON.stringify(response, undefined, 2)}`})
+      res
+        .status(200)
+        .json({ name: `${JSON.stringify(response, undefined, 2)}` });
     })
     .catch((error) => {
       console.log(error);
-    res.status(400).json({ name: `${JSON.stringify(error, undefined, 2)}`})
+      res.status(400).json({ name: `${JSON.stringify(error, undefined, 2)}` });
     });
 }
