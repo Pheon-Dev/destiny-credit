@@ -360,8 +360,8 @@ export default function handler(
 
   const environment = "sandbox";
 
-  // const mpesa = new Mpesa(credentials, environment);
-  const mpesa = new MpesaApi(credentials, environment);
+  const mpesa = new Mpesa(credentials, environment);
+  // const mpesa = new MpesaApi(credentials, environment);
 
   // mpesa
   //   .lipaNaMpesaQuery({
