@@ -373,15 +373,15 @@ export class MpesaApi {
     AccountReference,
     CallBackURL,
     PhoneNumber,
-  }: StkPushInterface): Promise<StkPushResponseInterface>{
+  }: StkPushInterface): Promise<StkPushResponseInterface> {
     const Timestamp = new Date()
-    .toISOString()
-    .replace(/[^0-9]/g, '')
-    .slice(0, -3);
+      .toISOString()
+      .replace(/[^0-9]/g, "")
+      .slice(0, -3);
 
     const Password = Buffer.from(
-      BusinessShortCode + passKey + Timestamp,
-    ).toString('base64');
+      BusinessShortCode + passKey + Timestamp
+    ).toString("base64");
 
     const token = await this.authenticate();
 
@@ -391,21 +391,21 @@ export class MpesaApi {
         BusinessShortCode,
         Password,
         Timestamp,
-        TransactionType: TransactionType ?? 'CustomerPayBillOnline',
+        TransactionType: TransactionType ?? "CustomerPayBillOnline",
         Amount,
         PartyA,
         PartyB,
         PhoneNumber,
         CallBackURL,
         AccountReference,
-        TransactionDesc: TransactionDesc ?? 'Lipa na M-PESA Online',
+        TransactionDesc: TransactionDesc ?? "Lipa na M-PESA Online",
       },
       {
         headers: {
-          Authorization: 'Bearer ' + process.env.security_credential,
+          Authorization: "Bearer " + process.env.security_credential,
           // Authorization: 'Bearer ' + token,
         },
-      },
+      }
     );
 
     return response.data;
@@ -450,20 +450,22 @@ export default function handler(
       passKey: "Lipa Na M-PESA Pass Key",
       TransactionDesc: "Transaction Desc",
       TransactionType: "CustomerPayBillOnline",
-      PartyA: "Party A",
-      PartyB: "Party B",
+      PartyA: "254768858280",
+      PartyB: "4085055",
       Amount: 1000,
-      PhoneNumber: "Phone Number",
-      CallBackURL: "CallBack URL",
+      PhoneNumber: "254768858280",
+      CallBackURL: "http://0be0-197-232-251-62.ngrok.io/mpesa/lipa-na-mpesa-callback",
       AccountReference: "Account Reference",
     })
     .then((response) => {
       console.log(response);
-    res.status(200).json({ name: `${JSON.stringify(response, undefined, 2)}`})
+      res
+        .status(200)
+        .json({ name: `${JSON.stringify(response, undefined, 2)}` });
     })
     .catch((error) => {
       console.log(error);
-    res.status(400).json({ name: `${JSON.stringify(error, undefined, 2)}`})
+      res.status(400).json({ name: `${JSON.stringify(error, undefined, 2)}` });
     });
 
   // mpesa
