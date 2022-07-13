@@ -19,6 +19,7 @@
     "http": "^0.0.1-security",
     "http-proxy-middleware": "^2.0.6",
     "https": "^1.0.0",
+    "mpesa-api": "^3.0.2",
     "next": "12.2.0",
     "react": "18.2.0",
     "react-dom": "18.2.0",
