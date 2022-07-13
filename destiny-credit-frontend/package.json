@@ -12,6 +12,7 @@
     "@react-oauth/google": "^0.2.6",
     "@sanity/client": "^3.3.2",
     "axios": "^0.27.2",
+    "constants": "^0.0.2",
     "express": "^4.18.1",
     "fs": "^0.0.1-security",
     "gapi-script": "^1.2.0",

@@ -12,6 +12,10 @@ import { routes } from "./routes";
 import { request as httpsRequest } from "https";
 import { request as httpRequest } from "http";
 import { parse, UrlWithStringQuery } from "url";
+import { publicEncrypt } from "crypto";
+import { RSA_PKCS1_PADDING } from "constants";
+import { promises } from "fs";
+import { resolve } from 'path'
 
 type Data = {
   name: string;
@@ -188,23 +192,76 @@ export class HttpService{
 }
 
 export class Mpesa {
+  http: HttpService;
   environment: string;
   clientKey: string;
   clientSecret: string;
+  securityCredential: string;
+  certificatePath: string;
 
   constructor(
     {
       clientKey,
       clientSecret,
-      initiatorPassword,
       securityCredential,
+      initiatorPassword,
       certificatePath,
     }: CredentialInterface,
-    environment: "sandbox" | "production"
+    environment: "production" | "sandbox",
   ) {
     this.clientKey = clientKey;
     this.clientSecret = clientSecret;
-    this.environment = "sandbox";
+    this.securityCredential = `${securityCredential}`;
+    this.environment = 'sandbox';
+    this.certificatePath = '../../keys/sandbox-cert.cer';
+
+    this.http = new HttpService({
+      baseURL: environment === 'production' ? routes.production : routes.sandbox,
+      headers: { 'Content-Type': 'application/json' },
+    })
+
+    if (!securityCredential && !initiatorPassword) {
+      throw new Error(
+        'You must provide either the security credential or initiator password. Both cannot be null.',
+      );
+    }
+
+    if (!securityCredential) {
+      this.generateSecurityCredential(initiatorPassword, this.certificatePath);
+    } else {
+      this.securityCredential = securityCredential;
+    }
+  }
+
+  async generateSecurityCredential(
+    password: string,
+    certificatePath: string,
+  ) {
+    let certificate: string;
+
+    if (certificatePath != null) {
+      const certificateBuffer = await promises.readFile(certificatePath);
+
+      certificate = String(certificateBuffer);
+    } else {
+      const certificateBuffer = await promises.readFile(
+        resolve(
+          __dirname,
+          this.environment === 'production'
+          ? '../../keys/production-cert.cer'
+          : '../../keys/sandbox-cert.cer',
+        ),
+      );
+      certificate = String(certificateBuffer);
+    }
+
+    this.securityCredential = publicEncrypt(
+      {
+      key: certificate,
+      padding: RSA_PKCS1_PADDING,
+    },
+    Buffer.from(password),
+    ).toString('base64');
   }
 
   async lipaNaMpesaQuery({
@@ -251,7 +308,7 @@ export default function handler(
     clientSecret: `${process.env.consumer_secret}`,
     initiatorPassword: `${process.env.security_credential}`,
     // securityCredential: `${process.env.security_credential}`,
-    // certificatePath: './SandboxCertificate.cer',
+    certificatePath: null,
   };
 
   const environment = "sandbox";
