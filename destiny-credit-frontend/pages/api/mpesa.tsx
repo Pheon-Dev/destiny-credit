@@ -27,6 +27,81 @@ export class HttpService{
     this.uri = parse(baseURL);
     this.headers = headers;
   }
+
+  get<T = unknown>(
+    path: string,
+    { headers }: HttpServiceConfig,
+  ): Promise<HttpServiceResponse<T>> {
+    return new Promise<HttpServiceResponse<T>>((resolve, reject) => {
+      try {
+        const request = this.uri.protocol === 'https:' ? httpsRequest : httpRequest;
+
+        const clientRequest = request(
+          {
+            protocol: this.uri.protocol,
+            hostname: this.uri.hostname,
+            path,
+            method: 'GET',
+            headers: {
+              ...this.headers,
+              ...headers,
+            },
+          },
+          (response) => {
+            const { headers, statusCode, statusMessage } = response;
+            let dataChunks = '';
+
+            response.on('data', (chunk) => {
+              dataChunks += chunk;
+            });
+
+            response.on('end', () => {
+              let data: any;
+
+              try {
+                data = JSON.parse(dataChunks);
+              } catch (error) {
+                data = dataChunks?.toString();
+              }
+
+              const result = {
+                protocol: this.uri.protocol,
+                hostname: this.uri.hostname,
+                path: path,
+                method: 'GET',
+                headers,
+                statusCode,
+                statusMessage,
+                data,
+              };
+
+              if (Number(statusCode) >= 200 && Number(statusCode) < 300) {
+                return resolve({
+                protocol: `${this.uri.protocol}`,
+                hostname: `${this.uri.hostname}`,
+                path: path,
+                method: 'GET',
+                headers,
+                statusCode: Number(statusCode),
+                statusMessage: `${statusMessage}`,
+                data,
+                });
+              }
+
+              reject(result);
+            });
+          },
+        );
+        clientRequest.on('error', (error) => {
+          reject(error);
+        });
+
+        clientRequest.end();
+      } catch (error) {
+        reject(error);
+      }
+    })
+  }
 }
 
 export class Mpesa {
@@ -73,7 +148,7 @@ export class Mpesa {
       },
       {
         headers: {
-          Authorization: "Bearer" + process.env.security_credential,
+          Authorization: "Bearer " + process.env.security_credential,
         },
       }
     );
