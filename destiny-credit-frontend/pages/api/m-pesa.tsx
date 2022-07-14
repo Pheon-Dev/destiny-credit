@@ -14,7 +14,7 @@ import {
   AuthorizeResponseInterface,
   C2BRegisterResponseInterface,
 } from "../../models/interfaces";
-import { routes } from "./routes";
+import { routes } from "../../utils/routes";
 import { request as httpsRequest } from "https";
 import { request as httpRequest } from "http";
 import { parse, UrlWithStringQuery } from "url";
@@ -422,8 +422,8 @@ export default function handler(
 
   const environment = "sandbox";
 
-  // const mpesa = new Mpesa(credentials, environment);
-  const mpesa = new MpesaApi(credentials, environment);
+  const mpesa = new Mpesa(credentials, environment);
+  // const mpesa = new MpesaApi(credentials, environment);
 
   // mpesa
   //   .lipaNaMpesaQuery({
