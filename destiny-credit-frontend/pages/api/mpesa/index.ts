@@ -48,18 +48,55 @@ export default function handler(
   //     res.status(400).json({ name: `${JSON.stringify(error, null, 2)}` });
   //   });
 
+  // mpesa
+  //   .c2b({
+  //     CommandID: "CustomerPayBillOnline",
+  //     Amount: 1,
+  //     Msisdn: `${PHONE_NUMBER}`,
+  //     BillRefNumber: "00000",
+  //     ShortCode: Number(PAY_BILL),
+  //   })
+  //   .then((response) => {
+  //     console.log(response);
+  //     res
+  //       .status(200)
+  //       .json({ name: `${JSON.stringify(response, undefined, 2)}` });
+  //   })
+  //   .catch((error) => {
+  //     console.log(error);
+  //     res.status(400).json({ name: `${JSON.stringify(error, undefined, 2)}` });
+  //   });
+  //
+  // mpesa
+  //   .lipaNaMpesaOnline({
+  //     BusinessShortCode: Number(PAY_BILL),
+  //     passKey: `${PASS_KEY}`,
+  //     TransactionDesc: "Transaction Desc",
+  //     TransactionType: "CustomerPayBillOnline",
+  //     PartyA: `${PHONE_NUMBER}`,
+  //     PartyB: `${PAY_BILL}`,
+  //     Amount: 1,
+  //     PhoneNumber: `${PHONE_NUMBER}`,
+  //     CallBackURL: `${CALL_BACK_URL}`,
+  //     AccountReference: "Account Reference",
+  //   })
+  //   .then((response) => {
+  //     console.log(response);
+  //     res
+  //       .status(200)
+  //       .json({ name: `${JSON.stringify(response, undefined, 2)}` });
+  //   })
+  //   .catch((error) => {
+  //     console.log(error);
+  //     res.status(400).json({ name: `${JSON.stringify(error, undefined, 2)}` });
+  //   });
+
   mpesa
-    .lipaNaMpesaOnline({
-      BusinessShortCode: Number(PAY_BILL),
-      passKey: `${PASS_KEY}`,
-      TransactionDesc: "Transaction Desc",
-      TransactionType: "CustomerPayBillOnline",
-      PartyA: `${PHONE_NUMBER}`,
-      PartyB: `${PAY_BILL}`,
-      Amount: 1000,
-      PhoneNumber: `${PHONE_NUMBER}`,
-      CallBackURL: `${CALL_BACK_URL}`,
-      AccountReference: "Account Reference",
+    .c2bRegister({
+      ShortCode: Number(PAY_BILL),
+      ConfirmationURL: `${CALL_BACK_URL}`,
+      ValidationURL: `${CALL_BACK_URL}`,
+      ResponseType: "Completed",
     })
     .then((response) => {
       console.log(response);
@@ -75,10 +112,10 @@ export default function handler(
   // mpesa
   //   .c2bSimulate({
   //     ShortCode: Number(PAY_BILL),
-  //     Amount: 1000,
+  //     Amount: 100,
   //     Msisdn: Number(PHONE_NUMBER),
   //     CommandID: "CustomerPayBillOnline",
-  //     BillRefNumber: "8986987",
+  //     BillRefNumber: "00000",
   //   })
   //   .then((response) => {
   //     console.log(response);
