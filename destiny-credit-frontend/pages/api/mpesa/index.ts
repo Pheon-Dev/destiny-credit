@@ -7,10 +7,10 @@ const CONSUMER_KEY = process.env.NEXT_PUBLIC_CONSUMER_KEY;
 const CONSUMER_SECRET = process.env.NEXT_PUBLIC_CONSUMER_SECRET;
 
 const BUSINESS_SHORT_CODE = process.env.NEXT_PUBLIC_PAY_BILL;
-const PASS_KEY = process.env.NEXT_PUBLIC_CONSUMER_KEY;
+const PASS_KEY = process.env.NEXT_PUBLIC_PASS_KEY;
 const TRANSACTION_TYPE = "CustomerPayBillOnline";
 const ACCOUNT_REFERENCE = "Test";
-const CALL_BACK_URL = process.env.NEXT_PUBLIC_CALL_BACK_URS;
+const CALL_BACK_URL = process.env.NEXT_PUBLIC_CALL_BACK_URL;
 const PHONE_NUMBER = process.env.NEXT_PUBLIC_PHONE_NUMBER;
 const TIME_STAMP = dateTime();
 
