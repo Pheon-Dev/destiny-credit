@@ -3,14 +3,14 @@ import type { NextApiRequest, NextApiResponse } from "next";
 import { dateTime } from "../../../utils/dates";
 import { routes } from "../../../utils/routes";
 
-const CONSUMER_KEY = process.env.NEXT_PUBLIC_CONSUMER_KEY;
-const CONSUMER_SECRET = process.env.NEXT_PUBLIC_CONSUMER_SECRET;
+const CONSUMER_KEY = process.env.NEXT_PUBLIC_CONSUMER_KEYS;
+const CONSUMER_SECRET = process.env.NEXT_PUBLIC_CONSUMER_SECRETS;
 
 const BUSINESS_SHORT_CODE = process.env.NEXT_PUBLIC_PAY_BILL;
 const PASS_KEY = process.env.NEXT_PUBLIC_PASS_KEY;
 const TRANSACTION_TYPE = "CustomerPayBillOnline";
 const ACCOUNT_REFERENCE = "Test";
-const CALL_BACK_URL = process.env.NEXT_PUBLIC_CALL_BACK_URL;
+const CALL_BACK_URL = process.env.NEXT_PUBLIC_CALL_BACK_URS;
 const PHONE_NUMBER = process.env.NEXT_PUBLIC_PHONE_NUMBER;
 const TIME_STAMP = dateTime();
 

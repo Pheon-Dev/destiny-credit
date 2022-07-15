@@ -319,8 +319,8 @@ export class MpesaApi {
       },
       {
         headers: {
-          Authorization: "Bearer " + SECURITY_CREDENTIAL,
-          // Authorization: "Bearer " + token
+          // Authorization: "Bearer " + SECURITY_CREDENTIAL,
+          Authorization: "Bearer " + token
         },
       }
     );
@@ -350,8 +350,8 @@ export class MpesaApi {
       },
       {
         headers: {
-          Authorization: "Bearer " + token,
-          // Authorization: "Bearer " + SECURITY_CREDENTIAL,
+          // Authorization: "Bearer " + token,
+          Authorization: "Bearer " + SECURITY_CREDENTIAL,
         },
       }
     );
@@ -399,8 +399,8 @@ export class MpesaApi {
       },
       {
         headers: {
-          Authorization: "Bearer " + SECURITY_CREDENTIAL,
-          // Authorization: 'Bearer ' + token,
+          // Authorization: "Bearer " + SECURITY_CREDENTIAL,
+          Authorization: 'Bearer ' + token,
         },
       }
     );
@@ -421,14 +421,14 @@ export default function handler(
     // certificatePath: null,
   };
 
-  const environment = "sandbox";
+  // const environment = "sandbox";
+  const environment = "production";
 
   const mpesa = new Mpesa(credentials, environment);
   // const mpesa = new MpesaApi(credentials, environment);
 
   // mpesa
   //   .lipaNaMpesaQuery({
-  //     // BusinessShortCode: 123456,
   //     BusinessShortCode: Number(PAY_BILL),
   //     CheckoutRequestID: "Checkout Request ID",
   //     passKey: `${CONSUMER_KEY}`,
@@ -448,10 +448,10 @@ export default function handler(
       passKey: `${PASS_KEY}`,
       TransactionDesc: "Transaction Desc",
       TransactionType: "CustomerPayBillOnline",
-      PartyA: '254790139154',
+      PartyA: `${PHONE_NUMBER}`,
       PartyB: `${PAY_BILL}`,
       Amount: 1000,
-      PhoneNumber: '254790139154',
+      PhoneNumber: `${PHONE_NUMBER}`,
       CallBackURL: `${CALL_BACK_URL}`,
       AccountReference: "Account Reference",
     })
