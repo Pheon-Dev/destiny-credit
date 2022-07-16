@@ -31,7 +31,6 @@ export default function handler(
   const environment = "production";
 
   const mpesa = new Mpesa(credentials, environment);
-  // const mpesa = new MpesaApi(credentials, environment);
 
   // mpesa
   //   .lipaNaMpesaQuery({
@@ -67,36 +66,18 @@ export default function handler(
   //     res.status(400).json({ name: `${JSON.stringify(error, undefined, 2)}` });
   //   });
   //
-  // mpesa
-  //   .lipaNaMpesaOnline({
-  //     BusinessShortCode: Number(PAY_BILL),
-  //     passKey: `${PASS_KEY}`,
-  //     TransactionDesc: "Transaction Desc",
-  //     TransactionType: "CustomerPayBillOnline",
-  //     PartyA: `${PHONE_NUMBER}`,
-  //     PartyB: `${PAY_BILL}`,
-  //     Amount: 1,
-  //     PhoneNumber: `${PHONE_NUMBER}`,
-  //     CallBackURL: `${CALL_BACK_URL}`,
-  //     AccountReference: "Account Reference",
-  //   })
-  //   .then((response) => {
-  //     console.log(response);
-  //     res
-  //       .status(200)
-  //       .json({ name: `${JSON.stringify(response, undefined, 2)}` });
-  //   })
-  //   .catch((error) => {
-  //     console.log(error);
-  //     res.status(400).json({ name: `${JSON.stringify(error, undefined, 2)}` });
-  //   });
-
   mpesa
-    .c2bRegister({
-      ShortCode: Number(PAY_BILL),
-      ConfirmationURL: `${CALL_BACK_URL}`,
-      ValidationURL: `${CALL_BACK_URL}`,
-      ResponseType: "Completed",
+    .lipaNaMpesaOnline({
+      BusinessShortCode: Number(PAY_BILL),
+      passKey: `${PASS_KEY}`,
+      TransactionDesc: "Transaction Desc",
+      TransactionType: "CustomerPayBillOnline",
+      PartyA: `${PHONE_NUMBER}`,
+      PartyB: `${PAY_BILL}`,
+      Amount: 1,
+      PhoneNumber: `${PHONE_NUMBER}`,
+      CallBackURL: `${CALL_BACK_URL}`,
+      AccountReference: "Account Reference",
     })
     .then((response) => {
       console.log(response);
@@ -108,6 +89,24 @@ export default function handler(
       console.log(error);
       res.status(400).json({ name: `${JSON.stringify(error, undefined, 2)}` });
     });
+
+  // mpesa
+  //   .c2bRegister({
+  //     ShortCode: Number(PAY_BILL),
+  //     ConfirmationURL: `${CALL_BACK_URL}`,
+  //     ValidationURL: `${CALL_BACK_URL}`,
+  //     ResponseType: "Completed",
+  //   })
+  //   .then((response) => {
+  //     console.log(response);
+  //     res
+  //       .status(200)
+  //       .json({ name: `${JSON.stringify(response, undefined, 2)}` });
+  //   })
+  //   .catch((error) => {
+  //     console.log(error);
+  //     res.status(400).json({ name: `${JSON.stringify(error, undefined, 2)}` });
+  //   });
 
   // mpesa
   //   .c2bSimulate({
