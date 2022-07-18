@@ -5,7 +5,7 @@ export const routes = {
   b2c: '/mpesa/b2c/v1/paymentrequest',
   b2b: '/mpesa/b2b/v1/paymentrequest',
   c2bregister: '/mpesa/c2b/v2/registerurl',
-  c2bsimulate: '/mpesa/c2b/v1/simulate',
+  c2bsimulate: '/mpesa/c2b/v2/simulate',
   accountbalance: '/mpesa/accountbalance/v1/query',
   transactionstatus: '/mpesa/transactionstatus/v1/query',
   reversal: '/mpesa/reversal/v1/request',

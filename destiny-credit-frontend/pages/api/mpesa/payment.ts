@@ -10,8 +10,8 @@ const PASS_KEY = process.env.NEXT_PUBLIC_PASS_KEY;
 const BUSINESS_SHORT_CODE = process.env.NEXT_PUBLIC_PAY_BILL;
 const TILL_NUMBER = process.env.NEXT_PUBLIC_TILL_NUMBER;
 const PHONE_NUMBER = process.env.NEXT_PUBLIC_PHONE_NUMBER;
-const CALLBACK_URL = process.env.NEXT_PUBLIC_CALL_BACK_URL;
-// const CALLBACK_URL = process.env.NEXT_PUBLIC_CALL_BACK_URI;
+// const CALLBACK_URL = process.env.NEXT_PUBLIC_CALL_BACK_URL;
+const CALLBACK_URL = process.env.NEXT_PUBLIC_CALL_BACK_URI;
 
 const TRANSACTION_TYPE = "CustomerPayBillOnline";
 const ACCOUNT_REFERENCE = "Account Reference";

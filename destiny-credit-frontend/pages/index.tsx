@@ -1,12 +1,14 @@
-import axios from 'axios';
-import type { NextPage } from 'next';
-import Head from 'next/head';
-import { FormEvent, useState } from 'react';
-import styles from '../styles/Home.module.css';
+import axios from "axios";
+import type { NextPage } from "next";
+import Head from "next/head";
+import { FormEvent, useEffect, useState } from "react";
+import styles from "../styles/Home.module.css";
 
 const Home: NextPage = () => {
-  const [tel, setTel] = useState('254');
-  const [amt, setAmt] = useState('');
+  const [tel, setTel] = useState("254");
+  const [amt, setAmt] = useState("");
+  const [data, setData] = useState("");
+  const [subscription, setSubscription] = useState(true);
 
   const amtChange = (e: FormEvent<HTMLInputElement>) => {
     if (isNaN(Number(e.currentTarget.value))) return;
@@ -24,25 +26,34 @@ const Home: NextPage = () => {
     if (+amt <= 0) return;
 
     const res = await axios.request({
-      method: 'POST',
-      url: '/api/mpesa',
+      method: "POST",
+      url: "/api/mpesa",
       data: { PhoneNumber: +tel, Amount: +amt },
     });
 
-    console.log(res);
+    () => setData(res.data);
+    console.log(res.data);
   };
 
+      console.log(data);
+  useEffect(() => {
+    if (subscription) {
+      console.log(data);
+    }
+    return () => setSubscription(false);
+  }, [data]);
+
+      console.log(data);
   return (
     <div className={styles.container}>
       <Head>
-        <title>MPESA pay</title>
-        <meta name="description" content="MPESA pay" />
+        <title>Destiny Credit</title>
+        <meta name="description" content="Destiny Credit" />
         <link rel="icon" href="/favicon.ico" />
       </Head>
 
       <main className={styles.main}>
         <form onSubmit={submitHandler} className={styles.form}>
-          <h1 className={styles.title}>Mpesa Pay</h1>
           <label htmlFor="tel">Phone Number</label>
           <input
             type="tel"
@@ -63,7 +74,7 @@ const Home: NextPage = () => {
         </form>
       </main>
 
-      <footer className={styles.footer}>Mpesa payment integration</footer>
+      <pre>{JSON.stringify(data, undefined, 2)}</pre>
     </div>
   );
 };
