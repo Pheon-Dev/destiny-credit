@@ -8,7 +8,6 @@ const Home: NextPage = () => {
   const [tel, setTel] = useState("254");
   const [amt, setAmt] = useState("");
   const [data, setData] = useState("");
-  const [subscription, setSubscription] = useState(true);
 
   const amtChange = (e: FormEvent<HTMLInputElement>) => {
     if (isNaN(Number(e.currentTarget.value))) return;
@@ -35,15 +34,6 @@ const Home: NextPage = () => {
     console.log(res.data);
   };
 
-      console.log(data);
-  useEffect(() => {
-    if (subscription) {
-      console.log(data);
-    }
-    return () => setSubscription(false);
-  }, [data]);
-
-      console.log(data);
   return (
     <div className={styles.container}>
       <Head>

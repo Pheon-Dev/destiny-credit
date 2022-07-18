@@ -11,7 +11,10 @@ const PASS_KEY = process.env.NEXT_PUBLIC_PASS_KEY;
 const BUSINESS_SHORT_CODE = process.env.NEXT_PUBLIC_PAY_BILL;
 const TILL_NUMBER = process.env.NEXT_PUBLIC_TILL_NUMBER;
 const PHONE_NUMBER = process.env.NEXT_PUBLIC_PHONE_NUMBER;
-const CALLBACK_URL = process.env.NEXT_PUBLIC_CALL_BACK_URI;
+const CALLBACK_URL = process.env.NEXT_PUBLIC_CALL_BACK_URL;
+const VALIDATION_URL = process.env.NEXT_PUBLIC_VALIDATION_URL;
+// const VALIDATION_URL = process.env.NEXT_PUBLIC_VALIDATION_URI;
+// const CALLBACK_URL = process.env.NEXT_PUBLIC_CALL_BACK_URI;
 
 const TRANSACTION_TYPE = "CustomerPayBillOnline";
 const ACCOUNT_REFERENCE = "Account Reference";
@@ -86,10 +89,9 @@ export default async function handler(
       const url = routes.production + routes.c2bregister;
 
       const data = {
-        // ShortCode: Number(BUSINESS_SHORT_CODE),
-        BusinessShortCode: BUSINESS_SHORT_CODE,
-        ConfirmationURL: `${CALLBACK_URL}`,
-        ValidationURL: `${CALLBACK_URL}`,
+        ShortCode: Number(BUSINESS_SHORT_CODE),
+        ConfirmationURL: `${VALIDATION_URL}`,
+        ValidationURL: `${VALIDATION_URL}`,
         ResponseType: "Completed",
       };
 
@@ -147,7 +149,42 @@ export default async function handler(
     }
   }
 
+  async function c2bQry() {
+    try {
+      const token = await getToken();
+      const url = routes.production + routes.stkquery;
+
+      const data = {
+        BusinessShortCode: Number(BUSINESS_SHORT_CODE),
+        Password: Buffer.from(
+          `${BUSINESS_SHORT_CODE}${PASS_KEY}${TIMESTAMP}`
+        ).toString("base64"),
+        Timestamp: TIMESTAMP,
+        CheckoutRequestID: "ws_CO_18072022143304400768858280",
+      };
+
+      const headers = {
+        "Content-Type": "application/json",
+        Authorization: `Bearer ${token}`,
+      };
+
+      const response = await axios.request({
+        method: "POST",
+        url,
+        headers,
+        data,
+      });
+
+      res.status(200).json(response.data);
+    } catch (error) {
+      console.log(error);
+
+      res.status(500).json({ message: "Something went wrong", error });
+    }
+  }
+
   // lipaNM();
   // c2bReg();
-  c2bSim();
+  // c2bSim();
+  c2bQry();
 }
