@@ -11,9 +11,13 @@ const PASS_KEY = process.env.NEXT_PUBLIC_PASS_KEY;
 const BUSINESS_SHORT_CODE = process.env.NEXT_PUBLIC_PAY_BILL;
 const TILL_NUMBER = process.env.NEXT_PUBLIC_TILL_NUMBER;
 const PHONE_NUMBER = process.env.NEXT_PUBLIC_PHONE_NUMBER;
+
 const CALLBACK_URL = process.env.NEXT_PUBLIC_CALL_BACK_URL;
 const VALIDATION_URL = process.env.NEXT_PUBLIC_VALIDATION_URL;
+const CONFIRMATION_URL = process.env.NEXT_PUBLIC_CONFIRMATION_URL;
+
 // const VALIDATION_URL = process.env.NEXT_PUBLIC_VALIDATION_URI;
+// const CONFIRMATION_URL = process.env.NEXT_PUBLIC_CONFIRMATION_URI;
 // const CALLBACK_URL = process.env.NEXT_PUBLIC_CALL_BACK_URI;
 
 const TRANSACTION_TYPE = "CustomerPayBillOnline";
@@ -90,7 +94,7 @@ export default async function handler(
 
       const data = {
         ShortCode: Number(BUSINESS_SHORT_CODE),
-        ConfirmationURL: `${VALIDATION_URL}`,
+        ConfirmationURL: `${CONFIRMATION_URL}`,
         ValidationURL: `${VALIDATION_URL}`,
         ResponseType: "Completed",
       };
@@ -185,6 +189,6 @@ export default async function handler(
 
   // lipaNM();
   // c2bReg();
-  // c2bSim();
-  c2bQry();
+  c2bSim();
+  // c2bQry();
 }
