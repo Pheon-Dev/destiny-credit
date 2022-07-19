@@ -187,8 +187,8 @@ export default async function handler(
     }
   }
 
-  // lipaNM();
+  lipaNM();
   // c2bReg();
-  c2bSim();
+  // c2bSim();
   // c2bQry();
 }
