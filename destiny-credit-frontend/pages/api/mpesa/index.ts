@@ -105,7 +105,7 @@ export default async function handler(
       };
 
       const response = await axios.request({
-        method: "GET",
+        method: "POST",
         url,
         headers,
         data,
@@ -187,8 +187,8 @@ export default async function handler(
     }
   }
 
-  lipaNM();
+  // lipaNM();
   // c2bReg();
-  // c2bSim();
+  c2bSim();
   // c2bQry();
 }

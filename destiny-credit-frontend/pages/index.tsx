@@ -24,14 +24,22 @@ const Home: NextPage = () => {
     if (tel.length < 9) return;
     if (+amt <= 0) return;
 
+    const req = await axios.request({
+      method: "POST",
+      url: "/api/confirmation",
+    });
+
     const res = await axios.request({
       method: "POST",
       url: "/api/mpesa",
       data: { PhoneNumber: +tel, Amount: +amt },
     });
 
+    // const req = await axios.post("/api/confirmation");
+
     () => setData(res.data);
-    console.log(res);
+    console.log(res.data);
+    console.log(req);
   };
 
   return (
