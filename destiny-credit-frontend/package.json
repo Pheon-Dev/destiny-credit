@@ -22,6 +22,7 @@
     "http-proxy-middleware": "^2.0.6",
     "https": "^1.0.0",
     "mpesa-api": "^3.0.2",
+    "mpesa-c2b": "^0.0.0",
     "mpesa-node": "^0.1.3",
     "mpesa-tsc": "^1.0.27",
     "next": "12.2.0",

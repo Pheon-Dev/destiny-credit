@@ -105,7 +105,7 @@ export default async function handler(
       };
 
       const response = await axios.request({
-        method: "POST",
+        method: "GET",
         url,
         headers,
         data,
@@ -164,7 +164,7 @@ export default async function handler(
           `${BUSINESS_SHORT_CODE}${PASS_KEY}${TIMESTAMP}`
         ).toString("base64"),
         Timestamp: TIMESTAMP,
-        CheckoutRequestID: "ws_CO_18072022143304400768858280",
+        CheckoutRequestID: "ws_CO_18072022161824119768858280",
       };
 
       const headers = {
@@ -187,8 +187,8 @@ export default async function handler(
     }
   }
 
-  // lipaNM();
+  lipaNM();
   // c2bReg();
-  c2bSim();
+  // c2bSim();
   // c2bQry();
 }
