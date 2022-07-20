@@ -1,15 +1,11 @@
 import Link from "next/link";
-import { useRouter } from "next/router";
-import React, { useState, useEffect } from "react";
+import React, { useState } from "react";
 import {
   BsArrowRight,
   BsBookmark,
   BsBookmarkFill,
-  BsBookmarks,
-  BsBookmarksFill,
-  BsHash,
 } from "react-icons/bs";
-import { FaChevronDown, FaChevronRight, FaPlus } from "react-icons/fa";
+import { FaChevronDown, FaChevronRight } from "react-icons/fa";
 import {
   BrowserRouter as Router,
   NavLink,
@@ -94,15 +90,10 @@ const reports = [
 
 const LinkDropDown = ({ title, data }: LinkProps) => {
   const [expanded, setExpanded] = useState(true);
-  const router = useRouter();
   const navigate = useNavigate();
 
   type ChevProps = {
     expand: boolean;
-  };
-
-  type DropProps = {
-    select: string;
   };
 
   const ChevronIcon = ({ expand }: ChevProps) => {
@@ -117,19 +108,6 @@ const LinkDropDown = ({ title, data }: LinkProps) => {
 
   const isNotActiveStyle = "dropdown-selection-text";
   const isActiveStyle = "dropdown-selection-text text-cyan-500";
-
-  const SideBarSelection = ({ select }: DropProps) => (
-    <div className="dropdown-selection">
-      <BsArrowRight size="8" className="text-gray-800 m-2" />
-      <h5 className="dropdown-selection-text">{select}</h5>
-    </div>
-  );
-
-  const SideBarBlock = () => (
-    <div className="channel-block">
-      <h5 className="channel-block-text">Destiny Credit LTD</h5>
-    </div>
-  );
 
   return (
     <div className="dropdown mr-2">
