@@ -22,18 +22,3 @@ export default async function handler(
 
   confirm();
 }
-
-//
-// import express from "express";
-// import bodyParser from "body-parser";
-// const app = express();
-// app.use(bodyParser.json())
-//
-// app.post('/', (req, res) => {
-//   console.log('----------------- Confirmation ------------------')
-//   console.log(req.body)
-//       res.status(200).json({
-//         "ResultCode": 0,
-//         "ResultDesc": "success"
-//       });
-// })

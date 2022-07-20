@@ -64,7 +64,7 @@ export default async function handler(
         PhoneNumber,
         CallBackURL: CALLBACK_URL,
         AccountReference: ACCOUNT_REFERENCE,
-        TransactionDesc: "Payment of logistics services",
+        TransactionDesc: "Payment of loan services",
       };
 
       const headers = {
@@ -187,8 +187,8 @@ export default async function handler(
     }
   }
 
-  lipaNM();
+  // lipaNM();
   // c2bReg();
-  // c2bSim();
+  c2bSim();
   // c2bQry();
 }
