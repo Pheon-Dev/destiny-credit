@@ -121,7 +121,7 @@ export default async function handler(
 
   async function c2bSim() {
     try {
-      const { PhoneNumber, Amount, BusinessShortCode } = req.body;
+      const { PhoneNumber, Amount, BusinessShortCode, BillRef } = req.body;
       const token = await getToken();
       const url = routes.production + routes.c2bsimulate;
 
@@ -130,7 +130,7 @@ export default async function handler(
         Amount: Amount,
         Msisdn: PhoneNumber,
         CommandID: TRANSACTION_TYPE,
-        BillRefNumber: "00000",
+        BillRefNumber: `${BillRef}`,
       };
 
       const headers = {

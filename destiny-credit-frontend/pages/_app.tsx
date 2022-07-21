@@ -18,7 +18,7 @@ const MyApp = ({ Component, pageProps }: AppProps) => {
   if (isSSR) return null;
 
   return (
-    <div className="flex md:flex-row flex-col h-screen transition-height duration-75 ease-out">
+    <div className="flex bg-gray-300 md:flex-row flex-col h-screen transition-height duration-75 ease-out">
       <div className="hidden md:flex h-screen flex-initial">
         <NavBar />
         <SideBar />
@@ -45,6 +45,8 @@ const MyApp = ({ Component, pageProps }: AppProps) => {
         {toggleSidebar && (
           <>
             <div className="fixed w-3/5 bg-white h-screen shadow-md z-10 animate-slide-in animate-slide-out">
+              {/* <NavBar closeToggle={setToggleSidebar} /> */}
+              {/* <SideBar closeToggle={setToggleSidebar} /> */}
               <NavBar />
               <SideBar />
             </div>

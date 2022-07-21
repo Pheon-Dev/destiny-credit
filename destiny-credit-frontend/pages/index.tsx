@@ -8,7 +8,13 @@ const Home: NextPage = () => {
   const [tel, setTel] = useState("254");
   const [amt, setAmt] = useState("");
   const [pay, setPay] = useState("");
+  const [ref, setRef] = useState("");
   const [data, setData] = useState("");
+
+  const refChange = (e: FormEvent<HTMLInputElement>) => {
+    if (isNaN(Number(e.currentTarget.value))) return;
+    setRef(e.currentTarget.value);
+  };
 
   const payChange = (e: FormEvent<HTMLInputElement>) => {
     if (isNaN(Number(e.currentTarget.value))) return;
@@ -29,6 +35,7 @@ const Home: NextPage = () => {
     e.preventDefault();
     if (tel.length < 9) return;
     if (pay.length < 1) return;
+    if (ref.length < 1) return;
     if (+amt <= 0) return;
 
     const req = await axios.request({
@@ -41,7 +48,7 @@ const Home: NextPage = () => {
     const res = await axios.request({
       method: "POST",
       url: "/api/mpesa",
-      data: { PhoneNumber: +tel, Amount: +amt, BusinessShortCode: +pay },
+      data: { PhoneNumber: +tel, Amount: +amt, BusinessShortCode: +pay, BillRef: +ref },
     });
 
     // const req = await axios.get("/api/confirmation");
@@ -52,7 +59,7 @@ const Home: NextPage = () => {
   };
 
   return (
-    <div className={styles.container}>
+    <div className="w-full">
       <Head>
         <title>Destiny Credit</title>
         <meta name="description" content="Destiny Credit" />
@@ -84,6 +91,14 @@ const Home: NextPage = () => {
             placeholder="Enter Pay Bill No."
             value={pay}
             onChange={payChange}
+          />
+          <label htmlFor="pay">Bill Ref</label>
+          <input
+            type="text"
+            name="ref"
+            placeholder="Enter Bill Ref No."
+            value={ref}
+            onChange={refChange}
           />
           <button type="submit">Pay</button>
         </form>
