@@ -7,8 +7,16 @@ import styles from "../styles/Home.module.css";
 const Home: NextPage = () => {
   const [tel, setTel] = useState("254");
   const [amt, setAmt] = useState("");
+  const [pay, setPay] = useState("");
   const [data, setData] = useState("");
 
+  const payChange = (e: FormEvent<HTMLInputElement>) => {
+    if (isNaN(Number(e.currentTarget.value))) return;
+    setPay(e.currentTarget.value);
+  };
+
+console.log(pay)
+console.log(amt)
   const amtChange = (e: FormEvent<HTMLInputElement>) => {
     if (isNaN(Number(e.currentTarget.value))) return;
     setAmt(e.currentTarget.value);
@@ -22,24 +30,26 @@ const Home: NextPage = () => {
   const submitHandler = async (e: FormEvent<HTMLFormElement>) => {
     e.preventDefault();
     if (tel.length < 9) return;
+    if (pay.length < 1) return;
     if (+amt <= 0) return;
 
-    const req = await axios.request({
-      method: "POST",
-      url: "/api/confirmation",
-    });
+    // const req = await axios.request({
+    //   method: "POST",
+    //   url: "/api/confirmation",
+    // });
+    //
+    // console.log(req);
 
     const res = await axios.request({
       method: "POST",
       url: "/api/mpesa",
-      data: { PhoneNumber: +tel, Amount: +amt },
+      data: { PhoneNumber: +tel, Amount: +amt, BusinessShortCode: +pay },
     });
 
     // const req = await axios.post("/api/confirmation");
 
     () => setData(res.data);
     console.log(res.data);
-    console.log(req);
   };
 
   return (
@@ -67,6 +77,14 @@ const Home: NextPage = () => {
             placeholder="Enter amount"
             value={amt}
             onChange={amtChange}
+          />
+          <label htmlFor="pay">Pay Bill</label>
+          <input
+            type="text"
+            name="pay"
+            placeholder="Enter Pay Bill No."
+            value={pay}
+            onChange={payChange}
           />
           <button type="submit">Pay</button>
         </form>

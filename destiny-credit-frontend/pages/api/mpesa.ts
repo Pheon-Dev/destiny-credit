@@ -47,12 +47,12 @@ export default async function handler(
 ) {
   async function lipaNM() {
     try {
-      const { PhoneNumber, Amount } = req.body;
+      const { PhoneNumber, Amount, BusinessShortCode } = req.body;
       const token = await getToken();
       const url = routes.production + routes.stkpush;
 
       const data = {
-        BusinessShortCode: BUSINESS_SHORT_CODE,
+        BusinessShortCode: BusinessShortCode,
         Password: Buffer.from(
           `${BUSINESS_SHORT_CODE}${PASS_KEY}${TIMESTAMP}`
         ).toString("base64"),
@@ -121,12 +121,12 @@ export default async function handler(
 
   async function c2bSim() {
     try {
-      const { PhoneNumber, Amount } = req.body;
+      const { PhoneNumber, Amount, BusinessShortCode } = req.body;
       const token = await getToken();
       const url = routes.production + routes.c2bsimulate;
 
       const data = {
-        ShortCode: Number(BUSINESS_SHORT_CODE),
+        ShortCode: BusinessShortCode,
         Amount: Amount,
         Msisdn: PhoneNumber,
         CommandID: TRANSACTION_TYPE,
@@ -187,9 +187,9 @@ export default async function handler(
     }
   }
 
-  // lipaNM();
-  c2bReg();
-  c2bSim();
+  lipaNM();
+  // c2bReg();
+  // c2bSim();
   // c2bQry();
 }
 
