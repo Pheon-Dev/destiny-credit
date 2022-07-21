@@ -1,11 +1,20 @@
-import React from "react";
+import React, { useEffect, useState } from "react";
+import { client } from "../client";
 
 const CreateMember = () => {
-  console.log("Create Member Page")
+  const [data, setData] = useState("");
+
+  useEffect(() => {
+      const query = '*[_type == "member"]';
+
+      client.fetch(query).then((data: any) => {
+          setData(data);
+        })
+    }, [])
   return (
-    <>
-      <div>Create Member</div>
-    </>
+    <div className="ml-[15rem]">
+      <pre>{JSON.stringify(data, undefined, 2)}</pre>
+    </div>
   );
 };
 

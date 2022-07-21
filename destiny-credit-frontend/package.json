@@ -13,6 +13,7 @@
     "@osenco/mpesa": "^0.1.0",
     "@react-oauth/google": "^0.2.6",
     "@sanity/client": "^3.3.2",
+    "@sanity/image-url": "^1.0.1",
     "axios": "^0.27.2",
     "constants": "^0.0.2",
     "express": "^4.18.1",
