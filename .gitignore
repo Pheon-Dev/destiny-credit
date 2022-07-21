@@ -4,3 +4,5 @@ destiny-credit-frontend/pnpm-lock.yaml
 destiny-credit-frontend/.env
 destiny-credit-frontend/keys
 .vercel
+
+destiny-credit-frontend/pages/client.tsx
