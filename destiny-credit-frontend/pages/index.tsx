@@ -15,8 +15,6 @@ const Home: NextPage = () => {
     setPay(e.currentTarget.value);
   };
 
-console.log(pay)
-console.log(amt)
   const amtChange = (e: FormEvent<HTMLInputElement>) => {
     if (isNaN(Number(e.currentTarget.value))) return;
     setAmt(e.currentTarget.value);
@@ -33,11 +31,11 @@ console.log(amt)
     if (pay.length < 1) return;
     if (+amt <= 0) return;
 
-    // const req = await axios.request({
-    //   method: "POST",
-    //   url: "/api/confirmation",
-    // });
-    //
+    const req = await axios.request({
+      method: "GET",
+      url: "/api/confirmation",
+    });
+
     // console.log(req);
 
     const res = await axios.request({
@@ -46,10 +44,11 @@ console.log(amt)
       data: { PhoneNumber: +tel, Amount: +amt, BusinessShortCode: +pay },
     });
 
-    // const req = await axios.post("/api/confirmation");
+    // const req = await axios.get("/api/confirmation");
 
     () => setData(res.data);
     console.log(res.data);
+    console.log(req.data);
   };
 
   return (
