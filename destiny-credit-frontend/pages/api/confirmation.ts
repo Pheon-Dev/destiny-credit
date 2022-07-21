@@ -11,7 +11,7 @@ export default async function handler(
       console.log(req);
       res.status(200).json({
         ResultCode: 0,
-        ResultDesc: "success",
+        ResultDesc: "Accepted",
       });
     } catch (error) {
       console.log(error);
