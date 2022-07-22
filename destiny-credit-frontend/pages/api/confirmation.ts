@@ -41,39 +41,6 @@ export default async function handler(
   req: NextApiRequest,
   res: NextApiResponse
 ) {
-  async function c2bSim() {
-    try {
-      const { PhoneNumber, Amount, BusinessShortCode, BillRef } = req.body;
-      const token = await getToken();
-      const url = routes.production + routes.c2bsimulate;
-
-      const data = {
-        ShortCode: BusinessShortCode,
-        Amount: Amount,
-        Msisdn: PhoneNumber,
-        CommandID: TRANSACTION_TYPE,
-        BillRefNumber: `${BillRef}`,
-      };
-
-      const headers = {
-        "Content-Type": "application/json",
-        Authorization: `Bearer ${token}`,
-      };
-
-      const response = await axios.request({
-        method: "POST",
-        url,
-        headers,
-        data,
-      });
-
-      res.status(200).json(response.data);
-    } catch (error) {
-      console.log(error);
-
-      res.status(500).json({ message: "Something went wrong", error });
-    }
-  }
 
   async function confirm() {
     try {
@@ -85,13 +52,29 @@ export default async function handler(
       //   CommandID: TRANSACTION_TYPE,
       //   BillRefNumber: `${BillRef}`,
       // };
+      // const token = await getToken();
+      // const url = routes.production + routes.c2bsimulate;
       //
-      console.log(req.body);
-      // console.log(req);
-      // res.status(200).json({
-      //   ResultCode: 0,
-      //   ResultDesc: "Accepted",
+      // const headers = {
+      //   "Content-Type": "application/json",
+      //   Authorization: `Bearer ${token}`,
+      // };
+      //
+      // const response = await axios.request({
+      //   method: "POST",
+      //   url,
+      //   headers,
+      //   // data,
       // });
+      //
+      // res.status(200).json(response.data);
+
+      console.log(req.body);
+      // console.log(req.data);
+      res.status(200).json({
+        ResultCode: 0,
+        ResultDesc: "Accepted",
+      });
     } catch (error) {
       console.log(error);
 
@@ -99,6 +82,5 @@ export default async function handler(
     }
   }
 
-  c2bSim();
   confirm();
 }

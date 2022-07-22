@@ -43,17 +43,15 @@ const Home: NextPage = () => {
       url: "/api/mpesa",
       data: { PhoneNumber: +tel, Amount: +amt, BusinessShortCode: +pay, BillRef: +ref },
     });
+    console.log(res.data);
 
     const req = await axios.request({
       method: "POST",
-      url: "/api/confirmation",
-      data: { PhoneNumber: +tel, Amount: +amt, BusinessShortCode: +pay, BillRef: +ref },
+      url: "https://destiny-credit.vercel.app/api/confirmation",
     });
+    console.log(req.data);
 
-    console.log(req);
-
-    () => setData(res.data);
-    console.log(res.data);
+    // () => setData(res.data);
   };
 
   return (
