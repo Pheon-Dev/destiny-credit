@@ -45,11 +45,17 @@ const Home: NextPage = () => {
     });
     console.log(res.data);
 
-    const req = await axios.request({
+    const con = await axios.request({
       method: "POST",
       url: "https://destiny-credit.vercel.app/api/confirmation",
     });
-    console.log(req.data);
+    console.log(con.data);
+
+    const val = await axios.request({
+      method: "POST",
+      url: "https://destiny-credit.vercel.app/api/confirmation",
+    });
+    console.log(val.data);
 
     // () => setData(res.data);
   };
