@@ -10,6 +10,9 @@
     "lint": "next lint"
   },
   "dependencies": {
+    "@mantine/core": "^4.2.12",
+    "@mantine/hooks": "^4.2.12",
+    "@mantine/next": "^4.2.12",
     "@osenco/mpesa": "^0.1.0",
     "@react-oauth/google": "^0.2.6",
     "@sanity/client": "^3.3.2",

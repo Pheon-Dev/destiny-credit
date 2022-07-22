@@ -2,6 +2,40 @@ import axios from "axios";
 import type { NextApiRequest, NextApiResponse } from "next";
 import { dateTime } from "../../utils/dates";
 import { routes } from "../../utils/routes";
+const fs = require("fs");
+
+function syncWriteFile(filename: string, data: any) {
+  fs.writeFileSync(filename, data, {
+    flag: "a+",
+  });
+
+  const contents = fs.readFileSync(filename, "utf-8");
+  console.log(contents);
+
+  return contents;
+}
+
+async function asyncWriteFile(filename: string, data: any) {
+  try {
+    await fs.promises.writeFile(
+      fs.writeFileSync(filename, data, {
+        flag: "a+", // flag: "w",
+      })
+    );
+
+    const contents = await fs.promises.readFile(
+      filename,
+      "utf-8"
+    );
+    console.log(contents);
+
+    return contents;
+  } catch (err) {
+    console.log(err);
+    return "Something went wrong";
+  }
+}
+
 
 const CONSUMER_KEY = process.env.NEXT_PUBLIC_CONSUMER_KEY;
 const CONSUMER_SECRET = process.env.NEXT_PUBLIC_CONSUMER_SECRET;
@@ -144,6 +178,11 @@ export default async function handler(
       });
 
       res.status(200).json(response.data);
+      syncWriteFile(
+      // asyncWriteFile(
+        "./pages/api/simulation.json",
+        JSON.stringify(response.data, null, 4)
+      );
     } catch (error) {
       console.log(error);
 
