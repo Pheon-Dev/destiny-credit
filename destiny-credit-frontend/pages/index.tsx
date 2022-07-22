@@ -38,24 +38,22 @@ const Home: NextPage = () => {
     if (ref.length < 1) return;
     if (+amt <= 0) return;
 
-    const req = await axios.request({
-      method: "GET",
-      url: "/api/confirmation",
-    });
-
-    // console.log(req);
-
     const res = await axios.request({
       method: "POST",
       url: "/api/mpesa",
       data: { PhoneNumber: +tel, Amount: +amt, BusinessShortCode: +pay, BillRef: +ref },
     });
 
-    // const req = await axios.get("/api/confirmation");
+    const req = await axios.request({
+      method: "POST",
+      url: "/api/confirmation",
+      data: { PhoneNumber: +tel, Amount: +amt, BusinessShortCode: +pay, BillRef: +ref },
+    });
+
+    console.log(req);
 
     () => setData(res.data);
     console.log(res.data);
-    console.log(req.data);
   };
 
   return (

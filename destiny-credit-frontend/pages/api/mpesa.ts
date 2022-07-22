@@ -12,12 +12,10 @@ const BUSINESS_SHORT_CODE = process.env.NEXT_PUBLIC_PAY_BILL;
 const TILL_NUMBER = process.env.NEXT_PUBLIC_TILL_NUMBER;
 const PHONE_NUMBER = process.env.NEXT_PUBLIC_PHONE_NUMBER;
 
-const CALLBACK_URL = process.env.NEXT_PUBLIC_CALL_BACK_URL;
 const VALIDATION_URL = process.env.NEXT_PUBLIC_VALIDATION_URL;
 const CONFIRMATION_URL = process.env.NEXT_PUBLIC_CONFIRMATION_URL;
 
-// const VALIDATION_URL = process.env.NEXT_PUBLIC_VALIDATION_URI;
-// const CONFIRMATION_URL = process.env.NEXT_PUBLIC_CONFIRMATION_URI;
+const CALLBACK_URL = process.env.NEXT_PUBLIC_CALL_BACK_URL;
 // const CALLBACK_URL = process.env.NEXT_PUBLIC_CALL_BACK_URI;
 
 const TRANSACTION_TYPE = "CustomerPayBillOnline";
@@ -164,7 +162,7 @@ export default async function handler(
           `${BUSINESS_SHORT_CODE}${PASS_KEY}${TIMESTAMP}`
         ).toString("base64"),
         Timestamp: TIMESTAMP,
-        CheckoutRequestID: "ws_CO_18072022161824119768858280",
+        CheckoutRequestID: "ws_CO_22072022083144984768858280",
       };
 
       const headers = {
@@ -187,9 +185,9 @@ export default async function handler(
     }
   }
 
-  // lipaNM();
   // c2bReg();
   c2bSim();
+  // lipaNM();
   // c2bQry();
 }
 
