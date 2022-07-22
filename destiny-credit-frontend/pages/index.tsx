@@ -47,13 +47,13 @@ const Home: NextPage = () => {
 
     const con = await axios.request({
       method: "POST",
-      url: "https://destiny-credit.vercel.app/api/confirmation",
+      url: "/api/confirmation",
     });
     console.log(con.data);
 
     const val = await axios.request({
       method: "POST",
-      url: "https://destiny-credit.vercel.app/api/confirmation",
+      url: "/api/validation",
     });
     console.log(val.data);
 
