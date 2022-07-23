@@ -1,5 +1,7 @@
 import type { NextApiRequest, NextApiResponse } from "next";
 const fs = require("fs");
+const { connect } = require('../../lib/mongodb');
+const ObjectId = require("mongodb").ObjectId;
 
 function syncWriteFile(filename: string, data: any) {
   fs.writeFileSync(filename, data, {
@@ -37,6 +39,13 @@ export default async function handler(
   req: NextApiRequest,
   res: NextApiResponse
 ) {
+
+  switch (req.method) {
+    case 'POST': {
+      // return addPayments(req, res);
+      return console.log(req, res);
+    }
+  }
   async function confirm() {
     try {
       console.log(req.body);

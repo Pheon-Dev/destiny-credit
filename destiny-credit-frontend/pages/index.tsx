@@ -1,6 +1,7 @@
 import axios from "axios";
 import type { NextPage } from "next";
 import Head from "next/head";
+import { useRouter } from "next/router";
 import { FormEvent, useEffect, useState } from "react";
 import styles from "../styles/Home.module.css";
 
@@ -10,6 +11,7 @@ const Home: NextPage = () => {
   const [pay, setPay] = useState("");
   const [ref, setRef] = useState("");
   const [data, setData] = useState("");
+  const router = useRouter();
 
   const refChange = (e: FormEvent<HTMLInputElement>) => {
     if (isNaN(Number(e.currentTarget.value))) return;
@@ -41,24 +43,48 @@ const Home: NextPage = () => {
     const res = await axios.request({
       method: "POST",
       url: "/api/mpesa",
-      data: { PhoneNumber: +tel, Amount: +amt, BusinessShortCode: +pay, BillRef: +ref },
+      data: {
+        PhoneNumber: +tel,
+        Amount: +amt,
+        BusinessShortCode: +pay,
+        BillRef: +ref,
+      },
     });
     console.log(res.data);
 
-    const con = await axios.request({
+    let response = await fetch("api/confirmation", {
       method: "POST",
-      url: "/api/confirmation",
     });
-    console.log(con.data);
-
-    const val = await axios.request({
-      method: "POST",
-      url: "/api/validation",
-    });
-    console.log(val.data);
-
-    // () => setData(res.data);
+    let res_data = await response.json();
+    console.log(res_data);
+    // const con = await axios.request({
+    //   method: "POST",
+    //   url: "/api/confirmation",
+    // });
+    // console.log(con.data);
+    //
+    // const val = await axios.request({
+    //   method: "POST",
+    //   url: "/api/validation",
+    // });
+    // console.log(val.data);
   };
+
+  const fetchPayments = async () => {
+    try {
+      await fetch("/api/confirmation", {
+        method: "POST",
+      });
+      return router.push(router.asPath);
+    } catch (error) {
+      console.log(error);
+      return error;
+    }
+  };
+
+  useEffect(() => {
+    fetchPayments();
+  }, [amt, pay, tel, ref]);
 
   return (
     <div className="w-full">
