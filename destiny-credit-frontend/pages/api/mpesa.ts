@@ -178,11 +178,11 @@ export default async function handler(
       });
 
       res.status(200).json(response.data);
-      syncWriteFile(
-      // asyncWriteFile(
-        "./pages/api/simulation.json",
-        JSON.stringify(response.data, null, 4)
-      );
+      // syncWriteFile(
+      // // asyncWriteFile(
+      //   "./pages/api/simulation.json",
+      //   JSON.stringify(response.data, null, 4)
+      // );
     } catch (error) {
       console.log(error);
 

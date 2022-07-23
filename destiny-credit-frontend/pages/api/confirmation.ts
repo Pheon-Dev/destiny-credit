@@ -49,15 +49,11 @@ export default async function handler(
   async function confirm() {
     try {
       console.log(req.body);
-      // asyncWriteFile("./pages/api/confirmation.json", req.body);
       // asyncWriteFile(
-      //   "./pages/api/aconfirmation.json",
+      // syncWriteFile(
+      //   "./pages/api/confirmation.json",
       //   JSON.stringify(req.body, null, 4)
       // );
-      syncWriteFile(
-        "./pages/api/confirmation.json",
-        JSON.stringify(req.body, null, 4)
-      );
       // console.log(req.data);
       res.status(200).json({
         ResultCode: 0,
