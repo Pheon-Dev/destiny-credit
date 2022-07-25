@@ -224,8 +224,8 @@ export default async function handler(
     }
   }
 
-  // c2bReg();
-  c2bSim();
+  c2bReg();
+  // c2bSim();
   // lipaNM();
   // c2bQry();
 }

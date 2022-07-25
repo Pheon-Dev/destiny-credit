@@ -28,17 +28,18 @@ const MyApp = ({ Component, pageProps }: AppProps) => {
           <div className="text-l text-gray-500 flex justify-center ml-auto mr-auto font-bold">
             Destiny Credit LTD
           </div>
-          {toggleSidebar !== true ? (
+          {!toggleSidebar && (
             <HiMenu
               fontSize={24}
               className="cursor-pointer text-gray-500"
-              onClick={() => setToggleSidebar(true)}
+              // onClick={() => setToggleSidebar((prev) => !prev)}
             />
-          ) : (
+          )}
+          {toggleSidebar && (
             <AiOutlineCloseCircle
               fontSize={24}
               className="cursor-pointer text-gray-500"
-              onClick={() => setToggleSidebar(false)}
+              onClick={() => setToggleSidebar((prev) => !prev)}
             />
           )}
         </div>

@@ -138,7 +138,7 @@ const Home: NextPage = (data: any)  => {
   );
 };
 
-export async function getServerSideProps() {
+export async function getStaticProps() {
     const res = await fetch("https://destiny-credit.vercel.app/api/confirmation");
     const data = await res.json()
 

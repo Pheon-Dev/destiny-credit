@@ -56,25 +56,26 @@ export default async function handler(
       //   JSON.stringify(req.body, null, 4)
       // );
 
-      const confirmationReq  = {
-        transactionType: req.body.TransactionType,
-        action: "confirmation",
-        phone: req.body.MSISDN,
-        firstName: req.body.FirstName,
-        middleName: req.body.MiddleName,
-        lastName: req.body.LastName,
-        OrgAccountBalance: req.body.OrgAccountBalance,
-        amount: req.body.TransAmount,
-        accountNumber: req.body.BillRefNumber,
-        transID: req.body.TransID,
-        time: req.body.TransTime,
-      }
+      // const confirmationReq  = {
+      //   transactionType: req.body.TransactionType,
+      //   action: "confirmation",
+      //   phone: req.body.MSISDN,
+      //   firstName: req.body.FirstName,
+      //   middleName: req.body.MiddleName,
+      //   lastName: req.body.LastName,
+      //   OrgAccountBalance: req.body.OrgAccountBalance,
+      //   amount: req.body.TransAmount,
+      //   accountNumber: req.body.BillRefNumber,
+      //   transID: req.body.TransID,
+      //   time: req.body.TransTime,
+      // }
+      // res.status(200).json(confirmationReq);
+      //
       // console.log(JSON.stringify(confirmationReq));
-      // res.status(200).json({
-      //   ResultCode: 0,
-      //   ResultDesc: "Accepted",
-      // });
-      res.status(200).json(confirmationReq);
+      res.status(200).json({
+        ResultCode: 0,
+        ResultDesc: "Accepted",
+      });
     } catch (error) {
       console.log(error);
 
