@@ -40,25 +40,26 @@ export default async function handler(
   res: NextApiResponse
 ) {
 
-  switch (req.method) {
-    case 'POST': {
-      // return addPayments(req, res);
-      return console.log(req, res);
-    }
-  }
+  // switch (req.method) {
+  //   case 'POST': {
+  //     // return addPayments(req, res);
+  //     return console.log(req, res);
+  //   }
+  // }
   async function confirm() {
     try {
-      console.log(req.body);
+      // console.log(req.body);
       // asyncWriteFile(
       // syncWriteFile(
       //   "./pages/api/confirmation.json",
       //   JSON.stringify(req.body, null, 4)
       // );
       // console.log(req.data);
-      res.status(200).json({
-        ResultCode: 0,
-        ResultDesc: "Accepted",
-      });
+      // res.status(200).json({
+      //   ResultCode: 0,
+      //   ResultDesc: "Accepted",
+      // });
+      res.status(200).json(res);
     } catch (error) {
       console.log(error);
 
