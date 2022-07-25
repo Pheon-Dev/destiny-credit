@@ -1,5 +1,6 @@
 import type { NextApiRequest, NextApiResponse } from "next";
 const fs = require("fs");
+const moment = require("moment");
 const { connect } = require('../../lib/mongodb');
 const ObjectId = require("mongodb").ObjectId;
 
@@ -54,12 +55,26 @@ export default async function handler(
       //   "./pages/api/confirmation.json",
       //   JSON.stringify(req.body, null, 4)
       // );
-      // console.log(req.data);
-      res.status(200).json({
-        ResultCode: 0,
-        ResultDesc: "Accepted",
-      });
-      // res.status(200).json(res);
+
+      const confirmationReq  = {
+        transactionType: req.body.TransactionType,
+        action: "confirmation",
+        phone: req.body.MSISDN,
+        firstName: req.body.FirstName,
+        middleName: req.body.MiddleName,
+        lastName: req.body.LastName,
+        OrgAccountBalance: req.body.OrgAccountBalance,
+        amount: req.body.TransAmount,
+        accountNumber: req.body.BillRefNumber,
+        transID: req.body.TransID,
+        time: moment(moment(req.body.TransTime, "YYYYMMDDHHmmss")).format('YYYY-MM-DD HH:mm:ss')
+      }
+      // console.log(JSON.stringify(confirmationReq));
+      // res.status(200).json({
+      //   ResultCode: 0,
+      //   ResultDesc: "Accepted",
+      // });
+      res.status(200).json(confirmationReq);
     } catch (error) {
       console.log(error);
 

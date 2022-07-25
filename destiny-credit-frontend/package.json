@@ -25,6 +25,7 @@
     "http": "^0.0.1-security",
     "http-proxy-middleware": "^2.0.6",
     "https": "^1.0.0",
+    "moment": "^2.29.4",
     "mongodb": "^4.8.0",
     "mpesa-api": "^3.0.2",
     "mpesa-c2b": "^0.0.0",
