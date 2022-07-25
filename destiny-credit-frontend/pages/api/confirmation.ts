@@ -67,7 +67,7 @@ export default async function handler(
         amount: req.body.TransAmount,
         accountNumber: req.body.BillRefNumber,
         transID: req.body.TransID,
-        time: moment(moment(req.body.TransTime, "YYYYMMDDHHmmss")).format('YYYY-MM-DD HH:mm:ss')
+        time: req.body.TransTime,
       }
       // console.log(JSON.stringify(confirmationReq));
       // res.status(200).json({
