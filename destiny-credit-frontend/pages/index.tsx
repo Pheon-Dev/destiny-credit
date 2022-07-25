@@ -5,12 +5,11 @@ import { useRouter } from "next/router";
 import { FormEvent, useEffect, useState } from "react";
 import styles from "../styles/Home.module.css";
 
-const Home: NextPage = () => {
+const Home: NextPage = (data: any)  => {
   const [tel, setTel] = useState("254");
   const [amt, setAmt] = useState("");
   const [pay, setPay] = useState("");
   const [ref, setRef] = useState("");
-  const [data, setData] = useState("");
   const router = useRouter();
 
   const refChange = (e: FormEvent<HTMLInputElement>) => {
@@ -52,11 +51,12 @@ const Home: NextPage = () => {
     });
     console.log(res.data);
 
-    let response = await fetch("api/confirmation", {
-      method: "POST",
-    });
-    let res_data = await response.json();
-    console.log(res_data);
+    // let response = await fetch("api/confirmation", {
+    //   method: "POST",
+    // });
+    // let res_data = await response.json();
+    // console.log(res_data);
+
     // const con = await axios.request({
     //   method: "POST",
     //   url: "/api/confirmation",
@@ -70,22 +70,23 @@ const Home: NextPage = () => {
     // console.log(val.data);
   };
 
-  const fetchPayments = async () => {
-    try {
-      await fetch("/api/confirmation", {
-        method: "POST",
-      });
-      return router.push(router.asPath);
-    } catch (error) {
-      console.log(error);
-      return error;
-    }
-  };
+  // const fetchPayments = async () => {
+  //   try {
+  //     await fetch("https://destiny-credit.vercel.app/api/confirmation", {
+  //       method: "POST",
+  //     });
+  //     return router.push(router.asPath);
+  //   } catch (error) {
+  //     console.log(error);
+  //     return error;
+  //   }
+  // };
+  //
+  // useEffect(() => {
+  //   fetchPayments();
+  // }, [amt, pay, tel, ref]);
 
-  useEffect(() => {
-    fetchPayments();
-  }, [amt, pay, tel, ref]);
-
+    console.log(data);
   return (
     <div className="w-full">
       <Head>
@@ -132,9 +133,15 @@ const Home: NextPage = () => {
         </form>
       </main>
 
-      <pre>{JSON.stringify(data, undefined, 2)}</pre>
+      {/* <pre>{JSON.stringify(data, undefined, 2)}</pre> */}
     </div>
   );
 };
 
+export async function getServerSideProps() {
+    const res = await fetch("https://destiny-credit.vercel.app/api/confirmation");
+    const data = await res.json()
+
+    return { props: { data } }
+  }
 export default Home;

@@ -55,11 +55,11 @@ export default async function handler(
       //   JSON.stringify(req.body, null, 4)
       // );
       // console.log(req.data);
-      // res.status(200).json({
-      //   ResultCode: 0,
-      //   ResultDesc: "Accepted",
-      // });
-      res.status(200).json(res);
+      res.status(200).json({
+        ResultCode: 0,
+        ResultDesc: "Accepted",
+      });
+      // res.status(200).json(res);
     } catch (error) {
       console.log(error);
 
