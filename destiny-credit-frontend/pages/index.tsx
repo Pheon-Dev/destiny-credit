@@ -1,16 +1,25 @@
 import axios from "axios";
 import type { NextPage } from "next";
 import Head from "next/head";
-import { useRouter } from "next/router";
-import { FormEvent, useEffect, useState } from "react";
+import { FormEvent, useState } from "react";
 import styles from "../styles/Home.module.css";
 
-const Home: NextPage = (data: any)  => {
+export async function getServerSideProps() {
+  const res = await fetch(
+    "https://destiny-credit.vercel.app/api/confirmation",
+    { method: "GET" }
+  );
+  const data = await res.json();
+  console.log(data);
+
+  return { props: { data } };
+}
+
+const Home: NextPage = (data: any) => {
   const [tel, setTel] = useState("254");
   const [amt, setAmt] = useState("");
   const [pay, setPay] = useState("");
   const [ref, setRef] = useState("");
-  const router = useRouter();
 
   const refChange = (e: FormEvent<HTMLInputElement>) => {
     if (isNaN(Number(e.currentTarget.value))) return;
@@ -50,43 +59,8 @@ const Home: NextPage = (data: any)  => {
       },
     });
     console.log(res.data);
-
-    // let response = await fetch("api/confirmation", {
-    //   method: "POST",
-    // });
-    // let res_data = await response.json();
-    // console.log(res_data);
-
-    // const con = await axios.request({
-    //   method: "POST",
-    //   url: "/api/confirmation",
-    // });
-    // console.log(con.data);
-    //
-    // const val = await axios.request({
-    //   method: "POST",
-    //   url: "/api/validation",
-    // });
-    // console.log(val.data);
   };
 
-  // const fetchPayments = async () => {
-  //   try {
-  //     await fetch("https://destiny-credit.vercel.app/api/confirmation", {
-  //       method: "POST",
-  //     });
-  //     return router.push(router.asPath);
-  //   } catch (error) {
-  //     console.log(error);
-  //     return error;
-  //   }
-  // };
-  //
-  // useEffect(() => {
-  //   fetchPayments();
-  // }, [amt, pay, tel, ref]);
-
-    console.log(data);
   return (
     <div className="w-full">
       <Head>
@@ -131,17 +105,11 @@ const Home: NextPage = (data: any)  => {
           />
           <button type="submit">Pay</button>
         </form>
-      </main>
 
-      {/* <pre>{JSON.stringify(data, undefined, 2)}</pre> */}
+        <pre>{JSON.stringify(data, undefined, 2)}</pre>
+      </main>
     </div>
   );
 };
 
-export async function getStaticProps() {
-    const res = await fetch("https://destiny-credit.vercel.app/api/confirmation");
-    const data = await res.json()
-
-    return { props: { data } }
-  }
 export default Home;
