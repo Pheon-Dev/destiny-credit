@@ -224,6 +224,39 @@ export default async function handler(
     }
   }
 
+  async function confirm() {
+    try {
+      const token = await getToken();
+      const url = "https://destiny-credit.vercel.app/api/confirmation";
+
+      const data = {
+        BusinessShortCode: Number(BUSINESS_SHORT_CODE),
+        Password: Buffer.from(
+          `${BUSINESS_SHORT_CODE}${PASS_KEY}${TIMESTAMP}`
+        ).toString("base64"),
+      };
+
+      const headers = {
+        "Content-Type": "application/json",
+        Authorization: `Bearer ${token}`,
+      };
+
+      const response = await axios.request({
+        method: "POST",
+        url,
+        headers,
+      });
+
+      res.status(200).json(response.data);
+      
+    } catch (error) {
+      console.log(error);
+
+      res.status(500).json({ message: "Something went wrong", error });
+    }
+  }
+
+  confirm()
   // c2bReg();
   // c2bSim();
   // lipaNM();
