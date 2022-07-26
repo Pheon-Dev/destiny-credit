@@ -1,4 +1,5 @@
 import type { NextApiRequest, NextApiResponse } from "next";
+import axios from "axios";
 const fs = require("fs");
 const moment = require("moment");
 const { connect } = require('../../lib/mongodb');
@@ -72,7 +73,6 @@ export default async function handler(
       // res.status(200).json(confirmationReq);
       //
       // console.log(JSON.stringify(confirmationReq));
-      console.log(req.body);
       res.status(200).json({
         ResultCode: 0,
         ResultDesc: "Accepted",

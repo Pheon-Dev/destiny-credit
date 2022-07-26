@@ -256,7 +256,7 @@ export default async function handler(
     }
   }
 
-  confirm()
+  // confirm()
   // c2bReg();
   // c2bSim();
   // lipaNM();
