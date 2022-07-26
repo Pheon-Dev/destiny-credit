@@ -8,7 +8,7 @@ export default async function handler(
   async function validate() {
     try {
 
-      console.log(req.body);
+      // console.log(req.body);
       // console.log(req.data);
       res.status(200).json({
         ResultCode: 0,
