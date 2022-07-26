@@ -7,7 +7,7 @@ import styles from "../styles/Home.module.css";
 export async function getServerSideProps() {
   const res = await fetch(
     "https://destiny-credit.vercel.app/api/confirmation",
-    { method: "POST", headers: {"Content-Type": "application/json"} }
+    { method: "POST" }
   );
   const data = await res.json();
 
