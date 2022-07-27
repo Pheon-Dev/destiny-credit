@@ -48,19 +48,19 @@ export default async function handler(
   req: NextApiRequest,
   res: NextApiResponse
 ) {
-  file_get_contents("/").then(
-    (ret) => console.log(ret)
-  );
+  // file_get_contents("/").then(
+  //   (ret) => console.log(ret)
+  // );
 
   async function confirm() {
     try {
-      const data = file_get_contents(
-        "/"
-      );
-      syncWriteFile(
-        "./pages/api/confirmation.json",
-        JSON.stringify(data, undefined, 2)
-      );
+      // const data = file_get_contents(
+      //   "/"
+      // );
+      // syncWriteFile(
+      //   "./pages/api/confirmation.json",
+      //   JSON.stringify(data, undefined, 2)
+      // );
       res.status(200).json({
         ResultCode: 0,
         ResultDesc: "Accepted",
