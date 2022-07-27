@@ -17,6 +17,7 @@ export function middleware(req: NextRequest) {
       "196.201.212.74",
       "196.201.212.69",
       "76.76.21.9",
+      "76.76.21.93",
       "76.76.21.241",
     ];
     // const ip = req.headers['x-forwarded-for'];
