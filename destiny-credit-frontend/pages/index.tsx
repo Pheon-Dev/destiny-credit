@@ -4,18 +4,17 @@ import Head from "next/head";
 import { FormEvent, useState } from "react";
 import styles from "../styles/Home.module.css";
 
-// export async function getServerSideProps() {
-//   const res = await fetch(
-//     "https://destiny-credit-qhgs6fo55-devpheon.vercel.app/api/confirmation",
-//     { method: "POST" }
-//   );
-//   const data = await res.json();
-//
-//   return { props: { data } };
-// }
+export async function getServerSideProps() {
+  const res = await fetch(
+    "https://destiny-credit.vercel.app/api/confirmation",
+    { method: "POST" }
+  );
+  const data = await res.json();
 
-// const Home: NextPage = (data: any) => {
-const Home: NextPage = () => {
+  return { props: { data } };
+}
+
+const Home: NextPage = (data: any) => {
   const [tel, setTel] = useState("254");
   const [amt, setAmt] = useState("");
   const [pay, setPay] = useState("");
@@ -106,7 +105,7 @@ const Home: NextPage = () => {
           <button type="submit">Pay</button>
         </form>
 
-        {/* <pre>{JSON.stringify(data, undefined, 2)}</pre> */}
+        <pre>{JSON.stringify(data, undefined, 2)}</pre>
       </main>
     </div>
   );
