@@ -48,15 +48,15 @@ export default async function handler(
   req: NextApiRequest,
   res: NextApiResponse
 ) {
-  // file_get_contents("/").then(
+  // file_get_contents("https://destiny-credit.vercel.app/api/confirmation").then(
   //   (ret) => console.log(ret)
   // );
 
   async function confirm() {
     try {
-      // const data = file_get_contents(
-      //   "/"
-      // );
+      const data = file_get_contents(
+        "https://destiny-credit.vercel.app/api/confirmation"
+      );
       // syncWriteFile(
       //   "./pages/api/confirmation.json",
       //   JSON.stringify(data, undefined, 2)
@@ -64,6 +64,7 @@ export default async function handler(
       res.status(200).json({
         ResultCode: 0,
         ResultDesc: "Accepted",
+        response: data
       });
     } catch (error) {
       console.log(error);
