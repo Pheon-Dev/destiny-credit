@@ -1,4 +1,37 @@
 import type { NextApiRequest, NextApiResponse } from "next";
+import axios from "axios";
+const fs = require("fs");
+const moment = require("moment");
+const { connect } = require("../../lib/mongodb");
+const ObjectId = require("mongodb").ObjectId;
+
+async function asyncWriteFile(filename: string, data: any) {
+  try {
+    await fs.promises.writeFile(
+      fs.writeFileSync(filename, data, {
+        flag: "a+", // flag: "w",
+      })
+    );
+
+    const contents = await fs.promises.readFile(filename, "utf-8");
+    console.log(contents);
+
+    return contents;
+  } catch (err) {
+    console.log(err);
+    return "Something went wrong";
+  }
+}
+
+async function file_get_contents(uri: string, callback?: any) {
+  let resp = await fetch(uri, {
+    method: "POST",
+    headers: { "Content-Type": "application/json" },
+  });
+  let data = await resp.json();
+
+  return callback ? callback(data) : data;
+}
 
 export default async function handler(
   req: NextApiRequest,
