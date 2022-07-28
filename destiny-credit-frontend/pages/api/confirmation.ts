@@ -34,16 +34,6 @@ async function asyncWriteFile(filename: string, data: any) {
   }
 }
 
-async function file_get_contents(uri: string, callback?: any) {
-  let resp = await fetch(uri, {
-    method: "POST",
-    headers: { "Content-Type": "application/json" },
-  });
-  let data = await resp.json();
-
-  return callback ? callback(data) : data;
-}
-
 export default async function handler(
   req: NextApiRequest,
   res: NextApiResponse
@@ -54,13 +44,6 @@ export default async function handler(
 
   async function confirm() {
     try {
-      // const data = file_get_contents(
-      //   "https://destiny-credit.vercel.app/api/confirmation"
-      // );
-      // syncWriteFile(
-      //   "./pages/api/confirmation.json",
-      //   JSON.stringify(data, undefined, 2)
-      // );
       res.status(200).json({
         ResultCode: 0,
         ResultDesc: "Accepted",
