@@ -54,9 +54,9 @@ export default async function handler(
 
   async function confirm() {
     try {
-      const data = file_get_contents(
-        "https://destiny-credit.vercel.app/api/confirmation"
-      );
+      // const data = file_get_contents(
+      //   "https://destiny-credit.vercel.app/api/confirmation"
+      // );
       // syncWriteFile(
       //   "./pages/api/confirmation.json",
       //   JSON.stringify(data, undefined, 2)
@@ -64,7 +64,7 @@ export default async function handler(
       res.status(200).json({
         ResultCode: 0,
         ResultDesc: "Accepted",
-        response: data
+        // response: data
       });
     } catch (error) {
       console.log(error);
