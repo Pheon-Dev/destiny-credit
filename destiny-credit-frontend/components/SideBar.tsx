@@ -1,10 +1,6 @@
 import Link from "next/link";
 import React, { useState } from "react";
-import {
-  BsArrowRight,
-  BsBookmark,
-  BsBookmarkFill,
-} from "react-icons/bs";
+import { BsArrowRight, BsBookmark, BsBookmarkFill } from "react-icons/bs";
 import { FaChevronDown, FaChevronRight } from "react-icons/fa";
 import {
   BrowserRouter as Router,
@@ -139,17 +135,17 @@ const LinkDropDown = ({ title, data }: LinkProps) => {
         data.slice(0, data.length - 0).map((item: any) => (
           <div key={item.name} className="dropdown-selection">
             <BsArrowRight size="8" className="text-gray-400 m-2" />
-            <NavLink
-              to={item.url}
-              className={({ isActive }) =>
-                isActive ? isActiveStyle : isNotActiveStyle
-              }
-              onClick={() => navigate(`${item.url}`)}
-            >
-              <Link href={item.url} passHref>
+            <Link href={item.url}>
+              <NavLink
+                to={item.url}
+                className={({ isActive }) =>
+                  isActive ? isActiveStyle : isNotActiveStyle
+                }
+                onClick={() => navigate(`${item.url}`)}
+              >
                 {item.name}
-              </Link>
-            </NavLink>
+              </NavLink>
+            </Link>
           </div>
         ))}
     </div>
