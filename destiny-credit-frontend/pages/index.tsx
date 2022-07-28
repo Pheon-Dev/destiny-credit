@@ -3,29 +3,29 @@ import type { NextPage } from "next";
 import Head from "next/head";
 import { FormEvent, useState } from "react";
 import styles from "../styles/Home.module.css";
-const fs = require("fs");
-
-async function syncWriteFile(filename: string, data: any) {
-  fs.writeFileSync(filename, data, {
-    flag: "a+",
-  });
-
-  const contents = fs.readFileSync(filename, "utf-8");
-  console.log(contents);
-
-  return contents;
-}
-
+// const fs = require("fs");
+//
+// async function syncWriteFile(filename: string, data: any) {
+//   fs.writeFileSync(filename, data, {
+//     flag: "a+",
+//   });
+//
+//   const contents = fs.readFileSync(filename, "utf-8");
+//   console.log(contents);
+//
+//   return contents;
+// }
+//
 export async function getServerSideProps() {
   const res = await fetch(
     "https://destiny-credit.vercel.app/api/confirmation",
     { method: "POST" }
   );
   const data = await res.json();
-      syncWriteFile(
-        "./lib/confirmation.json",
-        JSON.stringify(data, undefined, 2)
-      );
+      // syncWriteFile(
+      //   "./lib/confirmation.json",
+      //   JSON.stringify(data, undefined, 2)
+      // );
 
   return { props: { data } };
 }
