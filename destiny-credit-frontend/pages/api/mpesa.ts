@@ -72,16 +72,6 @@ async function getToken() {
   return res.data.access_token;
 }
 
-async function file_get_contents(uri: string, callback?: any) {
-  let resp = await fetch(uri, {
-    method: "POST",
-    headers: { "Content-Type": "application/json" },
-  });
-  let data = await resp.json();
-
-  return callback ? callback(data) : data;
-}
-
 //   stk push
 export default async function handler(
   req: NextApiRequest,
@@ -233,47 +223,6 @@ export default async function handler(
       res.status(500).json({ message: "Something went wrong", error });
     }
   }
-
-  async function confirm() {
-    try {
-      const data = file_get_contents(
-        "https://destiny-credit.vercel.app/api/confirmation"
-      );
-      // syncWriteFile(
-      //   "./pages/api/confirmation.json",
-      //   JSON.stringify(data, undefined, 2)
-      // );
-      // const token = await getToken();
-      // const url = "https://destiny-credit.vercel.app/api/confirmation";
-      //
-      // const data = {
-      //   BusinessShortCode: Number(BUSINESS_SHORT_CODE),
-      //   Password: Buffer.from(
-      //     `${BUSINESS_SHORT_CODE}${PASS_KEY}${TIMESTAMP}`
-      //   ).toString("base64"),
-      // };
-      //
-      // const headers = {
-      //   "Content-Type": "application/json",
-      //   Authorization: `Bearer ${token}`,
-      // };
-      //
-      // const response = await axios.request({
-      //   method: "POST",
-      //   url,
-      //   headers,
-      // });
-
-      res.status(200).json(data);
-      
-    } catch (error) {
-      console.log(error);
-
-      res.status(500).json({ message: "Something went wrong", error });
-    }
-  }
-
-  confirm()
   // c2bReg();
   // c2bSim();
   // lipaNM();
