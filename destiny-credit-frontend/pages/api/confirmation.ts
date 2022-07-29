@@ -56,6 +56,7 @@ export default async function handler(
         ResultDesc: "Accepted",
       });
 
+      console.log(req.body)
       // const data = file_get_contents(
       //   "https://destiny-credit.vercel.app/api/confirmation"
       // );
@@ -64,7 +65,6 @@ export default async function handler(
       //   JSON.stringify(req.body, undefined, 2)
       // );
 
-      res.status(200).json(req);
     } catch (error) {
       console.log(error);
 
