@@ -5,6 +5,17 @@ const moment = require("moment");
 const { connect } = require("../../lib/mongodb");
 const ObjectId = require("mongodb").ObjectId;
 
+function syncWriteFile(filename: string, data: any) {
+  fs.writeFileSync(filename, data, {
+    flag: "a+",
+  });
+
+  const contents = fs.readFileSync(filename, "utf-8");
+  console.log(contents);
+
+  return contents;
+}
+
 async function asyncWriteFile(filename: string, data: any) {
   try {
     await fs.promises.writeFile(
@@ -44,6 +55,16 @@ export default async function handler(
         ResultCode: 0,
         ResultDesc: "Accepted",
       });
+
+      // const data = file_get_contents(
+      //   "https://destiny-credit.vercel.app/api/confirmation"
+      // );
+      // syncWriteFile(
+      //   "./lib/confirmation.json",
+      //   JSON.stringify(req.body, undefined, 2)
+      // );
+
+      res.status(200).json(req);
     } catch (error) {
       console.log(error);
 
