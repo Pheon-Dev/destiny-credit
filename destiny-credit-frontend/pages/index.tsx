@@ -1,7 +1,8 @@
 import axios from "axios";
 import type { NextPage } from "next";
 import Head from "next/head";
-import { FormEvent, useState } from "react";
+import { FormEvent, useEffect, useState } from "react";
+import { client } from "./client";
 import styles from "../styles/Home.module.css";
 
 export async function getServerSideProps() {
@@ -20,6 +21,88 @@ const Home: NextPage = (data: any) => {
   const [amt, setAmt] = useState("");
   const [pay, setPay] = useState("");
   const [ref, setRef] = useState("");
+  const [datalog, setDatalog] = useState("");
+  const [transactionType, setTransactionType] = useState("");
+  const [transID, setTransID] = useState("");
+  const [transTime, setTransTime] = useState("");
+  const [transAmount, setTransAmount] = useState("");
+  const [businessShortCode, setBusinessShortCode] = useState("");
+  const [billRefNumber, setBillRefNumber] = useState("");
+  const [invoiceNumber, setInvoiceNumber] = useState("");
+  const [orgAccountBalance, setOrgAccountBalance] = useState("");
+  const [thirdPartyTransID, setThirdPartyTransID] = useState("");
+  const [mSISDN, setMSISDN] = useState("");
+  const [firstName, setFirstName] = useState("");
+  const [middleName, setMiddleName] = useState("");
+  const [lastName, setLastName] = useState("");
+  // "TransactionType":"Pay Bill",
+  // "TransID":"RKTQDM7W6S",
+  // "TransTime":"20191122063845",
+  // "TransAmount":"10",
+  // "BusinessShortCode":"600638",
+  // "BillRefNumber":"254708374149",
+  // "InvoiceNumber":"",
+  // "OrgAccountBalance":"49197.00",
+  // "ThirdPartyTransID":"",
+  // "MSISDN":"254708374149",
+  // "FirstName":"John",
+  // "MiddleName":"",
+  // "LastName":"Doe"
+  const fetchPayments = () => {
+    const query = `*[_type == "mpesaPayments"]`;
+    let subs = true;
+    if (subs) {
+      client.fetch(query).then((data) => {
+        setDatalog(data);
+      });
+    }
+    return () => (subs = false);
+  };
+
+  useEffect(() => {
+    fetchPayments();
+    // setDataset(data);
+  }, []);
+
+  const handleSave = () => {
+    // setDataset(data);
+    setTransactionType(data.TransactionType);
+    setTransID(data.TransID);
+    setTransTime(data.TransTime);
+    setTransAmount(data.TransAmount);
+    setBusinessShortCode(data.BusinessShortCode);
+    setBillRefNumber(data.BillRefNumber);
+    setInvoiceNumber(data.InvoiceNumber);
+    setOrgAccountBalance(data.OrgAccountBalance);
+    setThirdPartyTransID(data.ThirdPartyTransID);
+    setMSISDN(data.MSISDN);
+    setFirstName(data.FirstName);
+    setMiddleName(data.MiddleName);
+    setLastName(data.LastName);
+    if (data.length > 0) {
+      const doc = {
+        _type: "mpesaPayments",
+        transactionType,
+        transID,
+        transTime,
+        transAmount,
+        businessShortCode,
+        billRefNumber,
+        invoiceNumber,
+        orgAccountBalance,
+        thirdPartyTransID,
+        mSISDN,
+        firstName,
+        middleName,
+        lastName,
+      };
+      client.create(doc).then(() => {
+        console.log(doc);
+      });
+    } else {
+      console.log("Data Empty");
+    }
+  };
 
   const refChange = (e: FormEvent<HTMLInputElement>) => {
     if (isNaN(Number(e.currentTarget.value))) return;
@@ -106,7 +189,18 @@ const Home: NextPage = (data: any) => {
           <button type="submit">Pay</button>
         </form>
 
+        <div className="text-blue-500 text-sm">/api/confirmation</div>
         <pre>{JSON.stringify(data, undefined, 2)}</pre>
+        <div className="text-blue-500 text-sm">/data/fetched</div>
+        {datalog.length > 0 && (
+          <pre>{JSON.stringify(datalog, undefined, 2)}</pre>
+        )}
+        <button
+          onClick={handleSave}
+          className="bg-green-800 text-white rounded-lg p-3"
+        >
+          Reload
+        </button>
       </main>
     </div>
   );

@@ -154,5 +154,11 @@ export default {
       type: 'array',
       of: [{ type: 'recentPayments' }],
     },
+    {
+      name: 'mpesaPayments',
+      title: 'M-PESA Payments',
+      type: 'array',
+      of: [{ type: 'mpesaPayments' }],
+    },
   ],
 };

@@ -51,12 +51,13 @@ export default async function handler(
 
   async function confirm() {
     try {
+      console.log(req.body)
       res.status(200).json({
         ResultCode: 0,
         ResultDesc: "Accepted",
       });
 
-      console.log(req.body)
+      // console.log(req.body)
       // const data = file_get_contents(
       //   "https://destiny-credit.vercel.app/api/confirmation"
       // );

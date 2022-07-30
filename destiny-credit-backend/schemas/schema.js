@@ -13,7 +13,8 @@ import maintenance from './maintenance';
 import collateral from './collateral';
 import groups from './groups';
 // import guarantor from './guarantor';
-// import payments from './payments';
+import payments from './payments';
+import mpesaPayments from './mpesaPayments';
 // import approve from './approve';
 // import disburse from './disburse';
 // import groupMembers from './groupMembers'
@@ -35,7 +36,8 @@ export default createSchema({
     // groupMembers,
     // approve,
     // disburse,
-    // payments,
+    payments,
+    mpesaPayments,
     // guarantor,
     // comment,
     // postedBy,
