@@ -35,19 +35,7 @@ const Home: NextPage = (data: any) => {
   const [firstName, setFirstName] = useState("");
   const [middleName, setMiddleName] = useState("");
   const [lastName, setLastName] = useState("");
-  // "TransactionType":"Pay Bill",
-  // "TransID":"RKTQDM7W6S",
-  // "TransTime":"20191122063845",
-  // "TransAmount":"10",
-  // "BusinessShortCode":"600638",
-  // "BillRefNumber":"254708374149",
-  // "InvoiceNumber":"",
-  // "OrgAccountBalance":"49197.00",
-  // "ThirdPartyTransID":"",
-  // "MSISDN":"254708374149",
-  // "FirstName":"John",
-  // "MiddleName":"",
-  // "LastName":"Doe"
+
   const fetchPayments = () => {
     const query = `*[_type == "mpesaPayments"]`;
     let subs = true;
