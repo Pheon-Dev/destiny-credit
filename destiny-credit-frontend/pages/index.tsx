@@ -2,7 +2,7 @@ import axios from "axios";
 import type { NextPage } from "next";
 import Head from "next/head";
 import { FormEvent, useEffect, useState } from "react";
-import { client } from "./client";
+import { client } from "../utils/client";
 import styles from "../styles/Home.module.css";
 
 export async function getServerSideProps() {
