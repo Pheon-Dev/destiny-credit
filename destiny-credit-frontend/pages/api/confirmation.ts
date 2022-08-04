@@ -1,6 +1,8 @@
 import type { NextApiRequest, NextApiResponse } from "next";
 import axios from "axios";
 const fs = require("fs");
+const micro = require("micro");
+const formidable = require("formidable");
 const moment = require("moment");
 const { connect } = require("../../lib/mongodb");
 const ObjectId = require("mongodb").ObjectId;
@@ -44,34 +46,48 @@ async function file_get_contents(uri: string, callback?: any) {
   return callback ? callback(data) : data;
 }
 
-export default async function handler(
+async function confirm(
   req: NextApiRequest,
   res: NextApiResponse
 ) {
 
-  async function confirm() {
+  async function confirmation() {
     try {
-      console.log(req.body)
       res.status(200).json({
         ResultCode: 0,
         ResultDesc: "Accepted",
       });
-
-      // console.log(req.body)
       // const data = file_get_contents(
       //   "https://destiny-credit.vercel.app/api/confirmation"
       // );
       // syncWriteFile(
-      //   "./lib/confirmation.json",
-      //   JSON.stringify(req.body, undefined, 2)
+      //   "./utils/confirmation.json",
+      //   JSON.stringify(data, undefined, 2)
       // );
-
     } catch (error) {
       console.log(error);
 
       res.status(500).json({ message: "Something went wrong", error });
     }
   }
+  confirmation();
 
-  confirm();
+  const data = await new Promise(function (resolve, reject) {
+    const form = new formidable.IncomingForm({ keepExtensions: true });
+    form.parse(req, function (err: any, fields: any, files: any) {
+      if (err) return reject(err);
+      resolve({fields, files});
+    });
+  });
+
+      const body = JSON.stringify(data);
+      console.log(body);
 }
+export const config = {
+  api: {
+    bodyParser: false,
+  },
+};
+
+// export default micro(confirm);
+export default confirm;
