@@ -5,7 +5,7 @@ import { FormEvent, useEffect, useState } from "react";
 import { client } from "../utils/client";
 import styles from "../styles/Home.module.css";
 
-const Home: NextPage = (data: any) => {
+ const Home: NextPage = (data: any) => {
   const [tel, setTel] = useState("254");
   const [amt, setAmt] = useState("");
   const [pay, setPay] = useState("");
@@ -24,6 +24,7 @@ const Home: NextPage = (data: any) => {
   const [firstName, setFirstName] = useState("");
   const [middleName, setMiddleName] = useState("");
   const [lastName, setLastName] = useState("");
+  // console.log(con_data)
 
   // const fetchPayments = () => {
   //   const query = `*[_type == "mpesaPayments"]`;

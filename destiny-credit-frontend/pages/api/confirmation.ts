@@ -54,15 +54,6 @@ async function confirm(req: NextApiRequest, res: NextApiResponse) {
         ResultCode: 0,
         ResultDesc: "Accepted",
       });
-      // const data = file_get_contents(
-      //   "https://destiny-credit.vercel.app/api/confirmation"
-      // );
-      // syncWriteFile(
-      //   "./utils/confirmation.json",
-      //   JSON.stringify(data, undefined, 2)
-      // );
-      console.log("Request Body", req.body);
-      console.log("Response Body", res);
     } catch (error) {
       console.log(error);
 
@@ -82,23 +73,27 @@ async function confirm(req: NextApiRequest, res: NextApiResponse) {
   const body = JSON.stringify(data);
   console.log(body);
 
-  let datalog = body;
-  const handleSave = () => {
-    // setDataset(data);
-    if (datalog) {
-      const doc = {
-        _type: "mpesaPayments",
-        datalog,
-      };
-      client.create(doc).then(() => {
-        console.log(doc);
-      });
-    } else {
-      console.log("Data Empty");
-    }
-  };
-
-  handleSave();
+      syncWriteFile(
+        "./lib/confirmation.json",
+        JSON.stringify(body, undefined, 2)
+      );
+  // let datalog = body;
+  // const handleSave = () => {
+  //   // setDataset(data);
+  //   if (datalog) {
+  //     const doc = {
+  //       _type: "mpesaPayments",
+  //       datalog,
+  //     };
+  //     client.create(doc).then(() => {
+  //       console.log(doc);
+  //     });
+  //   } else {
+  //     console.log("Data Empty");
+  //   }
+  // };
+  //
+  // handleSave();
 }
 export const config = {
   api: {
