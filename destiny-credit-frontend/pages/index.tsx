@@ -5,17 +5,6 @@ import { FormEvent, useEffect, useState } from "react";
 import { client } from "../utils/client";
 import styles from "../styles/Home.module.css";
 
-export async function getServerSideProps() {
-  const res = await fetch(
-    "https://destiny-credit.vercel.app/api/confirmation",
-    { method: "POST", headers: { "Content-Type": "application/json" } }
-  );
-
-  const data = await res.json();
-
-  return { props: { data } };
-}
-
 const Home: NextPage = (data: any) => {
   const [tel, setTel] = useState("254");
   const [amt, setAmt] = useState("");
@@ -193,5 +182,16 @@ const Home: NextPage = (data: any) => {
     </div>
   );
 };
+
+export async function getServerSideProps() {
+  const res = await fetch(
+    "https://destiny-credit.vercel.app/api/confirmation",
+    { method: "POST", headers: { "Content-Type": "application/json" } }
+  );
+
+  const data = await res.json();
+
+  return { props: { data }, revalidate: 1 };
+}
 
 export default Home;
