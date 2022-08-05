@@ -4,6 +4,11 @@ export default {
   type: 'document',
   fields: [
     {
+      name: 'datalog',
+      title: 'Data Logs',
+      type: 'string',
+    },
+    {
       name: 'transactionType',
       title: 'Transaction Type',
       type: 'string',

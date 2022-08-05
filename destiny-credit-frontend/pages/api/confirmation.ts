@@ -6,6 +6,7 @@ const formidable = require("formidable");
 const moment = require("moment");
 const { connect } = require("../../lib/mongodb");
 const ObjectId = require("mongodb").ObjectId;
+import { client } from "../../utils/client";
 
 function syncWriteFile(filename: string, data: any) {
   fs.writeFileSync(filename, data, {
@@ -46,11 +47,7 @@ async function file_get_contents(uri: string, callback?: any) {
   return callback ? callback(data) : data;
 }
 
-async function confirm(
-  req: NextApiRequest,
-  res: NextApiResponse
-) {
-
+async function confirm(req: NextApiRequest, res: NextApiResponse) {
   async function confirmation() {
     try {
       res.status(200).json({
@@ -64,6 +61,8 @@ async function confirm(
       //   "./utils/confirmation.json",
       //   JSON.stringify(data, undefined, 2)
       // );
+      console.log("Request Body", req.body);
+      console.log("Response Body", res);
     } catch (error) {
       console.log(error);
 
@@ -76,12 +75,30 @@ async function confirm(
     const form = new formidable.IncomingForm({ keepExtensions: true });
     form.parse(req, function (err: any, fields: any, files: any) {
       if (err) return reject(err);
-      resolve({fields, files});
+      resolve({ fields, files });
     });
   });
 
-      const body = JSON.stringify(data);
-      console.log(body);
+  const body = JSON.stringify(data);
+  console.log(body);
+
+  let datalog = body;
+  const handleSave = () => {
+    // setDataset(data);
+    if (datalog) {
+      const doc = {
+        _type: "mpesaPayments",
+        datalog,
+      };
+      client.create(doc).then(() => {
+        console.log(doc);
+      });
+    } else {
+      console.log("Data Empty");
+    }
+  };
+
+  handleSave();
 }
 export const config = {
   api: {
