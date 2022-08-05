@@ -25,61 +25,61 @@ const Home: NextPage = (data: any) => {
   const [middleName, setMiddleName] = useState("");
   const [lastName, setLastName] = useState("");
 
-  const fetchPayments = () => {
-    const query = `*[_type == "mpesaPayments"]`;
-    let subs = true;
-    if (subs) {
-      client.fetch(query).then((data) => {
-        setDatalog(data);
-      });
-    }
-    return () => (subs = false);
-  };
-
-  useEffect(() => {
-    fetchPayments();
-    // setDataset(data);
-  }, []);
-
-  const handleSave = () => {
-    // setDataset(data);
-    setTransactionType(data.TransactionType);
-    setTransID(data.TransID);
-    setTransTime(data.TransTime);
-    setTransAmount(data.TransAmount);
-    setBusinessShortCode(data.BusinessShortCode);
-    setBillRefNumber(data.BillRefNumber);
-    setInvoiceNumber(data.InvoiceNumber);
-    setOrgAccountBalance(data.OrgAccountBalance);
-    setThirdPartyTransID(data.ThirdPartyTransID);
-    setMSISDN(data.MSISDN);
-    setFirstName(data.FirstName);
-    setMiddleName(data.MiddleName);
-    setLastName(data.LastName);
-    if (data.length > 0) {
-      const doc = {
-        _type: "mpesaPayments",
-        transactionType,
-        transID,
-        transTime,
-        transAmount,
-        businessShortCode,
-        billRefNumber,
-        invoiceNumber,
-        orgAccountBalance,
-        thirdPartyTransID,
-        mSISDN,
-        firstName,
-        middleName,
-        lastName,
-      };
-      client.create(doc).then(() => {
-        console.log(doc);
-      });
-    } else {
-      console.log("Data Empty");
-    }
-  };
+  // const fetchPayments = () => {
+  //   const query = `*[_type == "mpesaPayments"]`;
+  //   let subs = true;
+  //   if (subs) {
+  //     client.fetch(query).then((data) => {
+  //       setDatalog(data);
+  //     });
+  //   }
+  //   return () => (subs = false);
+  // };
+  //
+  // useEffect(() => {
+  //   fetchPayments();
+  //   // setDataset(data);
+  // }, []);
+  //
+  // const handleSave = () => {
+  //   // setDataset(data);
+  //   setTransactionType(data.TransactionType);
+  //   setTransID(data.TransID);
+  //   setTransTime(data.TransTime);
+  //   setTransAmount(data.TransAmount);
+  //   setBusinessShortCode(data.BusinessShortCode);
+  //   setBillRefNumber(data.BillRefNumber);
+  //   setInvoiceNumber(data.InvoiceNumber);
+  //   setOrgAccountBalance(data.OrgAccountBalance);
+  //   setThirdPartyTransID(data.ThirdPartyTransID);
+  //   setMSISDN(data.MSISDN);
+  //   setFirstName(data.FirstName);
+  //   setMiddleName(data.MiddleName);
+  //   setLastName(data.LastName);
+  //   if (data.length > 0) {
+  //     const doc = {
+  //       _type: "mpesaPayments",
+  //       transactionType,
+  //       transID,
+  //       transTime,
+  //       transAmount,
+  //       businessShortCode,
+  //       billRefNumber,
+  //       invoiceNumber,
+  //       orgAccountBalance,
+  //       thirdPartyTransID,
+  //       mSISDN,
+  //       firstName,
+  //       middleName,
+  //       lastName,
+  //     };
+  //     client.create(doc).then(() => {
+  //       console.log(doc);
+  //     });
+  //   } else {
+  //     console.log("Data Empty");
+  //   }
+  // };
 
   const refChange = (e: FormEvent<HTMLInputElement>) => {
     if (isNaN(Number(e.currentTarget.value))) return;
@@ -173,7 +173,7 @@ const Home: NextPage = (data: any) => {
           <pre>{JSON.stringify(datalog, undefined, 2)}</pre>
         )}
         <button
-          onClick={handleSave}
+          // onClick={handleSave}
           className="bg-green-800 text-white rounded-lg p-3"
         >
           Reload
@@ -183,7 +183,7 @@ const Home: NextPage = (data: any) => {
   );
 };
 
-export async function getServerSideProps() {
+export async function getStaticProps() {
   const res = await fetch(
     "https://destiny-credit.vercel.app/api/confirmation",
     { method: "POST", headers: { "Content-Type": "application/json" } }
