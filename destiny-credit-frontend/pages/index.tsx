@@ -188,7 +188,7 @@ const AXIOM_API_TOKEN = process.env.NEXT_PUBLIC_AXIOM_API_TOKEN;
 export async function getStaticProps() {
   const res = await fetch(
     "https://cloud.axiom.co/api/v1/datasets/vercel/ingest",
-    { method: "POST", headers: { "Content-Type": "application/json", "Authorization": `Bearer ${AXIOM_API_TOKEN}` } }
+    { method: "POST", headers: { "Content-Type": "application/x-ndjson", "Authorization": `Bearer ${AXIOM_API_TOKEN}` } }
   );
 
   const data = await res.json();
