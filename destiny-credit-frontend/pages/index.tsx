@@ -6,6 +6,10 @@ import { client } from "../utils/client";
 import styles from "../styles/Home.module.css";
 
 const AXIOM_API_TOKEN = process.env.NEXT_PUBLIC_AXIOM_API_TOKEN;
+const LOGTAIL_API_TOKEN = process.env.NEXT_PUBLIC_LOGTAIL_API_TOKEN;
+const LOGTAIL_SOURCE_TOKEN = process.env.NEXT_PUBLIC_LOGTAIL_SOURCE_TOKEN;
+const AXIOM_API_ORG_ID = process.env.NEXT_PUBLIC_AXIOM_API_ORG_ID;
+
  const Home: NextPage = (data: any) => {
   const [tel, setTel] = useState("254");
   const [amt, setAmt] = useState("");
@@ -187,8 +191,8 @@ const AXIOM_API_TOKEN = process.env.NEXT_PUBLIC_AXIOM_API_TOKEN;
 
 export async function getStaticProps() {
   const res = await fetch(
-    "https://cloud.axiom.co/api/v1/datasets/vercel/ingest",
-    { method: "POST", headers: { "Content-Type": "application/x-ndjson", "Authorization": `Bearer ${AXIOM_API_TOKEN}` } }
+    "https://logtail.com/api/v1/query",
+    { method: "GET", headers: { "Authorization": `Bearer ${LOGTAIL_API_TOKEN}` } }
   );
 
   const data = await res.json();

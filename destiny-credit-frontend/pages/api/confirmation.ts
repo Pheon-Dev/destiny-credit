@@ -52,6 +52,7 @@ async function confirm(req: NextApiRequest, res: NextApiResponse) {
   async function confirmation() {
     try {
       log.info("Confirmation Function")
+      // const logger = log.with({})
       res.status(200).json({
         ResultCode: 0,
         ResultDesc: "Accepted",
