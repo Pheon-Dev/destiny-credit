@@ -73,10 +73,10 @@ async function confirm(req: NextApiRequest, res: NextApiResponse) {
   const body = JSON.stringify(data);
   console.log(body);
 
-      syncWriteFile(
-        "./lib/confirmation.json",
-        JSON.stringify(body, undefined, 2)
-      );
+      // syncWriteFile(
+      //   "./lib/confirmation.json",
+      //   JSON.stringify(body, undefined, 2)
+      // );
   // let datalog = body;
   // const handleSave = () => {
   //   // setDataset(data);

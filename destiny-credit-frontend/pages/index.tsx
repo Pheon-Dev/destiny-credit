@@ -5,6 +5,7 @@ import { FormEvent, useEffect, useState } from "react";
 import { client } from "../utils/client";
 import styles from "../styles/Home.module.css";
 
+const AXIOM_API_TOKEN = process.env.NEXT_PUBLIC_AXIOM_API_TOKEN;
  const Home: NextPage = (data: any) => {
   const [tel, setTel] = useState("254");
   const [amt, setAmt] = useState("");
@@ -186,8 +187,8 @@ import styles from "../styles/Home.module.css";
 
 export async function getStaticProps() {
   const res = await fetch(
-    "https://destiny-credit.vercel.app/api/confirmation",
-    { method: "POST", headers: { "Content-Type": "application/json" } }
+    "https://cloud.axiom.co/api/v1/datasets/vercel/ingest",
+    { method: "POST", headers: { "Content-Type": "application/json", "Authorization": `Bearer ${AXIOM_API_TOKEN}` } }
   );
 
   const data = await res.json();
