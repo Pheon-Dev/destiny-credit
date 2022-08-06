@@ -173,7 +173,14 @@ const AXIOM_API_ORG_ID = process.env.NEXT_PUBLIC_AXIOM_API_ORG_ID;
         </form>
 
         <div className="text-blue-500 text-sm">/api/confirmation</div>
+        <div className="text-blue-500 text-sm flex justify-center ml-auto mr-auto">
         <pre>{JSON.stringify(data, undefined, 2)}</pre>
+        {/* {data && (data?.data[3]?.map((item: any, index: any) => { */}
+        {/*     <div key={index}> */}
+        {/*     {item} */}
+        {/*     </div> */}
+        {/*   }))} */}
+        </div>
         <div className="text-blue-500 text-sm">/data/fetched</div>
         {datalog.length > 0 && (
           <pre>{JSON.stringify(datalog, undefined, 2)}</pre>

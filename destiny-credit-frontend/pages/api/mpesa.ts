@@ -23,10 +23,7 @@ async function asyncWriteFile(filename: string, data: any) {
       })
     );
 
-    const contents = await fs.promises.readFile(
-      filename,
-      "utf-8"
-    );
+    const contents = await fs.promises.readFile(filename, "utf-8");
     console.log(contents);
 
     return contents;
@@ -229,9 +226,11 @@ export default async function handler(
       const token = LOGTAIL_API_TOKEN;
       const url = "https://logtail.com/api/v1/query";
 
-        const params = {
-        "order": "newest_first"
-      }
+      const params = {
+        query: "TransactionType",
+        order: "newest_first",
+        // "path_string": "/api/confirmation",
+      };
       const headers = {
         // "Content-Type": "application/json",
         Authorization: `Bearer ${token}`,
@@ -244,7 +243,9 @@ export default async function handler(
         headers,
       });
 
-      res.status(200).json(response.data);
+      const data = response.data;
+
+      res.status(200).json(data);
     } catch (error) {
       console.log(error);
 
@@ -257,4 +258,3 @@ export default async function handler(
   // lipaNM();
   // c2bQry();
 }
-
