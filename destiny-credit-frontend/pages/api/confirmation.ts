@@ -1,6 +1,5 @@
 import type { NextApiRequest, NextApiResponse } from "next";
 const formidable = require("formidable");
-import { log, withAxiom } from "next-axiom";
 
 async function confirm(req: NextApiRequest, res: NextApiResponse) {
     try {
@@ -8,11 +7,6 @@ async function confirm(req: NextApiRequest, res: NextApiResponse) {
         ResultCode: 0,
         ResultDesc: "Accepted",
       });
-    } catch (error) {
-      console.log(error);
-
-      res.status(500).json({ message: "Something went wrong", error });
-    }
 
   const data = await new Promise(function (resolve, reject) {
     const form = new formidable.IncomingForm({ keepExtensions: true });
@@ -24,6 +18,11 @@ async function confirm(req: NextApiRequest, res: NextApiResponse) {
 
   const body = JSON.stringify(data);
   console.log(body);
+    } catch (error) {
+      console.log(error);
+
+      res.status(500).json({ message: "Something went wrong", error });
+    }
 
 }
 export const config = {
@@ -32,4 +31,4 @@ export const config = {
   },
 };
 
-export default withAxiom(confirm);
+export default confirm;
