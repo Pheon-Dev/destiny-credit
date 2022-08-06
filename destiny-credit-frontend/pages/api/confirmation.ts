@@ -7,6 +7,7 @@ const moment = require("moment");
 const { connect } = require("../../lib/mongodb");
 const ObjectId = require("mongodb").ObjectId;
 import { client } from "../../utils/client";
+import { log, withAxiom } from "next-axiom";
 
 function syncWriteFile(filename: string, data: any) {
   fs.writeFileSync(filename, data, {
@@ -50,6 +51,7 @@ async function file_get_contents(uri: string, callback?: any) {
 async function confirm(req: NextApiRequest, res: NextApiResponse) {
   async function confirmation() {
     try {
+      log.info("Confirmation Function")
       res.status(200).json({
         ResultCode: 0,
         ResultDesc: "Accepted",
@@ -102,4 +104,4 @@ export const config = {
 };
 
 // export default micro(confirm);
-export default confirm;
+export default withAxiom(confirm);
