@@ -36,7 +36,7 @@ async function asyncWriteFile(filename: string, data: any) {
   }
 }
 
-
+const LOGTAIL_API_TOKEN = process.env.NEXT_PUBLIC_LOGTAIL_API_TOKEN;
 const CONSUMER_KEY = process.env.NEXT_PUBLIC_CONSUMER_KEY;
 const CONSUMER_SECRET = process.env.NEXT_PUBLIC_CONSUMER_SECRET;
 const INITIATOR_PASSWORD = process.env.NEXT_PUBLIC_INITIATOR_PASSWORD;
@@ -223,6 +223,31 @@ export default async function handler(
       res.status(500).json({ message: "Something went wrong", error });
     }
   }
+
+  async function logs() {
+    try {
+      const token = LOGTAIL_API_TOKEN;
+      const url = "https://logtail.com/api/v1/query";
+
+      const headers = {
+        // "Content-Type": "application/json",
+        Authorization: `Bearer ${token}`,
+      };
+
+      const response = await axios.request({
+        method: "GET",
+        url,
+        headers,
+      });
+
+      res.status(200).json(response.data);
+    } catch (error) {
+      console.log(error);
+
+      res.status(500).json({ message: "Something went wrong", error });
+    }
+  }
+  logs();
   // c2bReg();
   // c2bSim();
   // lipaNM();

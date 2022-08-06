@@ -190,12 +190,17 @@ const AXIOM_API_ORG_ID = process.env.NEXT_PUBLIC_AXIOM_API_ORG_ID;
 };
 
 export async function getStaticProps() {
-  const res = await fetch(
+  const sources = await fetch(
+    "https://logtail.com/api/v1/sources",
+    { method: "GET", headers: { "Authorization": `Bearer ${LOGTAIL_API_TOKEN}` } }
+  );
+
+  const query = await fetch(
     "https://logtail.com/api/v1/query",
     { method: "GET", headers: { "Authorization": `Bearer ${LOGTAIL_API_TOKEN}` } }
   );
 
-  const data = await res.json();
+  const data = await sources.json();
 
   return { props: { data }, revalidate: 1 };
 }
