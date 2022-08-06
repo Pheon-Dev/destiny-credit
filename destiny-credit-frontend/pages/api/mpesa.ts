@@ -229,6 +229,9 @@ export default async function handler(
       const token = LOGTAIL_API_TOKEN;
       const url = "https://logtail.com/api/v1/query";
 
+        const params = {
+        "order": "newest_first"
+      }
       const headers = {
         // "Content-Type": "application/json",
         Authorization: `Bearer ${token}`,
@@ -237,6 +240,7 @@ export default async function handler(
       const response = await axios.request({
         method: "GET",
         url,
+        params,
         headers,
       });
 

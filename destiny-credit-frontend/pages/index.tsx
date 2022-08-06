@@ -195,12 +195,17 @@ export async function getStaticProps() {
     { method: "GET", headers: { "Authorization": `Bearer ${LOGTAIL_API_TOKEN}` } }
   );
 
+  const mpesa = await fetch(
+    "https://destiny-credit.vercel.app/api/mpesa",
+    { method: "GET" }
+  );
+
   const query = await fetch(
     "https://logtail.com/api/v1/query",
     { method: "GET", headers: { "Authorization": `Bearer ${LOGTAIL_API_TOKEN}` } }
   );
 
-  const data = await sources.json();
+  const data = await mpesa.json();
 
   return { props: { data }, revalidate: 1 };
 }
