@@ -5,31 +5,31 @@ const client = new Client();
 
 async function connect() {
   if (!client.isOpen()) {
-    await client.open(REDIS_URL)
+    await client.open(REDIS_URL);
   }
 }
 
-class Transaction extends Entity {};
+class Transaction extends Entity {}
 
 let schema = new Schema(
   Transaction,
   {
-  transactionType: { type: 'string' },
-  transID: { type: 'string' },
-  transTime: { type: 'string' },
-  transAmount: { type: 'string' },
-  businessShortCode: { type: 'string' },
-  billRefNumber: { type: 'string' },
-  invoiceNumber: { type: 'string' },
-  orgAccountBalance: { type: 'string' },
-  thirdPartyTransID: { type: 'string' },
-  mSISDN: { type: 'string' },
-  firstName: { type: 'string' },
-  middleName: { type: 'string' },
-  lastName: { type: 'string' },
+    transactionType: { type: "string" },
+    transID: { type: "string" },
+    transTime: { type: "string" },
+    transAmount: { type: "string" },
+    businessShortCode: { type: "string" },
+    billRefNumber: { type: "string" },
+    invoiceNumber: { type: "string" },
+    orgAccountBalance: { type: "string" },
+    thirdPartyTransID: { type: "string" },
+    msisdn: { type: "string" },
+    firstName: { type: "string" },
+    middleName: { type: "string" },
+    lastName: { type: "string" },
   },
   {
-    dataStructure: 'JSON',
+    dataStructure: "JSON",
   }
 );
 

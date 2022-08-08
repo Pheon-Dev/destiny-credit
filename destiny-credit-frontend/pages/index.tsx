@@ -10,25 +10,12 @@ const LOGTAIL_API_TOKEN = process.env.NEXT_PUBLIC_LOGTAIL_API_TOKEN;
 const LOGTAIL_SOURCE_TOKEN = process.env.NEXT_PUBLIC_LOGTAIL_SOURCE_TOKEN;
 const AXIOM_API_ORG_ID = process.env.NEXT_PUBLIC_AXIOM_API_ORG_ID;
 
- const Home: NextPage = (data: any) => {
+const Home: NextPage = (data: any) => {
   const [tel, setTel] = useState("254");
   const [amt, setAmt] = useState("");
   const [pay, setPay] = useState("");
   const [ref, setRef] = useState("");
   const [datalog, setDatalog] = useState("");
-  const [transactionType, setTransactionType] = useState("");
-  const [transID, setTransID] = useState("");
-  const [transTime, setTransTime] = useState("");
-  const [transAmount, setTransAmount] = useState("");
-  const [businessShortCode, setBusinessShortCode] = useState("");
-  const [billRefNumber, setBillRefNumber] = useState("");
-  const [invoiceNumber, setInvoiceNumber] = useState("");
-  const [orgAccountBalance, setOrgAccountBalance] = useState("");
-  const [thirdPartyTransID, setThirdPartyTransID] = useState("");
-  const [mSISDN, setMSISDN] = useState("");
-  const [firstName, setFirstName] = useState("");
-  const [middleName, setMiddleName] = useState("");
-  const [lastName, setLastName] = useState("");
   // console.log(con_data)
 
   // const fetchPayments = () => {
@@ -107,6 +94,52 @@ const AXIOM_API_ORG_ID = process.env.NEXT_PUBLIC_AXIOM_API_ORG_ID;
     setTel(e.currentTarget.value);
   };
 
+  const handleData = async (item: any) => {
+    // item.preventDefault();
+    let dest = item.split("{")[2].split("}")[0];
+
+    let transactionType = dest.split(",")[0].split(":")[1].split('"')[1];
+    let transID = dest.split(",")[1].split(":")[1].split('"')[1];
+    let transTime = dest.split(",")[2].split(":")[1].split('"')[1];
+    let transAmount = dest.split(",")[3].split(":")[1].split('"')[1];
+    let businessShortCode = dest.split(",")[4].split(":")[1].split('"')[1];
+    let billRefNumber = dest.split(",")[5].split(":")[1].split('"')[1];
+    let invoiceNumber = dest.split(",")[6].split(":")[1].split('"')[1];
+    let orgAccountBalance = dest.split(",")[7].split(":")[1].split('"')[1];
+    let thirdPartyTransID = dest.split(",")[8].split(":")[1].split('"')[1];
+    let msisdn = dest.split(",")[9].split(":")[1].split('"')[1];
+    let firstName = dest.split(",")[10].split(":")[1].split('"')[1];
+    let middleName = dest.split(",")[11].split(":")[1].split('"')[1];
+    let lastName = dest.split(",")[12].split(":")[1].split('"')[1];
+
+    console.log(transactionType);
+    const res_data = await fetch("/api/transaction", {
+      body: JSON.stringify({
+        transactionType: transactionType,
+        transID: transID,
+        transTime: transTime,
+        transAmount: transAmount,
+        businessShortCode: businessShortCode,
+        billRefNumber: billRefNumber,
+        invoiceNumber: invoiceNumber,
+        orgAccountBalance: orgAccountBalance,
+        thirdPartyTransID: thirdPartyTransID,
+        msisdn: msisdn,
+        firstName: firstName,
+        middleName: middleName,
+        lastName: lastName
+      }),
+      headers: {
+        "Content-Type": "application/json",
+      },
+      method: "POST",
+    });
+    const result = await res_data.json();
+    console.log(result);
+  };
+
+  handleData(data?.data?.data[0]?.message_string);
+
   const submitHandler = async (e: FormEvent<HTMLFormElement>) => {
     e.preventDefault();
     if (tel.length < 9) return;
@@ -174,13 +207,13 @@ const AXIOM_API_ORG_ID = process.env.NEXT_PUBLIC_AXIOM_API_ORG_ID;
 
         <div className="text-blue-500 text-sm">/api/confirmation</div>
         <div className="text-black-500 text-sm flex justify-center ml-auto mr-auto">
-        <pre>{JSON.stringify(data.data.data[0]?.message_string, undefined, 2)}</pre>
-        {/* <pre>{JSON.stringify(data, undefined, 2)}</pre> */}
-        {/* {data && (data[0]?.map((item: any, index: any) => { */}
-        {/*     <div key={index}> */}
-        {/*     {item} */}
-        {/*     </div> */}
-        {/*   }))} */}
+          <pre>{JSON.stringify(data.data.data[0], undefined, 2)}</pre>
+          {/* <pre>{JSON.stringify(data, undefined, 2)}</pre> */}
+          {/* {data && (data[0]?.map((item: any, index: any) => { */}
+          {/*     <div key={index}> */}
+          {/*     {item} */}
+          {/*     </div> */}
+          {/*   }))} */}
         </div>
         <div className="text-blue-500 text-sm">/data/fetched</div>
         {datalog.length > 0 && (
@@ -198,20 +231,19 @@ const AXIOM_API_ORG_ID = process.env.NEXT_PUBLIC_AXIOM_API_ORG_ID;
 };
 
 export async function getStaticProps() {
-  const sources = await fetch(
-    "https://logtail.com/api/v1/sources",
-    { method: "GET", headers: { "Authorization": `Bearer ${LOGTAIL_API_TOKEN}` } }
-  );
+  const sources = await fetch("https://logtail.com/api/v1/sources", {
+    method: "GET",
+    headers: { Authorization: `Bearer ${LOGTAIL_API_TOKEN}` },
+  });
 
-  const mpesa = await fetch(
-    "https://destiny-credit.vercel.app/api/mpesa",
-    { method: "GET" }
-  );
+  const mpesa = await fetch("https://destiny-credit.vercel.app/api/mpesa", {
+    method: "GET",
+  });
 
-  const query = await fetch(
-    "https://logtail.com/api/v1/query",
-    { method: "GET", headers: { "Authorization": `Bearer ${LOGTAIL_API_TOKEN}` } }
-  );
+  const query = await fetch("https://logtail.com/api/v1/query", {
+    method: "GET",
+    headers: { Authorization: `Bearer ${LOGTAIL_API_TOKEN}` },
+  });
 
   const data = await mpesa.json();
 

@@ -34,14 +34,19 @@ async function asyncWriteFile(filename: string, data: any) {
 }
 
 const LOGTAIL_API_TOKEN = process.env.NEXT_PUBLIC_LOGTAIL_API_TOKEN;
-const CONSUMER_KEY = process.env.NEXT_PUBLIC_CONSUMER_KEY;
-const CONSUMER_SECRET = process.env.NEXT_PUBLIC_CONSUMER_SECRET;
-const INITIATOR_PASSWORD = process.env.NEXT_PUBLIC_INITIATOR_PASSWORD;
-const SECURITY_CREDENTIAL = process.env.NEXT_PUBLIC_SECURITY_CREDENTIAL;
-const PASS_KEY = process.env.NEXT_PUBLIC_PASS_KEY;
-const BUSINESS_SHORT_CODE = process.env.NEXT_PUBLIC_PAY_BILL;
-const TILL_NUMBER = process.env.NEXT_PUBLIC_TILL_NUMBER;
-const PHONE_NUMBER = process.env.NEXT_PUBLIC_PHONE_NUMBER;
+
+const CONSUMER_KEY = process.env.NEXT_PUBLIC_CONSUMER_KEY_TILL;
+const CONSUMER_SECRET = process.env.NEXT_PUBLIC_CONSUMER_SECRET_TILL;
+const PASS_KEY = process.env.NEXT_PUBLIC_PASS_KEY_TILL;
+const BUSINESS_SHORT_CODE = process.env.NEXT_PUBLIC_TILL_SHORT_CODE;
+
+const TRANSACTION_TYPE = "CustomerBuyGoodsOnline";
+
+// const CONSUMER_KEY = process.env.NEXT_PUBLIC_CONSUMER_KEY;
+// const CONSUMER_SECRET = process.env.NEXT_PUBLIC_CONSUMER_SECRET;
+// const PASS_KEY = process.env.NEXT_PUBLIC_PASS_KEY;
+// const BUSINESS_SHORT_CODE = process.env.NEXT_PUBLIC_PAY_BILL;
+// const TRANSACTION_TYPE = "CustomerPayBillOnline";
 
 const VALIDATION_URL = process.env.NEXT_PUBLIC_VALIDATION_URL;
 const CONFIRMATION_URL = process.env.NEXT_PUBLIC_CONFIRMATION_URL;
@@ -49,7 +54,6 @@ const CONFIRMATION_URL = process.env.NEXT_PUBLIC_CONFIRMATION_URL;
 const CALLBACK_URL = process.env.NEXT_PUBLIC_CALL_BACK_URL;
 // const CALLBACK_URL = process.env.NEXT_PUBLIC_CALL_BACK_URI;
 
-const TRANSACTION_TYPE = "CustomerPayBillOnline";
 const ACCOUNT_REFERENCE = "Account Reference";
 const TIMESTAMP = dateTime();
 
@@ -74,48 +78,6 @@ export default async function handler(
   req: NextApiRequest,
   res: NextApiResponse
 ) {
-  async function lipaNM() {
-    try {
-      const { PhoneNumber, Amount, BusinessShortCode } = req.body;
-      const token = await getToken();
-      const url = routes.production + routes.stkpush;
-
-      const data = {
-        BusinessShortCode: BusinessShortCode,
-        Password: Buffer.from(
-          `${BUSINESS_SHORT_CODE}${PASS_KEY}${TIMESTAMP}`
-        ).toString("base64"),
-        Timestamp: TIMESTAMP,
-        TransactionType: TRANSACTION_TYPE,
-        Amount,
-        PartyA: PhoneNumber,
-        PartyB: BUSINESS_SHORT_CODE,
-        PhoneNumber,
-        CallBackURL: CALLBACK_URL,
-        AccountReference: ACCOUNT_REFERENCE,
-        TransactionDesc: "Payment of loan services",
-      };
-
-      const headers = {
-        "Content-Type": "application/json",
-        Authorization: `Bearer ${token}`,
-      };
-
-      const response = await axios.request({
-        method: "POST",
-        url,
-        headers,
-        data,
-      });
-
-      res.status(200).json(response.data);
-    } catch (error) {
-      console.log(error);
-
-      res.status(500).json({ message: "Something went wrong", error });
-    }
-  }
-
   async function c2bReg() {
     try {
       const token = await getToken();
@@ -148,83 +110,11 @@ export default async function handler(
     }
   }
 
-  async function c2bSim() {
-    try {
-      const { PhoneNumber, Amount, BusinessShortCode, BillRef } = req.body;
-      const token = await getToken();
-      const url = routes.production + routes.c2bsimulate;
-
-      const data = {
-        ShortCode: BusinessShortCode,
-        Amount: Amount,
-        Msisdn: PhoneNumber,
-        CommandID: TRANSACTION_TYPE,
-        BillRefNumber: `${BillRef}`,
-      };
-
-      const headers = {
-        "Content-Type": "application/json",
-        Authorization: `Bearer ${token}`,
-      };
-
-      const response = await axios.request({
-        method: "POST",
-        url,
-        headers,
-        data,
-      });
-
-      res.status(200).json(response.data);
-      // syncWriteFile(
-      // // asyncWriteFile(
-      //   "./pages/api/simulation.json",
-      //   JSON.stringify(response.data, null, 4)
-      // );
-    } catch (error) {
-      console.log(error);
-
-      res.status(500).json({ message: "Something went wrong", error });
-    }
-  }
-
-  async function c2bQry() {
-    try {
-      const token = await getToken();
-      const url = routes.production + routes.stkquery;
-
-      const data = {
-        BusinessShortCode: Number(BUSINESS_SHORT_CODE),
-        Password: Buffer.from(
-          `${BUSINESS_SHORT_CODE}${PASS_KEY}${TIMESTAMP}`
-        ).toString("base64"),
-        Timestamp: TIMESTAMP,
-        CheckoutRequestID: "ws_CO_22072022083144984768858280",
-      };
-
-      const headers = {
-        "Content-Type": "application/json",
-        Authorization: `Bearer ${token}`,
-      };
-
-      const response = await axios.request({
-        method: "POST",
-        url,
-        headers,
-        data,
-      });
-
-      res.status(200).json(response.data);
-    } catch (error) {
-      console.log(error);
-
-      res.status(500).json({ message: "Something went wrong", error });
-    }
-  }
-
   async function logs() {
     try {
       const token = LOGTAIL_API_TOKEN;
       const url = "https://logtail.com/api/v1/query";
+      const url_db = "/api/transaction";
 
       const params = {
         query: "TransactionType",
@@ -236,6 +126,9 @@ export default async function handler(
         Authorization: `Bearer ${token}`,
       };
 
+      const headers_db = {
+        "Content-Type": "application/json",
+      };
       const response = await axios.request({
         method: "GET",
         url,
@@ -244,8 +137,47 @@ export default async function handler(
       });
 
       const data = response.data;
+      const data_res = data.data[0]?.message_string.split("{")[2].split("}")[0]
 
-      res.status(200).json(data);
+      let transactionType = data_res.split(",")[0].split(":")[1].split('"')[1];
+      let transID = data_res.split(",")[1].split(":")[1].split('"')[1];
+      let transTime = data_res.split(",")[2].split(":")[1].split('"')[1];
+      let transAmount = data_res.split(",")[3].split(":")[1].split('"')[1];
+      let businessShortCode = data_res.split(",")[4].split(":")[1].split('"')[1];
+      let billRefNumber = data_res.split(",")[5].split(":")[1].split('"')[1];
+      let invoiceNumber = data_res.split(",")[6].split(":")[1].split('"')[1];
+      let orgAccountBalance = data_res.split(",")[7].split(":")[1].split('"')[1];
+      let thirdPartyTransID = data_res.split(",")[8].split(":")[1].split('"')[1];
+      let msisdn = data_res.split(",")[9].split(":")[1].split('"')[1];
+      let firstName = data_res.split(",")[10].split(":")[1].split('"')[1];
+      let middleName = data_res.split(",")[11].split(":")[1].split('"')[1];
+      let lastName = data_res.split(",")[12].split(":")[1].split('"')[1];
+
+      const body = {
+        transactionType: transactionType,
+        transID: transID,
+        transTime: transTime,
+        transAmount: transAmount,
+        businessShortCode: businessShortCode,
+        billRefNumber: billRefNumber,
+        invoiceNumber: invoiceNumber,
+        orgAccountBalance: orgAccountBalance,
+        thirdPartyTransID: thirdPartyTransID,
+        msisdn: msisdn,
+        firstName: firstName,
+        middleName: middleName,
+        lastName: lastName
+      }
+      // const res_db = await fetch(url_db, {
+      //   method: "POST",
+      //   headers: headers_db,
+      //   body: JSON.stringify(body),
+      // });
+      //
+      // const result = await res_db.json();
+      // console.log(result)
+      res.status(200).json(body);
+
     } catch (error) {
       console.log(error);
 
@@ -254,7 +186,4 @@ export default async function handler(
   }
   logs();
   // c2bReg();
-  // c2bSim();
-  // lipaNM();
-  // c2bQry();
 }
