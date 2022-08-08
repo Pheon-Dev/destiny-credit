@@ -99,7 +99,7 @@ const Home: NextPage = (data: any) => {
 
         <div className="text-blue-500 text-sm">/api/confirmation</div>
         <div className="text-black-500 text-sm flex justify-center ml-auto mr-auto">
-          <pre>{JSON.stringify(data.data.data[0], undefined, 2)}</pre>
+          <pre>{JSON.stringify(data, undefined, 2)}</pre>
           {/* <pre>{JSON.stringify(data, undefined, 2)}</pre> */}
           {/* {data && (data[0]?.map((item: any, index: any) => { */}
           {/*     <div key={index}> */}
