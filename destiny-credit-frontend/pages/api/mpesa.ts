@@ -114,7 +114,7 @@ export default async function handler(
     try {
       const token = LOGTAIL_API_TOKEN;
       const url = "https://logtail.com/api/v1/query";
-      const url_db = "/api/transaction";
+      const url_db = "https://destiny-credit.vercel.app/api/transaction";
 
       const params = {
         query: "TransactionType",
@@ -168,14 +168,13 @@ export default async function handler(
         middleName: middleName,
         lastName: lastName
       }
-      // const res_db = await fetch(url_db, {
-      //   method: "POST",
-      //   headers: headers_db,
-      //   body: JSON.stringify(body),
-      // });
-      //
-      // const result = await res_db.json();
-      // console.log(result)
+      const res_db = await axios.request({
+        data: JSON.stringify(body),
+        method: "POST",
+        url: url_db,
+        headers: headers_db,
+      });
+      console.log(res_db)
       res.status(200).json(body);
 
     } catch (error) {
