@@ -1,12 +1,13 @@
 import type { NextApiRequest, NextApiResponse } from "next";
+import { createTransaction } from "../../lib/redis";
 const formidable = require("formidable");
-const REDIS_URL = process.env.NEXT_PUBLIC_REDIS_URL;
 
 async function confirm(req: NextApiRequest, res: NextApiResponse) {
     try {
+      const id = await createTransaction(req.body);
       res.status(200).json({
         ResultCode: 0,
-        ResultDesc: "Accepted",
+        ResultDesc: {id},
       });
 
   const data = await new Promise(function (resolve, reject) {
