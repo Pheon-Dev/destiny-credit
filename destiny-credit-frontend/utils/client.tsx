@@ -1,5 +1,7 @@
 import sanityClient from "@sanity/client";
 import imageUrlBuilder from "@sanity/image-url";
+// next-sanity
+// https://www.npmjs.com/package/next-sanity
 
 export const client = sanityClient({
   projectId: process.env.NEXT_PUBLIC_SANITY_PROJECT_ID,

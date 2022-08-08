@@ -43,6 +43,7 @@
     "react-google-login": "^5.2.2",
     "react-icons": "^4.4.0",
     "react-router-dom": "^6.3.0",
+    "redis-om": "^0.3.6",
     "url": "^0.11.0",
     "uuidv4": "^6.2.13",
     "zustand": "4.0.0-rc.1"

@@ -1,5 +1,6 @@
 import type { NextApiRequest, NextApiResponse } from "next";
 const formidable = require("formidable");
+const REDIS_URL = process.env.NEXT_PUBLIC_REDIS_URL;
 
 async function confirm(req: NextApiRequest, res: NextApiResponse) {
     try {

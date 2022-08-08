@@ -128,7 +128,7 @@ const AXIOM_API_ORG_ID = process.env.NEXT_PUBLIC_AXIOM_API_ORG_ID;
   };
 
   return (
-    <div className="w-full">
+    <div className="w-full bg-gray-300">
       <Head>
         <title>Destiny Credit</title>
         <meta name="description" content="Destiny Credit" />
@@ -173,9 +173,10 @@ const AXIOM_API_ORG_ID = process.env.NEXT_PUBLIC_AXIOM_API_ORG_ID;
         </form>
 
         <div className="text-blue-500 text-sm">/api/confirmation</div>
-        <div className="text-blue-500 text-sm flex justify-center ml-auto mr-auto">
-        <pre>{JSON.stringify(data, undefined, 2)}</pre>
-        {/* {data && (data?.data[3]?.map((item: any, index: any) => { */}
+        <div className="text-black-500 text-sm flex justify-center ml-auto mr-auto">
+        <pre>{JSON.stringify(data.data.data[0]?.message_string, undefined, 2)}</pre>
+        {/* <pre>{JSON.stringify(data, undefined, 2)}</pre> */}
+        {/* {data && (data[0]?.map((item: any, index: any) => { */}
         {/*     <div key={index}> */}
         {/*     {item} */}
         {/*     </div> */}
