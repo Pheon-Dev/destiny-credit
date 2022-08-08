@@ -114,7 +114,7 @@ export default async function handler(
     try {
       const token = LOGTAIL_API_TOKEN;
       const url = "https://logtail.com/api/v1/query";
-      const url_db = "https://destiny-credit.vercel.app/api/transaction";
+      const url_db = "https://destiny-credit.vercel.app/api/confirmation";
 
       const params = {
         query: "TransactionType",
