@@ -2,36 +2,6 @@ import axios from "axios";
 import type { NextApiRequest, NextApiResponse } from "next";
 import { dateTime } from "../../utils/dates";
 import { routes } from "../../utils/routes";
-const fs = require("fs");
-
-function syncWriteFile(filename: string, data: any) {
-  fs.writeFileSync(filename, data, {
-    flag: "a+",
-  });
-
-  const contents = fs.readFileSync(filename, "utf-8");
-  console.log(contents);
-
-  return contents;
-}
-
-async function asyncWriteFile(filename: string, data: any) {
-  try {
-    await fs.promises.writeFile(
-      fs.writeFileSync(filename, data, {
-        flag: "a+", // flag: "w",
-      })
-    );
-
-    const contents = await fs.promises.readFile(filename, "utf-8");
-    console.log(contents);
-
-    return contents;
-  } catch (err) {
-    console.log(err);
-    return "Something went wrong";
-  }
-}
 
 const LOGTAIL_API_TOKEN = process.env.NEXT_PUBLIC_LOGTAIL_API_TOKEN;
 
