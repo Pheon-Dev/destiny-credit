@@ -163,7 +163,7 @@ export default async function handler(
         console.log(res_db);
         res.status(200).json(body);
       }
-      res.status(200).json(data.data);
+      res.status(200).json(data);
     } catch (error) {
       console.log(error);
 
