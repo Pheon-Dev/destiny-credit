@@ -60,4 +60,3 @@ const MyApp = ({ Component, pageProps }: AppProps) => {
 };
 
 export default MyApp;
-export { withAxiom } from 'next-axiom';
