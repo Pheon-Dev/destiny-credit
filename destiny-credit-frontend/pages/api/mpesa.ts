@@ -89,10 +89,8 @@ export default async function handler(
       const params = {
         query: "TransactionType",
         order: "newest_first",
-        // "path_string": "/api/confirmation",
       };
       const headers = {
-        // "Content-Type": "application/json",
         Authorization: `Bearer ${token}`,
       };
 
@@ -107,6 +105,7 @@ export default async function handler(
       });
 
       const data = response.data;
+
       const data_res = data.data[0]?.message_string.split("{")[2].split("}")[0]
 
       let transactionType = data_res.split(",")[0].split(":")[1].split('"')[1];

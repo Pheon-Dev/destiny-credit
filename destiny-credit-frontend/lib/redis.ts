@@ -9,10 +9,10 @@ async function connect() {
   }
 }
 
-class PayBill extends Entity {}
+class Transaction extends Entity {}
 
 let schema = new Schema(
-  PayBill,
+  Transaction,
   {
     transactionType: { type: "string" },
     transID: { type: "string" },
