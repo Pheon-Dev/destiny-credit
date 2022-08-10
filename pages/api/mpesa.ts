@@ -87,7 +87,7 @@ export default async function handler(
       const url_db = "https://destiny-credit.vercel.app/api/transaction";
 
       const params = {
-        query: "TransactionType",
+        // query: "TransactionType",
         order: "newest_first",
       };
       const headers = {
@@ -106,6 +106,8 @@ export default async function handler(
       });
 
       const data = response.data;
+      res.status(200).json(data);
+
       if (data.data.length > 0) {
         const data_res = data.data[0]?.message_string
           .split("{")[2]
@@ -163,7 +165,6 @@ export default async function handler(
         console.log(res_db);
         res.status(200).json(body);
       }
-      res.status(200).json(data);
     } catch (error) {
       console.log(error);
 
