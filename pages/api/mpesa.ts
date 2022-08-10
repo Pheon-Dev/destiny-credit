@@ -97,6 +97,7 @@ export default async function handler(
       const headers_db = {
         "Content-Type": "application/json",
       };
+
       const response = await axios.request({
         method: "GET",
         url,
@@ -151,16 +152,18 @@ export default async function handler(
           middleName: middleName,
           lastName: lastName,
         };
+
         const res_db = await axios.request({
           data: JSON.stringify(body),
           method: "POST",
           url: url_db,
           headers: headers_db,
         });
+
         console.log(res_db);
         res.status(200).json(body);
       }
-      res.status(200).json(data);
+      res.status(200).json(data.data);
     } catch (error) {
       console.log(error);
 
