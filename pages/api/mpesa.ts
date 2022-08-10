@@ -106,6 +106,11 @@ export default async function handler(
 
       const data = response.data;
 
+      if (!data) {
+      return res.status(200).json(data);
+      }
+
+      if (data) {
       const data_res = data.data[0]?.message_string.split("{")[2].split("}")[0]
 
       let transactionType = data_res.split(",")[0].split(":")[1].split('"')[1];
@@ -145,7 +150,7 @@ export default async function handler(
       });
       console.log(res_db)
       res.status(200).json(body);
-
+}
     } catch (error) {
       console.log(error);
 
