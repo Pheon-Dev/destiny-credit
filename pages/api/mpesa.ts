@@ -160,19 +160,10 @@ export default async function handler(
           lastName: lastName,
         };
 
-        const params = new URLSearchParams({ transTime });
+        await createIndex();
+        const q = transTime;
+        const transaction = await searchTransaction(q);
 
-        // const transaction = await fetch(
-        //   "https://destiny-credit.vercel.app/api/search?" + params
-        // );
-
-  await createIndex();
-  const q = params;
-  const transaction = await searchTransaction(q);
-
-        // const result = await transaction.json();
-
-        console.log(transaction);
         if (transaction.length > 0) {
           res.status(200).json({ data: body, message: "Transaction Exists!" });
           return;

@@ -15,7 +15,7 @@ let schema = new Schema(
   Transaction,
   {
     transactionType: { type: "string" },
-    transID: { type: "text" },
+    transID: { type: "string" },
     transTime: { type: "string" },
     transAmount: { type: "string" },
     businessShortCode: { type: "string" },
@@ -57,7 +57,6 @@ export async function searchTransaction(q: any) {
 
   const repository = client.fetchRepository(schema);
 
-  console.log("q :", q)
   const transaction = await repository
     .search()
     .where('transTime')
