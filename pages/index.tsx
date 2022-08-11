@@ -133,8 +133,7 @@ export async function getStaticProps() {
     headers: { Authorization: `Bearer ${LOGTAIL_API_TOKEN}` },
   });
 
-  // const data = await mpesa.json();
-  const data = await query.json();
+  const data = await mpesa.json();
 
   return { props: { data }, revalidate: 1 };
 }

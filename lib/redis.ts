@@ -15,7 +15,7 @@ let schema = new Schema(
   Transaction,
   {
     transactionType: { type: "string" },
-    transID: { type: "string" },
+    transID: { type: "text" },
     transTime: { type: "string" },
     transAmount: { type: "string" },
     businessShortCode: { type: "string" },
@@ -42,4 +42,26 @@ export async function createTransaction(data: any) {
 
   const id = await repository.save(transaction);
   return id;
+}
+
+export async function createIndex() {
+  await connect();
+
+  const repository = client.fetchRepository(schema);
+
+  await repository.createIndex();
+}
+
+export async function searchTransaction(q: any) {
+  await connect();
+
+  const repository = client.fetchRepository(schema);
+
+  const transaction = await repository
+    .search()
+    .where("transID")
+    .matches(q)
+    .return.all();
+
+  return transaction;
 }
