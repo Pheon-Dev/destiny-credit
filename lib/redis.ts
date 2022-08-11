@@ -65,3 +65,13 @@ export async function searchTransaction(q: any) {
 
   return transaction;
 }
+
+export async function listTransactions() {
+  await connect();
+
+  const repository = client.fetchRepository(schema);
+
+  const list = await repository.search().return.all();
+
+  return list;
+}

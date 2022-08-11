@@ -11,6 +11,22 @@ const Home: NextPage = (data: any) => {
   const [amt, setAmt] = useState("");
   const [pay, setPay] = useState("");
   const [ref, setRef] = useState("");
+  const [transactions, setTransactions] = useState([]);
+
+  async function fetchTransactions() {
+    const res = await fetch("/api/list");
+
+    const result = await res.json();
+
+    setTransactions(result["transactions"]);
+    return result;
+  }
+
+  useEffect(() => {
+    fetchTransactions();
+  }, [data]);
+
+    // console.log(transactions);
 
   const refChange = (e: FormEvent<HTMLInputElement>) => {
     if (isNaN(Number(e.currentTarget.value))) return;
@@ -99,13 +115,20 @@ const Home: NextPage = (data: any) => {
 
         <div className="text-blue-500 text-sm">/api/confirmation</div>
         <div className="text-black-500 text-sm flex justify-center ml-auto mr-auto">
-          <pre>{JSON.stringify(data, undefined, 2)}</pre>
-          {/* <pre>{JSON.stringify(data, undefined, 2)}</pre> */}
-          {/* {data && (data[0]?.map((item: any, index: any) => { */}
-          {/*     <div key={index}> */}
-          {/*     {item} */}
-          {/*     </div> */}
-          {/*   }))} */}
+          <pre>{JSON.stringify(transactions, undefined, 2)}</pre>
+        </div>
+        <div>
+          <>
+            {transactions &&
+              transactions.map((item: any) => {
+                <div
+                  key={item.entityId}
+                  className="text-black-500 text-sm flex justify-center ml-auto mr-auto"
+                >
+                  {item.firstName}
+                </div>;
+              })}
+          </>
         </div>
         {/* <button */}
         {/*   // onClick={handleSave} */}
@@ -133,6 +156,7 @@ export async function getStaticProps() {
     headers: { Authorization: `Bearer ${LOGTAIL_API_TOKEN}` },
   });
 
+  // const data = await mpesa.json();
   const data = await mpesa.json();
 
   return { props: { data }, revalidate: 1 };
