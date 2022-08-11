@@ -60,7 +60,7 @@ export async function searchTransaction(q: any) {
   const transaction = await repository
     .search()
     // .where("transID")
-    // .matches(q)
+    // .equals(q)
     .return.all();
 
   return transaction;
