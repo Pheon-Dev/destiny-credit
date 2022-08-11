@@ -159,16 +159,19 @@ export default async function handler(
           lastName: lastName,
         };
 
-        // const params = new URLSearchParams({transID});
-        //
-        // const transaction = await fetch("https://destiny-credit.vercel.app/api/search?" + params)
-        //
-        //   const result = await transaction.json();
-        //   console.log(result)
-        // if (result.length > 0) {
-        //   res.status(200).json({ data: body, message: "Transaction Exists!" });
-        //   return;
-        // }
+        const params = new URLSearchParams({ transID });
+
+        const transaction = await fetch(
+          "https://destiny-credit.vercel.app/api/search?"
+        );
+
+        const result = await transaction.json();
+
+        console.log(result);
+        if (result.data > 0) {
+          res.status(200).json({ data: body, message: "Transaction Exists!" });
+          return;
+        }
         const res_db = await axios.request({
           data: JSON.stringify(body),
           method: "POST",
@@ -176,7 +179,7 @@ export default async function handler(
           headers: headers_db,
         });
 
-        // console.log(res_db);
+        console.log(res_db);
         res.status(200).json({ data: body, message: "Transaction Created!" });
         return;
       }

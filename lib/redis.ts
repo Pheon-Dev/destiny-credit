@@ -52,15 +52,15 @@ export async function createIndex() {
   await repository.createIndex();
 }
 
-export async function searchTransaction(q: any) {
+export async function searchTransaction() {
   await connect();
 
   const repository = client.fetchRepository(schema);
 
   const transaction = await repository
     .search()
-    .where("transID")
-    .matches(q)
+    // .where("transID")
+    // .matches(q)
     .return.all();
 
   return transaction;

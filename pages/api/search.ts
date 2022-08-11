@@ -7,6 +7,6 @@ export default async function handler(
   res: NextApiResponse
 ) {
   const q = req.query.q;
-  const transaction = await searchTransaction(q);
+  const transaction = await searchTransaction();
   res.status(200).send({ transaction });
 }
