@@ -88,7 +88,7 @@ export default async function handler(
       const url_db = "https://destiny-credit.vercel.app/api/transaction";
 
       const params = {
-        query: "TransactionType",
+        query: "TransactionTypes",
         order: "newest_first",
       };
       const headers = {
@@ -109,7 +109,7 @@ export default async function handler(
       const data = response.data;
 
       if (data.data.length < 1) {
-        res.status(200).json({ data: data, message: "No New Transaction!" });
+        res.status(200).json({ data: data.data, message: "No New Transaction!" });
         return;
       }
 
