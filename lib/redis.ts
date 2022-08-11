@@ -52,7 +52,7 @@ export async function createIndex() {
   await repository.createIndex();
 }
 
-export async function searchTransaction() {
+export async function searchTransaction(q: any) {
   await connect();
 
   const repository = client.fetchRepository(schema);

@@ -162,7 +162,7 @@ export default async function handler(
         const params = new URLSearchParams({ transID });
 
         const transaction = await fetch(
-          "https://destiny-credit.vercel.app/api/search?"
+          "https://destiny-credit.vercel.app/api/search?" + params
         );
 
         const result = await transaction.json();
