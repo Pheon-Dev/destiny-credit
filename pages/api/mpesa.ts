@@ -88,7 +88,7 @@ export default async function handler(
       const url_db = "https://destiny-credit.vercel.app/api/transaction";
 
       const params = {
-        query: "TransactionTypes",
+        query: "TransactionType",
         order: "newest_first",
       };
       const headers = {
