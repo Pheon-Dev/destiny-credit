@@ -2,6 +2,7 @@ import axios from "axios";
 import type { NextApiRequest, NextApiResponse } from "next";
 import { dateTime } from "../../utils/dates";
 import { routes } from "../../utils/routes";
+import { searchTransaction, createIndex } from "../../lib/redis";
 
 const LOGTAIL_API_TOKEN = process.env.NEXT_PUBLIC_LOGTAIL_API_TOKEN;
 
@@ -159,16 +160,20 @@ export default async function handler(
           lastName: lastName,
         };
 
-        const params = new URLSearchParams({ transID });
+        const params = new URLSearchParams({ transTime });
 
-        const transaction = await fetch(
-          "https://destiny-credit.vercel.app/api/search?" + params
-        );
+        // const transaction = await fetch(
+        //   "https://destiny-credit.vercel.app/api/search?" + params
+        // );
 
-        const result = await transaction.json();
+  await createIndex();
+  const q = params;
+  const transaction = await searchTransaction(q);
 
-        console.log(result);
-        if (result.data > 0) {
+        // const result = await transaction.json();
+
+        console.log(transaction);
+        if (transaction.length > 0) {
           res.status(200).json({ data: body, message: "Transaction Exists!" });
           return;
         }

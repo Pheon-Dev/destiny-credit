@@ -57,10 +57,11 @@ export async function searchTransaction(q: any) {
 
   const repository = client.fetchRepository(schema);
 
+  console.log("q :", q)
   const transaction = await repository
     .search()
-    // .where("transID")
-    // .equals(q)
+    .where('transTime')
+    .equals(q)
     .return.all();
 
   return transaction;
