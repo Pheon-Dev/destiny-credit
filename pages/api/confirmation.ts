@@ -21,6 +21,9 @@ async function confirm(req: NextApiRequest, res: NextApiResponse) {
     const headers = {
       "Content-Type": "application/json",
     };
+    console.log("--------")
+    console.log(data)
+    console.log("--------")
     const body_data = {
       transactionTest: data,
     };
