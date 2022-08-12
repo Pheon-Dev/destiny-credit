@@ -14,8 +14,9 @@ async function confirm(req: NextApiRequest, res: NextApiResponse) {
       form.parse(req, function (err: any, fields: any, files: any) {
         if (err) return reject(err);
         resolve({ fields, files });
+        console.log(fields.TransactionType)
         async function writeData() {
-          if (fields?.TransactionType === "Pay Bill") {
+          if (fields.TransactionType) {
             const url = "https://destiny-credit.vercel.app/api/transaction";
             const headers = {
               "Content-Type": "application/json",
@@ -42,25 +43,25 @@ async function confirm(req: NextApiRequest, res: NextApiResponse) {
               url: url,
               headers: headers,
             });
-            console.log(results);
+            return console.log(results);
           }
-          if (fields?.ResultDesc === "Accepted") {
-            const url = "https://destiny-credit.vercel.app/api/test";
-            const headers = {
-              "Content-Type": "application/json",
-            };
-
-            const body = {
-              transactionTest: fields?.ResultDesc,
-            };
-            const results = await axios.request({
-              data: JSON.stringify(body),
-              method: "POST",
-              url: url,
-              headers: headers,
-            });
-            console.log(results);
-          }
+          // if (!fields.TransactionType) {
+          //   const url = "https://destiny-credit.vercel.app/api/test";
+          //   const headers = {
+          //     "Content-Type": "application/json",
+          //   };
+          //
+          //   const body = {
+          //     transactionTest: "No Fields",
+          //   };
+          //   const results = await axios.request({
+          //     data: JSON.stringify(body),
+          //     method: "POST",
+          //     url: url,
+          //     headers: headers,
+          //   });
+          //   return console.log(results);
+          // }
         }
         writeData();
       });
