@@ -14,51 +14,59 @@ async function confirm(req: NextApiRequest, res: NextApiResponse) {
       form.parse(req, function (err: any, fields: any, files: any) {
         if (err) return reject(err);
         resolve({ fields, files });
+
         console.log(fields.TransactionType);
-        async function writeData() {
-            const url = "https://destiny-credit.vercel.app/api/transaction";
-            const headers = {
-              "Content-Type": "application/json",
-            };
 
-            let transactionType = fields.TransactionType;
-            let transID = fields.TransID;
-            let transTime = fields.TransTime;
-            let transAmount = fields.TransAmount;
-            let businessShortCode = fields.BusinessShortCode;
-            let billRefNumber = fields.BillRefNumber;
-            let invoiceNumber = fields.InvoiceNumber;
-            let orgAccountBalance = fields.OrgAccountBalance;
-            let thirdPartyTransID = fields.ThirdPartyTransID;
-            let msisdn = fields.Msisdn;
-            let firstName = fields.FirstName;
-            let middleName = fields.MiddleName;
-            let lastName = fields.LastName;
+        async function test() {
+          const url = "https://destiny-credit.vercel.app/api/test";
+          const headers = {
+            "Content-Type": "application/json",
+          };
 
-            const body = {
-              transactionType: transactionType,
-              transID: transID,
-              transTime: transTime,
-              transAmount: transAmount,
-              businessShortCode: businessShortCode,
-              billRefNumber: billRefNumber,
-              invoiceNumber: invoiceNumber,
-              orgAccountBalance: orgAccountBalance,
-              thirdPartyTransID: thirdPartyTransID,
-              msisdn: msisdn,
-              firstName: firstName,
-              middleName: middleName,
-              lastName: lastName,
-            };
+          const data = {
+            transactionTest: fields.TransactionType,
+          };
 
-            const results = await axios.request({
-              data: JSON.stringify(body),
-              method: "POST",
-              url: url,
-              headers: headers,
-            });
-            console.log(results);
+          const results = await axios.request({
+            data: JSON.stringify(data),
+            method: "POST",
+            url: url,
+            headers: headers,
+          });
+          console.log(results);
         }
+
+        async function writeData() {
+          const url = "https://destiny-credit.vercel.app/api/transaction";
+          const headers = {
+            "Content-Type": "application/json",
+          };
+
+          const body = {
+            transactionType: fields.TransactionType,
+            transID: fields.TransID,
+            transTime: fields.TransTime,
+            transAmount: fields.TransAmount,
+            businessShortCode: fields.BusinessShortCode,
+            billRefNumber: fields.BillRefNumber,
+            invoiceNumber: fields.InvoiceNumber,
+            orgAccountBalance: fields.OrgAccountBalance,
+            thirdPartyTransID: fields.ThirdPartyTransID,
+            msisdn: fields.Msisdn,
+            firstName: fields.FirstName,
+            middleName: fields.MiddleName,
+            lastName: fields.LastName,
+          };
+
+          const results = await axios.request({
+            data: JSON.stringify(body),
+            method: "POST",
+            url: url,
+            headers: headers,
+          });
+          console.log(results);
+        }
+        test();
         writeData();
       });
     });
