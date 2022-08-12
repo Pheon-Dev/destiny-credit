@@ -1,4 +1,5 @@
 import type { NextApiRequest, NextApiResponse } from "next";
+import axios from "axios";
 const formidable = require("formidable");
 
 async function confirm(req: NextApiRequest, res: NextApiResponse) {
@@ -16,6 +17,21 @@ async function confirm(req: NextApiRequest, res: NextApiResponse) {
       });
     });
 
+    const url = "https://destiny-credit.vercel.app/api/test";
+    const headers = {
+      "Content-Type": "application/json",
+    };
+    const body_data = {
+      transactionTest: data,
+    };
+    const results = await axios.request({
+      data: JSON.stringify(body_data),
+      method: "POST",
+      url: url,
+      headers: headers,
+    });
+
+    console.log(results);
     const body = JSON.stringify(data);
     console.log(body);
   } catch (error) {

@@ -10,6 +10,17 @@ async function connect() {
 }
 
 class Transaction extends Entity {}
+class Test extends Entity {}
+
+let test_schema = new Schema(
+  Test,
+  {
+    transactionTest: { type: "string" },
+  },
+  {
+    dataStructure: "JSON",
+  }
+);
 
 let schema = new Schema(
   Transaction,
@@ -32,6 +43,17 @@ let schema = new Schema(
     dataStructure: "JSON",
   }
 );
+
+export async function createTest(data: any) {
+  await connect();
+
+  const repository = client.fetchRepository(test_schema);
+
+  const transaction = repository.createEntity(data);
+
+  const id = await repository.save(transaction);
+  return id;
+}
 
 export async function createTransaction(data: any) {
   await connect();

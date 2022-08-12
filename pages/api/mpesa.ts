@@ -44,7 +44,6 @@ async function getToken() {
   return res.data.access_token;
 }
 
-//   stk push
 export default async function handler(
   req: NextApiRequest,
   res: NextApiResponse
