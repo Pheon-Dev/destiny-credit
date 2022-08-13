@@ -9,70 +9,43 @@ async function confirm(req: NextApiRequest, res: NextApiResponse) {
       ResultDesc: "Accepted",
     });
 
+    const url = "https://destiny-credit.vercel.app/api/test";
+    const headers = {
+      "Content-Type": "application/json",
+    };
+
     const data = await new Promise(function (resolve, reject) {
       const form = new formidable.IncomingForm({ keepExtensions: true });
       form.parse(req, function (err: any, fields: any, files: any) {
         if (err) return reject(err);
         resolve({ fields, files });
-
-        console.log(fields.TransactionType);
-
-        async function test() {
-          const url = "https://destiny-credit.vercel.app/api/test";
-          const headers = {
-            "Content-Type": "application/json",
-          };
-
-          const data = {
-            transactionTest: fields.TransactionType,
-          };
-
-          const results = await axios.request({
-            data: JSON.stringify(data),
-            method: "POST",
-            url: url,
-            headers: headers,
-          });
-          console.log(results);
-        }
-
-        async function writeData() {
-          const url = "https://destiny-credit.vercel.app/api/transaction";
-          const headers = {
-            "Content-Type": "application/json",
-          };
-
-          const body = {
-            transactionType: fields.TransactionType,
-            transID: fields.TransID,
-            transTime: fields.TransTime,
-            transAmount: fields.TransAmount,
-            businessShortCode: fields.BusinessShortCode,
-            billRefNumber: fields.BillRefNumber,
-            invoiceNumber: fields.InvoiceNumber,
-            orgAccountBalance: fields.OrgAccountBalance,
-            thirdPartyTransID: fields.ThirdPartyTransID,
-            msisdn: fields.Msisdn,
-            firstName: fields.FirstName,
-            middleName: fields.MiddleName,
-            lastName: fields.LastName,
-          };
-
-          const results = await axios.request({
-            data: JSON.stringify(body),
-            method: "POST",
-            url: url,
-            headers: headers,
-          });
-          console.log(results);
-        }
-        test();
-        writeData();
       });
     });
-
     const body = JSON.stringify(data);
-    console.log(body);
+
+    const body_data = {
+      transactionTest: body,
+      // transID: body?.fields.TransID,
+      // transTime: body?.fields.TransTime,
+      // transAmount: body?.fields.TransAmount,
+      // businessShortCode: body?.fields.BusinessShortCode,
+      // billRefNumber: body?.fields.BillRefNumber,
+      // invoiceNumber: body?.fields.InvoiceNumber,
+      // orgAccountBalance: body?.fields.OrgAccountBalance,
+      // thirdPartyTransID: body?.fields.ThirdPartyTransID,
+      // msisdn: body?.fields.Msisdn,
+      // firstName: body?.fields.FirstName,
+      // middleName: body?.fields.MiddleName,
+      // lastName: body?.fields.LastName,
+    };
+
+    const results = await axios.request({
+      data: body_data,
+      method: "POST",
+      url: url,
+      headers: headers,
+    });
+    console.log(results);
   } catch (error) {
     console.log(error);
 
