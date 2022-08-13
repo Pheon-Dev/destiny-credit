@@ -9,7 +9,7 @@ async function confirm(req: NextApiRequest, res: NextApiResponse) {
       ResultDesc: "Accepted",
     });
 
-    const url = "https://destiny-credit.vercel.app/api/test";
+    const url = "https://destiny-credit.vercel.app/api/transaction";
     const headers = {
       "Content-Type": "application/json",
     };
@@ -23,29 +23,33 @@ async function confirm(req: NextApiRequest, res: NextApiResponse) {
     });
     const body = JSON.stringify(data);
 
+    console.log(body);
+
+    console.log(req.body?.TransTime);
     const body_data = {
-      transactionTest: body,
-      // transID: body?.fields.TransID,
-      // transTime: body?.fields.TransTime,
-      // transAmount: body?.fields.TransAmount,
-      // businessShortCode: body?.fields.BusinessShortCode,
-      // billRefNumber: body?.fields.BillRefNumber,
-      // invoiceNumber: body?.fields.InvoiceNumber,
-      // orgAccountBalance: body?.fields.OrgAccountBalance,
-      // thirdPartyTransID: body?.fields.ThirdPartyTransID,
-      // msisdn: body?.fields.Msisdn,
-      // firstName: body?.fields.FirstName,
-      // middleName: body?.fields.MiddleName,
-      // lastName: body?.fields.LastName,
+      transactionType: req.body?.TransactionType,
+      transID: req.body?.TransID,
+      transTime: req.body?.TransTime,
+      transAmount: req.body?.TransAmount,
+      businessShortCode: req.body?.BusinessShortCode,
+      billRefNumber: req.body?.BillRefNumber,
+      invoiceNumber: req.body?.InvoiceNumber,
+      orgAccountBalance: req.body?.OrgAccountBalance,
+      thirdPartyTransID: req.body?.ThirdPartyTransID,
+      msisdn: req.body?.Msisdn,
+      firstName: req.body?.FirstName,
+      middleName: req.body?.MiddleName,
+      lastName: req.body?.LastName,
     };
 
     const results = await axios.request({
-      data: body_data,
+      data: JSON.stringify(body_data),
       method: "POST",
       url: url,
       headers: headers,
     });
-    console.log(results);
+    console.log("Results :", results);
+    console.log("Data :", body_data);
   } catch (error) {
     console.log(error);
 
