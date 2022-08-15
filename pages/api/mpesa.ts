@@ -107,17 +107,11 @@ export default async function handler(
 
       const data = response.data;
 
-      if (data.data.length < 1) {
-        res
-          .status(200)
-          .json({ data: data.data, message: "No New Transaction!" });
-        return;
-      }
-
       // res.status(200).json({ data: data.data, message: "All Transaction!" });
       if (data.data.length > 0) {
-        let counter = 0;
-        while (counter <= data.data.length) {
+        let counter: number = 0;
+        do {
+          console.log(counter);
           const data_res = data.data[counter]?.message_string
             .split("{")[2]
             .split("}")[0];
@@ -171,30 +165,32 @@ export default async function handler(
           };
 
           await createIndex();
-          const q = transTime;
+          let q = transTime;
           const transaction = await searchTransaction(q);
 
           if (transaction.length > 0) {
-            res
-              .status(200)
-              .json({ data: body, message: "Transaction Exists!" });
-            return counter += 1;
-          }
-
-          if (transaction.length < 1) {
-            const res_db = await axios.request({
-              data: JSON.stringify(body),
-              method: "POST",
-              url: url_db,
-              headers: headers_db,
-            });
-
+             counter++;
             return res
               .status(200)
-              .json({ data: body, id: res_db.data.id, message: "Transaction Created!" });
+              .json({ data: body, message: "Transaction Exists!" });
           }
-        }
+
+          const res_db = await axios.request({
+            data: JSON.stringify(body),
+            method: "POST",
+            url: url_db,
+            headers: headers_db,
+          });
+
+          console.log(res_db.data);
+          return res
+            .status(200)
+            .json({ data: body, message: "Transaction Created!" });
+        } while (counter < data.data.length);
       }
+      return res
+        .status(200)
+        .json({ data: data.data, message: "No New Transaction!" });
     } catch (error) {
       console.log(error);
 

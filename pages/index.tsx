@@ -147,6 +147,8 @@ export async function getStaticProps() {
     headers: { Authorization: `Bearer ${LOGTAIL_API_TOKEN}` },
   });
 
+  // const transactions = await fetch("https://data.mongodb-api.com/app/data-tkbsg/endpoint/data/v1");
+
   const mpesa = await fetch("https://destiny-credit.vercel.app/api/mpesa", {
     method: "GET",
   });
@@ -156,7 +158,6 @@ export async function getStaticProps() {
     headers: { Authorization: `Bearer ${LOGTAIL_API_TOKEN}` },
   });
 
-  // const data = await mpesa.json();
   const data = await mpesa.json();
 
   return { props: { data }, revalidate: 1 };
