@@ -174,7 +174,7 @@ export default async function handler(
           headers: headers_db,
         });
 
-        console.log(res_db);
+        console.log(res_db.data);
         res.status(200).json({ data: body, message: "Transaction Created!" });
         return;
       }

@@ -24,6 +24,7 @@ async function confirm(req: NextApiRequest, res: NextApiResponse) {
     const body = JSON.stringify(data);
 
     console.log(body);
+    console.log(req.body);
 
     if (req.body?.TransTime) {
       const body_data = {
