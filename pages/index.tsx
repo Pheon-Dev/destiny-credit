@@ -117,19 +117,20 @@ const Home: NextPage = (data: any) => {
         <div className="text-black-500 text-sm flex justify-center ml-auto mr-auto">
           <pre>{JSON.stringify(transactions, undefined, 2)}</pre>
         </div>
-        <div>
-          <>
-            {transactions &&
-              transactions.map((item: any) => {
-                <div
-                  key={item.entityId}
-                  className="text-black-500 text-sm flex justify-center ml-auto mr-auto"
-                >
-                  {item.firstName}
-                </div>;
-              })}
-          </>
-        </div>
+        {/* <div> */}
+        {/*   <> */}
+        {/*     {transactions && */}
+        {/*       transactions.map((item: any) => { */}
+        {/*         <div */}
+        {/*           key={item.entityId} */}
+        {/*           className="text-black-500 text-sm flex justify-center ml-auto mr-auto" */}
+        {/*         > */}
+        {/*           {item.firstName} */}
+        {/*         </div>; */}
+        {/*       })} */}
+        {/*   </> */}
+        {/* </div> */}
+
         {/* <button */}
         {/*   // onClick={handleSave} */}
         {/*   className="bg-green-800 text-white rounded-lg p-3" */}
@@ -141,7 +142,7 @@ const Home: NextPage = (data: any) => {
   );
 };
 
-export async function getStaticProps() {
+export const getServerSideProps = async () => {
   const sources = await fetch("https://logtail.com/api/v1/sources", {
     method: "GET",
     headers: { Authorization: `Bearer ${LOGTAIL_API_TOKEN}` },
@@ -160,7 +161,7 @@ export async function getStaticProps() {
 
   const data = await mpesa.json();
 
-  return { props: { data }, revalidate: 1 };
+  return { props: { data }};
 }
 
 export default Home;

@@ -5,10 +5,10 @@ const MONGODB_DB = process.env.NEXT_PUBLIC_DB_NAME;
 
 try {
   if (!MONGODB_URI) {
-    console.log(`Found ${MONGODB_URI} environment variable!`);
+    throw new Error(`Found ${MONGODB_URI} environment variable!`);
   }
   if (!MONGODB_DB) {
-    console.log(`Found ${MONGODB_DB} environment variable!`);
+    throw new Error(`Found ${MONGODB_DB} environment variable!`);
   }
 } catch (error) {
   console.log(error);
