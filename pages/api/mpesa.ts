@@ -111,10 +111,10 @@ export default async function handler(
 
       const data = response.data;
 
-      // res.status(200).json({ data: data.data, message: "All Transaction!" });
+      // res.status(200).json({ data: data.data, message: "All Transactions!" });
       if (data.data.length > 0) {
         let counter: number = 0;
-        do {
+         while (counter < data.data.length) {
           console.log(counter);
           const data_res = data.data[counter]?.message_string
             .split("{")[2]
@@ -173,10 +173,10 @@ export default async function handler(
           const transaction = await searchTransaction(q);
 
           if (transaction.length > 0) {
-            counter++;
-            return res
+            res
               .status(200)
               .json({ data: body, message: "Transaction Exists!" });
+              return counter++;
           }
 
           const res_db = await axios.request({
@@ -209,10 +209,11 @@ export default async function handler(
           ]);
 
           console.log(res_db.data);
-          return res
+           res
             .status(200)
             .json({ data: body, message: "Transaction Created!" });
-        } while (counter < data.data.length);
+              return counter++;
+        }
       }
       return res
         .status(200)

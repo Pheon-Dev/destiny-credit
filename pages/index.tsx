@@ -27,7 +27,19 @@ type Transactions = {
 };
 
 type Data = {
-  data: any;
+  transactionType: string;
+  transID: string;
+  transTime: string;
+  transAmount: string;
+  businessShortCode: string;
+  billRefNumber: string;
+  invoiceNumber: string;
+  orgAccountBalance: string;
+  thirdPartyTransID: string;
+  msisdn: string;
+  firstName: string;
+  middleName: string;
+  lastName: string;
 };
 
 export default function Home({
@@ -37,10 +49,6 @@ export default function Home({
   data: Data[];
   transactions: Transactions[];
 }) {
-  const [tel, setTel] = useState("254");
-  const [amt, setAmt] = useState("");
-  const [pay, setPay] = useState("");
-  const [ref, setRef] = useState("");
   const [mpesaTransactions, setMpesaTransactions] = useState([]);
 
   async function fetchTransactions() {
@@ -56,109 +64,16 @@ export default function Home({
     fetchTransactions();
   }, [data]);
 
-  // console.log(transactions);
-
-  const refChange = (e: FormEvent<HTMLInputElement>) => {
-    if (isNaN(Number(e.currentTarget.value))) return;
-    setRef(e.currentTarget.value);
-  };
-
-  const payChange = (e: FormEvent<HTMLInputElement>) => {
-    if (isNaN(Number(e.currentTarget.value))) return;
-    setPay(e.currentTarget.value);
-  };
-
-  const amtChange = (e: FormEvent<HTMLInputElement>) => {
-    if (isNaN(Number(e.currentTarget.value))) return;
-    setAmt(e.currentTarget.value);
-  };
-
-  const telChange = (e: FormEvent<HTMLInputElement>) => {
-    if (isNaN(Number(e.currentTarget.value))) return;
-    setTel(e.currentTarget.value);
-  };
-
-  const submitHandler = async (e: FormEvent<HTMLFormElement>) => {
-    e.preventDefault();
-    if (tel.length < 9) return;
-    if (pay.length < 1) return;
-    if (ref.length < 1) return;
-    if (+amt <= 0) return;
-
-    const res = await axios.request({
-      method: "POST",
-      url: "/api/mpesa",
-      data: {
-        PhoneNumber: +tel,
-        Amount: +amt,
-        BusinessShortCode: +pay,
-        BillRef: +ref,
-      },
-    });
-    console.log(res.data);
-  };
-
   return (
     <div className="w-full bg-gray-300">
-      <Head>
-        <title>Destiny Credit</title>
-        <meta name="description" content="Destiny Credit" />
-        <link rel="icon" href="/favicon.ico" />
-      </Head>
-
-      <main className={styles.main}>
-        <form onSubmit={submitHandler} className={styles.form}>
-          <label htmlFor="tel">Phone Number</label>
-          <input
-            type="tel"
-            name="tel"
-            placeholder="Enter phone number"
-            value={tel}
-            onChange={telChange}
-          />
-          <label htmlFor="amt">Amount</label>
-          <input
-            type="text"
-            name="amt"
-            placeholder="Enter amount"
-            value={amt}
-            onChange={amtChange}
-          />
-          <label htmlFor="pay">Pay Bill</label>
-          <input
-            type="text"
-            name="pay"
-            placeholder="Enter Pay Bill No."
-            value={pay}
-            onChange={payChange}
-          />
-          <label htmlFor="pay">Bill Ref</label>
-          <input
-            type="text"
-            name="ref"
-            placeholder="Enter Bill Ref No."
-            value={ref}
-            onChange={refChange}
-          />
-          <button type="submit">Pay</button>
-        </form>
-
-        <div className="text-blue-500 text-sm">/api/confirmation</div>
         <div className="text-black-500 text-sm flex justify-center ml-auto mr-auto">
           <pre>{JSON.stringify(transactions, undefined, 2)}</pre>
-        </div>
-        <div>
-          <>
-            {transactions &&
-              transactions.map((item) => {
-                <div
-                  key={item.transID}
-                  className="text-black-500 text-sm flex justify-center ml-auto mr-auto"
-                >
-                  {item.firstName}
-                </div>;
-              })}
-          </>
+            {transactions.map((transaction) => (
+                <TransactionDiv
+                  key={transaction.transID}
+                  transaction={transaction}
+                />
+              ))}
         </div>
 
         {/* <button */}
@@ -167,10 +82,15 @@ export default function Home({
         {/* > */}
         {/*   Reload */}
         {/* </button> */}
-      </main>
     </div>
   );
 }
+
+function TransactionDiv({transaction}: {transaction: Transactions}) {
+    return (
+    <div>{transaction.transID}</div>
+    )
+  }
 
 export const getServerSideProps = async (context: any) => {
   const { res } = context;
