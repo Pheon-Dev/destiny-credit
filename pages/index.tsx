@@ -66,37 +66,32 @@ export default function Home({
 
   return (
     <div className="w-full bg-gray-300">
-        <div className="text-black-500 text-sm flex justify-center ml-auto mr-auto">
-          <pre>{JSON.stringify(data, undefined, 2)}</pre>
-            {transactions.map((transaction) => (
-                <TransactionDiv
-                  key={transaction.transID}
-                  transaction={transaction}
-                />
-              ))}
-        </div>
+      <div className="text-black-500 text-sm flex justify-center ml-auto mr-auto">
+        <pre>{JSON.stringify(data, undefined, 2)}</pre>
+        {transactions.map((transaction) => (
+          <TransactionDiv key={transaction.transID} transaction={transaction} />
+        ))}
+      </div>
 
-        {/* <button */}
-        {/*   // onClick={handleSave} */}
-        {/*   className="bg-green-800 text-white rounded-lg p-3" */}
-        {/* > */}
-        {/*   Reload */}
-        {/* </button> */}
+      {/* <button */}
+      {/*   // onClick={handleSave} */}
+      {/*   className="bg-green-800 text-white rounded-lg p-3" */}
+      {/* > */}
+      {/*   Reload */}
+      {/* </button> */}
     </div>
   );
 }
 
-function TransactionDiv({transaction}: {transaction: Transactions}) {
-    return (
-    <div>{transaction.transID}</div>
-    )
-  }
+function TransactionDiv({ transaction }: { transaction: Transactions }) {
+  return <div>{transaction.transID}</div>;
+}
 
 export const getServerSideProps = async (context: any) => {
   const { res } = context;
   res.setHeader("Cache-Control", `s-maxage=60, stale-while-revalidate`);
 
-// export const getSaticProps = async () => {
+  // export const getSaticProps = async () => {
   const supabaseAdmin = createClient(
     SUPABASE_URL || "",
     SUPABASE_SERVICE_ROLE_KEY || ""
