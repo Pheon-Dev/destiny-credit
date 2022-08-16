@@ -176,6 +176,7 @@ export const getServerSideProps = async (context: any) => {
   const { res } = context;
   res.setHeader("Cache-Control", `s-maxage=60, stale-while-revalidate`);
 
+// export const getSaticProps = async () => {
   const supabaseAdmin = createClient(
     SUPABASE_URL || "",
     SUPABASE_SERVICE_ROLE_KEY || ""
