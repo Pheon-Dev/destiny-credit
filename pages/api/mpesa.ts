@@ -91,8 +91,8 @@ export default async function handler(
 
       const params = {
         query: "TransactionType",
-        order: "newest_first",
       };
+
       const headers = {
         Authorization: `Bearer ${token}`,
       };
@@ -106,11 +106,12 @@ export default async function handler(
 
       const data = response.data;
 
+      // res.status(200).json({ data: data.data, message: "All Transactions!" });
       if (data.data.length > 0) {
         let counter: number = 0;
         while (counter < data.data.length) {
           console.log(counter);
-          const data_res = data.data[counter]?.message_string
+          const data_res = data.data[counter]?.message
             .split("{")[2]
             .split("}")[0];
 
