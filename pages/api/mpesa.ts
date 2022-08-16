@@ -3,6 +3,10 @@ import type { NextApiRequest, NextApiResponse } from "next";
 import { dateTime } from "../../utils/dates";
 import { routes } from "../../utils/routes";
 import { searchTransaction, createIndex } from "../../lib/redis";
+import { createClient } from "@supabase/supabase-js";
+
+const SUPABASE_URL = process.env.NEXT_PUBLIC_SUPABASE_URL;
+const SUPABASE_SERVICE_ROLE_KEY = process.env.SUPABASE_SERVICE_ROLE_KEY;
 
 const LOGTAIL_API_TOKEN = process.env.NEXT_PUBLIC_LOGTAIL_API_TOKEN;
 
@@ -169,7 +173,7 @@ export default async function handler(
           const transaction = await searchTransaction(q);
 
           if (transaction.length > 0) {
-             counter++;
+            counter++;
             return res
               .status(200)
               .json({ data: body, message: "Transaction Exists!" });
@@ -181,6 +185,28 @@ export default async function handler(
             url: url_db,
             headers: headers_db,
           });
+
+          const supabaseAdmin = createClient(
+            SUPABASE_URL || "",
+            SUPABASE_SERVICE_ROLE_KEY || ""
+          );
+          await supabaseAdmin.from("transactions").insert([
+            {
+              transactionType: transactionType,
+              transID: transID,
+              transTime: transTime,
+              transAmount: transAmount,
+              businessShortCode: businessShortCode,
+              billRefNumber: billRefNumber,
+              invoiceNumber: invoiceNumber,
+              orgAccountBalance: orgAccountBalance,
+              thirdPartyTransID: thirdPartyTransID,
+              msisdn: msisdn,
+              firstName: firstName,
+              middleName: middleName,
+              lastName: lastName,
+            },
+          ]);
 
           console.log(res_db.data);
           return res

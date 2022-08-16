@@ -2,9 +2,12 @@ import axios from "axios";
 import type { NextPage } from "next";
 import Head from "next/head";
 import { FormEvent, useEffect, useState } from "react";
+import { createClient } from "@supabase/supabase-js";
 import styles from "../styles/Home.module.css";
 
 const LOGTAIL_API_TOKEN = process.env.NEXT_PUBLIC_LOGTAIL_API_TOKEN;
+const SUPABASE_URL = process.env.NEXT_PUBLIC_SUPABASE_URL;
+const SUPABASE_SERVICE_ROLE_KEY = process.env.SUPABASE_SERVICE_ROLE_KEY;
 
 const Home: NextPage = (data: any) => {
   const [tel, setTel] = useState("254");
@@ -143,6 +146,8 @@ const Home: NextPage = (data: any) => {
 };
 
 export const getServerSideProps = async () => {
+const supabaseAdmin = createClient(SUPABASE_URL || '', SUPABASE_SERVICE_ROLE_KEY || '')
+
   const sources = await fetch("https://logtail.com/api/v1/sources", {
     method: "GET",
     headers: { Authorization: `Bearer ${LOGTAIL_API_TOKEN}` },
@@ -159,9 +164,10 @@ export const getServerSideProps = async () => {
     headers: { Authorization: `Bearer ${LOGTAIL_API_TOKEN}` },
   });
 
-  const data = await mpesa.json();
+  const mpesa_data = await mpesa.json();
+  const { data } = await supabaseAdmin.from('transactions').select('*').order('transTime');
 
-  return { props: { data }};
+  return { props: { data: mpesa_data, transactions: data }};
 }
 
 export default Home;
