@@ -88,7 +88,6 @@ export default async function handler(
     try {
       const token = LOGTAIL_API_TOKEN;
       const url = "https://logtail.com/api/v1/query";
-      const url_db = "https://destiny-credit.vercel.app/api/transaction";
 
       const params = {
         query: "TransactionType",
@@ -96,10 +95,6 @@ export default async function handler(
       };
       const headers = {
         Authorization: `Bearer ${token}`,
-      };
-
-      const headers_db = {
-        "Content-Type": "application/json",
       };
 
       const response = await axios.request({
@@ -111,10 +106,9 @@ export default async function handler(
 
       const data = response.data;
 
-      // res.status(200).json({ data: data.data, message: "All Transactions!" });
       if (data.data.length > 0) {
         let counter: number = 0;
-         while (counter < data.data.length) {
+        while (counter < data.data.length) {
           console.log(counter);
           const data_res = data.data[counter]?.message_string
             .split("{")[2]
@@ -173,11 +167,16 @@ export default async function handler(
           const transaction = await searchTransaction(q);
 
           if (transaction.length > 0) {
+            counter++;
             res
               .status(200)
               .json({ data: body, message: "Transaction Exists!" });
-              return counter++;
           }
+
+          const url_db = "https://destiny-credit.vercel.app/api/transaction";
+          const headers_db = {
+            "Content-Type": "application/json",
+          };
 
           const res_db = await axios.request({
             data: JSON.stringify(body),
@@ -185,6 +184,8 @@ export default async function handler(
             url: url_db,
             headers: headers_db,
           });
+
+          console.log(res_db.data);
 
           const supabaseAdmin = createClient(
             SUPABASE_URL || "",
@@ -208,14 +209,11 @@ export default async function handler(
             },
           ]);
 
-          console.log(res_db.data);
-           res
-            .status(200)
-            .json({ data: body, message: "Transaction Created!" });
-              return counter++;
+          counter++;
+          res.status(200).json({ data: body, message: "Transaction Created!" });
         }
       }
-      return res
+       res
         .status(200)
         .json({ data: data.data, message: "No New Transaction!" });
     } catch (error) {

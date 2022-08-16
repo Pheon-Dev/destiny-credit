@@ -67,7 +67,7 @@ export default function Home({
   return (
     <div className="w-full bg-gray-300">
         <div className="text-black-500 text-sm flex justify-center ml-auto mr-auto">
-          <pre>{JSON.stringify(transactions, undefined, 2)}</pre>
+          <pre>{JSON.stringify(data, undefined, 2)}</pre>
             {transactions.map((transaction) => (
                 <TransactionDiv
                   key={transaction.transID}
@@ -118,7 +118,7 @@ export const getServerSideProps = async (context: any) => {
     headers: { Authorization: `Bearer ${LOGTAIL_API_TOKEN}` },
   });
 
-  const mpesa_data = await mpesa.json();
+  const mpesa_data = await query.json();
   const { data } = await supabaseAdmin.from("transactions").select("*");
 
   return { props: { data: mpesa_data, transactions: data } };
