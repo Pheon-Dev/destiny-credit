@@ -27,10 +27,16 @@ type Transactions = {
 };
 
 type Data = {
-    data: any;
-  }
+  data: any;
+};
 
-export default function Home({data, transactions}: {data: Data[], transactions: Transactions[]}) {
+export default function Home({
+  data,
+  transactions,
+}: {
+  data: Data[];
+  transactions: Transactions[];
+}) {
   const [tel, setTel] = useState("254");
   const [amt, setAmt] = useState("");
   const [pay, setPay] = useState("");
@@ -141,19 +147,19 @@ export default function Home({data, transactions}: {data: Data[], transactions: 
         <div className="text-black-500 text-sm flex justify-center ml-auto mr-auto">
           <pre>{JSON.stringify(transactions, undefined, 2)}</pre>
         </div>
-        {/* <div> */}
-        {/*   <> */}
-        {/*     {transactions && */}
-        {/*       transactions.map((item: any) => { */}
-        {/*         <div */}
-        {/*           key={item.entityId} */}
-        {/*           className="text-black-500 text-sm flex justify-center ml-auto mr-auto" */}
-        {/*         > */}
-        {/*           {item.firstName} */}
-        {/*         </div>; */}
-        {/*       })} */}
-        {/*   </> */}
-        {/* </div> */}
+        <div>
+          <>
+            {transactions &&
+              transactions.map((item) => {
+                <div
+                  key={item.transID}
+                  className="text-black-500 text-sm flex justify-center ml-auto mr-auto"
+                >
+                  {item.firstName}
+                </div>;
+              })}
+          </>
+        </div>
 
         {/* <button */}
         {/*   // onClick={handleSave} */}
@@ -164,7 +170,7 @@ export default function Home({data, transactions}: {data: Data[], transactions: 
       </main>
     </div>
   );
-};
+}
 
 export const getServerSideProps = async (context: any) => {
   const { res } = context;
@@ -196,4 +202,3 @@ export const getServerSideProps = async (context: any) => {
 
   return { props: { data: mpesa_data, transactions: data } };
 };
-
