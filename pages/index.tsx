@@ -9,19 +9,40 @@ const LOGTAIL_API_TOKEN = process.env.NEXT_PUBLIC_LOGTAIL_API_TOKEN;
 const SUPABASE_URL = process.env.NEXT_PUBLIC_SUPABASE_URL;
 const SUPABASE_SERVICE_ROLE_KEY = process.env.SUPABASE_SERVICE_ROLE_KEY;
 
-const Home: NextPage = (data: any) => {
+type Transactions = {
+  id: number;
+  transactionType: string;
+  transID: string;
+  transTime: string;
+  transAmount: string;
+  businessShortCode: string;
+  billRefNumber: string;
+  invoiceNumber: string;
+  orgAccountBalance: string;
+  thirdPartyTransID: string;
+  msisdn: string;
+  firstName: string;
+  middleName: string;
+  lastName: string;
+};
+
+type Data = {
+    data: any;
+  }
+
+export default function Home({data, transactions}: {data: Data[], transactions: Transactions[]}) {
   const [tel, setTel] = useState("254");
   const [amt, setAmt] = useState("");
   const [pay, setPay] = useState("");
   const [ref, setRef] = useState("");
-  const [transactions, setTransactions] = useState([]);
+  const [mpesaTransactions, setMpesaTransactions] = useState([]);
 
   async function fetchTransactions() {
     const res = await fetch("/api/list");
 
     const result = await res.json();
 
-    setTransactions(result["transactions"]);
+    setMpesaTransactions(result["transactions"]);
     return result;
   }
 
@@ -29,7 +50,7 @@ const Home: NextPage = (data: any) => {
     fetchTransactions();
   }, [data]);
 
-    // console.log(transactions);
+  // console.log(transactions);
 
   const refChange = (e: FormEvent<HTMLInputElement>) => {
     if (isNaN(Number(e.currentTarget.value))) return;
@@ -145,8 +166,14 @@ const Home: NextPage = (data: any) => {
   );
 };
 
-export const getServerSideProps = async () => {
-const supabaseAdmin = createClient(SUPABASE_URL || '', SUPABASE_SERVICE_ROLE_KEY || '')
+export const getServerSideProps = async (context: any) => {
+  const { res } = context;
+  res.setHeader("Cache-Control", `s-maxage=60, stale-while-revalidate`);
+
+  const supabaseAdmin = createClient(
+    SUPABASE_URL || "",
+    SUPABASE_SERVICE_ROLE_KEY || ""
+  );
 
   const sources = await fetch("https://logtail.com/api/v1/sources", {
     method: "GET",
@@ -165,9 +192,8 @@ const supabaseAdmin = createClient(SUPABASE_URL || '', SUPABASE_SERVICE_ROLE_KEY
   });
 
   const mpesa_data = await mpesa.json();
-  const { data } = await supabaseAdmin.from('transactions').select('*').order('transTime');
+  const { data } = await supabaseAdmin.from("transactions").select("*");
 
-  return { props: { data: mpesa_data, transactions: data }};
-}
+  return { props: { data: mpesa_data, transactions: data } };
+};
 
-export default Home;
