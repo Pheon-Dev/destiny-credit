@@ -556,6 +556,11 @@
   dependencies:
     tslib "^2.4.0"
 
+"@tabler/icons@^1.83.1":
+  version "1.83.1"
+  resolved "https://registry.yarnpkg.com/@tabler/icons/-/icons-1.83.1.tgz#7e59f4aebcf19b029afd7454164ac3aa8d47f57c"
+  integrity sha512-xJi+59SEIoa3ApbIu81uivmf7Byp9zexoclMlJedBUJGm8vJOeh5PHZFa9k2a/mBnVFccMvJrWpEKbYg0jn1ew==
+
 "@types/cookie@^0.4.1":
   version "0.4.1"
   resolved "https://registry.yarnpkg.com/@types/cookie/-/cookie-0.4.1.tgz#bfd02c1f2224567676c1545199f87c3a861d878d"
