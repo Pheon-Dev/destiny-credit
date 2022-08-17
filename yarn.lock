@@ -222,50 +222,50 @@
   resolved "https://registry.yarnpkg.com/@humanwhocodes/object-schema/-/object-schema-1.2.1.tgz#b520529ec21d8e5945a1851dfd1c32e94e39ff45"
   integrity sha512-ZnQMnLV4e7hDlUvw8H+U8ASL02SS2Gn6+9Ac3wGGLIe7+je2AeAOxPY+izIPJDfFDb7eDjev0Us8MO1iFRN8hA==
 
-"@mantine/core@^5.1.4":
-  version "5.1.4"
-  resolved "https://registry.yarnpkg.com/@mantine/core/-/core-5.1.4.tgz#9d1fb4339b19b10b6045d0ab3f17488d9533513e"
-  integrity sha512-+80FsYfhAqHbBeM+CtO1l1ShALsPoqg8xjqDcwd9f+APRSuu2j0eQ5h91kTKFRHkLuDBCYNsBjmWd+VY9HGKkQ==
+"@mantine/core@^5.1.6":
+  version "5.1.6"
+  resolved "https://registry.yarnpkg.com/@mantine/core/-/core-5.1.6.tgz#98c984bf08ceeb8684a8dc7146034c85e35de9f7"
+  integrity sha512-ZG/ccTc+LcxcUahxMu4m3hOkAss8LetETFbZ5zsDotJTvij2lzMzNcuPebLeyxNt714VEWIXNzIUotNtGXDSGg==
   dependencies:
     "@floating-ui/react-dom-interactions" "0.6.6"
-    "@mantine/styles" "5.1.4"
-    "@mantine/utils" "5.1.4"
+    "@mantine/styles" "5.1.6"
+    "@mantine/utils" "5.1.6"
     "@radix-ui/react-scroll-area" "1.0.0"
     react-textarea-autosize "8.3.4"
 
-"@mantine/hooks@^5.1.4":
-  version "5.1.4"
-  resolved "https://registry.yarnpkg.com/@mantine/hooks/-/hooks-5.1.4.tgz#728b7daf3098de7d4ac13ff230c0abfaec65a433"
-  integrity sha512-hK0f46+JDP2av7R4sD8s+jkunWszlo0SqX3L0wdFZ7BdjnGC7vTgRrESbu+/K6x0eWSXtAQ0GWXt+0R7jkO3Eg==
+"@mantine/hooks@^5.1.6":
+  version "5.1.6"
+  resolved "https://registry.yarnpkg.com/@mantine/hooks/-/hooks-5.1.6.tgz#07d4850d3444526268a749c965ce64eea8cb7583"
+  integrity sha512-wD+Cx9W00YQchudIvkiEy52e/UCB0EhTkJs2fr2JbTlfKCWfWSilE/CPbLz6NWmK58bbyB/qjdKUDwXV6qyasw==
 
-"@mantine/next@^5.1.4":
-  version "5.1.4"
-  resolved "https://registry.yarnpkg.com/@mantine/next/-/next-5.1.4.tgz#389bb819687567e8d15d4748f4bd65e7faa99f1d"
-  integrity sha512-8b9LTNwNFEvwOG9ZInypDv7LEquJD/h3XqEGj8y9PisnspmYK8delXhrtRIiMCMFwZVgsmzYHmqNI1l/hECEHw==
+"@mantine/next@^5.1.6":
+  version "5.1.6"
+  resolved "https://registry.yarnpkg.com/@mantine/next/-/next-5.1.6.tgz#fecc2090fec65bd133b58ed07cef4154cb634e47"
+  integrity sha512-Uf9dPssBCUaErI2kIhN3bDLjCWA9M2L6/JSv+4ik+hyKgVIYNvdWIwPZQTr5C9o5kANAl30OovvQMNbR5NPK5A==
   dependencies:
-    "@mantine/ssr" "5.1.4"
-    "@mantine/styles" "5.1.4"
+    "@mantine/ssr" "5.1.6"
+    "@mantine/styles" "5.1.6"
 
-"@mantine/ssr@5.1.4":
-  version "5.1.4"
-  resolved "https://registry.yarnpkg.com/@mantine/ssr/-/ssr-5.1.4.tgz#a068103da00225c2f8c71e694b5ffeaf43ef2649"
-  integrity sha512-mnQpFK5crH06yWGux8vmtG/2sFmMPiUv1yBuGic9d1DMB/BLCOynKvuK0Hrc31rHFjn4xHVmgtluj+wKMDSyIQ==
+"@mantine/ssr@5.1.6":
+  version "5.1.6"
+  resolved "https://registry.yarnpkg.com/@mantine/ssr/-/ssr-5.1.6.tgz#573e45b199357c57be837b6edc394500268d188a"
+  integrity sha512-MXCUvq+/kcgSWxbcr73Gx7dum6B6Nrp3zT/MpLfWUixZPtsXOMGgPnssdvTvd2GTs8kJWnEGK0XyNwLf3kom2A==
   dependencies:
-    "@mantine/styles" "5.1.4"
+    "@mantine/styles" "5.1.6"
     html-react-parser "1.4.12"
 
-"@mantine/styles@5.1.4":
-  version "5.1.4"
-  resolved "https://registry.yarnpkg.com/@mantine/styles/-/styles-5.1.4.tgz#4414dbcdabb4f28d4ce02753eb7339d64a254fbc"
-  integrity sha512-GMzI4km5sxxwPoAj1JMfOTgqfyHtrd+puMc0Nv+mlTTM22+P8Xp5yM00csL0PV94KP7oiuV1XDFJ7xiyRCamLA==
+"@mantine/styles@5.1.6":
+  version "5.1.6"
+  resolved "https://registry.yarnpkg.com/@mantine/styles/-/styles-5.1.6.tgz#cfb4a33d4c38ffb499d51cd0af35abd436ebe831"
+  integrity sha512-7d112DIHauP+X0JaVh0uzlpVndWqw/muaz77C5hLlA8yP7gVuRWOhEqJDuTnZzNtj/utIJJDAyVM2+DHFqtQtg==
   dependencies:
     clsx "1.1.1"
     csstype "3.0.9"
 
-"@mantine/utils@5.1.4":
-  version "5.1.4"
-  resolved "https://registry.yarnpkg.com/@mantine/utils/-/utils-5.1.4.tgz#3da8459f77fb98f09c3f9a1939449e0c0a9fe58d"
-  integrity sha512-f2lnKjvGkQrWXSqTRg5uNh2PZpeow1enjX8OFwlOn0B6bJDdKYiHl+YidWe2DObOi36WSvtLbaRS7yKQOG+1XQ==
+"@mantine/utils@5.1.6":
+  version "5.1.6"
+  resolved "https://registry.yarnpkg.com/@mantine/utils/-/utils-5.1.6.tgz#992cd1e8850467533aa88dc5fd933650674abf5e"
+  integrity sha512-y7va2keQ+TPwn2j668r889NhQWO0OhSvaxT5P8n2iBaTyPg+Xp5Jm2IE5UjI+OrZErrgmQq1sxbfg6v5vdK+0A==
 
 "@next/env@12.2.0":
   version "12.2.0"

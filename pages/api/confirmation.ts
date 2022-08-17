@@ -21,7 +21,9 @@ type Fields = {
   lastName: string;
 };
 
-const parseForm = async (req: NextApiRequest): Promise<{ fields: formidable.Fields; files: formidable.Files }> => {
+const parseForm = async (
+  req: NextApiRequest
+): Promise<{ fields: formidable.Fields; files: formidable.Files }> => {
   return await new Promise(async (resolve, reject) => {
     resolve({ files: {}, fields: {} });
   });
@@ -42,6 +44,7 @@ async function confirm(req: NextApiRequest, res: NextApiResponse) {
       form.parse(req, function (err: any, fields: any, files: any) {
         if (err) return reject(err);
         resolve({ fields, files });
+        // res.json({ files, fields });
         result.push({
           transactionType: fields.TransactionType,
           transID: fields.TransID,
@@ -61,21 +64,21 @@ async function confirm(req: NextApiRequest, res: NextApiResponse) {
           SUPABASE_URL || "",
           SUPABASE_SERVICE_ROLE_KEY || ""
         );
-         supabaseAdmin.from("transactions").insert([
+        supabaseAdmin.from("transactions").insert([
           {
-              transactionType: result[0].transactionType,
-              transID: result[0].transID,
-              transTime: result[0].transTime,
-              transAmount: result[0].transAmount,
-              businessShortCode: result[0].businessShortCode,
-              billRefNumber: result[0].billRefNumber,
-              invoiceNumber: result[0].invoiceNumber,
-              orgAccountBalance: result[0].orgAccountBalance,
-              thirdPartyTransID: result[0].thirdPartyTransID,
-              msisdn: result[0].msisdn,
-              firstName: result[0].firstName,
-              middleName: result[0].middleName,
-              lastName: result[0].lastName,
+            transactionType: result[0].transactionType,
+            transID: result[0].transID,
+            transTime: result[0].transTime,
+            transAmount: result[0].transAmount,
+            businessShortCode: result[0].businessShortCode,
+            billRefNumber: result[0].billRefNumber,
+            invoiceNumber: result[0].invoiceNumber,
+            orgAccountBalance: result[0].orgAccountBalance,
+            thirdPartyTransID: result[0].thirdPartyTransID,
+            msisdn: result[0].msisdn,
+            firstName: result[0].firstName,
+            middleName: result[0].middleName,
+            lastName: result[0].lastName,
           },
         ]);
         console.log(result);
@@ -84,7 +87,7 @@ async function confirm(req: NextApiRequest, res: NextApiResponse) {
     const body = JSON.stringify(data);
 
     console.log(body);
-    console.log({fields, files});
+    console.log({ fields, files });
 
     // return data.then(({fields, files})=> {
     // res.status(200).json({ data: result });

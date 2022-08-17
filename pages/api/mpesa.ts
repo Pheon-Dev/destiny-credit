@@ -90,9 +90,10 @@ export default async function handler(
       const url = "https://logtail.com/api/v1/query";
 
       const params = {
-        query: "message.fields",
+        query: "fields",
         // order: "newest_first",
-        // from: "2022-08-16T01:00:00+0000"
+        // from: "2022-08-16T01:00:00+0000",
+        // to: "2022-08-17T13:00:00+0000"
       };
 
       const headers = {

@@ -1,9 +1,8 @@
-import axios from "axios";
-import type { NextPage } from "next";
+import { AppProps } from "next/app";
 import Head from "next/head";
-import { FormEvent, useEffect, useState } from "react";
+import { MantineProvider } from "@mantine/core";
+import { useEffect, useState } from "react";
 import { createClient } from "@supabase/supabase-js";
-import styles from "../styles/Home.module.css";
 
 const LOGTAIL_API_TOKEN = process.env.NEXT_PUBLIC_LOGTAIL_API_TOKEN;
 const SUPABASE_URL = process.env.NEXT_PUBLIC_SUPABASE_URL;
@@ -45,10 +44,13 @@ type Data = {
 export default function Home({
   data,
   transactions,
+  props,
 }: {
   data: Data[];
   transactions: Transactions[];
+  props: AppProps;
 }) {
+  const { Component, pageProps } = props;
   const [mpesaTransactions, setMpesaTransactions] = useState([]);
 
   async function fetchTransactions() {
@@ -65,6 +67,11 @@ export default function Home({
   }, [data]);
 
   return (
+  <>
+  <Head>
+  <title>Destiny Credit</title>
+  <meta name="viewport" content="minimum-scale=1, intial-scale=1, width=device-width"/>
+  </Head>
     <div className="w-full bg-gray-300">
       <div className="text-black-500 text-sm flex justify-center ml-auto mr-auto">
         <pre>{JSON.stringify(data, undefined, 2)}</pre>
@@ -79,7 +86,7 @@ export default function Home({
       {/* > */}
       {/*   Reload */}
       {/* </button> */}
-    </div>
+    </div></>
   );
 }
 
