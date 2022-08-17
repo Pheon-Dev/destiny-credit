@@ -90,7 +90,9 @@ export default async function handler(
       const url = "https://logtail.com/api/v1/query";
 
       const params = {
-        query: "TransactionType",
+        query: "message.fields",
+        // order: "newest_first",
+        // from: "2022-08-16T01:00:00+0000"
       };
 
       const headers = {
@@ -100,13 +102,13 @@ export default async function handler(
       const response = await axios.request({
         method: "GET",
         url,
-        // params,
+        params,
         headers,
       });
 
       const data = response.data;
-
       res.status(200).json({ data: data.data, message: "All Transactions!" });
+
       // if (data.data.length > 0) {
       //   let counter: number = 0;
       //   while (counter < data.data.length) {

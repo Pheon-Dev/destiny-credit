@@ -7,6 +7,7 @@ async function confirm(req: NextApiRequest, res: NextApiResponse) {
       ResultCode: 0,
       ResultDesc: "Accepted",
     });
+    console.log(req);
     const data = await new Promise(function (resolve, reject) {
       const form = new formidable.IncomingForm({ keepExtensions: true });
       form.parse(req, function (err: any, fields: any, files: any) {
