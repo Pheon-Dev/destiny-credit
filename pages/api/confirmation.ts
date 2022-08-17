@@ -21,14 +21,9 @@ type Fields = {
   lastName: string;
 };
 
-const parseForm = async (
-  req: NextApiRequest
-): Promise<{ fields: formidable.Fields; files: formidable.Files }> => {
+const parseForm = async (req: NextApiRequest): Promise<{ fields: formidable.Fields; files: formidable.Files }> => {
   return await new Promise(async (resolve, reject) => {
-    resolve({
-      files: {},
-      fields: {},
-    });
+    resolve({ files: {}, fields: {} });
   });
 };
 
