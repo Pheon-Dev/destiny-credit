@@ -1,6 +1,6 @@
-import { AppProps } from "next/app";
-import Head from "next/head";
-import { MantineProvider } from "@mantine/core";
+import { createGetInitialProps } from "@mantine/next";
+import Document, { Head, Html, Main, NextScript } from "next/document";
+
 import { useEffect, useState } from "react";
 import { createClient } from "@supabase/supabase-js";
 
@@ -44,14 +44,12 @@ type Data = {
 export default function Home({
   data,
   transactions,
-  props,
 }: {
   data: Data[];
   transactions: Transactions[];
-  props: AppProps;
 }) {
-  const { Component, pageProps } = props;
   const [mpesaTransactions, setMpesaTransactions] = useState([]);
+const getInitialProps = createGetInitialProps();
 
   async function fetchTransactions() {
     const res = await fetch("/api/list");
@@ -67,26 +65,28 @@ export default function Home({
   }, [data]);
 
   return (
-  <>
-  <Head>
-  <title>Destiny Credit</title>
-  <meta name="viewport" content="minimum-scale=1, intial-scale=1, width=device-width"/>
-  </Head>
-    <div className="w-full bg-gray-300">
-      <div className="text-black-500 text-sm flex justify-center ml-auto mr-auto">
-        <pre>{JSON.stringify(data, undefined, 2)}</pre>
-        {transactions.map((transaction) => (
-          <TransactionDiv key={transaction.transID} transaction={transaction} />
-        ))}
-      </div>
+      <Html>
+        <Head />
+        <body>
+          <Main />
+          <div className="w-full bg-gray-300">
+            <div className="text-black-500 text-sm flex justify-center ml-auto mr-auto">
+              <pre>{JSON.stringify(data, undefined, 2)}</pre>
+              {transactions.map((transaction) => (
+                <TransactionDiv key={transaction.transID} transaction={transaction} />
+              ))}
+            </div>
 
-      {/* <button */}
-      {/*   // onClick={handleSave} */}
-      {/*   className="bg-green-800 text-white rounded-lg p-3" */}
-      {/* > */}
-      {/*   Reload */}
-      {/* </button> */}
-    </div></>
+            {/* <button */}
+            {/*   // onClick={handleSave} */}
+            {/*   className="bg-green-800 text-white rounded-lg p-3" */}
+            {/* > */}
+            {/*   Reload */}
+            {/* </button> */}
+          </div>
+          <NextScript />
+        </body>
+      </Html>
   );
 }
 

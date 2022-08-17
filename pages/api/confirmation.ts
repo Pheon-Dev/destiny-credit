@@ -21,22 +21,36 @@ type Fields = {
   lastName: string;
 };
 
-const parseForm = async (
-  req: NextApiRequest
-): Promise<{ fields: formidable.Fields; files: formidable.Files }> => {
-  return await new Promise(async (resolve, reject) => {
-    resolve({ files: {}, fields: {} });
-  });
-};
+export default async function confirm(req: NextApiRequest, res: NextApiResponse) {
+    async function write({data}: {data: Fields[]}) {
+        const supabaseAdmin = createClient(
+          SUPABASE_URL || "",
+          SUPABASE_SERVICE_ROLE_KEY || ""
+        );
+        await supabaseAdmin.from("transactions").insert([
+          {
+            transactionType: data[0].transactionType,
+            transID: data[0].transID,
+            transTime: data[0].transTime,
+            transAmount: data[0].transAmount,
+            businessShortCode: data[0].businessShortCode,
+            billRefNumber: data[0].billRefNumber,
+            invoiceNumber: data[0].invoiceNumber,
+            orgAccountBalance: data[0].orgAccountBalance,
+            thirdPartyTransID: data[0].thirdPartyTransID,
+            msisdn: data[0].msisdn,
+            firstName: data[0].firstName,
+            middleName: data[0].middleName,
+            lastName: data[0].lastName,
+          },
+        ]);
+    }
 
-async function confirm(req: NextApiRequest, res: NextApiResponse) {
   try {
     res.status(200).json({
       ResultCode: 0,
       ResultDesc: "Accepted",
     });
-    const { fields, files } = await parseForm(req);
-
     let result: Array<Fields> = [];
 
     const data = await new Promise(function (resolve, reject) {
@@ -60,34 +74,12 @@ async function confirm(req: NextApiRequest, res: NextApiResponse) {
           middleName: fields.MiddleName,
           lastName: fields.LastName,
         });
-        const supabaseAdmin = createClient(
-          SUPABASE_URL || "",
-          SUPABASE_SERVICE_ROLE_KEY || ""
-        );
-        supabaseAdmin.from("transactions").insert([
-          {
-            transactionType: result[0].transactionType,
-            transID: result[0].transID,
-            transTime: result[0].transTime,
-            transAmount: result[0].transAmount,
-            businessShortCode: result[0].businessShortCode,
-            billRefNumber: result[0].billRefNumber,
-            invoiceNumber: result[0].invoiceNumber,
-            orgAccountBalance: result[0].orgAccountBalance,
-            thirdPartyTransID: result[0].thirdPartyTransID,
-            msisdn: result[0].msisdn,
-            firstName: result[0].firstName,
-            middleName: result[0].middleName,
-            lastName: result[0].lastName,
-          },
-        ]);
-        console.log(result);
+        write({data: result});
       });
     });
     const body = JSON.stringify(data);
 
     console.log(body);
-    console.log({ fields, files });
 
     // return data.then(({fields, files})=> {
     // res.status(200).json({ data: result });
@@ -103,5 +95,3 @@ export const config = {
     bodyParser: false,
   },
 };
-
-export default confirm;
