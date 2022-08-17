@@ -84,7 +84,7 @@ export default function Home({
 }
 
 function TransactionDiv({ transaction }: { transaction: Transactions }) {
-  return <div>{transaction.transID}</div>;
+  return <pre>{JSON.stringify(transaction, undefined, 2)}</pre>
 }
 
 export const getServerSideProps = async (context: any) => {

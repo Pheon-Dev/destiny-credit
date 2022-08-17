@@ -218,7 +218,7 @@ export default async function handler(
       }
        res
         .status(200)
-        .json({ data: data.data, message: "No New Transaction!" });
+        .json({ data: data.data, message: "No New Transactions!" });
     } catch (error) {
       console.log(error);
 
