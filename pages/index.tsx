@@ -1,6 +1,3 @@
-import { createGetInitialProps } from "@mantine/next";
-import Document, { Head, Html, Main, NextScript } from "next/document";
-
 import { useEffect, useState } from "react";
 import { createClient } from "@supabase/supabase-js";
 
@@ -49,7 +46,6 @@ export default function Home({
   transactions: Transactions[];
 }) {
   const [mpesaTransactions, setMpesaTransactions] = useState([]);
-const getInitialProps = createGetInitialProps();
 
   async function fetchTransactions() {
     const res = await fetch("/api/list");
@@ -65,10 +61,6 @@ const getInitialProps = createGetInitialProps();
   }, [data]);
 
   return (
-      <Html>
-        <Head />
-        <body>
-          <Main />
           <div className="w-full bg-gray-300">
             <div className="text-black-500 text-sm flex justify-center ml-auto mr-auto">
               <pre>{JSON.stringify(data, undefined, 2)}</pre>
@@ -84,9 +76,6 @@ const getInitialProps = createGetInitialProps();
             {/*   Reload */}
             {/* </button> */}
           </div>
-          <NextScript />
-        </body>
-      </Html>
   );
 }
 
