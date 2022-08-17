@@ -22,6 +22,10 @@ type Fields = {
 };
 async function confirm(req: NextApiRequest, res: NextApiResponse) {
   try {
+    res.status(200).json({
+      ResultCode: 0,
+      ResultDesc: "Accepted",
+    });
     let result: Array<Fields> = [];
 
     const data = await new Promise(function (resolve, reject) {
@@ -73,10 +77,7 @@ async function confirm(req: NextApiRequest, res: NextApiResponse) {
     ]);
     console.log(result);
     // return data.then(({fields, files})=> {
-    res.status(200).json({
-      ResultCode: 0,
-      ResultDesc: result
-    });
+    // res.status(200).json({ data: result });
     // })
   } catch (error) {
     console.log(error);
