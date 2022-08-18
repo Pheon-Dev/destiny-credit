@@ -1,6 +1,6 @@
 import { useEffect, useState } from "react";
 import { createClient } from "@supabase/supabase-js";
-import { ColorSchemeToggle } from "../components/ColorSchemeToggle";
+import { TopBar } from "../components/TopBar";
 
 const LOGTAIL_API_TOKEN = process.env.NEXT_PUBLIC_LOGTAIL_API_TOKEN;
 const SUPABASE_URL = process.env.NEXT_PUBLIC_SUPABASE_URL;
@@ -62,8 +62,10 @@ export default function Home({
   }, [data]);
 
   return (
+  <>
+  <TopBar />
           <div className="w-full bg-gray-300">
-          <ColorSchemeToggle />
+
             <div className="text-black-500 text-sm flex justify-center ml-auto mr-auto">
               <pre>{JSON.stringify(data, undefined, 2)}</pre>
               {transactions.map((transaction) => (
@@ -78,6 +80,7 @@ export default function Home({
             {/*   Reload */}
             {/* </button> */}
           </div>
+          </>
   );
 }
 
