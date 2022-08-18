@@ -5,7 +5,6 @@ export function ColorSchemeToggle() {
   const { colorScheme, toggleColorScheme } = useMantineColorScheme();
 
   return (
-    <Group position="right" mt="xl">
       <ActionIcon
         onClick={() => toggleColorScheme()}
         size="xl"
@@ -26,6 +25,5 @@ export function ColorSchemeToggle() {
           <IconMoonStars size={20} stroke={1.5} />
         )}
       </ActionIcon>
-    </Group>
   );
 }

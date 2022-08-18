@@ -2,6 +2,7 @@ import { useEffect, useState } from "react";
 import { createClient } from "@supabase/supabase-js";
 import {
   Navbar,
+  Group,
   AppShell,
   Header,
   Footer,
@@ -12,6 +13,7 @@ import {
   useMantineTheme,
 } from "@mantine/core";
 import { ColorSchemeToggle } from "../components/ColorSchemeToggle";
+import { MainLinks } from "../components/MainLinks";
 
 const LOGTAIL_API_TOKEN = process.env.NEXT_PUBLIC_LOGTAIL_API_TOKEN;
 const SUPABASE_URL = process.env.NEXT_PUBLIC_SUPABASE_URL;
@@ -88,29 +90,32 @@ export default function Home({
       asideOffsetBreakpoint="sm"
       navbar={
         <Navbar
-          p="md"
+          p="xs"
           hiddenBreakpoint="sm"
           hidden={!opened}
-          width={{ sm: 200, lg: 300 }}
+          height={500}
+          width={{base: 300}}
         >
-          <Text>App Navbar</Text>
+          <Navbar.Section grow mt="xs">
+          <MainLinks />
+          </Navbar.Section>
         </Navbar>
       }
-      aside={
-        <MediaQuery smallerThan="sm" styles={{ display: "none" }}>
-          <Aside p="md" hiddenBreakpoint="sm" width={{ sm: 200, lg: 300 }}>
-            <Text>App SideBar</Text>
-          </Aside>
-        </MediaQuery>
-      }
-      footer={
-        <Footer height={60} p="md">
-          App Footer
-        </Footer>
-      }
+      // aside={
+      //   <MediaQuery smallerThan="sm" styles={{ display: "none" }}>
+      //     <Aside p="md" hiddenBreakpoint="sm" width={{ sm: 200, lg: 300 }}>
+      //       <Text>App SideBar</Text>
+      //     </Aside>
+      //   </MediaQuery>
+      // }
+      // footer={
+      //   <Footer height={60} p="md">
+      //     App Footer
+      //   </Footer>
+      // }
       header={
-        <Header height={70} p="md">
-          <div style={{display: 'flex', alignItems: 'center', height: '100%'}}>
+        <Header height={70}>
+          <Group sx={{ height: "100%" }} px={20} position="apart">
             <MediaQuery largerThan="sm" styles={{ display: "none" }}>
               <Burger
                 opened={opened}
@@ -120,9 +125,9 @@ export default function Home({
                 mr="xl"
               />
             </MediaQuery>
+            <Text style={{ fontWeight: "bold" }}>DESTINY CREDIT LTD</Text>
             <ColorSchemeToggle />
-            <Text>DESTINY CREDIT LTD</Text>
-          </div>
+          </Group>
         </Header>
       }
     >

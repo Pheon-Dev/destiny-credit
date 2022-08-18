@@ -54,7 +54,7 @@ export default async function confirm(
           middleName: fields.MiddleName,
           lastName: fields.LastName,
         });
-    console.log(result);
+        console.log(result);
       });
     });
     // const body = JSON.stringify(data);
