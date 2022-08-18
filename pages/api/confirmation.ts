@@ -69,7 +69,6 @@ export default async function confirm(
   }
 
   try {
-    console.log(req.body)
     res.status(200).json({
       ResultCode: 0,
       ResultDesc: "Accepted",
@@ -98,14 +97,15 @@ export default async function confirm(
           lastName: fields.LastName,
         });
         write({ data: result });
+    console.log(result);
       });
     });
     const body = JSON.stringify(data);
 
-    console.log(body);
+    // console.log(body);
 
     // return data.then(({fields, files})=> {
-    // res.status(200).json({ data: result });
+    res.status(200).json({ data: body });
     // })
   } catch (error) {
     console.log(error);

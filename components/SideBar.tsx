@@ -152,7 +152,7 @@ const LinkDropDown = ({ title, data }: LinkProps) => {
   );
 };
 
-const SideBar = () => {
+export function SideBar() {
   return (
     <div className="w-full h-full mr-0 m-0 ml-14 bg-gray-200 dark:bg-gray-800 overflow-hidden shadow-lg">
       <div className="channel-container">
@@ -168,5 +168,3 @@ const SideBar = () => {
     </div>
   );
 };
-
-export default SideBar;

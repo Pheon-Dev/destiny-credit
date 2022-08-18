@@ -13,7 +13,7 @@ import { IoMdLogOut } from "react-icons/io";
 
 const Divider = () => <hr className="sidebar-hr" />;
 
-const Navbar = () => {
+export function NavBar() {
   return (
     <div className="fixed p-1 hide-scrollbar top-0 left-0 h-screen w-18 flex flex-col bg-white dark:bg-gray-900 shadow-lg justify-between">
       <div>
@@ -91,5 +91,3 @@ const Navbar = () => {
     </div>
   );
 };
-
-export default Navbar;

@@ -1,5 +1,16 @@
 import { useEffect, useState } from "react";
 import { createClient } from "@supabase/supabase-js";
+import {
+  Navbar,
+  AppShell,
+  Header,
+  Footer,
+  Aside,
+  Text,
+  MediaQuery,
+  Burger,
+  useMantineTheme,
+} from "@mantine/core";
 import { TopBar } from "../components/TopBar";
 
 const LOGTAIL_API_TOKEN = process.env.NEXT_PUBLIC_LOGTAIL_API_TOKEN;
@@ -47,6 +58,8 @@ export default function Home({
   transactions: Transactions[];
 }) {
   const [mpesaTransactions, setMpesaTransactions] = useState([]);
+  const theme = useMantineTheme();
+  const [opened, setOpened] = useState(false);
 
   async function fetchTransactions() {
     const res = await fetch("/api/list");
@@ -62,30 +75,74 @@ export default function Home({
   }, [data]);
 
   return (
-  <>
-  <TopBar />
-          <div className="w-full bg-gray-300">
-
-            <div className="text-black-500 text-sm flex justify-center ml-auto mr-auto">
-              <pre>{JSON.stringify(data, undefined, 2)}</pre>
-              {transactions.map((transaction) => (
-                <TransactionDiv key={transaction.transID} transaction={transaction} />
-              ))}
-            </div>
-
-            {/* <button */}
-            {/*   // onClick={handleSave} */}
-            {/*   className="bg-green-800 text-white rounded-lg p-3" */}
-            {/* > */}
-            {/*   Reload */}
-            {/* </button> */}
+    <AppShell
+      styles={{
+        main: {
+          background:
+            theme.colorScheme === "dark"
+              ? theme.colors.dark[8]
+              : theme.colors.gray[0],
+        },
+      }}
+      navbarOffsetBreakpoint="sm"
+      asideOffsetBreakpoint="sm"
+      navbar={
+        <Navbar
+          p="md"
+          hiddenBreakpoint="sm"
+          hidden={!opened}
+          width={{ sm: 200, lg: 300 }}
+        >
+          <Text>App Navbar</Text>
+        </Navbar>
+      }
+      aside={
+        <MediaQuery smallerThan="sm" styles={{ display: "none" }}>
+          <Aside p="md" hiddenBreakpoint="sm" width={{ sm: 200, lg: 300 }}>
+            <Text>App SideBar</Text>
+          </Aside>
+        </MediaQuery>
+      }
+      footer={
+        <Footer height={60} p="md">
+          App Footer
+        </Footer>
+      }
+      header={
+        <Header height={70} p="md">
+          <div style={{display: 'flex', alignItems: 'center', height: '100%'}}>
+            <MediaQuery largerThan="sm" styles={{ display: "none" }}>
+              <Burger
+                opened={opened}
+                onClick={() => setOpened((prev) => !prev)}
+                size="sm"
+                color={theme.colors.gray[6]}
+                mr="xl"
+              />
+            </MediaQuery>
+            <Text>DESTINY CREDIT LTD</Text>
+            <TopBar />
           </div>
-          </>
+        </Header>
+      }
+    >
+      <div className="w-full bg-gray-300">
+        <div className="text-black-500 text-sm flex justify-center ml-auto mr-auto">
+          <pre>{JSON.stringify(data, undefined, 2)}</pre>
+          {transactions.map((transaction) => (
+            <TransactionDiv
+              key={transaction.transID}
+              transaction={transaction}
+            />
+          ))}
+        </div>
+      </div>
+    </AppShell>
   );
 }
 
 function TransactionDiv({ transaction }: { transaction: Transactions }) {
-  return <pre>{JSON.stringify(transaction, undefined, 2)}</pre>
+  return <pre>{JSON.stringify(transaction, undefined, 2)}</pre>;
 }
 
 export const getServerSideProps = async (context: any) => {

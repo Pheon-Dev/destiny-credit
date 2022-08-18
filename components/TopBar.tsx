@@ -1,6 +1,7 @@
 import React, { useState, useEffect } from "react";
-import { Burger, Drawer, Button, Group } from "@mantine/core";
+import { Burger, Drawer, Tabs, TabsProps, Button, Group } from "@mantine/core";
 import { ColorSchemeToggle } from "./ColorSchemeToggle";
+import { IconSettings } from "@tabler/icons";
 
 export function TopBar() {
   const [opened, setOpened] = useState(false);
@@ -8,22 +9,6 @@ export function TopBar() {
   return (
     <>
       <ColorSchemeToggle />
-      {/* Drawer */}
-      <Burger
-      opened={opened}
-      onClick={() => setOpened((prev) => !prev)}
-      title={title}
-      />
-      <Drawer
-      position="right"
-opened={opened}
-onClose={() => setOpened(false)}
-title="Drawer"
-padding="xl"
-size="xl"
-      >
-      Lorem ipsum dolor sit amet, officia excepteur ex fugiat reprehenderit enim labore culpa sint ad nisi Lorem pariatur mollit ex esse exercitation amet. Nisi anim cupidatat excepteur officia. Reprehenderit nostrud nostrud ipsum Lorem est aliquip amet voluptate voluptate dolor minim nulla est proident. Nostrud officia pariatur ut officia. Sit irure elit esse ea nulla sunt ex occaecat reprehenderit commodo officia dolor Lorem duis laboris cupidatat officia voluptate. Culpa proident adipisicing id nulla nisi laboris ex in Lorem sunt duis officia eiusmod. Aliqua reprehenderit commodo ex non excepteur duis sunt velit enim. Voluptate laboris sint cupidatat ullamco ut ea consectetur et est culpa et culpa duis.
-      </Drawer>
     </>
   );
 }
