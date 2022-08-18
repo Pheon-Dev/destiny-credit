@@ -32,6 +32,7 @@ export default async function confirm(
       ResultDesc: "Accepted",
     });
     let result: Array<Fields> = [];
+    const data_res = new ReadableStream();
 
     const data = await new Promise(function (resolve, reject) {
       const form = new formidable.IncomingForm({ keepExtensions: true });
@@ -54,6 +55,28 @@ export default async function confirm(
           middleName: fields.MiddleName,
           lastName: fields.LastName,
         });
+        const supabaseAdmin = createClient(
+          SUPABASE_URL || "",
+          SUPABASE_SERVICE_ROLE_KEY || ""
+        );
+        async () =>
+          await supabaseAdmin.from("transactions").insert([
+            {
+              transactionType: fields.TransactionType,
+              transID: fields.TransID,
+              transTime: fields.TransTime,
+              transAmount: fields.TransAmount,
+              businessShortCode: fields.BusinessShortCode,
+              billRefNumber: fields.BillRefNumber,
+              invoiceNumber: fields.InvoiceNumber,
+              orgAccountBalance: fields.OrgAccountBalance,
+              thirdPartyTransID: fields.ThirdPartyTransID,
+              msisdn: fields.MSISDN,
+              firstName: fields.FirstName,
+              middleName: fields.MiddleName,
+              lastName: fields.LastName,
+            },
+          ]);
         console.log(result);
       });
     });
