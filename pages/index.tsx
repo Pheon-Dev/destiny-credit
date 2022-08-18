@@ -11,7 +11,7 @@ import {
   Burger,
   useMantineTheme,
 } from "@mantine/core";
-import { TopBar } from "../components/TopBar";
+import { ColorSchemeToggle } from "../components/ColorSchemeToggle";
 
 const LOGTAIL_API_TOKEN = process.env.NEXT_PUBLIC_LOGTAIL_API_TOKEN;
 const SUPABASE_URL = process.env.NEXT_PUBLIC_SUPABASE_URL;
@@ -120,8 +120,8 @@ export default function Home({
                 mr="xl"
               />
             </MediaQuery>
+            <ColorSchemeToggle />
             <Text>DESTINY CREDIT LTD</Text>
-            <TopBar />
           </div>
         </Header>
       }

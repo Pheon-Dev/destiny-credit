@@ -26,48 +26,6 @@ export default async function confirm(
   req: NextApiRequest,
   res: NextApiResponse
 ) {
-  async function write({ data }: { data: Fields[] }) {
-    const url_db = "https://destiny-credit.vercel.app/api/transaction";
-    const headers_db = {
-      "Content-Type": "application/json",
-    };
-
-    const body = {
-      transactionType: data[0].transactionType,
-      transID: data[0].transID,
-      transTime: data[0].transTime,
-      transAmount: data[0].transAmount,
-      businessShortCode: data[0].businessShortCode,
-      billRefNumber: data[0].billRefNumber,
-      invoiceNumber: data[0].invoiceNumber,
-      orgAccountBalance: data[0].orgAccountBalance,
-      thirdPartyTransID: data[0].thirdPartyTransID,
-      msisdn: data[0].msisdn,
-      firstName: data[0].firstName,
-      middleName: data[0].middleName,
-      lastName: data[0].lastName,
-    };
-
-    const res_db = await axios.request({
-      data: JSON.stringify(body),
-      method: "POST",
-      url: url_db,
-      headers: headers_db,
-    });
-
-    console.log(res_db.data);
-
-    const supabaseAdmin = createClient(
-      SUPABASE_URL || "",
-      SUPABASE_SERVICE_ROLE_KEY || ""
-    );
-    await supabaseAdmin.from("transactions").insert([
-      {
-        body,
-      },
-    ]);
-  }
-
   try {
     res.status(200).json({
       ResultCode: 0,
@@ -96,16 +54,15 @@ export default async function confirm(
           middleName: fields.MiddleName,
           lastName: fields.LastName,
         });
-        write({ data: result });
     console.log(result);
       });
     });
-    const body = JSON.stringify(data);
+    // const body = JSON.stringify(data);
 
     // console.log(body);
 
     // return data.then(({fields, files})=> {
-    res.status(200).json({ data: body });
+    // res.status(200).json({ data: body });
     // })
   } catch (error) {
     console.log(error);
