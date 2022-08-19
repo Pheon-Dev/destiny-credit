@@ -15,6 +15,7 @@ import {
   Header,
   Footer,
   Aside,
+  ScrollArea,
   Text,
   MediaQuery,
   Burger,
@@ -50,32 +51,24 @@ export default function App(props: AppProps & { colorScheme: ColorScheme }) {
 
   return (
     <>
-    <Head>
-      <title>Destiny Credit</title>
-      <meta
-        name="viewport"
-        content="minimum-scale=1, initial-scale=1, width=device-width"
-      />
-    </Head>
-      <ColorSchemeProvider
-        colorScheme={colorScheme}
-        toggleColorScheme={toggleColorScheme}
-      >
+      <Head>
+        <title>Destiny Credit</title>
+        <meta
+          name="viewport"
+          content="minimum-scale=1, initial-scale=1, width=device-width"
+        />
+      </Head>
         <MantineProvider
           withGlobalStyles
           withNormalizeCSS
           theme={{ colorScheme }}
         >
+        <ColorSchemeProvider
+          colorScheme={colorScheme}
+          toggleColorScheme={toggleColorScheme}
+        >
           <NotificationsProvider>
             <AppShell
-              styles={{
-                main: {
-                  background:
-                    theme.colorScheme === "dark"
-                      ? theme.colors.dark[8]
-                      : theme.colors.gray[0],
-                },
-              }}
               navbarOffsetBreakpoint="sm"
               asideOffsetBreakpoint="sm"
               navbar={
@@ -87,27 +80,27 @@ export default function App(props: AppProps & { colorScheme: ColorScheme }) {
                   // width={{ base: 300 }}
                   width={{ lg: 300, sm: 200 }}
                 >
-                  <Navbar.Section grow mt="xs">
+                  <Navbar.Section grow component={ScrollArea} mx="-xs" px="xs" mt="xs">
                     <MainLinks />
                   </Navbar.Section>
                 </Navbar>
               }
-              aside={
-                <MediaQuery smallerThan="sm" styles={{ display: "none" }}>
-                  <Aside
-                    p="md"
-                    hiddenBreakpoint="sm"
-                    width={{ sm: 200, lg: 300 }}
-                  >
-                    <Text>App SideBar</Text>
-                  </Aside>
-                </MediaQuery>
-              }
-              footer={
-                <Footer height={60} p="md">
-                  App Footer
-                </Footer>
-              }
+              // aside={
+              //   <MediaQuery smallerThan="sm" styles={{ display: "none" }}>
+              //     <Aside
+              //       p="md"
+              //       hiddenBreakpoint="sm"
+              //       width={{ sm: 200, lg: 300 }}
+              //     >
+              //       <Text>App SideBar</Text>
+              //     </Aside>
+              //   </MediaQuery>
+              // }
+              // footer={
+              //   <Footer height={60} p="md">
+              //     App Footer
+              //   </Footer>
+              // }
               header={
                 <Header height={70}>
                   <Group sx={{ height: "100%" }} px={20} position="apart">
@@ -129,10 +122,10 @@ export default function App(props: AppProps & { colorScheme: ColorScheme }) {
               }
             >
               <Component {...pageProps} />
-      </AppShell>
-      </NotificationsProvider>
-      </MantineProvider>
-      </ColorSchemeProvider>
+            </AppShell>
+          </NotificationsProvider>
+          </ColorSchemeProvider>
+        </MantineProvider>
     </>
   );
 }

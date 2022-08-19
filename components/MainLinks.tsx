@@ -21,6 +21,7 @@ import {
 } from "@mantine/core";
 import { MainLinkProps } from "../types";
 import Link from "next/link";
+import {useRouter} from "next/router";
 import {
   BrowserRouter as Router,
   // NavLink,
@@ -30,9 +31,10 @@ import {
 function MainLink({ icon, color, label, data, right }: MainLinkProps) {
   const [active, setActive] = useState(0);
   const navigate = useNavigate();
+  const router = useRouter();
   useEffect(() => {
-    return console.log(active);
-  }, [active]);
+      return console.log('-----')
+    }, [active])
   const sx: any = (theme: any) => ({
     display: "block",
     width: "100%",
@@ -56,6 +58,19 @@ function MainLink({ icon, color, label, data, right }: MainLinkProps) {
       }
       childrenOffset={30}
     >
+      {/* {data?.map((item: any, index: number) => ( */}
+      {/*   <Link key={item.name} href={item.url} passHref> */}
+      {/*   {item.name} */}
+      {/*     <NavLink */}
+      {/*     component="a" */}
+      {/*       active={router.pathname === item.url} */}
+      {/*       label={item.name} */}
+      {/*       onClick={() => { */}
+      {/*         navigate(`${item.url}`); */}
+      {/*       }} */}
+      {/*     /> */}
+      {/*   </Link> */}
+      {/* ))} */}
       {data?.map((item: any, index: number) => (
         <Link key={item.name} href={item.url}>
           <NavLink
@@ -190,5 +205,6 @@ const data = [
 
 export function MainLinks() {
   const links = data.map((link) => <MainLink {...link} key={link.label} />);
+  // return <div>{links}</div>;
   return <Router>{links}</Router>;
 }
