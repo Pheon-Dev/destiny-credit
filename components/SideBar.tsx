@@ -7,11 +7,7 @@ import {
   NavLink,
   useNavigate,
 } from "react-router-dom";
-
-type LinkProps = {
-  title: string;
-  data: any;
-};
+import { Links, Chevs } from "../types";
 
 const dashboard = [
   {
@@ -84,15 +80,11 @@ const reports = [
   },
 ];
 
-const LinkDropDown = ({ title, data }: LinkProps) => {
+const LinkDropDown = ({ title, data }: Links) => {
   const [expanded, setExpanded] = useState(true);
   const navigate = useNavigate();
 
-  type ChevProps = {
-    expand: boolean;
-  };
-
-  const ChevronIcon = ({ expand }: ChevProps) => {
+  const ChevronIcon = ({ expand }: Chevs) => {
     const chevClass = "text-accent text-opacity-80 my-auto mr-1";
 
     return expand ? (
@@ -167,4 +159,4 @@ export function SideBar() {
       </div>
     </div>
   );
-};
+}

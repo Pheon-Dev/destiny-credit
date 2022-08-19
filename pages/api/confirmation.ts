@@ -1,26 +1,7 @@
 import type { NextApiRequest, NextApiResponse } from "next";
-import axios from "axios";
+import supabase from "../../lib/supabase";
 import formidable from "formidable";
-import { createClient } from "@supabase/supabase-js";
-
-const SUPABASE_URL = process.env.NEXT_PUBLIC_SUPABASE_URL;
-const SUPABASE_SERVICE_ROLE_KEY = process.env.SUPABASE_SERVICE_ROLE_KEY;
-
-type Fields = {
-  transactionType: string;
-  transID: string;
-  transTime: string;
-  transAmount: string;
-  businessShortCode: string;
-  billRefNumber: string;
-  invoiceNumber: string;
-  orgAccountBalance: string;
-  thirdPartyTransID: string;
-  msisdn: string;
-  firstName: string;
-  middleName: string;
-  lastName: string;
-};
+import { Fields } from "../../types";
 
 export default async function confirm(
   req: NextApiRequest,
@@ -31,9 +12,8 @@ export default async function confirm(
       ResultCode: 0,
       ResultDesc: "Accepted",
     });
-    console.log(req.body)
+    console.log(req.body);
     let result: Array<Fields> = [];
-    const data_res = new ReadableStream();
 
     const data = await new Promise(function (resolve, reject) {
       const form = new formidable.IncomingForm({ keepExtensions: true });
@@ -56,12 +36,8 @@ export default async function confirm(
           middleName: fields.MiddleName,
           lastName: fields.LastName,
         });
-        const supabaseAdmin = createClient(
-          SUPABASE_URL || "",
-          SUPABASE_SERVICE_ROLE_KEY || ""
-        );
         async () =>
-          await supabaseAdmin.from("transactions").insert([
+          await supabase.from("transactions").insert([
             {
               transactionType: fields.TransactionType,
               transID: fields.TransID,

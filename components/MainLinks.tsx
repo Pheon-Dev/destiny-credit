@@ -1,4 +1,4 @@
-import React, { useState } from "react";
+import React, { useEffect, useState } from "react";
 import {
   IconHome,
   IconAffiliate,
@@ -19,7 +19,7 @@ import {
   Group,
   Text,
 } from "@mantine/core";
-import { MainLinkProps } from "../models/interfaces";
+import { MainLinkProps } from "../types";
 import Link from "next/link";
 import {
   BrowserRouter as Router,
@@ -28,8 +28,11 @@ import {
 } from "react-router-dom";
 
 function MainLink({ icon, color, label, data, right }: MainLinkProps) {
-  const [open, setOpen] = useState(false);
   const [active, setActive] = useState(0);
+  const navigate = useNavigate();
+  useEffect(() => {
+    return console.log(active);
+  }, [active]);
   const sx: any = (theme: any) => ({
     display: "block",
     width: "100%",
@@ -44,38 +47,28 @@ function MainLink({ icon, color, label, data, right }: MainLinkProps) {
     },
   });
   return (
-    <>
-      <NavLink
-        label={label}
-        icon={
-          <ThemeIcon color={color} variant="light">
-            {icon}
-          </ThemeIcon>
-        }
-        childrenOffset={30}
-      >
-        {data?.map((item: any, index: number) => (
-          <>
-            <Link
-              // component={Link}
-              // active={index === item.id}
-              key={item.id}
-              href={item.url}
-              // label={item.name}
-              // onClick={() => setActive(index)}
-            >
-              <NavLink
-                // component={Link}
-                active={index === item.id}
-                // href={`${item.url}`}
-                label={item.name}
-                onClick={() => setActive(index)}
-              />
-            </Link>
-          </>
-        ))}
-      </NavLink>
-    </>
+    <NavLink
+      label={label}
+      icon={
+        <ThemeIcon color={color} variant="light">
+          {icon}
+        </ThemeIcon>
+      }
+      childrenOffset={30}
+    >
+      {data?.map((item: any, index: number) => (
+        <Link key={item.name} href={item.url}>
+          <NavLink
+            active={item.id === active}
+            label={item.name}
+            onClick={() => {
+              navigate(`${item.url}`);
+              setActive(item.id);
+            }}
+          />
+        </Link>
+      ))}
+    </NavLink>
   );
 }
 
@@ -197,5 +190,5 @@ const data = [
 
 export function MainLinks() {
   const links = data.map((link) => <MainLink {...link} key={link.label} />);
-  return <div>{links}</div>;
+  return <Router>{links}</Router>;
 }
