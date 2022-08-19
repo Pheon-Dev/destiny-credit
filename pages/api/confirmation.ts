@@ -31,6 +31,7 @@ export default async function confirm(
       ResultCode: 0,
       ResultDesc: "Accepted",
     });
+    console.log(req.body)
     let result: Array<Fields> = [];
     const data_res = new ReadableStream();
 
