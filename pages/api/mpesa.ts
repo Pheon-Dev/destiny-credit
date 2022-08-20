@@ -3,10 +3,7 @@ import type { NextApiRequest, NextApiResponse } from "next";
 import { dateTime } from "../../utils/dates";
 import { routes } from "../../utils/routes";
 import { searchTransaction, createIndex } from "../../lib/redis";
-import { createClient } from "@supabase/supabase-js";
-
-const SUPABASE_URL = process.env.NEXT_PUBLIC_SUPABASE_URL;
-const SUPABASE_SERVICE_ROLE_KEY = process.env.SUPABASE_SERVICE_ROLE_KEY;
+import supabase from "../../lib/supabase";
 
 const LOGTAIL_API_TOKEN = process.env.NEXT_PUBLIC_LOGTAIL_API_TOKEN;
 
@@ -87,14 +84,11 @@ export default async function handler(
   async function logs() {
     try {
       const token = LOGTAIL_API_TOKEN;
-      const url = "https://logtail.com/api/v1/query";
-
-      const params = {
-        query: "fields",
-        // order: "newest_first",
-        // from: "2022-08-16T01:00:00+0000",
-        // to: "2022-08-17T13:00:00+0000"
-      };
+      // const url = "https://logtail.com/api/v1/query?";
+      const date = new Date();
+      const q_date = new Date(date.getFullYear(), date.getMonth(), date.getDate());
+      q_date.setDate(q_date.getDate() - 2)
+      const url = `https://logtail.com/api/v1/query?query=fields&from=${q_date} 00:00:00&source_ids=158744`;
 
       const headers = {
         Authorization: `Bearer ${token}`,
@@ -103,123 +97,118 @@ export default async function handler(
       const response = await axios.request({
         method: "GET",
         url,
-        params,
         headers,
       });
 
       const data = response.data;
       // res.status(200).json({ data: data.data, message: "All Transactions!" });
 
-      // if (data.data.length > 0) {
-      //   let counter: number = 0;
-      //   while (counter < data.data.length) {
-      //     console.log(counter);
-      //     const data_res = data.data[counter]?.message
-      //       .split("{")[2]
-      //       .split("}")[0];
-      //
-      //     let transactionType = data_res
-      //       .split(",")[0]
-      //       .split(":")[1]
-      //       .split('"')[1];
-      //     let transID = data_res.split(",")[1].split(":")[1].split('"')[1];
-      //     let transTime = data_res.split(",")[2].split(":")[1].split('"')[1];
-      //     let transAmount = data_res.split(",")[3].split(":")[1].split('"')[1];
-      //     let businessShortCode = data_res
-      //       .split(",")[4]
-      //       .split(":")[1]
-      //       .split('"')[1];
-      //     let billRefNumber = data_res
-      //       .split(",")[5]
-      //       .split(":")[1]
-      //       .split('"')[1];
-      //     let invoiceNumber = data_res
-      //       .split(",")[6]
-      //       .split(":")[1]
-      //       .split('"')[1];
-      //     let orgAccountBalance = data_res
-      //       .split(",")[7]
-      //       .split(":")[1]
-      //       .split('"')[1];
-      //     let thirdPartyTransID = data_res
-      //       .split(",")[8]
-      //       .split(":")[1]
-      //       .split('"')[1];
-      //     let msisdn = data_res.split(",")[9].split(":")[1].split('"')[1];
-      //     let firstName = data_res.split(",")[10].split(":")[1].split('"')[1];
-      //     let middleName = data_res.split(",")[11].split(":")[1].split('"')[1];
-      //     let lastName = data_res.split(",")[12].split(":")[1].split('"')[1];
-      //
-      //     const body = {
-      //       transactionType: transactionType,
-      //       transID: transID,
-      //       transTime: transTime,
-      //       transAmount: transAmount,
-      //       businessShortCode: businessShortCode,
-      //       billRefNumber: billRefNumber,
-      //       invoiceNumber: invoiceNumber,
-      //       orgAccountBalance: orgAccountBalance,
-      //       thirdPartyTransID: thirdPartyTransID,
-      //       msisdn: msisdn,
-      //       firstName: firstName,
-      //       middleName: middleName,
-      //       lastName: lastName,
-      //     };
-      //
-      //     await createIndex();
-      //     let q = transTime;
-      //     const transaction = await searchTransaction(q);
-      //
-      //     if (transaction.length > 0) {
-      //       counter++;
-      //       res
-      //         .status(200)
-      //         .json({ data: body, message: "Transaction Exists!" });
-      //     }
-      //
-      //     const url_db = "https://destiny-credit.vercel.app/api/transaction";
-      //     const headers_db = {
-      //       "Content-Type": "application/json",
-      //     };
-      //
-      //     const res_db = await axios.request({
-      //       data: JSON.stringify(body),
-      //       method: "POST",
-      //       url: url_db,
-      //       headers: headers_db,
-      //     });
-      //
-      //     console.log(res_db.data);
-      //
-      //     const supabaseAdmin = createClient(
-      //       SUPABASE_URL || "",
-      //       SUPABASE_SERVICE_ROLE_KEY || ""
-      //     );
-      //     await supabaseAdmin.from("transactions").insert([
-      //       {
-      //         transactionType: transactionType,
-      //         transID: transID,
-      //         transTime: transTime,
-      //         transAmount: transAmount,
-      //         businessShortCode: businessShortCode,
-      //         billRefNumber: billRefNumber,
-      //         invoiceNumber: invoiceNumber,
-      //         orgAccountBalance: orgAccountBalance,
-      //         thirdPartyTransID: thirdPartyTransID,
-      //         msisdn: msisdn,
-      //         firstName: firstName,
-      //         middleName: middleName,
-      //         lastName: lastName,
-      //       },
-      //     ]);
-      //
-      //     counter++;
-      //     res.status(200).json({ data: body, message: "Transaction Created!" });
-      //   }
-      // }
+      if (data.data.length > 0) {
+        let counter: number = 0;
+        while (counter < data.data.length) {
+          console.log(counter);
+          const data_res = data.data[counter]?.message
+            .split("{")[2]
+            .split("}")[0];
+
+          let transactionType = data_res
+            .split(",")[0]
+            .split(":")[1]
+            .split('"')[1];
+          let transID = data_res.split(",")[1].split(":")[1].split('"')[1];
+          let transTime = data_res.split(",")[2].split(":")[1].split('"')[1];
+          let transAmount = data_res.split(",")[3].split(":")[1].split('"')[1];
+          let businessShortCode = data_res
+            .split(",")[4]
+            .split(":")[1]
+            .split('"')[1];
+          let billRefNumber = data_res
+            .split(",")[5]
+            .split(":")[1]
+            .split('"')[1];
+          let invoiceNumber = data_res
+            .split(",")[6]
+            .split(":")[1]
+            .split('"')[1];
+          let orgAccountBalance = data_res
+            .split(",")[7]
+            .split(":")[1]
+            .split('"')[1];
+          let thirdPartyTransID = data_res
+            .split(",")[8]
+            .split(":")[1]
+            .split('"')[1];
+          let msisdn = data_res.split(",")[9].split(":")[1].split('"')[1];
+          let firstName = data_res.split(",")[10].split(":")[1].split('"')[1];
+          let middleName = data_res.split(",")[11].split(":")[1].split('"')[1];
+          let lastName = data_res.split(",")[12].split(":")[1].split('"')[1];
+
+          const body = {
+            transactionType: transactionType,
+            transID: transID,
+            transTime: transTime,
+            transAmount: transAmount,
+            businessShortCode: businessShortCode,
+            billRefNumber: billRefNumber,
+            invoiceNumber: invoiceNumber,
+            orgAccountBalance: orgAccountBalance,
+            thirdPartyTransID: thirdPartyTransID,
+            msisdn: msisdn,
+            firstName: firstName,
+            middleName: middleName,
+            lastName: lastName,
+          };
+
+          await createIndex();
+          let q = transTime;
+          const transaction = await searchTransaction(q);
+
+          if (transaction.length > 0) {
+            counter++;
+            res
+              .status(200)
+              .json({ data: body, message: "Transaction Exists!", date: q_date });
+          }
+
+          const url_db = "https://destiny-credit.vercel.app/api/transaction";
+          const headers_db = {
+            "Content-Type": "application/json",
+          };
+
+          const res_db = await axios.request({
+            data: JSON.stringify(body),
+            method: "POST",
+            url: url_db,
+            headers: headers_db,
+          });
+
+          console.log(res_db.data);
+
+          await supabase.from("transactions").insert([
+            {
+              transactionType: transactionType,
+              transID: transID,
+              transTime: transTime,
+              transAmount: transAmount,
+              businessShortCode: businessShortCode,
+              billRefNumber: billRefNumber,
+              invoiceNumber: invoiceNumber,
+              orgAccountBalance: orgAccountBalance,
+              thirdPartyTransID: thirdPartyTransID,
+              msisdn: msisdn,
+              firstName: firstName,
+              middleName: middleName,
+              lastName: lastName,
+            },
+          ]);
+
+          counter++;
+          res.status(200).json({ data: body, message: "Transaction Created!" });
+        }
+      }
        res
         .status(200)
-        .json({ data: data.data, message: "No New Transactions!" });
+        .json({ data: data.data, message: "No New Transactions!", date: q_date });
     } catch (error) {
       console.log(error);
 
