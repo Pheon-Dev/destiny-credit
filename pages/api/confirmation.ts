@@ -12,7 +12,6 @@ export default async function confirm(
       ResultCode: 0,
       ResultDesc: "Accepted",
     });
-    console.log(req);
     let result: Array<Fields> = [];
 
     const data = await new Promise(function (resolve, reject) {

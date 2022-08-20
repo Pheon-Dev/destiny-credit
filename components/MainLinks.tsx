@@ -32,9 +32,6 @@ function MainLink({ icon, color, label, data, right }: MainLinkProps) {
   const [active, setActive] = useState(0);
   const navigate = useNavigate();
   const router = useRouter();
-  useEffect(() => {
-      return console.log('-----')
-    }, [active])
   const sx: any = (theme: any) => ({
     display: "block",
     width: "100%",
