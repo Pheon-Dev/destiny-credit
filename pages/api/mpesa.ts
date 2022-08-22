@@ -103,11 +103,11 @@ export default async function handler(
 
           result.push({
             transactionType: transactionType,
-            transID: transID,
-            transTime: transTime,
             transAmount: transAmount,
             businessShortCode: businessShortCode,
             billRefNumber: billRefNumber,
+            transID: transID,
+            transTime: transTime,
             invoiceNumber: invoiceNumber,
             orgAccountBalance: orgAccountBalance,
             thirdPartyTransID: thirdPartyTransID,
@@ -130,19 +130,19 @@ export default async function handler(
           if (data.length === 0) {
             await supabase.from("transactions").insert([
               {
-                transactionType: transactionType,
-                transID: transID,
-                transTime: transTime,
-                transAmount: transAmount,
-                businessShortCode: businessShortCode,
-                billRefNumber: billRefNumber,
-                invoiceNumber: invoiceNumber,
-                orgAccountBalance: orgAccountBalance,
-                thirdPartyTransID: thirdPartyTransID,
-                msisdn: msisdn,
                 firstName: firstName,
                 middleName: middleName,
                 lastName: lastName,
+                transAmount: transAmount,
+                msisdn: msisdn,
+                billRefNumber: billRefNumber,
+                transactionType: transactionType,
+                businessShortCode: businessShortCode,
+                transID: transID,
+                transTime: transTime,
+                orgAccountBalance: orgAccountBalance,
+                thirdPartyTransID: thirdPartyTransID,
+                invoiceNumber: invoiceNumber,
               },
             ]);
 
