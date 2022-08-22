@@ -86,10 +86,19 @@ export default async function handler(
       const token = LOGTAIL_API_TOKEN;
       // const url = "https://logtail.com/api/v1/query?";
       const date = new Date();
-      const q_date = new Date(date.getFullYear(), date.getMonth(), date.getDate());
-      q_date.setDate(q_date.getDate() - 2)
-      const new_date = q_date.getFullYear() + '-' + (Number(q_date.getMonth() + 1)).toString() + '-' + q_date.getDate();
-      const url = `https://logtail.com/api/v1/query?query=transactionType&from=2022-08-20 12:00:00&source_ids=158744`;
+      const q_date = new Date(
+        date.getFullYear(),
+        date.getMonth(),
+        date.getDate()
+      );
+      q_date.setDate(q_date.getDate() - 3);
+      const new_date =
+        q_date.getFullYear() +
+        "-" +
+        Number(q_date.getMonth() + 1).toString() +
+        "-" +
+        q_date.getDate();
+      const url = `https://logtail.com/api/v1/query?query=fields&from=${new_date} 00:00:00&source_ids=158744`;
 
       const headers = {
         Authorization: `Bearer ${token}`,
@@ -168,7 +177,11 @@ export default async function handler(
             counter++;
             res
               .status(200)
-              .json({ data: body, message: "Transaction Exists!", date: new_date });
+              .json({
+                data: body,
+                message: "Transaction Exists!",
+                date: new_date,
+              });
           }
 
           const url_db = "https://destiny-credit.vercel.app/api/transaction";
@@ -185,15 +198,19 @@ export default async function handler(
 
           console.log(res_db.data);
 
-          await supabase.from("transactions").insert([ body ]);
+          await supabase.from("transactions").insert([body]);
 
           counter++;
           res.status(200).json({ data: body, message: "Transaction Created!" });
         }
       }
-       res
+      res
         .status(200)
-        .json({ data: data.data, message: "No New Transactions!", date: new_date });
+        .json({
+          data: data.data,
+          message: "No New Transactions!",
+          date: new_date,
+        });
     } catch (error) {
       console.log(error);
 
