@@ -12,20 +12,28 @@ export default async function handler(
   async function queryAndWrite() {
     try {
       const date = new Date();
-      const q_date = new Date(
-        date.getFullYear(),
-        date.getMonth(),
-        date.getDate()
-      );
-      q_date.setDate(q_date.getDate() - 1);
-      const new_date =
-        q_date.getFullYear() +
-        "-" +
-        Number(q_date.getMonth() + 1).toString() +
-        "-" +
-        q_date.getDate();
+      const n_date = new Date();
 
-      const url = `https://logtail.com/api/v1/query?query=transactionType&from=${new_date} 00:00:00&source_ids=158744`;
+      date.setDate(date.getDate() - 1);
+      let str_date: string = date.toLocaleDateString()
+      let str_ndate: string = n_date.toLocaleDateString()
+      let str_tdate: string = n_date.toUTCString()
+      let str_time: string = str_tdate.split(' ')[4]
+
+      const new_date =
+        str_date.split('/')[2] +
+        "-" +
+        str_date.split('/')[1] +
+        "-" +
+        str_date.split('/')[0];
+
+      const now_date =
+        str_ndate.split('/')[2] +
+        "-" +
+        str_ndate.split('/')[1] +
+        "-" +
+        str_ndate.split('/')[0];
+      const url = `https://logtail.com/api/v1/query?query=transactionType&from=${new_date} 00:00:00&to=${now_date} ${str_time}&source_ids=158744`;
       const token = LOGTAIL_API_TOKEN;
       const headers = {
         Authorization: `Bearer ${token}`,
@@ -98,7 +106,6 @@ export default async function handler(
             .split(":")[1]
             .split("'")[1];
 
-            console.log(firstName)
           let result: Array<Fields> = [];
 
           result.push({
@@ -130,19 +137,19 @@ export default async function handler(
           if (data.length === 0) {
             await supabase.from("transactions").insert([
               {
+                transactionType: transactionType,
+                transID: transID,
+                transTime: transTime,
+                transAmount: transAmount,
+                businessShortCode: businessShortCode,
+                billRefNumber: billRefNumber,
+                invoiceNumber: invoiceNumber,
+                orgAccountBalance: orgAccountBalance,
+                thirdPartyTransID: thirdPartyTransID,
+                msisdn: msisdn,
                 firstName: firstName,
                 middleName: middleName,
                 lastName: lastName,
-                transAmount: transAmount,
-                msisdn: msisdn,
-                billRefNumber: billRefNumber,
-                transactionType: transactionType,
-                businessShortCode: businessShortCode,
-                transID: transID,
-                transTime: transTime,
-                orgAccountBalance: orgAccountBalance,
-                thirdPartyTransID: thirdPartyTransID,
-                invoiceNumber: invoiceNumber,
               },
             ]);
 
@@ -156,7 +163,7 @@ export default async function handler(
       }
       res
         .status(200)
-        .json({ data: log.data.length, message: "All Transaction!" });
+        .json({ data: log.data, date: new_date, message: "Transactions Upto Date" });
 
     } catch (error) {
       console.log(error);
