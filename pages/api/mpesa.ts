@@ -88,7 +88,8 @@ export default async function handler(
       const date = new Date();
       const q_date = new Date(date.getFullYear(), date.getMonth(), date.getDate());
       q_date.setDate(q_date.getDate() - 2)
-      const url = `https://logtail.com/api/v1/query?query=fields&from=${q_date} 00:00:00&source_ids=158744`;
+      const new_date = q_date.getFullYear() + '-' + (Number(q_date.getMonth() + 1)).toString() + '-' + q_date.getDate();
+      const url = `https://logtail.com/api/v1/query?query=transactionType&from=2022-08-20 12:00:00&source_ids=158744`;
 
       const headers = {
         Authorization: `Bearer ${token}`,
@@ -167,7 +168,7 @@ export default async function handler(
             counter++;
             res
               .status(200)
-              .json({ data: body, message: "Transaction Exists!", date: q_date });
+              .json({ data: body, message: "Transaction Exists!", date: new_date });
           }
 
           const url_db = "https://destiny-credit.vercel.app/api/transaction";
@@ -184,23 +185,7 @@ export default async function handler(
 
           console.log(res_db.data);
 
-          await supabase.from("transactions").insert([
-            {
-              transactionType: transactionType,
-              transID: transID,
-              transTime: transTime,
-              transAmount: transAmount,
-              businessShortCode: businessShortCode,
-              billRefNumber: billRefNumber,
-              invoiceNumber: invoiceNumber,
-              orgAccountBalance: orgAccountBalance,
-              thirdPartyTransID: thirdPartyTransID,
-              msisdn: msisdn,
-              firstName: firstName,
-              middleName: middleName,
-              lastName: lastName,
-            },
-          ]);
+          await supabase.from("transactions").insert([ body ]);
 
           counter++;
           res.status(200).json({ data: body, message: "Transaction Created!" });
@@ -208,7 +193,7 @@ export default async function handler(
       }
        res
         .status(200)
-        .json({ data: data.data, message: "No New Transactions!", date: q_date });
+        .json({ data: data.data, message: "No New Transactions!", date: new_date });
     } catch (error) {
       console.log(error);
 
