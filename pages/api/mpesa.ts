@@ -33,7 +33,7 @@ export default async function handler(
         str_ndate.split('/')[1] +
         "-" +
         str_ndate.split('/')[0];
-      const url = `https://logtail.com/api/v1/query?query=transactionType&from=${new_date} 00:00:00&to=${now_date} ${str_time}&source_ids=158744`;
+      const url = `https://logtail.com/api/v1/query?query=transactionType: &from=${new_date} 00:00:00&to=${now_date} ${str_time}&source_ids=158744`;
       const token = LOGTAIL_API_TOKEN;
       const headers = {
         Authorization: `Bearer ${token}`,
@@ -161,6 +161,7 @@ export default async function handler(
           }
         }
       }
+
       res
         .status(200)
         .json({ data: log.data, date: new_date, message: "Transactions Upto Date" });
