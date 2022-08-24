@@ -44,6 +44,7 @@ export default async function handler(
         headers,
       });
 
+  res.setHeader("Cache-Control", `s-maxage=30, stale-while-revalidate`);
       const log = response.data;
 
       // if (log.data.length > 0) {
