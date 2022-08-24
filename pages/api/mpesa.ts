@@ -14,7 +14,7 @@ export default async function handler(
       const date = new Date();
       const n_date = new Date();
 
-      date.setDate(date.getDate() - 2);
+      date.setDate(date.getDate() - 5);
       let str_date: string = date.toLocaleDateString();
       let str_ndate: string = n_date.toLocaleDateString();
       let str_tdate: string = n_date.toUTCString();
