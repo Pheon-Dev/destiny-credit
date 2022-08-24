@@ -136,17 +136,8 @@ export default async function handler(
 
           if (data.length === 0) {
             if (
-              transactionType &&
-              transID &&
-              transTime &&
-              transAmount &&
-              businessShortCode &&
-              billRefNumber &&
-              msisdn &&
-              firstName &&
-              middleName &&
-              lastName &&
-              orgAccountBalance
+              transactionType === "Pay Bill" ||
+              transactionType === "Customer Merchant Payment"
             ) {
               await supabase.from("transactions").insert([
                 {
@@ -173,14 +164,6 @@ export default async function handler(
           if (data.length !== 0) {
             counter++;
           }
-
-          return res
-            .status(200)
-            .json({
-              error: log.data,
-              date: new_date,
-              message: "Something Went Wrong",
-            });
         }
       }
 
