@@ -170,7 +170,7 @@ export const getServerSideProps: GetServerSideProps = async (context) => {
   const { res } = context;
   res.setHeader("Cache-Control", `s-maxage=60, stale-while-revalidate`);
 
-      const url = `/api/mpesa`;
+      const url = `https://destiny-credit.vercel.app/api/mpesa`;
       const token = LOGTAIL_API_TOKEN;
       const headers = {
         Authorization: `Bearer ${token}`,
