@@ -19,7 +19,7 @@ import {
   Group,
   Text,
 } from "@mantine/core";
-import { MainLinkProps } from "../types";
+import { MainLinkProps } from "../../types";
 import Link from "next/link";
 import {useRouter} from "next/router";
 import {

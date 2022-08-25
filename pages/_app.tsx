@@ -21,8 +21,7 @@ import {
   Burger,
   useMantineTheme,
 } from "@mantine/core";
-import { ColorSchemeToggle } from "../components/ColorSchemeToggle";
-import { MainLinks } from "../components/MainLinks";
+import { MainLinks, ColorSchemeToggle } from "../components";
 
 export default function App(props: AppProps & { colorScheme: ColorScheme }) {
   const theme = useMantineTheme();
@@ -61,7 +60,7 @@ export default function App(props: AppProps & { colorScheme: ColorScheme }) {
         <MantineProvider
           withGlobalStyles
           withNormalizeCSS
-          theme={{ colorScheme }}
+          theme={{ colorScheme, loader: 'bars' }}
         >
         <ColorSchemeProvider
           colorScheme={colorScheme}

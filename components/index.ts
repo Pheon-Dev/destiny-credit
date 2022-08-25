@@ -1,2 +1,3 @@
-export { ColorSchemeToggle } from "./ColorSchemeToggle";
-export { MainLinks } from "./MainLinks";
+export { ColorSchemeToggle } from "./Theme/ColorSchemeToggle";
+export { MainLinks } from "./Navigation/MainLinks";
+export { TransactionsTable } from "./Tables/TransactionsTable";

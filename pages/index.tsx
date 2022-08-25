@@ -1,7 +1,7 @@
-import { useEffect, useState } from "react";
+import React from "react";
 import supabase from "../lib/supabase";
-import { Text } from "@mantine/core";
 import { Transactions, Fields, Data } from "../types";
+import { TransactionsTable } from "../components";
 import { GetServerSideProps } from "next";
 
 export default function Home({
@@ -11,17 +11,9 @@ export default function Home({
 }) {
   return (
     <>
-      <Text>
-        {transactions?.map((transaction) => (
-          <TransactionDiv key={transaction.transID} transaction={transaction} />
-        ))}
-      </Text>
+      <TransactionsTable transactions={transactions} />
     </>
   );
-}
-
-function TransactionDiv({ transaction }: { transaction: Transactions }) {
-  return <pre>{JSON.stringify(transaction, undefined, 2)}</pre>;
 }
 
 export const getServerSideProps: GetServerSideProps = async () => {
