@@ -1,7 +1,7 @@
 import React, { useEffect, useState } from "react";
+import { supabase } from "../../lib/supabase";
 import { useForm } from "@mantine/form";
 import { TextInput, Grid, Button, Group, Select } from "@mantine/core";
-import { randomId } from "@mantine/hooks";
 import { TitleText } from "../../components";
 
 const CreateMember = () => {
@@ -14,7 +14,7 @@ const CreateMember = () => {
       otherNames: "",
       dob: "",
       idPass: "",
-      pinNumber: "",
+      kraPin: "",
       mobileNumber: "",
       gender: "",
       age: "",
@@ -36,8 +36,8 @@ const CreateMember = () => {
       refereeName: "",
       refereeNumber: "",
       communityPosition: "",
-      mpesaTransNumber: "",
-      mpesaAmount: "",
+      mpesaCode: "",
+      membershipAmount: "",
       nameKin: "",
       relationship: "",
       residentialAddressKin: "",
@@ -47,6 +47,55 @@ const CreateMember = () => {
       numberKin: "",
     },
   });
+
+  const fetchMembers = async () => {
+    const { data, error } = await supabase.from("members").select();
+  };
+
+  const handleSave = async () => {
+    await supabase.from("members").insert([
+      {
+        date: form.values.date,
+        branchName: form.values.branchName,
+        memberNumber: form.values.memberNumber,
+        surName: form.values.surName,
+        otherNames: form.values.otherNames,
+        dob: form.values.dob,
+        idPass: form.values.idPass,
+        kraPin: form.values.kraPin,
+        mobileNumber: form.values.mobileNumber,
+        gender: form.values.gender,
+        age: form.values.age,
+        religion: form.values.religion,
+        maritalStatus: form.values.maritalStatus,
+        spouseName: form.values.spouseName,
+        spouseNumber: form.values.spouseNumber,
+        postalAddress: form.values.postalAddress,
+        postalCode: form.values.postalCode,
+        cityTown: form.values.cityTown,
+        residentialAddress: form.values.residentialAddress,
+        emailAddress: form.values.emailAddress,
+        rentedOwned: form.values.rentedOwned,
+        landCareAgent: form.values.landCareAgent,
+        occupationEmployer: form.values.occupationEmployer,
+        employerNumber: form.values.employerNumber,
+        businessLocation: form.values.businessLocation,
+        businessAge: form.values.businessAge,
+        refereeName: form.values.refereeName,
+        refereeNumber: form.values.refereeNumber,
+        communityPosition: form.values.communityPosition,
+        mpesaCode: form.values.mpesaCode,
+        membershipAmount: form.values.membershipAmount,
+        nameKin: form.values.nameKin,
+        relationship: form.values.relationship,
+        residentialAddressKin: form.values.residentialAddressKin,
+        postalAddressKin: form.values.postalAddressKin,
+        postalCodeKin: form.values.postalCodeKin,
+        cityTownKin: form.values.cityTownKin,
+        numberKin: form.values.numberKin,
+      },
+    ]);
+  };
   return (
     <div>
       <Group position="center" m="md">
@@ -138,7 +187,7 @@ const CreateMember = () => {
             mt="md"
             label="KRA PIN"
             placeholder="KRA PIN"
-            {...form.getInputProps("pinNumber")}
+            {...form.getInputProps("kraPin")}
             required
           />
         </Grid.Col>
@@ -388,9 +437,7 @@ const CreateMember = () => {
               required
             />
           </Grid.Col>
-        ) :
-          null
-        }
+        ) : null}
         <Grid.Col span={4}>
           <TextInput
             mt="md"
@@ -419,9 +466,7 @@ const CreateMember = () => {
               required
             />
           </Grid.Col>
-        ) :
-          null
-        }
+        ) : null}
       </Grid>
 
       <Grid grow>
@@ -435,15 +480,13 @@ const CreateMember = () => {
               required
             />
           </Grid.Col>
-        ) :
-          null
-        }
+        ) : null}
         <Grid.Col span={4}>
           <TextInput
             mt="md"
             label="Membership Fee (M-PESA Code)"
             placeholder="Membership Fee (M-PESA Code)"
-            {...form.getInputProps("mpesaTransNumber")}
+            {...form.getInputProps("mpesaCode")}
             required
           />
         </Grid.Col>
@@ -452,7 +495,7 @@ const CreateMember = () => {
             mt="md"
             label="Membership Fee Amount"
             placeholder="Membership Fee Amount"
-            {...form.getInputProps("mpesaAmount")}
+            {...form.getInputProps("membershipAmount")}
             required
           />
         </Grid.Col>
@@ -463,15 +506,15 @@ const CreateMember = () => {
       </Group>
 
       <Grid grow>
-          <Grid.Col span={4}>
-            <TextInput
-              mt="md"
-              label="Names (kin)"
-              placeholder="Names (kin)"
-              {...form.getInputProps("nameKin")}
-              required
-            />
-          </Grid.Col>
+        <Grid.Col span={4}>
+          <TextInput
+            mt="md"
+            label="Names (kin)"
+            placeholder="Names (kin)"
+            {...form.getInputProps("nameKin")}
+            required
+          />
+        </Grid.Col>
         <Grid.Col span={4}>
           <TextInput
             mt="md"
@@ -493,15 +536,15 @@ const CreateMember = () => {
       </Grid>
 
       <Grid grow>
-          <Grid.Col span={4}>
-            <TextInput
-              mt="md"
-              label="Residential Address"
-              placeholder="Residential Address"
-              {...form.getInputProps("residentialAddressKin")}
-              required
-            />
-          </Grid.Col>
+        <Grid.Col span={4}>
+          <TextInput
+            mt="md"
+            label="Residential Address"
+            placeholder="Residential Address"
+            {...form.getInputProps("residentialAddressKin")}
+            required
+          />
+        </Grid.Col>
         <Grid.Col span={4}>
           <TextInput
             mt="md"
@@ -538,46 +581,7 @@ const CreateMember = () => {
         <Button
           variant="outline"
           onClick={() => {
-            form.setValues({
-              date: "",
-              branchName: "",
-              memberNumber: "",
-              surName: "",
-              otherNames: "",
-              dob: "",
-              idPass: "",
-              pinNumber: "",
-              mobileNumber: "",
-              gender: "",
-              age: "",
-              religion: "",
-              maritalStatus: "",
-              spouseName: "",
-              spouseNumber: "",
-              postalAddress: "",
-              postalCode: "",
-              cityTown: "",
-              residentialAddress: "",
-              emailAddress: "",
-              rentedOwned: "",
-              landCareAgent: "",
-              occupationEmployer: "",
-              employerNumber: "",
-              businessLocation: "",
-              businessAge: "",
-              refereeName: "",
-              refereeNumber: "",
-              communityPosition: "",
-              mpesaTransNumber: "",
-              mpesaAmount: "",
-              nameKin: "",
-              relationship: "",
-              residentialAddressKin: "",
-              postalAddressKin: "",
-              postalCodeKin: "",
-              cityTownKin: "",
-              numberKin: "",
-            });
+            handleSave();
           }}
         >
           Submit

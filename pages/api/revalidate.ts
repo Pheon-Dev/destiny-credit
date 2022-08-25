@@ -13,6 +13,7 @@ export default function handler(
   async function revalidation() {
     try {
       await res.revalidate('/');
+      await res.revalidate('/members/create-member');
       return res.json({ revalidated: true });
     } catch (error) {
       return res.status(500).send('Error Revlidating');

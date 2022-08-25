@@ -1,5 +1,5 @@
 import React from "react";
-import supabase from "../lib/supabase";
+import { supabase } from "../lib/supabase";
 import { Transactions, Fields, Data } from "../types";
 import { TransactionsTable } from "../components";
 import { GetServerSideProps } from "next";
