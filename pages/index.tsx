@@ -150,9 +150,10 @@ export default function Home({
   //   }
   // }
 
+console.log(data)
   return (
     <>
-    <pre>{JSON.stringify(data, undefined, 2)}</pre>
+    {/* <pre>{JSON.stringify(data, undefined, 2)}</pre> */}
       <Text>
         {transactions?.map((transaction) => (
           <TransactionDiv key={transaction.transID} transaction={transaction} />
@@ -166,11 +167,8 @@ function TransactionDiv({ transaction }: { transaction: Transactions }) {
   return <pre>{JSON.stringify(transaction, undefined, 2)}</pre>;
 }
 
-export const getServerSideProps: GetServerSideProps = async (context) => {
-  const { res } = context;
-  res.setHeader("Cache-Control", `s-maxage=60, stale-while-revalidate`);
-
-      const url = `https://destiny-credit.vercel.app/api/mpesa`;
+export const getServerSideProps: GetServerSideProps = async () => {
+      const url = `/api/mpesa`;
       const token = LOGTAIL_API_TOKEN;
       const headers = {
         Authorization: `Bearer ${token}`,

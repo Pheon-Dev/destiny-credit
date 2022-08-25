@@ -70,19 +70,7 @@ export type Transactions = {
 };
 
 export type Data = {
-  transactionType: string;
-  transID: string;
-  transTime: string;
-  transAmount: string;
-  businessShortCode: string;
-  billRefNumber: string;
-  invoiceNumber: string;
-  orgAccountBalance: string;
-  thirdPartyTransID: string;
-  msisdn: string;
-  firstName: string;
-  middleName: string;
-  lastName: string;
+  data: any
 };
 
 type Links = {
