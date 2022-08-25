@@ -17,8 +17,7 @@ export default async function handler(
       date.setDate(date.getDate() - 2);
       let str_date: string = date.toLocaleDateString();
       let str_ndate: string = n_date.toLocaleDateString();
-      let str_tdate: string = n_date.toUTCString();
-      let str_time: string = str_tdate.split(" ")[4];
+      let str_tdate: string = n_date.toLocaleTimeString();
 
       const new_date =
         str_date.split("/")[2] +
@@ -33,7 +32,7 @@ export default async function handler(
         str_ndate.split("/")[1] +
         "-" +
         str_ndate.split("/")[0];
-      const url = `https://logtail.com/api/v1/query?source_ids=158744&query=transID`;
+      const url = `https://logtail.com/api/v1/query?source_ids=158744&query=transID&to=${now_date} ${str_tdate}`;
       const token = LOGTAIL_API_TOKEN;
       const headers = {
         Authorization: `Bearer ${token}`,
@@ -171,7 +170,7 @@ export default async function handler(
         .status(200)
         .json({
           data: log.data,
-          date: new_date,
+          date: new_date + " " + str_tdate,
           message: "Transactions Upto Date",
         });
     } catch (error) {
