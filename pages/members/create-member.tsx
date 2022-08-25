@@ -1,7 +1,8 @@
 import React, { useEffect, useState } from "react";
 import { useForm } from "@mantine/form";
-import { Text, TextInput, Grid, Button, Group, Select } from "@mantine/core";
+import { TextInput, Grid, Button, Group, Select } from "@mantine/core";
 import { randomId } from "@mantine/hooks";
+import { TitleText } from "../../components";
 
 const CreateMember = () => {
   const form = useForm({
@@ -43,13 +44,13 @@ const CreateMember = () => {
       postalAddressKin: "",
       postalCodeKin: "",
       cityTownKin: "",
-      mobileNumberKin: "",
+      numberKin: "",
     },
   });
   return (
     <div>
       <Group position="center" m="md">
-        <Text>MEMBER REGISTRATION</Text>
+        <TitleText title="Member Registration" />
       </Group>
 
       <Grid grow>
@@ -80,7 +81,7 @@ const CreateMember = () => {
       </Grid>
 
       <Group position="center" m="md">
-        <Text>PERSONAL DETAILS</Text>
+        <TitleText title="Personal Details" />
       </Group>
 
       <Grid grow>
@@ -387,27 +388,27 @@ const CreateMember = () => {
               required
             />
           </Grid.Col>
-        ) : 
-        null
+        ) :
+          null
         }
-          <Grid.Col span={4}>
-            <TextInput
-              mt="md"
-              label="Referee (name)"
-              placeholder="Referee (name)"
-              {...form.getInputProps("refereeName")}
-              required
-            />
-          </Grid.Col>
-          <Grid.Col span={4}>
-            <TextInput
-              mt="md"
-              label="Referee (number)"
-              placeholder="Referee (number)"
-              {...form.getInputProps("refereeNumber")}
-              required
-            />
-          </Grid.Col>
+        <Grid.Col span={4}>
+          <TextInput
+            mt="md"
+            label="Referee (name)"
+            placeholder="Referee (name)"
+            {...form.getInputProps("refereeName")}
+            required
+          />
+        </Grid.Col>
+        <Grid.Col span={4}>
+          <TextInput
+            mt="md"
+            label="Phone No. (referee)"
+            placeholder="Phone No. (referee)"
+            {...form.getInputProps("refereeNumber")}
+            required
+          />
+        </Grid.Col>
         {form.values.occupationEmployer.toUpperCase() === "BUSINESS" ? (
           <Grid.Col span={4}>
             <TextInput
@@ -418,8 +419,8 @@ const CreateMember = () => {
               required
             />
           </Grid.Col>
-        ) : 
-        null
+        ) :
+          null
         }
       </Grid>
 
@@ -434,27 +435,103 @@ const CreateMember = () => {
               required
             />
           </Grid.Col>
-        ) : 
-        null
+        ) :
+          null
         }
+        <Grid.Col span={4}>
+          <TextInput
+            mt="md"
+            label="Membership Fee (M-PESA Code)"
+            placeholder="Membership Fee (M-PESA Code)"
+            {...form.getInputProps("mpesaTransNumber")}
+            required
+          />
+        </Grid.Col>
+        <Grid.Col span={4}>
+          <TextInput
+            mt="md"
+            label="Membership Fee Amount"
+            placeholder="Membership Fee Amount"
+            {...form.getInputProps("mpesaAmount")}
+            required
+          />
+        </Grid.Col>
+      </Grid>
+
+      <Group position="center" m="md">
+        <TitleText title="Next of Kin Details" />
+      </Group>
+
+      <Grid grow>
           <Grid.Col span={4}>
             <TextInput
               mt="md"
-              label="Membership Fee (M-PESA Code)"
-              placeholder="Membership Fee (M-PESA Code)"
-              {...form.getInputProps("mpesaTransNumber")}
+              label="Names (kin)"
+              placeholder="Names (kin)"
+              {...form.getInputProps("nameKin")}
               required
             />
           </Grid.Col>
+        <Grid.Col span={4}>
+          <TextInput
+            mt="md"
+            label="Relationship"
+            placeholder="Relationship"
+            {...form.getInputProps("relationship")}
+            required
+          />
+        </Grid.Col>
+        <Grid.Col span={4}>
+          <TextInput
+            mt="md"
+            label="Phone No. (kin)"
+            placeholder="Phone No. (kin)"
+            {...form.getInputProps("numberKin")}
+            required
+          />
+        </Grid.Col>
+      </Grid>
+
+      <Grid grow>
           <Grid.Col span={4}>
             <TextInput
               mt="md"
-              label="Membership Fee Amount"
-              placeholder="Membership Fee Amount"
-              {...form.getInputProps("mpesaAmount")}
+              label="Residential Address"
+              placeholder="Residential Address"
+              {...form.getInputProps("residentialAddressKin")}
               required
             />
           </Grid.Col>
+        <Grid.Col span={4}>
+          <TextInput
+            mt="md"
+            label="City | Town"
+            placeholder="City | Town"
+            {...form.getInputProps("cityTownKin")}
+            required
+          />
+        </Grid.Col>
+      </Grid>
+
+      <Grid grow>
+        <Grid.Col span={4}>
+          <TextInput
+            mt="md"
+            label="Postal Address"
+            placeholder="Postal Address"
+            {...form.getInputProps("postalAddressKin")}
+            required
+          />
+        </Grid.Col>
+        <Grid.Col span={4}>
+          <TextInput
+            mt="md"
+            label="Postal Code"
+            placeholder="Postal Code"
+            {...form.getInputProps("postalCodeKin")}
+            required
+          />
+        </Grid.Col>
       </Grid>
 
       <Group position="center" mt="xl">
@@ -499,7 +576,7 @@ const CreateMember = () => {
               postalAddressKin: "",
               postalCodeKin: "",
               cityTownKin: "",
-              mobileNumberKin: "",
+              numberKin: "",
             });
           }}
         >

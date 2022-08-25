@@ -69,6 +69,10 @@ export type Transactions = {
   lastName: string;
 };
 
+export interface Title {
+  title: string
+};
+
 export type Data = {
   data: any
 };
