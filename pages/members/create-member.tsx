@@ -1,7 +1,7 @@
 import React, { useEffect, useState } from "react";
 import { supabase } from "../../lib/supabase";
 import { useForm } from "@mantine/form";
-import { TextInput, Grid, Button, Group, Select } from "@mantine/core";
+import { TextInput, Grid, Button, Divider, Group, Select } from "@mantine/core";
 import { TitleText } from "../../components";
 
 const CreateMember = () => {
@@ -10,8 +10,8 @@ const CreateMember = () => {
       date: "",
       branchName: "",
       memberNumber: "",
-      surName: "",
-      otherNames: "",
+      firstName: "",
+      lastName: "",
       dob: "",
       idPass: "",
       kraPin: "",
@@ -53,13 +53,14 @@ const CreateMember = () => {
   };
 
   const handleSave = async () => {
+    console.log(form.values.firstName)
     await supabase.from("members").insert([
       {
         date: form.values.date,
         branchName: form.values.branchName,
         memberNumber: form.values.memberNumber,
-        surName: form.values.surName,
-        otherNames: form.values.otherNames,
+        firstName: form.values.firstName,
+        lastName: form.values.lastName,
         dob: form.values.dob,
         idPass: form.values.idPass,
         kraPin: form.values.kraPin,
@@ -129,6 +130,7 @@ const CreateMember = () => {
         </Grid.Col>
       </Grid>
 
+      <Divider mt="lg" variant="dashed" my="sm" />
       <Group position="center" m="md">
         <TitleText title="Personal Details" />
       </Group>
@@ -137,18 +139,18 @@ const CreateMember = () => {
         <Grid.Col span={4}>
           <TextInput
             mt="md"
-            label="Surname"
-            placeholder="Surname"
-            {...form.getInputProps("surName")}
+            label="First Name"
+            placeholder="First Name"
+            {...form.getInputProps("firstName")}
             required
           />
         </Grid.Col>
         <Grid.Col span={4}>
           <TextInput
             mt="md"
-            label="Other Names"
-            placeholder="Other Names"
-            {...form.getInputProps("otherNames")}
+            label="Last Name (other names)"
+            placeholder="Last Name (other names)"
+            {...form.getInputProps("lastName")}
             required
           />
         </Grid.Col>
@@ -501,6 +503,7 @@ const CreateMember = () => {
         </Grid.Col>
       </Grid>
 
+      <Divider mt="lg" variant="dashed" my="sm" />
       <Group position="center" m="md">
         <TitleText title="Next of Kin Details" />
       </Group>
@@ -577,6 +580,7 @@ const CreateMember = () => {
         </Grid.Col>
       </Grid>
 
+      <Divider mt="lg" variant="dashed" my="sm" />
       <Group position="center" mt="xl">
         <Button
           variant="outline"
