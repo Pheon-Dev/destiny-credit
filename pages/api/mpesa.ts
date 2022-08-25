@@ -32,7 +32,7 @@ export default async function handler(
         str_ndate.split("/")[1] +
         "-" +
         str_ndate.split("/")[0];
-      const url = `https://logtail.com/api/v1/query?source_ids=158744&query=transID&to=${now_date} ${str_tdate}`;
+      const url = "https://logtail.com/api/v1/query?source_ids=158744&query=transID" + `&to=${now_date} + ${str_tdate}`;
       const token = LOGTAIL_API_TOKEN;
       const headers = {
         Authorization: `Bearer ${token}`,
