@@ -10,6 +10,7 @@ export default async function handler(
   res: NextApiResponse
 ) {
   async function queryAndWrite() {
+    try {
       const date = new Date();
       const n_date = new Date();
 
@@ -172,6 +173,9 @@ export default async function handler(
           date: new_date + " " + str_tdate,
           message: "Transactions Upto Date",
         });
+    } catch (error) {
+      res.status(500).json({ message: "Something went wrong" });
+    }
   }
   queryAndWrite();
 }
