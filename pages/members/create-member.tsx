@@ -92,7 +92,7 @@ const CreateMember = ({ members }: { members: Member[] }) => {
   // const [dateValue, setDateValue] = useState(new Date())
   // const [dobValue, setDobValue] = useState(new Date())
 
-  let sage: number = 0;
+  let age_result: number = 0;
 
   let lencode: number = members.length + 1;
   let memcode =
@@ -103,40 +103,6 @@ const CreateMember = ({ members }: { members: Member[] }) => {
           : "DC-0" + `${lencode}`
         : "DC-00" + `${lencode}`
       : "DC-000" + `${lencode}`;
-
-  // let resage: number = 0;
-  // let tdate = new Date(dateValue);
-  // let bdate = new Date(dobValue);
-  // // let sdob = form.values.dob.toString();
-  //
-  // let rdate = tdate.toLocaleDateString();
-  // let ddate = bdate.toLocaleDateString();
-  //
-  // const ndate =
-  //   rdate.split("/")[0] + "-" + rdate.split("/")[1] + "-" + rdate.split("/")[2];
-  //
-  // const wdate =
-  //   ddate.split("/")[0] + "-" + ddate.split("/")[1] + "-" + ddate.split("/")[2];
-  //
-  // let ydiff: number = Number(rdate.split("/")[2]) - Number(ddate.split("/")[2]);
-  //
-  // function renderAge(tmonth: number, bmonth: number) {
-  //   let result: number = 0;
-  //   if (tmonth === bmonth) result = 1;
-  //   if (tmonth > bmonth) result = 1;
-  //   if (tmonth < bmonth) result = 0;
-  //   return result;
-  // }
-  //
-  // let mdiff = renderAge(
-  //   Number(tdate.getMonth()) + 1,
-  //   Number(bdate.getMonth()) + 1
-  // );
-  //
-  // resage = ydiff + mdiff - 1;
-  // sage = resage > 0 ? resage : resage * -1;
-  // console.log(ndate);
-  // console.log(wdate);
 
   const form = useForm({
     validate: zodResolver(schema),
@@ -151,7 +117,7 @@ const CreateMember = ({ members }: { members: Member[] }) => {
       kraPin: "",
       phoneNumber: "",
       gender: "",
-      age: `${sage}`,
+      age: `${age_result}`,
       religion: "",
       maritalStatus: "",
       spouseName: "NA",
@@ -183,6 +149,37 @@ const CreateMember = ({ members }: { members: Member[] }) => {
       maintained: "false",
     },
   });
+
+  let today_date = new Date(form.values.date);
+  let birth_date = new Date(form.values.dob);
+  //
+  let local_today_date = today_date.toLocaleDateString();
+  let local_birth_date = birth_date.toLocaleDateString();
+  //
+  const dash_today_date =
+    local_today_date.split("/")[0] + "-" + local_today_date.split("/")[1] + "-" + local_today_date.split("/")[2];
+
+  const dash_birth_date =
+    local_birth_date.split("/")[0] + "-" + local_birth_date.split("/")[1] + "-" + local_birth_date.split("/")[2];
+
+  let year_difference: number = Number(dash_today_date.split("-")[2]) - Number(dash_birth_date.split("-")[2]);
+  //
+  function renderAge(today_month: number, birth_month: number) {
+    let result: number = 0;
+    if (today_month === birth_month) result = 1;
+    if (today_month > birth_month) result = 1;
+    if (today_month < birth_month) result = 0;
+    return result;
+  }
+
+  let month_difference = renderAge(
+    Number(local_today_date.split("-")[1]),
+    Number(local_birth_date.split("-")[1])
+  );
+
+  age_result = year_difference + month_difference - 1;
+  age_result = age_result > 0 ? age_result : age_result * -1;
+  console.log(age_result)
 
   const handleSave = async () => {
     if (
@@ -822,9 +819,9 @@ const CreateMember = ({ members }: { members: Member[] }) => {
           variant="outline"
           onClick={() => {
             form.setFieldValue("memberNumber", `${memcode}`);
-            form.setFieldValue("age", `${sage}`);
-            // form.setFieldValue("date", tdate);
-            // form.setFieldValue("dob", bdate);
+            form.setFieldValue("age", `${age_result}`);
+            form.setFieldValue("date", new Date(local_today_date));
+            form.setFieldValue("dob", new Date(local_birth_date));
             {form.values.maritalStatus !== "married" ? null :
               form.setFieldValue("spouseName", "NA");
             }
