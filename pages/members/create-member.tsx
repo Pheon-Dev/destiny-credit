@@ -3,8 +3,24 @@ import { supabase } from "../../lib/supabase";
 import { useForm } from "@mantine/form";
 import { TextInput, Grid, Button, Divider, Group, Select } from "@mantine/core";
 import { TitleText } from "../../components";
+import { Member } from "../../types";
 
-const CreateMember = () => {
+export async function getStaticProps() {
+  const { data, error } = await supabase
+    .from("members")
+    .select("*")
+    .order("id");
+
+  if (error) return console.log({ error: error });
+  if (data)
+    return {
+      props: {
+        members: data,
+      },
+    };
+}
+
+const CreateMember = ({ members }: { members: Member[] }) => {
   const form = useForm({
     initialValues: {
       date: "",
@@ -45,57 +61,57 @@ const CreateMember = () => {
       postalCodeKin: "",
       cityTownKin: "",
       numberKin: "",
+      group: "false",
+      maintained: "false",
     },
   });
 
-  const fetchMembers = async () => {
-    const { data, error } = await supabase.from("members").select();
-  };
-
   const handleSave = async () => {
-    console.log(form.values.firstName)
-    await supabase.from("members").insert([
-      {
-        date: form.values.date,
-        branchName: form.values.branchName,
-        memberNumber: form.values.memberNumber,
-        firstName: form.values.firstName,
-        lastName: form.values.lastName,
-        dob: form.values.dob,
-        idPass: form.values.idPass,
-        kraPin: form.values.kraPin,
-        mobileNumber: form.values.mobileNumber,
-        gender: form.values.gender,
-        age: form.values.age,
-        religion: form.values.religion,
-        maritalStatus: form.values.maritalStatus,
-        spouseName: form.values.spouseName,
-        spouseNumber: form.values.spouseNumber,
-        postalAddress: form.values.postalAddress,
-        postalCode: form.values.postalCode,
-        cityTown: form.values.cityTown,
-        residentialAddress: form.values.residentialAddress,
-        emailAddress: form.values.emailAddress,
-        rentedOwned: form.values.rentedOwned,
-        landCareAgent: form.values.landCareAgent,
-        occupationEmployer: form.values.occupationEmployer,
-        employerNumber: form.values.employerNumber,
-        businessLocation: form.values.businessLocation,
-        businessAge: form.values.businessAge,
-        refereeName: form.values.refereeName,
-        refereeNumber: form.values.refereeNumber,
-        communityPosition: form.values.communityPosition,
-        mpesaCode: form.values.mpesaCode,
-        membershipAmount: form.values.membershipAmount,
-        nameKin: form.values.nameKin,
-        relationship: form.values.relationship,
-        residentialAddressKin: form.values.residentialAddressKin,
-        postalAddressKin: form.values.postalAddressKin,
-        postalCodeKin: form.values.postalCodeKin,
-        cityTownKin: form.values.cityTownKin,
-        numberKin: form.values.numberKin,
-      },
-    ]);
+    console.log(form.values.firstName);
+    // await supabase.from("members").insert([
+    //   {
+    //     date: form.values.date,
+    //     branchName: form.values.branchName,
+    //     memberNumber: form.values.memberNumber,
+    //     firstName: form.values.firstName,
+    //     lastName: form.values.lastName,
+    //     dob: form.values.dob,
+    //     idPass: form.values.idPass,
+    //     kraPin: form.values.kraPin,
+    //     mobileNumber: form.values.mobileNumber,
+    //     gender: form.values.gender,
+    //     age: form.values.age,
+    //     religion: form.values.religion,
+    //     maritalStatus: form.values.maritalStatus,
+    //     spouseName: form.values.spouseName,
+    //     spouseNumber: form.values.spouseNumber,
+    //     postalAddress: form.values.postalAddress,
+    //     postalCode: form.values.postalCode,
+    //     cityTown: form.values.cityTown,
+    //     residentialAddress: form.values.residentialAddress,
+    //     emailAddress: form.values.emailAddress,
+    //     rentedOwned: form.values.rentedOwned,
+    //     landCareAgent: form.values.landCareAgent,
+    //     occupationEmployer: form.values.occupationEmployer,
+    //     employerNumber: form.values.employerNumber,
+    //     businessLocation: form.values.businessLocation,
+    //     businessAge: form.values.businessAge,
+    //     refereeName: form.values.refereeName,
+    //     refereeNumber: form.values.refereeNumber,
+    //     communityPosition: form.values.communityPosition,
+    //     mpesaCode: form.values.mpesaCode,
+    //     membershipAmount: form.values.membershipAmount,
+    //     nameKin: form.values.nameKin,
+    //     relationship: form.values.relationship,
+    //     residentialAddressKin: form.values.residentialAddressKin,
+    //     postalAddressKin: form.values.postalAddressKin,
+    //     postalCodeKin: form.values.postalCodeKin,
+    //     cityTownKin: form.values.cityTownKin,
+    //     numberKin: form.values.numberKin,
+    //     group: form.values.group,
+    //     maintained: form.values.maintained,
+    //   },
+    // ]);
   };
   return (
     <div>
@@ -585,7 +601,9 @@ const CreateMember = () => {
         <Button
           variant="outline"
           onClick={() => {
-            handleSave();
+            form.setFieldValue("memberNumber", `${members.length + 1}`);
+            form.setFieldValue("group", "false");
+            form.setFieldValue("maintained", "false");
           }}
         >
           Submit

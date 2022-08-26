@@ -70,11 +70,11 @@ export type Transactions = {
 };
 
 export interface Title {
-  title: string
-};
+  title: string;
+}
 
 export type Data = {
-  data: any
+  data: any;
 };
 
 type Links = {
@@ -92,4 +92,47 @@ export interface MainLinkProps {
   color: string;
   label: string;
   data?: any;
+}
+
+export interface Member {
+  date: string;
+  branchName: string;
+  memberNumber: string;
+  firstName: string;
+  lastName: string;
+  dob: string;
+  idPass: string;
+  kraPin: string;
+  mobileNumber: string;
+  gender: string;
+  age: string;
+  religion: string;
+  maritalStatus: string;
+  spouseName: string;
+  spouseNumber: string;
+  postalAddress: string;
+  postalCode: string;
+  cityTown: string;
+  residentialAddress: string;
+  emailAddress: string;
+  rentedOwned: string;
+  landCareAgent: string;
+  occupationEmployer: string;
+  employerNumber: string;
+  businessLocation: string;
+  businessAge: string;
+  refereeName: string;
+  refereeNumber: string;
+  communityPosition: string;
+  mpesaCode: string;
+  membershipAmount: string;
+  nameKin: string;
+  relationship: string;
+  residentialAddressKin: string;
+  postalAddressKin: string;
+  postalCodeKin: string;
+  cityTownKin: string;
+  numberKin: string;
+  maintained?: string;
+  group?: string;
 }
