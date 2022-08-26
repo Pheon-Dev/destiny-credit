@@ -30,7 +30,8 @@
     "react-icons": "^4.4.0",
     "react-router-dom": "^6.3.0",
     "redis-om": "^0.3.6",
-    "uuidv4": "^6.2.13"
+    "uuidv4": "^6.2.13",
+    "zod": "^3.18.0"
   },
   "devDependencies": {
     "@types/formidable": "^2.0.5",

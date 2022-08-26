@@ -95,12 +95,12 @@ export interface MainLinkProps {
 }
 
 export interface Member {
-  date: string;
+  date: Date;
   branchName: string;
   memberNumber: string;
   firstName: string;
   lastName: string;
-  dob: string;
+  dob: Date;
   idPass: string;
   kraPin: string;
   mobileNumber: string;

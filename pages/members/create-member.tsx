@@ -1,7 +1,14 @@
 import React, { useEffect, useState } from "react";
 import { supabase } from "../../lib/supabase";
-import { useForm } from "@mantine/form";
-import { IconCalendar } from "@tabler/icons";
+import { z } from "zod";
+import { useForm, zodResolver } from "@mantine/form";
+import {
+  IconAlertOctagon,
+  IconAlertTriangle,
+  IconCalendar,
+  IconCheck,
+  IconX,
+} from "@tabler/icons";
 import { DatePicker } from "@mantine/dates";
 import {
   TextInput,
@@ -14,6 +21,7 @@ import {
 } from "@mantine/core";
 import { TitleText } from "../../components";
 import { Member } from "../../types";
+import { showNotification, updateNotification } from "@mantine/notifications";
 
 export async function getStaticProps() {
   const { data, error } = await supabase
@@ -22,7 +30,6 @@ export async function getStaticProps() {
     .order("id");
 
   if (error) return console.log({ error: error });
-  if (data)
     return {
       props: {
         members: data,
@@ -30,8 +37,62 @@ export async function getStaticProps() {
     };
 }
 
+const schema = z.object({
+  date: z.date({ required_error: "Enter Todays' Date" }),
+  branchName: z.string().min(2, { message: "Enter Branch Name" }),
+  memberNumber: z.string().min(2, { message: "Enter Member Number" }),
+  firstName: z.string().min(2, { message: "Enter First Name" }),
+  lastName: z.string().min(2, { message: "Enter Last Name" }),
+  dob: z.date({ required_error: "Enter Date of Birth" }),
+  idPass: z.string().min(2, { message: "Enter ID | Passport #" }),
+  kraPin: z.string().min(2, { message: "Enter KRA PIN" }),
+  phoneNumber: z.string().min(2, { message: "Enter Phone Number" }),
+  gender: z.string().min(2, { message: "Enter Gender" }),
+  age: z.string().min(2, { message: "Enter Age" }),
+  religion: z.string().min(2, { message: "Enter Religion" }),
+  maritalStatus: z.string().min(2, { message: "Enter Marital Status" }),
+  spouseName: z.string().min(2, { message: "Enter Name (spouse)" }),
+  spouseNumber: z.string().min(2, { message: "Enter Number (spouse)" }),
+  postalAddress: z.string().min(2, { message: "Enter Postal Address" }),
+  postalCode: z.string().min(2, { message: "Enter Postal Code" }),
+  cityTown: z.string().min(2, { message: "Enter City | Town" }),
+  residentialAddress: z
+    .string()
+    .min(2, { message: "Enter Residential Address" }),
+  emailAddress: z.string().min(2, { message: "Enter Email Address" }),
+  rentedOwned: z.string().min(2, { message: "Enter Rented | Owned" }),
+  landCareAgent: z
+    .string()
+    .min(2, { message: "Enter Landlord | Care Taker | Agent" }),
+  occupationEmployer: z
+    .string()
+    .min(2, { message: "Enter Occupation | Employer" }),
+  employerNumber: z.string().min(2, { message: "Enter Employer Number" }),
+  businessLocation: z.string().min(2, { message: "Enter Business Location" }),
+  businessAge: z.string().min(2, { message: "Enter Business Age" }),
+  refereeName: z.string().min(2, { message: "Enter Referee (name)" }),
+  refereeNumber: z.string().min(2, { message: "Enter Referee (number)" }),
+  communityPosition: z.string().min(2, { message: "Enter Community Position" }),
+  mpesaCode: z.string().min(2, { message: "Enter M-PESA Code" }),
+  membershipAmount: z.string().min(2, { message: "Enter Membership Amount" }),
+  nameKin: z.string().min(2, { message: "Enter Name (kin)" }),
+  relationship: z.string().min(2, { message: "Enter Relationship (kin)" }),
+  residentialAddressKin: z
+    .string()
+    .min(2, { message: "Enter Residential Address (kin)" }),
+  postalAddressKin: z
+    .string()
+    .min(2, { message: "Enter Postal Address (kin)" }),
+  postalCodeKin: z.string().min(2, { message: "Enter Postal Code (kin)" }),
+  cityTownKin: z.string().min(2, { message: "Enter City | Town (kin)" }),
+  numberKin: z.string().min(2, { message: "Enter  Phone # (kin)" }),
+});
+
 const CreateMember = ({ members }: { members: Member[] }) => {
-  let sage: string = "0";
+  // const [dateValue, setDateValue] = useState(new Date())
+  // const [dobValue, setDobValue] = useState(new Date())
+
+  let sage: number = 0;
 
   let lencode: number = members.length + 1;
   let memcode =
@@ -43,32 +104,67 @@ const CreateMember = ({ members }: { members: Member[] }) => {
         : "DC-00" + `${lencode}`
       : "DC-000" + `${lencode}`;
 
+  // let resage: number = 0;
+  // let tdate = new Date(dateValue);
+  // let bdate = new Date(dobValue);
+  // // let sdob = form.values.dob.toString();
+  //
+  // let rdate = tdate.toLocaleDateString();
+  // let ddate = bdate.toLocaleDateString();
+  //
+  // const ndate =
+  //   rdate.split("/")[0] + "-" + rdate.split("/")[1] + "-" + rdate.split("/")[2];
+  //
+  // const wdate =
+  //   ddate.split("/")[0] + "-" + ddate.split("/")[1] + "-" + ddate.split("/")[2];
+  //
+  // let ydiff: number = Number(rdate.split("/")[2]) - Number(ddate.split("/")[2]);
+  //
+  // function renderAge(tmonth: number, bmonth: number) {
+  //   let result: number = 0;
+  //   if (tmonth === bmonth) result = 1;
+  //   if (tmonth > bmonth) result = 1;
+  //   if (tmonth < bmonth) result = 0;
+  //   return result;
+  // }
+  //
+  // let mdiff = renderAge(
+  //   Number(tdate.getMonth()) + 1,
+  //   Number(bdate.getMonth()) + 1
+  // );
+  //
+  // resage = ydiff + mdiff - 1;
+  // sage = resage > 0 ? resage : resage * -1;
+  // console.log(ndate);
+  // console.log(wdate);
+
   const form = useForm({
+    validate: zodResolver(schema),
     initialValues: {
-      date: "",
+      date: new Date(),
       branchName: "Eldoret",
       memberNumber: `${memcode}`,
       firstName: "",
       lastName: "",
-      dob: "",
+      dob: new Date(),
       idPass: "",
       kraPin: "",
-      mobileNumber: "",
+      phoneNumber: "",
       gender: "",
       age: `${sage}`,
       religion: "",
       maritalStatus: "",
-      spouseName: "",
-      spouseNumber: "",
+      spouseName: "NA",
+      spouseNumber: "NA",
       postalAddress: "",
       postalCode: "",
       cityTown: "",
       residentialAddress: "",
       emailAddress: "",
       rentedOwned: "",
-      landCareAgent: "",
+      landCareAgent: "NA",
       occupationEmployer: "",
-      employerNumber: "",
+      employerNumber: "NA",
       businessLocation: "",
       businessAge: "",
       refereeName: "",
@@ -88,79 +184,129 @@ const CreateMember = ({ members }: { members: Member[] }) => {
     },
   });
 
-  let resage: number = 0;
-  let tdate = new Date(form.values.date);
-  let bdate = new Date(form.values.dob);
-  // let sdob = form.values.dob.toString();
-
-  let ydiff: number = Number(tdate.getFullYear()) - Number(bdate.getFullYear());
-
-  function renderAge(tmonth: number, bmonth: number) {
-    let result: number = 0;
-    if (tmonth === bmonth) result = 1;
-    if (tmonth > bmonth) result = 1;
-    if (tmonth < bmonth) result = 0;
-    return result;
-  }
-
-  let mdiff = renderAge(Number(tdate.getMonth()) + 1, bdate.getMonth() + 1);
-
-  resage = ydiff + mdiff - 1;
-  resage = resage > 0 ? resage : resage * -1;
-  sage = resage > 0 ? `${resage}` : "0";
-
   const handleSave = async () => {
-    console.log(form.values.age);
-    // await supabase.from("members").insert([
-    //   {
-    //     date: form.values.date,
-    //     branchName: form.values.branchName,
-    //     memberNumber: form.values.memberNumber,
-    //     firstName: form.values.firstName,
-    //     lastName: form.values.lastName,
-    //     dob: form.values.dob,
-    //     idPass: form.values.idPass,
-    //     kraPin: form.values.kraPin,
-    //     mobileNumber: form.values.mobileNumber,
-    //     gender: form.values.gender,
-    //     age: form.values.age,
-    //     religion: form.values.religion,
-    //     maritalStatus: form.values.maritalStatus,
-    //     spouseName: form.values.spouseName,
-    //     spouseNumber: form.values.spouseNumber,
-    //     postalAddress: form.values.postalAddress,
-    //     postalCode: form.values.postalCode,
-    //     cityTown: form.values.cityTown,
-    //     residentialAddress: form.values.residentialAddress,
-    //     emailAddress: form.values.emailAddress,
-    //     rentedOwned: form.values.rentedOwned,
-    //     landCareAgent: form.values.landCareAgent,
-    //     occupationEmployer: form.values.occupationEmployer,
-    //     employerNumber: form.values.employerNumber,
-    //     businessLocation: form.values.businessLocation,
-    //     businessAge: form.values.businessAge,
-    //     refereeName: form.values.refereeName,
-    //     refereeNumber: form.values.refereeNumber,
-    //     communityPosition: form.values.communityPosition,
-    //     mpesaCode: form.values.mpesaCode,
-    //     membershipAmount: form.values.membershipAmount,
-    //     nameKin: form.values.nameKin,
-    //     relationship: form.values.relationship,
-    //     residentialAddressKin: form.values.residentialAddressKin,
-    //     postalAddressKin: form.values.postalAddressKin,
-    //     postalCodeKin: form.values.postalCodeKin,
-    //     cityTownKin: form.values.cityTownKin,
-    //     numberKin: form.values.numberKin,
-    //     group: form.values.group,
-    //     maintained: form.values.maintained,
-    //   },
-    // ]);
+    if (
+      form.values.date &&
+      form.values.branchName &&
+      form.values.memberNumber &&
+      form.values.firstName &&
+      form.values.lastName &&
+      form.values.dob &&
+      form.values.idPass &&
+      form.values.kraPin &&
+      form.values.phoneNumber &&
+      form.values.gender &&
+      form.values.age &&
+      form.values.religion &&
+      form.values.maritalStatus &&
+      form.values.spouseName &&
+      form.values.spouseNumber &&
+      form.values.postalAddress &&
+      form.values.postalCode &&
+      form.values.cityTown &&
+      form.values.residentialAddress &&
+      form.values.emailAddress &&
+      form.values.rentedOwned &&
+      form.values.landCareAgent &&
+      form.values.occupationEmployer &&
+      form.values.employerNumber &&
+      form.values.businessLocation &&
+      form.values.businessAge &&
+      form.values.refereeName &&
+      form.values.refereeNumber &&
+      form.values.communityPosition &&
+      form.values.mpesaCode &&
+      form.values.membershipAmount &&
+      form.values.nameKin &&
+      form.values.relationship &&
+      form.values.residentialAddressKin &&
+      form.values.postalAddressKin &&
+      form.values.postalCodeKin &&
+      form.values.cityTownKin &&
+      form.values.numberKin &&
+      form.values.group &&
+      form.values.maintained
+    ) {
+      console.table(form.values);
+      showNotification({
+        id: "submit",
+        title: "Member Registration",
+        message: "Highlighted Fields are missing.",
+        loading: true,
+      });
+
+      // await supabase.from("members").insert([
+      //   {
+      //     date: form.values.date,
+      //     branchName: form.values.branchName.toUpperCase(),
+      //     memberNumber: form.values.memberNumber.toUpperCase(),
+      //     firstName: form.values.firstName.toUpperCase(),
+      //     lastName: form.values.lastName.toUpperCase(),
+      //     dob: form.values.dob.toUpperCase(),
+      //     idPass: form.values.idPass.toUpperCase(),
+      //     kraPin: form.values.kraPin.toUpperCase(),
+      //     phoneNumber: form.values.phoneNumber.toUpperCase(),
+      //     gender: form.values.gender.toUpperCase(),
+      //     age: form.values.age.toUpperCase(),
+      //     religion: form.values.religion.toUpperCase(),
+      //     maritalStatus: form.values.maritalStatus.toUpperCase(),
+      //     spouseName: form.values.spouseName.toUpperCase(),
+      //     spouseNumber: form.values.spouseNumber.toUpperCase(),
+      //     postalAddress: form.values.postalAddress.toUpperCase(),
+      //     postalCode: form.values.postalCode.toUpperCase(),
+      //     cityTown: form.values.cityTown.toUpperCase(),
+      //     residentialAddress: form.values.residentialAddress.toUpperCase(),
+      //     emailAddress: form.values.emailAddress.toUpperCase(),
+      //     rentedOwned: form.values.rentedOwned.toUpperCase(),
+      //     landCareAgent: form.values.landCareAgent.toUpperCase(),
+      //     occupationEmployer: form.values.occupationEmployer.toUpperCase(),
+      //     employerNumber: form.values.employerNumber.toUpperCase(),
+      //     businessLocation: form.values.businessLocation.toUpperCase(),
+      //     businessAge: form.values.businessAge.toUpperCase(),
+      //     refereeName: form.values.refereeName.toUpperCase(),
+      //     refereeNumber: form.values.refereeNumber.toUpperCase(),
+      //     communityPosition: form.values.communityPosition.toUpperCase(),
+      //     mpesaCode: form.values.mpesaCode.toUpperCase(),
+      //     membershipAmount: form.values.membershipAmount.toUpperCase(),
+      //     nameKin: form.values.nameKin.toUpperCase(),
+      //     relationship: form.values.relationship.toUpperCase(),
+      //     residentialAddressKin: form.values.residentialAddressKin.toUpperCase(),
+      //     postalAddressKin: form.values.postalAddressKin.toUpperCase(),
+      //     postalCodeKin: form.values.postalCodeKin.toUpperCase(),
+      //     cityTownKin: form.values.cityTownKin.toUpperCase(),
+      //     numberKin: form.values.numberKin.toUpperCase(),
+      //     group: form.values.group,
+      //     maintained: form.values.maintained,
+      //   },
+      // ]);
+
+      return setTimeout(() => {
+        updateNotification({
+          id: "submit",
+          color: "teal",
+          title: "Member Registration",
+          message: "Member Registered Successfully!",
+          icon: <IconCheck size={16} />,
+          autoClose: 2000,
+        });
+      });
+    }
+    return showNotification({
+      id: "missing-fields",
+      title: "Missing Fields",
+      message: "Highlighted Fields are missing!",
+      color: "red",
+    });
   };
+
   return (
     <form
-      onSubmit={() => {
-        form.onSubmit(handleSave);
-      }}
+    //     onSubmit={() => {
+    //       form.onSubmit((values) => {
+    //           console.log(values);
+    // handleSave();
+    //         });
+    //     }}
     >
       <Group position="center" m="md">
         <TitleText title="Member Registration" />
@@ -189,6 +335,8 @@ const CreateMember = ({ members }: { members: Member[] }) => {
                 </Indicator>
               );
             }}
+            // value={dateValue}
+            // onChange={setDateValue}
             {...form.getInputProps("date")}
             required
           />
@@ -238,9 +386,9 @@ const CreateMember = ({ members }: { members: Member[] }) => {
         <Grid.Col span={4}>
           <TextInput
             mt="md"
-            label="Phone No."
-            placeholder="Phone No."
-            {...form.getInputProps("mobileNumber")}
+            label="Phone #"
+            placeholder="Phone #"
+            {...form.getInputProps("phoneNumber")}
             required
           />
         </Grid.Col>
@@ -256,6 +404,8 @@ const CreateMember = ({ members }: { members: Member[] }) => {
             inputFormat="DD-MM-YYYY"
             dropdownType="modal"
             firstDayOfWeek="sunday"
+            // value={dobValue}
+            // onChange={setDobValue}
             {...form.getInputProps("dob")}
             required
           />
@@ -263,8 +413,8 @@ const CreateMember = ({ members }: { members: Member[] }) => {
         <Grid.Col span={4}>
           <TextInput
             mt="md"
-            label="ID | Passport No."
-            placeholder="ID | Passport No."
+            label="ID | Passport #"
+            placeholder="ID | Passport #"
             {...form.getInputProps("idPass")}
             required
           />
@@ -349,8 +499,8 @@ const CreateMember = ({ members }: { members: Member[] }) => {
             <Grid.Col span={4}>
               <TextInput
                 mt="md"
-                label="Phone No. (spouse)"
-                placeholder="Phone No. (spouse)"
+                label="Phone # (spouse)"
+                placeholder="Phone # (spouse)"
                 {...form.getInputProps("spouseNumber")}
                 required
               />
@@ -537,8 +687,8 @@ const CreateMember = ({ members }: { members: Member[] }) => {
         <Grid.Col span={4}>
           <TextInput
             mt="md"
-            label="Phone No. (referee)"
-            placeholder="Phone No. (referee)"
+            label="Phone # (referee)"
+            placeholder="Phone # (referee)"
             {...form.getInputProps("refereeNumber")}
             required
           />
@@ -549,7 +699,7 @@ const CreateMember = ({ members }: { members: Member[] }) => {
               mt="md"
               label="Position in Community"
               placeholder="Position in Community"
-              {...form.getInputProps("refereeName")}
+              {...form.getInputProps("communityPosition")}
               required
             />
           </Grid.Col>
@@ -563,7 +713,7 @@ const CreateMember = ({ members }: { members: Member[] }) => {
               mt="md"
               label="Position in Community"
               placeholder="Position in Community"
-              {...form.getInputProps("refereeName")}
+              {...form.getInputProps("communityPosition")}
               required
             />
           </Grid.Col>
@@ -615,8 +765,8 @@ const CreateMember = ({ members }: { members: Member[] }) => {
         <Grid.Col span={4}>
           <TextInput
             mt="md"
-            label="Phone No. (kin)"
-            placeholder="Phone No. (kin)"
+            label="Phone # (kin)"
+            placeholder="Phone # (kin)"
             {...form.getInputProps("numberKin")}
             required
           />
@@ -668,14 +818,30 @@ const CreateMember = ({ members }: { members: Member[] }) => {
       <Divider mt="lg" variant="dashed" my="sm" />
       <Group position="center" mt="xl">
         <Button
-          type="submit"
+          // type="submit"
           variant="outline"
           onClick={() => {
             form.setFieldValue("memberNumber", `${memcode}`);
             form.setFieldValue("age", `${sage}`);
+            // form.setFieldValue("date", tdate);
+            // form.setFieldValue("dob", bdate);
+            {form.values.maritalStatus !== "married" ? null :
+              form.setFieldValue("spouseName", "NA");
+            }
+            {form.values.maritalStatus !== "married" ? null :
+              form.setFieldValue("spouseNumber", "NA");
+            }
+            {form.values.rentedOwned !== "owned" ? null :
+              form.setFieldValue("landCareAgent", "NA");
+            }
+            {form.values.rentedOwned.toUpperCase() !== "BUSINESS" ? null :
+              form.setFieldValue("employerNumber", "NA");
+            }
             form.setFieldValue("branchName", "Eldoret");
             form.setFieldValue("group", "false");
             form.setFieldValue("maintained", "false");
+            form.validate();
+            handleSave();
           }}
         >
           Submit
