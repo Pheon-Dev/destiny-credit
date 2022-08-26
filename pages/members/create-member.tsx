@@ -1,7 +1,17 @@
 import React, { useEffect, useState } from "react";
 import { supabase } from "../../lib/supabase";
 import { useForm } from "@mantine/form";
-import { TextInput, Grid, Button, Divider, Group, Select } from "@mantine/core";
+import { IconCalendar } from "@tabler/icons";
+import { DatePicker } from "@mantine/dates";
+import {
+  TextInput,
+  Grid,
+  Button,
+  Divider,
+  Group,
+  Select,
+  Indicator,
+} from "@mantine/core";
 import { TitleText } from "../../components";
 import { Member } from "../../types";
 
@@ -21,11 +31,23 @@ export async function getStaticProps() {
 }
 
 const CreateMember = ({ members }: { members: Member[] }) => {
+  let sage: string = "0";
+
+  let lencode: number = members.length + 1;
+  let memcode =
+    lencode > 9
+      ? lencode > 99
+        ? lencode > 999
+          ? lencode
+          : "DC-0" + `${lencode}`
+        : "DC-00" + `${lencode}`
+      : "DC-000" + `${lencode}`;
+
   const form = useForm({
     initialValues: {
       date: "",
-      branchName: "",
-      memberNumber: "",
+      branchName: "Eldoret",
+      memberNumber: `${memcode}`,
       firstName: "",
       lastName: "",
       dob: "",
@@ -33,7 +55,7 @@ const CreateMember = ({ members }: { members: Member[] }) => {
       kraPin: "",
       mobileNumber: "",
       gender: "",
-      age: "",
+      age: `${sage}`,
       religion: "",
       maritalStatus: "",
       spouseName: "",
@@ -66,8 +88,29 @@ const CreateMember = ({ members }: { members: Member[] }) => {
     },
   });
 
+  let resage: number = 0;
+  let tdate = new Date(form.values.date);
+  let bdate = new Date(form.values.dob);
+  // let sdob = form.values.dob.toString();
+
+  let ydiff: number = Number(tdate.getFullYear()) - Number(bdate.getFullYear());
+
+  function renderAge(tmonth: number, bmonth: number) {
+    let result: number = 0;
+    if (tmonth === bmonth) result = 1;
+    if (tmonth > bmonth) result = 1;
+    if (tmonth < bmonth) result = 0;
+    return result;
+  }
+
+  let mdiff = renderAge(Number(tdate.getMonth()) + 1, bdate.getMonth() + 1);
+
+  resage = ydiff + mdiff - 1;
+  resage = resage > 0 ? resage : resage * -1;
+  sage = resage > 0 ? `${resage}` : "0";
+
   const handleSave = async () => {
-    console.log(form.values.firstName);
+    console.log(form.values.age);
     // await supabase.from("members").insert([
     //   {
     //     date: form.values.date,
@@ -114,16 +157,38 @@ const CreateMember = ({ members }: { members: Member[] }) => {
     // ]);
   };
   return (
-    <div>
+    <form
+      onSubmit={() => {
+        form.onSubmit(handleSave);
+      }}
+    >
       <Group position="center" m="md">
         <TitleText title="Member Registration" />
       </Group>
 
       <Grid grow>
         <Grid.Col span={4}>
-          <TextInput
+          <DatePicker
             label="Date"
             placeholder="Date"
+            icon={<IconCalendar size={16} />}
+            inputFormat="DD-MM-YYYY"
+            dropdownType="modal"
+            firstDayOfWeek="sunday"
+            renderDay={(date) => {
+              const today = new Date();
+              const day = date.getDate();
+              return (
+                <Indicator
+                  size={6}
+                  color="blue"
+                  offset={8}
+                  disabled={day !== Number(today.getDate())}
+                >
+                  <div>{day}</div>
+                </Indicator>
+              );
+            }}
             {...form.getInputProps("date")}
             required
           />
@@ -141,7 +206,7 @@ const CreateMember = ({ members }: { members: Member[] }) => {
             label="Member Number"
             placeholder="Member Number"
             {...form.getInputProps("memberNumber")}
-            required
+            disabled
           />
         </Grid.Col>
       </Grid>
@@ -183,10 +248,14 @@ const CreateMember = ({ members }: { members: Member[] }) => {
 
       <Grid grow>
         <Grid.Col span={4}>
-          <TextInput
+          <DatePicker
             mt="md"
             label="Date of Birth"
             placeholder="Date of Birth"
+            icon={<IconCalendar size={16} />}
+            inputFormat="DD-MM-YYYY"
+            dropdownType="modal"
+            firstDayOfWeek="sunday"
             {...form.getInputProps("dob")}
             required
           />
@@ -231,7 +300,7 @@ const CreateMember = ({ members }: { members: Member[] }) => {
             label="Age"
             placeholder="Age"
             {...form.getInputProps("age")}
-            required
+            disabled
           />
         </Grid.Col>
         <Grid.Col span={4}>
@@ -599,9 +668,12 @@ const CreateMember = ({ members }: { members: Member[] }) => {
       <Divider mt="lg" variant="dashed" my="sm" />
       <Group position="center" mt="xl">
         <Button
+          type="submit"
           variant="outline"
           onClick={() => {
-            form.setFieldValue("memberNumber", `${members.length + 1}`);
+            form.setFieldValue("memberNumber", `${memcode}`);
+            form.setFieldValue("age", `${sage}`);
+            form.setFieldValue("branchName", "Eldoret");
             form.setFieldValue("group", "false");
             form.setFieldValue("maintained", "false");
           }}
@@ -609,7 +681,7 @@ const CreateMember = ({ members }: { members: Member[] }) => {
           Submit
         </Button>
       </Group>
-    </div>
+    </form>
   );
 };
 
