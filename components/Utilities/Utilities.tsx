@@ -1,4 +1,5 @@
 import axios from "axios";
+import { showNotification, updateNotification } from "@mantine/notifications";
 import {
   Tabs,
   TabsProps,
@@ -17,6 +18,7 @@ import {
   IconSearch,
   IconRefresh,
   IconUser,
+  IconCheck,
 } from "@tabler/icons";
 import { ColorSchemeToggle } from "../Theme/ColorSchemeToggle";
 import Router from "next/router";
@@ -94,8 +96,18 @@ function StyledTabs(props: TabsProps) {
 export const forceReload = async () => {
   const res = await axios.get("/api/mpesa");
   const data = res.data;
-  console.table({date: data.date, message: data.message});
   Router.replace(Router.asPath);
+
+  setTimeout(() => {
+    updateNotification({
+      id: "transactions-status",
+      color: "teal",
+      title: data.message,
+      message: `${data.data.length} Recent Transactions as of ${data.date}`,
+      icon: <IconCheck size={16} />,
+      autoClose: 8000,
+    });
+  });
 };
 
 export function Utilities() {
@@ -121,7 +133,17 @@ export function Utilities() {
                 </Tabs.Tab>
               </Menu.Target>
               <Tabs.Tab
-                onClick={forceReload}
+                onClick={() => {
+                  showNotification({
+                    id: "transactions-status",
+                    color: "teal",
+                    title: "Loading Transactions",
+                    message: "Fetching Recent M-PESA Transactions ...",
+                    loading: true,
+                    autoClose: 50000
+                  });
+                  forceReload();
+                }}
                 value="refresh"
                 icon={<IconRefresh />}
               >
