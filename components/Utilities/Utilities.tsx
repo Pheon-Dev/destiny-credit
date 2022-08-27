@@ -1,3 +1,4 @@
+import axios from "axios";
 import {
   Tabs,
   TabsProps,
@@ -38,7 +39,7 @@ function StyledTabs(props: TabsProps) {
               ? theme.colors.dark[6]
               : theme.colors.gray[4]
           }`,
-            borderColor: theme.colors.blue[9],
+          borderColor: theme.colors.blue[9],
           padding: `${theme.spacing.xs} px ${theme.spacing.md}px`,
           cursor: "pointer",
           fontSize: theme.fontSizes.sm,
@@ -71,9 +72,7 @@ function StyledTabs(props: TabsProps) {
                 ? theme.colors.dark[3]
                 : theme.colors.blue[1],
             color:
-              theme.colorScheme === "dark"
-                ? theme.white
-                : theme.colors.gray[9],
+              theme.colorScheme === "dark" ? theme.white : theme.colors.gray[9],
           },
         },
 
@@ -93,10 +92,11 @@ function StyledTabs(props: TabsProps) {
 }
 
 export const forceReload = async () => {
-  const res = await fetch("/api/mpesa")
-  console.log(res.json())
-    Router.replace(Router.asPath)
-  }
+  const res = await axios.get("/api/mpesa");
+  const data = res.data;
+  console.table({date: data.date, message: data.message});
+  Router.replace(Router.asPath);
+};
 
 export function Utilities() {
   const [scroll, scrollTo] = useWindowScroll();
@@ -120,7 +120,11 @@ export function Utilities() {
                   Apps
                 </Tabs.Tab>
               </Menu.Target>
-              <Tabs.Tab onClick={forceReload} value="refresh" icon={<IconRefresh />}>
+              <Tabs.Tab
+                onClick={forceReload}
+                value="refresh"
+                icon={<IconRefresh />}
+              >
                 Refresh
               </Tabs.Tab>
               <Tabs.Tab value="account" icon={<IconUser />}>
