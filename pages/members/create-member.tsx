@@ -2,10 +2,7 @@ import React, { useEffect, useState } from "react";
 import { supabase } from "../../lib/supabase";
 import { z } from "zod";
 import { useForm, zodResolver } from "@mantine/form";
-import {
-  IconCalendar,
-  IconCheck,
-} from "@tabler/icons";
+import { IconCalendar, IconCheck } from "@tabler/icons";
 import { DatePicker } from "@mantine/dates";
 import {
   LoadingOverlay,
@@ -87,8 +84,8 @@ const schema = z.object({
 });
 
 const CreateMember = ({ members }: { members: Member[] }) => {
-  const [visible, setVisible] = useState(false)
-  const [ageResult, setAgeResult] = useState(0);
+  const [visible, setVisible] = useState(false);
+  // const [ageResult, setAgeResult] = useState(0);
 
   let lencode: number = members.length + 1;
   let memcode =
@@ -146,7 +143,6 @@ const CreateMember = ({ members }: { members: Member[] }) => {
     },
   });
 
-
   let today_date = new Date(form.values.date);
   let birth_date = new Date(form.values.dob);
   //
@@ -184,21 +180,26 @@ const CreateMember = ({ members }: { members: Member[] }) => {
     Number(local_birth_date.split("-")[1])
   );
 
+  let age_result = year_difference + month_difference - 1;
+  age_result = age_result > 0 ? age_result : age_result * -1;
+
   useEffect(() => {
     let subscribe = true;
-
     if (subscribe) {
-      let age_result = year_difference + month_difference - 1;
-      setAgeResult(age_result > 0 ? age_result : age_result * -1);
-            form.setFieldValue("age", `${ageResult}`);
-    }
+      if (form.values.age === `${age_result}`) {
+        const interval = setInterval(() => {
+          form.setFieldValue("age", `${age_result}`);
+        }, 1000);
 
-    return () => {
-      subscribe = false;
-    };
+        return () => {
+          clearInterval(interval);
+        };
+      }
+    }
+    return () => (subscribe = false);
   }, []);
 
-  console.log(ageResult);
+  // console.log(age_result);
 
   const handleSave = async () => {
     if (
@@ -304,10 +305,10 @@ const CreateMember = ({ members }: { members: Member[] }) => {
           icon: <IconCheck size={16} />,
           autoClose: 2000,
         });
-      setVisible(false)
+        setVisible(false);
       });
     }
-      setVisible(false)
+    setVisible(false);
     return showNotification({
       id: "missing-fields",
       title: "Missing Fields",
@@ -325,8 +326,8 @@ const CreateMember = ({ members }: { members: Member[] }) => {
     //         });
     //     }}
     >
-      <div style={{ width: 400, position: 'relative' }}>
-      <LoadingOverlay visible={visible} overlayBlur={2} />
+      <div style={{ width: 400, position: "relative" }}>
+        <LoadingOverlay visible={visible} overlayBlur={2} />
       </div>
       <Group position="center" m="md">
         <TitleText title="Member Registration" />
@@ -468,7 +469,7 @@ const CreateMember = ({ members }: { members: Member[] }) => {
           <TextInput
             mt="md"
             label="Age"
-            value={ageResult}
+            value={age_result}
             placeholder="Age"
             {...form.getInputProps("age")}
             disabled
@@ -869,7 +870,7 @@ const CreateMember = ({ members }: { members: Member[] }) => {
             form.setFieldValue("group", "false");
             form.setFieldValue("maintained", "false");
             form.validate();
-      setVisible((prev) => !prev)
+            setVisible((prev) => !prev);
             handleSave();
           }}
         >

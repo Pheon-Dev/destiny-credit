@@ -7,7 +7,7 @@ import {
   IconTag,
   IconBrandAsana,
 } from "@tabler/icons";
-import { Box, NavLink } from "@mantine/core";
+import { Box, NavLink, Text } from "@mantine/core";
 import Link from "next/link";
 
 export function MainLinks() {
@@ -27,7 +27,11 @@ export function MainLinks() {
             margin: 2,
           },
         }}
-        label="Home"
+        label={
+          <Text weight={700} size="md">
+            Home
+          </Text>
+        }
         icon={<IconHome size={16} stroke={1.5} />}
         childrenOffset={24}
       >
@@ -39,7 +43,7 @@ export function MainLinks() {
                 margin: 2,
               },
             }}
-            label="Dashboard"
+            label={<Text weight={500}>Dashboard</Text>}
             active={dashboardActive}
             onClick={() => {
               setMembersActive(8);
@@ -59,7 +63,11 @@ export function MainLinks() {
             margin: 2,
           },
         }}
-        label="Members"
+        label={
+          <Text weight={700} size="md">
+            Members
+          </Text>
+        }
         icon={<IconUsers size={16} stroke={1.5} />}
         childrenOffset={24}
       >
@@ -72,7 +80,7 @@ export function MainLinks() {
                   margin: 2,
                 },
               }}
-              label={item.name}
+              label={<Text weight={500}>{item.name}</Text>}
               active={membersActive === index}
               onClick={() => {
                 setMembersActive(index);
@@ -93,7 +101,11 @@ export function MainLinks() {
             margin: 2,
           },
         }}
-        label="Groups"
+        label={
+          <Text weight={700} size="md">
+            Groups
+          </Text>
+        }
         icon={<IconBrandAsana size={16} stroke={1.5} />}
         childrenOffset={24}
       >
@@ -106,7 +118,7 @@ export function MainLinks() {
                   margin: 2,
                 },
               }}
-              label={item.name}
+              label={<Text weight={500}>{item.name}</Text>}
               active={groupsActive === index}
               onClick={() => {
                 setMembersActive(8);
@@ -127,7 +139,11 @@ export function MainLinks() {
             margin: 2,
           },
         }}
-        label="Products"
+        label={
+          <Text weight={700} size="md">
+            Products
+          </Text>
+        }
         icon={<IconTag size={16} stroke={1.5} />}
         childrenOffset={24}
       >
@@ -140,7 +156,7 @@ export function MainLinks() {
                   margin: 2,
                 },
               }}
-              label={item.name}
+              label={<Text weight={500}>{item.name}</Text>}
               active={productsActive === index}
               onClick={() => {
                 setMembersActive(8);
@@ -161,7 +177,11 @@ export function MainLinks() {
             margin: 2,
           },
         }}
-        label="Loans"
+        label={
+          <Text weight={700} size="md">
+            Loans
+          </Text>
+        }
         icon={<IconCash size={16} stroke={1.5} />}
         childrenOffset={24}
       >
@@ -174,7 +194,7 @@ export function MainLinks() {
                   margin: 2,
                 },
               }}
-              label={item.name}
+              label={<Text weight={500}>{item.name}</Text>}
               active={loansActive === index}
               onClick={() => {
                 setMembersActive(8);
@@ -195,7 +215,11 @@ export function MainLinks() {
       {/*       margin: 2, */}
       {/*     }, */}
       {/*   }} */}
-      {/*   label="Apps" */}
+        {/* label={ */}
+        {/*   <Text weight={700} size="md"> */}
+        {/*     Apps */}
+        {/*   </Text> */}
+        {/* } */}
       {/*   icon={<IconApps size={16} stroke={1.5} />} */}
       {/*   childrenOffset={24} */}
       {/* > */}
@@ -208,7 +232,7 @@ export function MainLinks() {
       {/*             margin: 2, */}
       {/*           }, */}
       {/*         }} */}
-      {/*         label={item.name} */}
+      {/* label={<Text weight={500}>{item.name}</Text>} */}
       {/*         active={reportsActive === index} */}
       {/*         onClick={() => { */}
       {/*           setMembersActive(8); */}
@@ -229,7 +253,11 @@ export function MainLinks() {
             margin: 2,
           },
         }}
-        label="Reports"
+        label={
+          <Text weight={700} size="md">
+            Reports
+          </Text>
+        }
         icon={<IconReport size={16} stroke={1.5} />}
         childrenOffset={24}
       >
@@ -242,7 +270,7 @@ export function MainLinks() {
                   margin: 2,
                 },
               }}
-              label={item.name}
+              label={<Text weight={500}>{item.name}</Text>}
               active={reportsActive === index}
               onClick={() => {
                 setMembersActive(8);
@@ -347,4 +375,3 @@ const reports_data = [
     url: "/reports/schedule-report/",
   },
 ];
-

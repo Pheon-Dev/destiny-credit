@@ -173,6 +173,7 @@ export function Utilities() {
             <ColorSchemeToggle />
             <Text style={{ paddingLeft: 6 }}>Theme</Text>
           </div>
+          <Menu.Divider />
           <Menu.Item icon={<IconSettings size={20} />}>Settings</Menu.Item>
           <Menu.Item icon={<IconMessageCircle size={20} />} disabled>
             Messages
