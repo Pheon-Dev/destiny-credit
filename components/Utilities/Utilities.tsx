@@ -103,7 +103,7 @@ export const forceReload = async () => {
       id: "transactions-status",
       color: "teal",
       title: data.message,
-      message: `${data.data.length} Recent Transactions as of ${data.date}`,
+      message: `${data.data.length} Recent Transactions as from ${data.from} to ${data.to}`,
       icon: <IconCheck size={16} />,
       autoClose: 8000,
     });
@@ -149,9 +149,9 @@ export function Utilities() {
               >
                 Refresh
               </Tabs.Tab>
-              <Tabs.Tab value="account" icon={<IconUser />}>
-                Account
-              </Tabs.Tab>
+              {/* <Tabs.Tab value="account" icon={<IconUser />}> */}
+              {/*   Account */}
+              {/* </Tabs.Tab> */}
             </Tabs.List>
           </StyledTabs>
         </Affix>

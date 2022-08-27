@@ -170,7 +170,8 @@ export default async function handler(
         .status(200)
         .json({
           data: log.data,
-          date: new_date + " " + str_tdate,
+          from: new_date + " " + str_tdate,
+          to: now_date + " " + str_tdate,
           message: "Transactions Upto Date",
         });
     } catch (error) {
