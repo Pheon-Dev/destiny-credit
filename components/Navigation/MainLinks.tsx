@@ -5,6 +5,8 @@ import {
   IconReport,
   IconCash,
   IconTag,
+  IconBrandAsana,
+  IconApps,
 } from "@tabler/icons";
 import { Box, NavLink } from "@mantine/core";
 import Link from "next/link";
@@ -73,6 +75,18 @@ const loans_data = [
     url: "/loans/",
   },
 ];
+const apps_data = [
+  {
+    id: 0,
+    name: "Profit & Loss",
+    url: "/apps/expenses/",
+  },
+  // {
+  //   id: 1,
+  //   name: "Schedules",
+  //   url: "/reports/schedule-report/",
+  // },
+];
 const reports_data = [
   {
     id: 0,
@@ -140,7 +154,7 @@ export function MainLinks() {
         childrenOffset={24}
       >
         {members_data.map((item: any, index: number) => (
-          <Link href={item.url}>
+          <Link href={item.url} key={item.label}>
             <NavLink
               styles={{
                 root: {
@@ -148,7 +162,6 @@ export function MainLinks() {
                   margin: 2,
                 },
               }}
-              key={item.label}
               label={item.name}
               active={membersActive === index}
               onClick={() => {
@@ -171,11 +184,11 @@ export function MainLinks() {
           },
         }}
         label="Groups"
-        icon={<IconTag size={16} stroke={1.5} />}
+        icon={<IconBrandAsana size={16} stroke={1.5} />}
         childrenOffset={24}
       >
         {groups_data.map((item: any, index: number) => (
-          <Link href={item.url}>
+          <Link href={item.url} key={item.label}>
             <NavLink
               styles={{
                 root: {
@@ -183,7 +196,6 @@ export function MainLinks() {
                   margin: 2,
                 },
               }}
-              key={item.label}
               label={item.name}
               active={groupsActive === index}
               onClick={() => {
@@ -210,7 +222,7 @@ export function MainLinks() {
         childrenOffset={24}
       >
         {products_data.map((item: any, index: number) => (
-          <Link href={item.url}>
+          <Link href={item.url} key={item.label}>
             <NavLink
               styles={{
                 root: {
@@ -218,7 +230,6 @@ export function MainLinks() {
                   margin: 2,
                 },
               }}
-              key={item.label}
               label={item.name}
               active={productsActive === index}
               onClick={() => {
@@ -245,7 +256,7 @@ export function MainLinks() {
         childrenOffset={24}
       >
         {loans_data.map((item: any, index: number) => (
-          <Link href={item.url}>
+          <Link href={item.url} key={item.label}>
             <NavLink
               styles={{
                 root: {
@@ -253,7 +264,6 @@ export function MainLinks() {
                   margin: 2,
                 },
               }}
-              key={item.label}
               label={item.name}
               active={loansActive === index}
               onClick={() => {
@@ -275,12 +285,12 @@ export function MainLinks() {
             margin: 2,
           },
         }}
-        label="Reports"
-        icon={<IconReport size={16} stroke={1.5} />}
+        label="Apps"
+        icon={<IconApps size={16} stroke={1.5} />}
         childrenOffset={24}
       >
-        {reports_data.map((item: any, index: number) => (
-          <Link href={item.url}>
+        {apps_data.map((item: any, index: number) => (
+          <Link href={item.url} key={item.label}>
             <NavLink
               styles={{
                 root: {
@@ -288,7 +298,40 @@ export function MainLinks() {
                   margin: 2,
                 },
               }}
-              key={item.label}
+              label={item.name}
+              active={reportsActive === index}
+              onClick={() => {
+                setMembersActive(8);
+                setLoansActive(8);
+                setProductsActive(8);
+                setGroupsActive(8);
+                setReportsActive(index);
+                setDashboardActive(false);
+              }}
+            />
+          </Link>
+        ))}
+      </NavLink>
+      <NavLink
+        styles={{
+          root: {
+            borderRadius: 6,
+            margin: 2,
+          },
+        }}
+        label="Reports"
+        icon={<IconReport size={16} stroke={1.5} />}
+        childrenOffset={24}
+      >
+        {reports_data.map((item: any, index: number) => (
+          <Link href={item.url} key={item.label}>
+            <NavLink
+              styles={{
+                root: {
+                  borderRadius: 6,
+                  margin: 2,
+                },
+              }}
               label={item.name}
               active={reportsActive === index}
               onClick={() => {
