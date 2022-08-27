@@ -92,10 +92,10 @@ function StyledTabs(props: TabsProps) {
   );
 }
 
-const forceReload =  () => {
-  // const res = await fetch("/api/mpesa")
-  // console.log(res.json())
-    Router.reload()
+export const forceReload = async () => {
+  const res = await fetch("/api/mpesa")
+  console.log(res.json())
+    Router.replace(Router.asPath)
   }
 
 export function Utilities() {
