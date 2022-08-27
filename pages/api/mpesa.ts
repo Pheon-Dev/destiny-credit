@@ -32,16 +32,33 @@ export default async function handler(
         str_ndate.split("/")[1] +
         "-" +
         str_ndate.split("/")[0];
-      const url = "https://logtail.com/api/v1/query?source_ids=158744&query=transID" + `&to=${now_date} + ${str_tdate}`;
+      const url_one =
+        "https://logtail.com/api/v1/query?source_ids=158744&query=transID" +
+        `&to=${now_date} + ${str_tdate}`;
+      const url_two =
+        "https://logtail.com/api/v1/query?source_ids=158744&query=transID";
       const token = LOGTAIL_API_TOKEN;
       const headers = {
         Authorization: `Bearer ${token}`,
       };
-      const response = await axios.request({
+
+      let response = await axios.request({
         method: "GET",
-        url,
+        url: url_one,
         headers,
       });
+
+      if (response.status !== 200) {
+        try {
+          response = await axios.request({
+            method: "GET",
+            url: url_two,
+            headers,
+          });
+        } catch (error) {
+          res.status(500).json({ message: "Something went wrong" });
+        }
+      }
 
       const log = response.data;
 
@@ -166,14 +183,12 @@ export default async function handler(
         }
       }
 
-      res
-        .status(200)
-        .json({
-          data: log.data,
-          from: new_date + " " + str_tdate,
-          to: now_date + " " + str_tdate,
-          message: "Transactions Upto Date",
-        });
+      res.status(200).json({
+        data: log.data,
+        from: new_date + " " + str_tdate,
+        to: now_date + " " + str_tdate,
+        message: "Transactions Upto Date",
+      });
     } catch (error) {
       res.status(500).json({ message: "Something went wrong" });
     }
