@@ -14,8 +14,11 @@ import {
   IconArrowUp,
   IconMessageCircle,
   IconSearch,
+  IconRefresh,
+  IconUser,
 } from "@tabler/icons";
 import { ColorSchemeToggle } from "../Theme/ColorSchemeToggle";
+import Router from "next/router";
 
 function StyledTabs(props: TabsProps) {
   return (
@@ -35,6 +38,7 @@ function StyledTabs(props: TabsProps) {
               ? theme.colors.dark[6]
               : theme.colors.gray[4]
           }`,
+            borderColor: theme.colors.blue[9],
           padding: `${theme.spacing.xs} px ${theme.spacing.md}px`,
           cursor: "pointer",
           fontSize: theme.fontSizes.sm,
@@ -64,11 +68,11 @@ function StyledTabs(props: TabsProps) {
             borderColor: theme.colors.blue[7],
             backgroundColor:
               theme.colorScheme === "dark"
-                ? theme.colors.dark[4]
-                : theme.colors.blue[0],
+                ? theme.colors.dark[3]
+                : theme.colors.blue[1],
             color:
               theme.colorScheme === "dark"
-                ? theme.colors.dark[0]
+                ? theme.white
                 : theme.colors.gray[9],
           },
         },
@@ -88,8 +92,15 @@ function StyledTabs(props: TabsProps) {
   );
 }
 
+const forceReload =  () => {
+  // const res = await fetch("/api/mpesa")
+  // console.log(res.json())
+    Router.reload()
+  }
+
 export function Utilities() {
   const [scroll, scrollTo] = useWindowScroll();
+
   return (
     <>
       <Menu
@@ -101,18 +112,23 @@ export function Utilities() {
         position="left-start"
         withArrow
       >
-        <Menu.Target>
-          <Affix position={{ top: 55, right: 20 }}>
-            <StyledTabs defaultValue="apps">
-              <Tabs.List>
+        <Affix position={{ top: 55, right: 20 }}>
+          <StyledTabs defaultValue="apps">
+            <Tabs.List>
+              <Menu.Target>
                 <Tabs.Tab value="apps" icon={<IconCategory2 />}>
                   Apps
                 </Tabs.Tab>
-                {/* <Tabs.Tab value="settings" icon={<IconTrash />}>Delete</Tabs.Tab> */}
-              </Tabs.List>
-            </StyledTabs>
-          </Affix>
-        </Menu.Target>
+              </Menu.Target>
+              <Tabs.Tab onClick={forceReload} value="refresh" icon={<IconRefresh />}>
+                Refresh
+              </Tabs.Tab>
+              <Tabs.Tab value="account" icon={<IconUser />}>
+                Account
+              </Tabs.Tab>
+            </Tabs.List>
+          </StyledTabs>
+        </Affix>
         <Menu.Dropdown>
           {/* <Menu.Label>Apps</Menu.Label> */}
           <div style={{ display: "inline-flex", padding: 6, paddingLeft: 8 }}>

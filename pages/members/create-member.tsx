@@ -3,14 +3,12 @@ import { supabase } from "../../lib/supabase";
 import { z } from "zod";
 import { useForm, zodResolver } from "@mantine/form";
 import {
-  IconAlertOctagon,
-  IconAlertTriangle,
   IconCalendar,
   IconCheck,
-  IconX,
 } from "@tabler/icons";
 import { DatePicker } from "@mantine/dates";
 import {
+  LoadingOverlay,
   TextInput,
   Grid,
   Button,
@@ -30,11 +28,11 @@ export async function getStaticProps() {
     .order("id");
 
   if (error) return console.log({ error: error });
-    return {
-      props: {
-        members: data,
-      },
-    };
+  return {
+    props: {
+      members: data,
+    },
+  };
 }
 
 const schema = z.object({
@@ -89,10 +87,8 @@ const schema = z.object({
 });
 
 const CreateMember = ({ members }: { members: Member[] }) => {
-  // const [dateValue, setDateValue] = useState(new Date())
-  // const [dobValue, setDobValue] = useState(new Date())
-
-  let age_result: number = 0;
+  const [visible, setVisible] = useState(false)
+  const [ageResult, setAgeResult] = useState(0);
 
   let lencode: number = members.length + 1;
   let memcode =
@@ -117,7 +113,7 @@ const CreateMember = ({ members }: { members: Member[] }) => {
       kraPin: "",
       phoneNumber: "",
       gender: "",
-      age: `${age_result}`,
+      age: `${0}`,
       religion: "",
       maritalStatus: "",
       spouseName: "NA",
@@ -150,6 +146,7 @@ const CreateMember = ({ members }: { members: Member[] }) => {
     },
   });
 
+
   let today_date = new Date(form.values.date);
   let birth_date = new Date(form.values.dob);
   //
@@ -157,12 +154,22 @@ const CreateMember = ({ members }: { members: Member[] }) => {
   let local_birth_date = birth_date.toLocaleDateString();
   //
   const dash_today_date =
-    local_today_date.split("/")[0] + "-" + local_today_date.split("/")[1] + "-" + local_today_date.split("/")[2];
+    local_today_date.split("/")[0] +
+    "-" +
+    local_today_date.split("/")[1] +
+    "-" +
+    local_today_date.split("/")[2];
 
   const dash_birth_date =
-    local_birth_date.split("/")[0] + "-" + local_birth_date.split("/")[1] + "-" + local_birth_date.split("/")[2];
+    local_birth_date.split("/")[0] +
+    "-" +
+    local_birth_date.split("/")[1] +
+    "-" +
+    local_birth_date.split("/")[2];
 
-  let year_difference: number = Number(dash_today_date.split("-")[2]) - Number(dash_birth_date.split("-")[2]);
+  let year_difference: number =
+    Number(dash_today_date.split("-")[2]) -
+    Number(dash_birth_date.split("-")[2]);
   //
   function renderAge(today_month: number, birth_month: number) {
     let result: number = 0;
@@ -177,9 +184,21 @@ const CreateMember = ({ members }: { members: Member[] }) => {
     Number(local_birth_date.split("-")[1])
   );
 
-  age_result = year_difference + month_difference - 1;
-  age_result = age_result > 0 ? age_result : age_result * -1;
-  console.log(age_result)
+  useEffect(() => {
+    let subscribe = true;
+
+    if (subscribe) {
+      let age_result = year_difference + month_difference - 1;
+      setAgeResult(age_result > 0 ? age_result : age_result * -1);
+            form.setFieldValue("age", `${ageResult}`);
+    }
+
+    return () => {
+      subscribe = false;
+    };
+  }, []);
+
+  console.log(ageResult);
 
   const handleSave = async () => {
     if (
@@ -224,7 +243,6 @@ const CreateMember = ({ members }: { members: Member[] }) => {
       form.values.group &&
       form.values.maintained
     ) {
-      console.table(form.values);
       showNotification({
         id: "submit",
         title: "Member Registration",
@@ -286,8 +304,10 @@ const CreateMember = ({ members }: { members: Member[] }) => {
           icon: <IconCheck size={16} />,
           autoClose: 2000,
         });
+      setVisible(false)
       });
     }
+      setVisible(false)
     return showNotification({
       id: "missing-fields",
       title: "Missing Fields",
@@ -305,6 +325,9 @@ const CreateMember = ({ members }: { members: Member[] }) => {
     //         });
     //     }}
     >
+      <div style={{ width: 400, position: 'relative' }}>
+      <LoadingOverlay visible={visible} overlayBlur={2} />
+      </div>
       <Group position="center" m="md">
         <TitleText title="Member Registration" />
       </Group>
@@ -445,6 +468,7 @@ const CreateMember = ({ members }: { members: Member[] }) => {
           <TextInput
             mt="md"
             label="Age"
+            value={ageResult}
             placeholder="Age"
             {...form.getInputProps("age")}
             disabled
@@ -819,25 +843,33 @@ const CreateMember = ({ members }: { members: Member[] }) => {
           variant="outline"
           onClick={() => {
             form.setFieldValue("memberNumber", `${memcode}`);
-            form.setFieldValue("age", `${age_result}`);
             form.setFieldValue("date", new Date(local_today_date));
             form.setFieldValue("dob", new Date(local_birth_date));
-            {form.values.maritalStatus !== "married" ? null :
-              form.setFieldValue("spouseName", "NA");
+            {
+              form.values.maritalStatus !== "married"
+                ? null
+                : form.setFieldValue("spouseName", "NA");
             }
-            {form.values.maritalStatus !== "married" ? null :
-              form.setFieldValue("spouseNumber", "NA");
+            {
+              form.values.maritalStatus !== "married"
+                ? null
+                : form.setFieldValue("spouseNumber", "NA");
             }
-            {form.values.rentedOwned !== "owned" ? null :
-              form.setFieldValue("landCareAgent", "NA");
+            {
+              form.values.rentedOwned !== "owned"
+                ? null
+                : form.setFieldValue("landCareAgent", "NA");
             }
-            {form.values.rentedOwned.toUpperCase() !== "BUSINESS" ? null :
-              form.setFieldValue("employerNumber", "NA");
+            {
+              form.values.rentedOwned.toUpperCase() !== "BUSINESS"
+                ? null
+                : form.setFieldValue("employerNumber", "NA");
             }
             form.setFieldValue("branchName", "Eldoret");
             form.setFieldValue("group", "false");
             form.setFieldValue("maintained", "false");
             form.validate();
+      setVisible((prev) => !prev)
             handleSave();
           }}
         >
