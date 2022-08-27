@@ -6,99 +6,9 @@ import {
   IconCash,
   IconTag,
   IconBrandAsana,
-  IconApps,
 } from "@tabler/icons";
 import { Box, NavLink } from "@mantine/core";
 import Link from "next/link";
-import { useRouter } from "next/router";
-
-const members_data = [
-  {
-    id: 0,
-    name: "New Member",
-    url: "/members/create-member/",
-  },
-  {
-    id: 1,
-    name: "All Members",
-    url: "/members/",
-  },
-];
-const groups_data = [
-  {
-    id: 0,
-    name: "New Group",
-    url: "/groups/create-group/",
-  },
-  {
-    id: 1,
-    name: "All Groups",
-    url: "/groups/",
-  },
-];
-const products_data = [
-  {
-    id: 0,
-    name: "New Product",
-    url: "/products/create-product/",
-  },
-  {
-    id: 1,
-    name: "All Products",
-    url: "/products/",
-  },
-];
-const loans_data = [
-  {
-    id: 0,
-    name: "New Loan",
-    url: "/loans/create-loan/",
-  },
-  {
-    id: 1,
-    name: "Approvals",
-    url: "/loans/approvals/",
-  },
-  {
-    id: 2,
-    name: "Disbursments",
-    url: "/loans/disbursements/",
-  },
-  {
-    id: 3,
-    name: "Payments",
-    url: "/loans/payments/",
-  },
-  {
-    id: 4,
-    name: "All Loans",
-    url: "/loans/",
-  },
-];
-// const apps_data = [
-//   {
-//     id: 0,
-//     name: "Profit & Loss",
-//     url: "/apps/expenses/",
-//   },
-//   {
-//     id: 1,
-//     name: "Schedules",
-//     url: "/reports/schedule-report/",
-//   },
-// ];
-const reports_data = [
-  {
-    id: 0,
-    name: "PAR Report",
-    url: "/reports/par-report/",
-  },
-  {
-    id: 1,
-    name: "Schedules",
-    url: "/reports/schedule-report/",
-  },
-];
 
 export function MainLinks() {
   const [membersActive, setMembersActive] = useState(9);
@@ -106,7 +16,7 @@ export function MainLinks() {
   const [productsActive, setProductsActive] = useState(9);
   const [loansActive, setLoansActive] = useState(9);
   const [reportsActive, setReportsActive] = useState(9);
-  const [dashboardActive, setDashboardActive] = useState(false);
+  const [dashboardActive, setDashboardActive] = useState(true);
 
   return (
     <Box>
@@ -349,3 +259,92 @@ export function MainLinks() {
     </Box>
   );
 }
+
+const members_data = [
+  {
+    id: 0,
+    name: "New Member",
+    url: "/members/create-member/",
+  },
+  {
+    id: 1,
+    name: "All Members",
+    url: "/members/",
+  },
+];
+const groups_data = [
+  {
+    id: 0,
+    name: "New Group",
+    url: "/groups/create-group/",
+  },
+  {
+    id: 1,
+    name: "All Groups",
+    url: "/groups/",
+  },
+];
+const products_data = [
+  {
+    id: 0,
+    name: "New Product",
+    url: "/products/create-product/",
+  },
+  {
+    id: 1,
+    name: "All Products",
+    url: "/products/",
+  },
+];
+const loans_data = [
+  {
+    id: 0,
+    name: "New Loan",
+    url: "/loans/create-loan/",
+  },
+  {
+    id: 1,
+    name: "Approvals",
+    url: "/loans/approvals/",
+  },
+  {
+    id: 2,
+    name: "Disbursments",
+    url: "/loans/disbursements/",
+  },
+  {
+    id: 3,
+    name: "Payments",
+    url: "/loans/payments/",
+  },
+  {
+    id: 4,
+    name: "All Loans",
+    url: "/loans/",
+  },
+];
+// const apps_data = [
+//   {
+//     id: 0,
+//     name: "Profit & Loss",
+//     url: "/apps/expenses/",
+//   },
+//   {
+//     id: 1,
+//     name: "Schedules",
+//     url: "/reports/schedule-report/",
+//   },
+// ];
+const reports_data = [
+  {
+    id: 0,
+    name: "PAR Report",
+    url: "/reports/par-report/",
+  },
+  {
+    id: 1,
+    name: "Schedules",
+    url: "/reports/schedule-report/",
+  },
+];
+
