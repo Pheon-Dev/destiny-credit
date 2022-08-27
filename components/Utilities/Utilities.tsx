@@ -94,20 +94,32 @@ function StyledTabs(props: TabsProps) {
 }
 
 export const forceReload = async () => {
-  const res = await axios.get("/api/mpesa");
-  const data = res.data;
-  Router.replace(Router.asPath);
+  try {
+    const res = await axios.get("/api/mpesa");
+    const data = res.data;
+    Router.replace(Router.asPath);
 
-  setTimeout(() => {
-    updateNotification({
-      id: "transactions-status",
-      color: "teal",
-      title: data.message,
-      message: `${data.data.length} Recent Transactions as from ${data.from} to ${data.to}`,
-      icon: <IconCheck size={16} />,
-      autoClose: 8000,
+    setTimeout(() => {
+      updateNotification({
+        id: "transactions-status",
+        color: "teal",
+        title: data.message,
+        message: `${data.data.length} Recent Transactions as from ${data.from} to ${data.to}`,
+        icon: <IconCheck size={16} />,
+        autoClose: 8000,
+      });
     });
-  });
+  } catch (error) {
+    setTimeout(() => {
+      updateNotification({
+        id: "transactions-status",
+        title: "Transaction Fetch Error!",
+        message: `${error}. Please Try Again Later`,
+        color: "red",
+        autoClose: 4000,
+      });
+    });
+  }
 };
 
 export function Utilities() {
@@ -140,7 +152,7 @@ export function Utilities() {
                     title: "Loading Transactions",
                     message: "Fetching Recent M-PESA Transactions ...",
                     loading: true,
-                    autoClose: 50000
+                    autoClose: 50000,
                   });
                   forceReload();
                 }}
