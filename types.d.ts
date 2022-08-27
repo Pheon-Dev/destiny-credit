@@ -74,12 +74,12 @@ export interface Title {
 }
 
 export type Data = {
-  data: any;
+  data: {};
 };
 
 type Links = {
   title: string;
-  data: any;
+  data: {};
 };
 
 type Chevs = {
