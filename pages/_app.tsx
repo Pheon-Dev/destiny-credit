@@ -21,7 +21,7 @@ import {
   Burger,
   useMantineTheme,
 } from "@mantine/core";
-import { TitleText, MainLinks, ColorSchemeToggle } from "../components";
+import { TitleText, MainLinks, Utilities } from "../components";
 
 export default function App(props: AppProps & { colorScheme: ColorScheme }) {
   const theme = useMantineTheme();
@@ -113,7 +113,7 @@ export default function App(props: AppProps & { colorScheme: ColorScheme }) {
                       />
                     </MediaQuery>
                     <TitleText title="DESTINY CREDIT LTD" />
-                    <ColorSchemeToggle />
+                    <Utilities />
                   </Group>
                 </Header>
               }

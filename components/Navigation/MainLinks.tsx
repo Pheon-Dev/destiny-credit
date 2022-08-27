@@ -75,18 +75,18 @@ const loans_data = [
     url: "/loans/",
   },
 ];
-const apps_data = [
-  {
-    id: 0,
-    name: "Profit & Loss",
-    url: "/apps/expenses/",
-  },
-  // {
-  //   id: 1,
-  //   name: "Schedules",
-  //   url: "/reports/schedule-report/",
-  // },
-];
+// const apps_data = [
+//   {
+//     id: 0,
+//     name: "Profit & Loss",
+//     url: "/apps/expenses/",
+//   },
+//   {
+//     id: 1,
+//     name: "Schedules",
+//     url: "/reports/schedule-report/",
+//   },
+// ];
 const reports_data = [
   {
     id: 0,
@@ -154,7 +154,7 @@ export function MainLinks() {
         childrenOffset={24}
       >
         {members_data.map((item: any, index: number) => (
-          <Link href={item.url} key={item.label}>
+          <Link key={item.url} href={item.url}>
             <NavLink
               styles={{
                 root: {
@@ -188,7 +188,7 @@ export function MainLinks() {
         childrenOffset={24}
       >
         {groups_data.map((item: any, index: number) => (
-          <Link href={item.url} key={item.label}>
+          <Link key={item.url} href={item.url}>
             <NavLink
               styles={{
                 root: {
@@ -222,7 +222,7 @@ export function MainLinks() {
         childrenOffset={24}
       >
         {products_data.map((item: any, index: number) => (
-          <Link href={item.url} key={item.label}>
+          <Link key={item.url} href={item.url}>
             <NavLink
               styles={{
                 root: {
@@ -256,7 +256,7 @@ export function MainLinks() {
         childrenOffset={24}
       >
         {loans_data.map((item: any, index: number) => (
-          <Link href={item.url} key={item.label}>
+          <Link key={item.url} href={item.url}>
             <NavLink
               styles={{
                 root: {
@@ -278,40 +278,40 @@ export function MainLinks() {
           </Link>
         ))}
       </NavLink>
-      <NavLink
-        styles={{
-          root: {
-            borderRadius: 6,
-            margin: 2,
-          },
-        }}
-        label="Apps"
-        icon={<IconApps size={16} stroke={1.5} />}
-        childrenOffset={24}
-      >
-        {apps_data.map((item: any, index: number) => (
-          <Link href={item.url} key={item.label}>
-            <NavLink
-              styles={{
-                root: {
-                  borderRadius: 6,
-                  margin: 2,
-                },
-              }}
-              label={item.name}
-              active={reportsActive === index}
-              onClick={() => {
-                setMembersActive(8);
-                setLoansActive(8);
-                setProductsActive(8);
-                setGroupsActive(8);
-                setReportsActive(index);
-                setDashboardActive(false);
-              }}
-            />
-          </Link>
-        ))}
-      </NavLink>
+      {/* <NavLink */}
+      {/*   styles={{ */}
+      {/*     root: { */}
+      {/*       borderRadius: 6, */}
+      {/*       margin: 2, */}
+      {/*     }, */}
+      {/*   }} */}
+      {/*   label="Apps" */}
+      {/*   icon={<IconApps size={16} stroke={1.5} />} */}
+      {/*   childrenOffset={24} */}
+      {/* > */}
+      {/*   {apps_data.map((item: any, index: number) => ( */}
+      {/*     <Link key={item.url} href={item.url}> */}
+      {/*       <NavLink */}
+      {/*         styles={{ */}
+      {/*           root: { */}
+      {/*             borderRadius: 6, */}
+      {/*             margin: 2, */}
+      {/*           }, */}
+      {/*         }} */}
+      {/*         label={item.name} */}
+      {/*         active={reportsActive === index} */}
+      {/*         onClick={() => { */}
+      {/*           setMembersActive(8); */}
+      {/*           setLoansActive(8); */}
+      {/*           setProductsActive(8); */}
+      {/*           setGroupsActive(8); */}
+      {/*           setReportsActive(index); */}
+      {/*           setDashboardActive(false); */}
+      {/*         }} */}
+      {/*       /> */}
+      {/*     </Link> */}
+      {/*   ))} */}
+      {/* </NavLink> */}
       <NavLink
         styles={{
           root: {
@@ -324,7 +324,7 @@ export function MainLinks() {
         childrenOffset={24}
       >
         {reports_data.map((item: any, index: number) => (
-          <Link href={item.url} key={item.label}>
+          <Link key={item.url} href={item.url}>
             <NavLink
               styles={{
                 root: {
