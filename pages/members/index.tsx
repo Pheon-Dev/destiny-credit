@@ -43,7 +43,8 @@ export const getServerSideProps: GetServerSideProps = async () => {
 
   const res = await axios.request({
     method: "GET",
-    url: "https://destiny-credit.vercel.app/api/members",
+    /* url: "https://destiny-credit.vercel.app/api/members", */
+    url: "/api/members",
   });
 
   const data = res.data;

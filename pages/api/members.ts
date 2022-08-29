@@ -8,7 +8,11 @@ async function members(req: NextApiRequest, res: NextApiResponse) {
   async function main() {
     try {
       const members = await prisma.members.findMany();
+
       res.status(200).json({ members: members })
+      return {
+        props : { members }
+      }
     } catch (error) {
       console.log(error);
 
