@@ -138,8 +138,8 @@ const CreateMember = ({ members }: { members: Member[] }) => {
       postalCodeKin: "",
       cityTownKin: "",
       numberKin: "",
-      group: "false",
-      maintained: "false",
+      group: false,
+      maintained: false,
     },
   });
 
@@ -186,10 +186,12 @@ const CreateMember = ({ members }: { members: Member[] }) => {
   useEffect(() => {
     let subscribe = true;
     if (subscribe) {
+      form.setFieldValue("age", `${age_result}`);
       if (form.values.age === `${age_result}`) {
         const interval = setInterval(() => {
           form.setFieldValue("age", `${age_result}`);
-        }, 1000);
+          // console.log(form.values.age)
+        }, 500);
 
         return () => {
           clearInterval(interval);
@@ -197,51 +199,93 @@ const CreateMember = ({ members }: { members: Member[] }) => {
       }
     }
     return () => (subscribe = false);
-  }, []);
+  }, [age_result]);
 
   // console.log(age_result);
-
   const handleSave = async () => {
+    console.table({
+      date: `${dash_today_date}`,
+      branchName: form.values.branchName.toUpperCase(),
+      memberNumber: form.values.memberNumber.toUpperCase(),
+      firstName: form.values.firstName.toUpperCase(),
+      lastName: form.values.lastName.toUpperCase(),
+      dob: `${dash_birth_date}`,
+      idPass: form.values.idPass.toUpperCase(),
+      kraPin: form.values.kraPin.toUpperCase(),
+      phoneNumber: form.values.phoneNumber.toUpperCase(),
+      gender: form.values.gender.toUpperCase(),
+      age: form.values.age.toUpperCase(),
+      religion: form.values.religion.toUpperCase(),
+      maritalStatus: form.values.maritalStatus.toUpperCase(),
+      spouseName: form.values.spouseName.toUpperCase(),
+      spouseNumber: form.values.spouseNumber.toUpperCase(),
+      postalAddress: form.values.postalAddress.toUpperCase(),
+      postalCode: form.values.postalCode.toUpperCase(),
+      cityTown: form.values.cityTown.toUpperCase(),
+      residentialAddress: form.values.residentialAddress.toUpperCase(),
+      emailAddress: form.values.emailAddress.toUpperCase(),
+      rentedOwned: form.values.rentedOwned.toUpperCase(),
+      landCareAgent: form.values.landCareAgent.toUpperCase(),
+      occupationEmployer: form.values.occupationEmployer.toUpperCase(),
+      employerNumber: form.values.employerNumber.toUpperCase(),
+      businessLocation: form.values.businessLocation.toUpperCase(),
+      businessAge: form.values.businessAge.toUpperCase(),
+      refereeName: form.values.refereeName.toUpperCase(),
+      refereeNumber: form.values.refereeNumber.toUpperCase(),
+      communityPosition: form.values.communityPosition.toUpperCase(),
+      mpesaCode: form.values.mpesaCode.toUpperCase(),
+      membershipAmount: form.values.membershipAmount.toUpperCase(),
+      nameKin: form.values.nameKin.toUpperCase(),
+      relationship: form.values.relationship.toUpperCase(),
+      residentialAddressKin: form.values.residentialAddressKin.toUpperCase(),
+      postalAddressKin: form.values.postalAddressKin.toUpperCase(),
+      postalCodeKin: form.values.postalCodeKin.toUpperCase(),
+      cityTownKin: form.values.cityTownKin.toUpperCase(),
+      numberKin: form.values.numberKin.toUpperCase(),
+      group: false,
+      maintained: false,
+    });
+
     if (
-      form.values.date &&
-      form.values.branchName &&
-      form.values.memberNumber &&
-      form.values.firstName &&
-      form.values.lastName &&
-      form.values.dob &&
-      form.values.idPass &&
-      form.values.kraPin &&
-      form.values.phoneNumber &&
-      form.values.gender &&
-      form.values.age &&
-      form.values.religion &&
-      form.values.maritalStatus &&
-      form.values.spouseName &&
-      form.values.spouseNumber &&
-      form.values.postalAddress &&
-      form.values.postalCode &&
-      form.values.cityTown &&
-      form.values.residentialAddress &&
-      form.values.emailAddress &&
-      form.values.rentedOwned &&
-      form.values.landCareAgent &&
-      form.values.occupationEmployer &&
-      form.values.employerNumber &&
-      form.values.businessLocation &&
-      form.values.businessAge &&
-      form.values.refereeName &&
-      form.values.refereeNumber &&
-      form.values.communityPosition &&
-      form.values.mpesaCode &&
-      form.values.membershipAmount &&
-      form.values.nameKin &&
-      form.values.relationship &&
-      form.values.residentialAddressKin &&
-      form.values.postalAddressKin &&
-      form.values.postalCodeKin &&
-      form.values.cityTownKin &&
-      form.values.numberKin &&
-      form.values.group &&
+      (form.values.date &&
+        form.values.branchName &&
+        form.values.memberNumber &&
+        form.values.firstName &&
+        form.values.lastName &&
+        form.values.dob &&
+        form.values.idPass &&
+        form.values.kraPin &&
+        form.values.phoneNumber &&
+        form.values.gender &&
+        form.values.age &&
+        form.values.religion &&
+        form.values.maritalStatus &&
+        form.values.spouseName &&
+        form.values.spouseNumber &&
+        form.values.postalAddress &&
+        form.values.postalCode &&
+        form.values.cityTown &&
+        form.values.residentialAddress &&
+        form.values.emailAddress &&
+        form.values.rentedOwned &&
+        form.values.landCareAgent &&
+        form.values.occupationEmployer &&
+        form.values.employerNumber &&
+        form.values.businessLocation &&
+        form.values.businessAge &&
+        form.values.refereeName &&
+        form.values.refereeNumber &&
+        form.values.communityPosition &&
+        form.values.mpesaCode &&
+        form.values.membershipAmount &&
+        form.values.nameKin &&
+        form.values.relationship &&
+        form.values.residentialAddressKin &&
+        form.values.postalAddressKin &&
+        form.values.postalCodeKin &&
+        form.values.cityTownKin &&
+        form.values.numberKin) ||
+      form.values.group ||
       form.values.maintained
     ) {
       showNotification({
@@ -251,50 +295,50 @@ const CreateMember = ({ members }: { members: Member[] }) => {
         loading: true,
       });
 
-      // await supabase.from("members").insert([
-      //   {
-      //     date: form.values.date,
-      //     branchName: form.values.branchName.toUpperCase(),
-      //     memberNumber: form.values.memberNumber.toUpperCase(),
-      //     firstName: form.values.firstName.toUpperCase(),
-      //     lastName: form.values.lastName.toUpperCase(),
-      //     dob: form.values.dob.toUpperCase(),
-      //     idPass: form.values.idPass.toUpperCase(),
-      //     kraPin: form.values.kraPin.toUpperCase(),
-      //     phoneNumber: form.values.phoneNumber.toUpperCase(),
-      //     gender: form.values.gender.toUpperCase(),
-      //     age: form.values.age.toUpperCase(),
-      //     religion: form.values.religion.toUpperCase(),
-      //     maritalStatus: form.values.maritalStatus.toUpperCase(),
-      //     spouseName: form.values.spouseName.toUpperCase(),
-      //     spouseNumber: form.values.spouseNumber.toUpperCase(),
-      //     postalAddress: form.values.postalAddress.toUpperCase(),
-      //     postalCode: form.values.postalCode.toUpperCase(),
-      //     cityTown: form.values.cityTown.toUpperCase(),
-      //     residentialAddress: form.values.residentialAddress.toUpperCase(),
-      //     emailAddress: form.values.emailAddress.toUpperCase(),
-      //     rentedOwned: form.values.rentedOwned.toUpperCase(),
-      //     landCareAgent: form.values.landCareAgent.toUpperCase(),
-      //     occupationEmployer: form.values.occupationEmployer.toUpperCase(),
-      //     employerNumber: form.values.employerNumber.toUpperCase(),
-      //     businessLocation: form.values.businessLocation.toUpperCase(),
-      //     businessAge: form.values.businessAge.toUpperCase(),
-      //     refereeName: form.values.refereeName.toUpperCase(),
-      //     refereeNumber: form.values.refereeNumber.toUpperCase(),
-      //     communityPosition: form.values.communityPosition.toUpperCase(),
-      //     mpesaCode: form.values.mpesaCode.toUpperCase(),
-      //     membershipAmount: form.values.membershipAmount.toUpperCase(),
-      //     nameKin: form.values.nameKin.toUpperCase(),
-      //     relationship: form.values.relationship.toUpperCase(),
-      //     residentialAddressKin: form.values.residentialAddressKin.toUpperCase(),
-      //     postalAddressKin: form.values.postalAddressKin.toUpperCase(),
-      //     postalCodeKin: form.values.postalCodeKin.toUpperCase(),
-      //     cityTownKin: form.values.cityTownKin.toUpperCase(),
-      //     numberKin: form.values.numberKin.toUpperCase(),
-      //     group: form.values.group,
-      //     maintained: form.values.maintained,
-      //   },
-      // ]);
+      await supabase.from("members").insert([
+        {
+          date: `${dash_today_date}`,
+          branchName: `${form.values.branchName.toUpperCase()}`,
+          memberNumber: `${form.values.memberNumber.toUpperCase()}`,
+          firstName: `${form.values.firstName.toUpperCase()}`,
+          lastName: `${form.values.lastName.toUpperCase()}`,
+          dob: `${dash_birth_date}`,
+          idPass: `${form.values.idPass.toUpperCase()}`,
+          kraPin: `${form.values.kraPin.toUpperCase()}`,
+          phoneNumber: `${form.values.phoneNumber.toUpperCase()}`,
+          gender: `${form.values.gender.toUpperCase()}`,
+          age: `${form.values.age.toUpperCase()}`,
+          religion: `${form.values.religion.toUpperCase()}`,
+          maritalStatus: `${form.values.maritalStatus.toUpperCase()}`,
+          spouseName: `${form.values.spouseName.toUpperCase()}`,
+          spouseNumber: `${form.values.spouseNumber.toUpperCase()}`,
+          postalAddress: `${form.values.postalAddress.toUpperCase()}`,
+          postalCode: `${form.values.postalCode.toUpperCase()}`,
+          cityTown: `${form.values.cityTown.toUpperCase()}`,
+          residentialAddress: `${form.values.residentialAddress.toUpperCase()}`,
+          emailAddress: `${form.values.emailAddress.toUpperCase()}`,
+          rentedOwned: `${form.values.rentedOwned.toUpperCase()}`,
+          landCareAgent: `${form.values.landCareAgent.toUpperCase()}`,
+          occupationEmployer: `${form.values.occupationEmployer.toUpperCase()}`,
+          employerNumber: `${form.values.employerNumber.toUpperCase()}`,
+          businessLocation: `${form.values.businessLocation.toUpperCase()}`,
+          businessAge: `${form.values.businessAge.toUpperCase()}`,
+          refereeName: `${form.values.refereeName.toUpperCase()}`,
+          refereeNumber: `${form.values.refereeNumber.toUpperCase()}`,
+          communityPosition: `${form.values.communityPosition.toUpperCase()}`,
+          mpesaCode: `${form.values.mpesaCode.toUpperCase()}`,
+          membershipAmount: `${form.values.membershipAmount.toUpperCase()}`,
+          nameKin: `${form.values.nameKin.toUpperCase()}`,
+          relationship: `${form.values.relationship.toUpperCase()}`,
+          residentialAddressKin: `${form.values.residentialAddressKin.toUpperCase()}`,
+          postalAddressKin: `${form.values.postalAddressKin.toUpperCase()}`,
+          postalCodeKin: `${form.values.postalCodeKin.toUpperCase()}`,
+          cityTownKin: `${form.values.cityTownKin.toUpperCase()}`,
+          numberKin: `${form.values.numberKin.toUpperCase()}`,
+          /* group: form.values.group, */
+          /* maintained: form.values.maintained */
+        },
+      ]);
 
       return setTimeout(() => {
         updateNotification({
@@ -316,6 +360,9 @@ const CreateMember = ({ members }: { members: Member[] }) => {
       color: "red",
     });
   };
+  // console.log(form.values.date)
+  // console.log(form.values.dob)
+  // console.log(form.values.age)
 
   return (
     <form
@@ -342,22 +389,20 @@ const CreateMember = ({ members }: { members: Member[] }) => {
             inputFormat="DD-MM-YYYY"
             dropdownType="modal"
             firstDayOfWeek="sunday"
-            renderDay={(date) => {
-              const today = new Date();
-              const day = date.getDate();
-              return (
-                <Indicator
-                  size={6}
-                  color="blue"
-                  offset={8}
-                  disabled={day !== Number(today.getDate())}
-                >
-                  <div>{day}</div>
-                </Indicator>
-              );
-            }}
-            // value={dateValue}
-            // onChange={setDateValue}
+            // renderDay={(date) => {
+            //   const today = new Date();
+            //   const day = date.getDate();
+            //   return (
+            //     <Indicator
+            //       size={6}
+            //       color="blue"
+            //       offset={8}
+            //       disabled={day !== Number(today.getDate())}
+            //     >
+            //       <div>{day}</div>
+            //     </Indicator>
+            //   );
+            // }}
             {...form.getInputProps("date")}
             required
           />
@@ -425,8 +470,6 @@ const CreateMember = ({ members }: { members: Member[] }) => {
             inputFormat="DD-MM-YYYY"
             dropdownType="modal"
             firstDayOfWeek="sunday"
-            // value={dobValue}
-            // onChange={setDobValue}
             {...form.getInputProps("dob")}
             required
           />
@@ -867,8 +910,8 @@ const CreateMember = ({ members }: { members: Member[] }) => {
                 : form.setFieldValue("employerNumber", "NA");
             }
             form.setFieldValue("branchName", "Eldoret");
-            form.setFieldValue("group", "false");
-            form.setFieldValue("maintained", "false");
+            form.setFieldValue("group", false);
+            form.setFieldValue("maintained", false);
             form.validate();
             setVisible((prev) => !prev);
             handleSave();

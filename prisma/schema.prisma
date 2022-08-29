@@ -1,0 +1,62 @@
+// This is your Prisma schema file,
+// learn more about it in the docs: https://pris.ly/d/prisma-schema
+
+generator client {
+  provider       = "prisma-client-js"
+  previewFeatures = ["referentialIntegrity"]
+}
+
+datasource db {
+  provider             = "mysql"
+  url                  = env("DATABASE_URL")
+  referentialIntegrity = "prisma"
+}
+
+model Members {
+  id                    Int      @id @default(autoincrement())
+  createdAt             DateTime @default(now())
+  updatedAt             DateTime @updatedAt
+  content               String?
+  date                  String?
+  branchName            String?
+  memberNumber          String?
+  firstName             String?
+  lastName              String?
+  dob                   String?
+  idPass                String?
+  kraPin                String?
+  phoneNumber           String?
+  gender                String?
+  age                   String?
+  religion              String?
+  maritalStatus         String?
+  spouseName            String?
+  spouseNumber          String?
+  postalAddress         String?
+  postalCode            String?
+  cityTown              String?
+  residentialAddress    String?
+  emailAddress          String?
+  rentedOwned           String?
+  landCareAgent         String?
+  occupationEmployer    String?
+  employerNumber        String?
+  businessLocation      String?
+  businessAge           String?
+  refereeName           String?
+  refereeNumber         String?
+  communityPosition     String?
+  mpesaCode             String?
+  membershipAmount      String?
+  nameKin               String?
+  relationship          String?
+  residentialAddressKin String?
+  postalAddressKin      String?
+  postalCodeKin         String?
+  cityTownKin           String?
+  numberKin             String?
+  group                 Boolean  @default(false)
+  maintained            Boolean  @default(false)
+
+  @@index(id)
+}

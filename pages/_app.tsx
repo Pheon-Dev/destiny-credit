@@ -60,7 +60,7 @@ export default function App(props: AppProps & { colorScheme: ColorScheme }) {
         <MantineProvider
           withGlobalStyles
           withNormalizeCSS
-          theme={{ colorScheme, loader: 'bars' }}
+          theme={{ colorScheme, loader: 'dots' }}
         >
         <ColorSchemeProvider
           colorScheme={colorScheme}

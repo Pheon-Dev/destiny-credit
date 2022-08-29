@@ -32,11 +32,16 @@ export default async function handler(
         str_ndate.split("/")[1] +
         "-" +
         str_ndate.split("/")[0];
-      const url_one =
-        "https://logtail.com/api/v1/query?source_ids=158744&query=transID" +
-        `&to=${now_date} + ${str_tdate}`;
-      const url_two =
-        "https://logtail.com/api/v1/query?source_ids=158744&query=transID";
+
+      // let str_now_date = `${now_date}` + ' ' + `${str_tdate}`
+
+      // const url_one = "https://logtail.com/api/v1/query?source_ids=158744&query=transID" + `&to=${str_now_date}`;
+
+      const url = "https://logtail.com/api/v1/query?source_ids=158744&query=transID";
+      // const url = "https://logtail.com/api/v1/query?source_ids=158744";
+      // const url = "https://logtail.com/api/v1/query";
+      // const url = "https://logtail.com/api/v1/sources";
+
       const token = LOGTAIL_API_TOKEN;
       const headers = {
         Authorization: `Bearer ${token}`,
@@ -44,21 +49,21 @@ export default async function handler(
 
       let response = await axios.request({
         method: "GET",
-        url: url_one,
+        url,
         headers,
       });
 
-      if (response.status !== 200) {
-        try {
-          response = await axios.request({
-            method: "GET",
-            url: url_two,
-            headers,
-          });
-        } catch (error) {
-          res.status(500).json({ message: "Something went wrong" });
-        }
-      }
+      // if (response.status !== 200) {
+      //   try {
+      //     response = await axios.request({
+      //       method: "GET",
+      //       url: url_two,
+      //       headers,
+      //     });
+      //   } catch (error) {
+      //     res.status(500).json({ message: "Something went wrong" });
+      //   }
+      // }
 
       const log = response.data;
 
@@ -190,7 +195,8 @@ export default async function handler(
         message: "Transactions Upto Date",
       });
     } catch (error) {
-      res.status(500).json({ message: "Something went wrong" });
+      res.status(500).json({ message: "Something Went Wrong With The Internal Server!" });
+      // res.status(500).json({ message: error });
     }
   }
   queryAndWrite();
