@@ -21,13 +21,13 @@ import { Members } from "../../types";
 import { showNotification, updateNotification } from "@mantine/notifications";
 
 export async function getStaticProps() {
-  const prisma = new PrismaClient();
+  /* const prisma = new PrismaClient(); */
   const { data, error } = await supabase
     .from("members")
     .select("*")
     .order("id");
 
-  const members = await prisma.members.findMany();
+  /* const members = await prisma.members.findMany(); */
 
   if (error) return console.log({ error: error });
   return {
