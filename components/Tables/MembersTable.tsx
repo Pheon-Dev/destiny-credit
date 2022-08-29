@@ -5,7 +5,7 @@ import { Members } from "../../types";
 export function MembersTable({
   members,
 }: {
-  members: any;
+  members: Members[];
 }) {
   return (
     <>
@@ -20,7 +20,7 @@ export function MembersTable({
           </tr>
         </thead>
         <tbody>
-          {members?.map((member: any) => (
+          {members?.map((member) => (
             <MemberRow
               key={member.memberNumber}
               member={member}
@@ -41,7 +41,7 @@ export function MembersTable({
   );
 }
 
-function MemberRow({ member }: { member: any }) {
+function MemberRow({ member }: { member: Members }) {
   return (
     <tr>
       <td>{member.memberNumber}</td>

@@ -96,15 +96,16 @@ export interface MainLinkProps {
 
 export interface Members {
   createdAt?: any;
-  date: Date;
+  updatedAt?: any;
+  date: string;
   branchName: string;
   memberNumber: string;
   firstName: string;
   lastName: string;
-  dob: Date;
+  dob: string;
   idPass: string;
   kraPin: string;
-  mobileNumber: string;
+  phoneNumber: string;
   gender: string;
   age: string;
   religion: string;
@@ -134,12 +135,12 @@ export interface Members {
   postalCodeKin: string;
   cityTownKin: string;
   numberKin: string;
-  maintained?: string;
-  group?: string;
+  maintained?: boolean;
+  group?: boolean;
 }
 
 export interface Member {
-  date: Date;
+  date: string;
   branchName: string;
   memberNumber: string;
   firstName: string;
@@ -147,7 +148,7 @@ export interface Member {
   dob: Date;
   idPass: string;
   kraPin: string;
-  mobileNumber: string;
+  phoneNumber: string;
   gender: string;
   age: string;
   religion: string;

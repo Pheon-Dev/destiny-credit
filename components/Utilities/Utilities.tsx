@@ -133,7 +133,7 @@ export function Utilities() {
         openDelay={100}
         closeDelay={400}
         width={200}
-        position="left-start"
+        position="bottom-end"
         withArrow
       >
         <Affix position={{ top: 55, right: 20 }}>

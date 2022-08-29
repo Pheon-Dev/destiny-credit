@@ -16,7 +16,6 @@ model Members {
   id                    Int      @id @default(autoincrement())
   createdAt             DateTime @default(now())
   updatedAt             DateTime @updatedAt
-  content               String?
   date                  String?
   branchName            String?
   memberNumber          String?
