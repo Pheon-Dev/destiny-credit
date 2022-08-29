@@ -39,7 +39,6 @@ export default async function confirm(
     });
     // const body = JSON.stringify(data);
     // console.log(body);
-
   } catch (error) {
     console.log(error);
 

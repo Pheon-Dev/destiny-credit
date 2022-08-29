@@ -92,22 +92,22 @@ async function transaction(req: NextApiRequest, res: NextApiResponse) {
           maintained: maintained,
         },
       });
-
-      main()
-        .then(async () => {
-          await prisma.$disconnect();
-        })
-        .catch(async (e) => {
-          console.error(e);
-          await prisma.$disconnect();
-          process.exit(1);
-        });
+      res.status(200).json({ message: req.body });
     } catch (error) {
       console.log(error);
 
       res.status(500).json({ message: "Something went wrong", error });
     }
   }
+  main()
+    .then(async () => {
+      await prisma.$disconnect();
+    })
+    .catch(async (e) => {
+      console.error(e);
+      await prisma.$disconnect();
+      process.exit(1);
+    });
 }
 
 export default transaction;
