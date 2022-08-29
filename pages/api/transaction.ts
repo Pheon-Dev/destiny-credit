@@ -48,7 +48,7 @@ async function transaction(req: NextApiRequest, res: NextApiResponse) {
         group,
         maintained,
       } = req.body;
-      await prisma.member.create({
+      await prisma.members.create({
         data: {
           date: date,
           branchName: branchName,
