@@ -205,49 +205,6 @@ const CreateMember = ({ members }: { members: Member[] }) => {
   /* const handleSave = async (e: FormEvent<HTMLFormElement>) => { */
   const handleSave = async () => {
     /* e.preventDefault(); */
-    /* console.table({ */
-    /*   date: `${dash_today_date}`, */
-    /*   branchName: form.values.branchName.toUpperCase(), */
-    /*   memberNumber: form.values.memberNumber.toUpperCase(), */
-    /*   firstName: form.values.firstName.toUpperCase(), */
-    /*   lastName: form.values.lastName.toUpperCase(), */
-    /*   dob: `${dash_birth_date}`, */
-    /*   idPass: form.values.idPass.toUpperCase(), */
-    /*   kraPin: form.values.kraPin.toUpperCase(), */
-    /*   phoneNumber: form.values.phoneNumber.toUpperCase(), */
-    /*   gender: form.values.gender.toUpperCase(), */
-    /*   age: form.values.age.toUpperCase(), */
-    /*   religion: form.values.religion.toUpperCase(), */
-    /*   maritalStatus: form.values.maritalStatus.toUpperCase(), */
-    /*   spouseName: form.values.spouseName.toUpperCase(), */
-    /*   spouseNumber: form.values.spouseNumber.toUpperCase(), */
-    /*   postalAddress: form.values.postalAddress.toUpperCase(), */
-    /*   postalCode: form.values.postalCode.toUpperCase(), */
-    /*   cityTown: form.values.cityTown.toUpperCase(), */
-    /*   residentialAddress: form.values.residentialAddress.toUpperCase(), */
-    /*   emailAddress: form.values.emailAddress.toUpperCase(), */
-    /*   rentedOwned: form.values.rentedOwned.toUpperCase(), */
-    /*   landCareAgent: form.values.landCareAgent.toUpperCase(), */
-    /*   occupationEmployer: form.values.occupationEmployer.toUpperCase(), */
-    /*   employerNumber: form.values.employerNumber.toUpperCase(), */
-    /*   businessLocation: form.values.businessLocation.toUpperCase(), */
-    /*   businessAge: form.values.businessAge.toUpperCase(), */
-    /*   refereeName: form.values.refereeName.toUpperCase(), */
-    /*   refereeNumber: form.values.refereeNumber.toUpperCase(), */
-    /*   communityPosition: form.values.communityPosition.toUpperCase(), */
-    /*   mpesaCode: form.values.mpesaCode.toUpperCase(), */
-    /*   membershipAmount: form.values.membershipAmount.toUpperCase(), */
-    /*   nameKin: form.values.nameKin.toUpperCase(), */
-    /*   relationship: form.values.relationship.toUpperCase(), */
-    /*   residentialAddressKin: form.values.residentialAddressKin.toUpperCase(), */
-    /*   postalAddressKin: form.values.postalAddressKin.toUpperCase(), */
-    /*   postalCodeKin: form.values.postalCodeKin.toUpperCase(), */
-    /*   cityTownKin: form.values.cityTownKin.toUpperCase(), */
-    /*   numberKin: form.values.numberKin.toUpperCase(), */
-    /*   group: false, */
-    /*   maintained: false, */
-    /* }); */
-
     if (
       (form.values.date &&
         form.values.branchName &&
@@ -290,107 +247,60 @@ const CreateMember = ({ members }: { members: Member[] }) => {
       form.values.group ||
       form.values.maintained
     ) {
-    console.log("Writing to Database")
+      console.log("Writing to Database");
       const res = await axios.request({
         method: "POST",
-        url: "/api/transaction",
+        url: "/api/register",
         data: {
-          date: +form.values.date,
-          branchName: +form.values.branchName,
-          memberNumber: +form.values.memberNumber,
-          firstName: +form.values.firstName,
-          lastName: +form.values.lastName,
-          dob: +form.values.dob,
-          idPass: +form.values.idPass,
-          kraPin: +form.values.kraPin,
-          phoneNumber: +form.values.phoneNumber,
-          gender: +form.values.gender,
-          age: +form.values.age,
-          religion: +form.values.religion,
-          maritalStatus: +form.values.maritalStatus,
-          spouseName: +form.values.spouseName,
-          spouseNumber: +form.values.spouseNumber,
-          postalAddress: +form.values.postalAddress,
-          postalCode: +form.values.postalCode,
-          cityTown: +form.values.cityTown,
-          residentialAddress: +form.values.residentialAddress,
-          emailAddress: +form.values.emailAddress,
-          rentedOwned: +form.values.rentedOwned,
-          landCareAgent: +form.values.landCareAgent,
-          occupationEmployer: +form.values.occupationEmployer,
-          employerNumber: +form.values.employerNumber,
-          businessLocation: +form.values.businessLocation,
-          businessAge: +form.values.businessAge,
-          refereeName: +form.values.refereeName,
-          refereeNumber: +form.values.refereeNumber,
-          communityPosition: +form.values.communityPosition,
-          mpesaCode: +form.values.mpesaCode,
-          membershipAmount: +form.values.membershipAmount,
-          nameKin: +form.values.nameKin,
-          relationship: +form.values.relationship,
-          residentialAddressKin: +form.values.residentialAddressKin,
-          postalAddressKin: +form.values.postalAddressKin,
-          postalCodeKin: +form.values.postalCodeKin,
-          cityTownKin: +form.values.cityTownKin,
-          numberKin: +form.values.numberKin,
-          group: +form.values.group,
-          maintained: +form.values.maintained,
+          date: `${dash_today_date}`,
+          branchName: form.values.branchName.toUpperCase(),
+          memberNumber: form.values.memberNumber.toUpperCase(),
+          firstName: form.values.firstName.toUpperCase(),
+          lastName: form.values.lastName.toUpperCase(),
+          dob: `${dash_birth_date}`,
+          idPass: form.values.idPass.toUpperCase(),
+          kraPin: form.values.kraPin.toUpperCase(),
+          phoneNumber: form.values.phoneNumber.toUpperCase(),
+          gender: form.values.gender.toUpperCase(),
+          age: form.values.age.toUpperCase(),
+          religion: form.values.religion.toUpperCase(),
+          maritalStatus: form.values.maritalStatus.toUpperCase(),
+          spouseName: form.values.spouseName.toUpperCase(),
+          spouseNumber: form.values.spouseNumber.toUpperCase(),
+          postalAddress: form.values.postalAddress.toUpperCase(),
+          postalCode: form.values.postalCode.toUpperCase(),
+          cityTown: form.values.cityTown.toUpperCase(),
+          residentialAddress: form.values.residentialAddress.toUpperCase(),
+          emailAddress: form.values.emailAddress.toUpperCase(),
+          rentedOwned: form.values.rentedOwned.toUpperCase(),
+          landCareAgent: form.values.landCareAgent.toUpperCase(),
+          occupationEmployer: form.values.occupationEmployer.toUpperCase(),
+          employerNumber: form.values.employerNumber.toUpperCase(),
+          businessLocation: form.values.businessLocation.toUpperCase(),
+          businessAge: form.values.businessAge.toUpperCase(),
+          refereeName: form.values.refereeName.toUpperCase(),
+          refereeNumber: form.values.refereeNumber.toUpperCase(),
+          communityPosition: form.values.communityPosition.toUpperCase(),
+          mpesaCode: form.values.mpesaCode.toUpperCase(),
+          membershipAmount: form.values.membershipAmount.toUpperCase(),
+          nameKin: form.values.nameKin.toUpperCase(),
+          relationship: form.values.relationship.toUpperCase(),
+          residentialAddressKin:
+            form.values.residentialAddressKin.toUpperCase(),
+          postalAddressKin: form.values.postalAddressKin.toUpperCase(),
+          postalCodeKin: form.values.postalCodeKin.toUpperCase(),
+          cityTownKin: form.values.cityTownKin.toUpperCase(),
+          numberKin: form.values.numberKin.toUpperCase(),
+          group: false,
+          maintained: false,
         },
       });
 
-      console.table(res.data);
-
-      await supabase.from("members").insert([
-        {
-          date: `${dash_today_date}`,
-          branchName: `${form.values.branchName.toUpperCase()}`,
-          memberNumber: `${form.values.memberNumber.toUpperCase()}`,
-          firstName: `${form.values.firstName.toUpperCase()}`,
-          lastName: `${form.values.lastName.toUpperCase()}`,
-          dob: `${dash_birth_date}`,
-          idPass: `${form.values.idPass.toUpperCase()}`,
-          kraPin: `${form.values.kraPin.toUpperCase()}`,
-          phoneNumber: `${form.values.phoneNumber.toUpperCase()}`,
-          gender: `${form.values.gender.toUpperCase()}`,
-          age: `${form.values.age.toUpperCase()}`,
-          religion: `${form.values.religion.toUpperCase()}`,
-          maritalStatus: `${form.values.maritalStatus.toUpperCase()}`,
-          spouseName: `${form.values.spouseName.toUpperCase()}`,
-          spouseNumber: `${form.values.spouseNumber.toUpperCase()}`,
-          postalAddress: `${form.values.postalAddress.toUpperCase()}`,
-          postalCode: `${form.values.postalCode.toUpperCase()}`,
-          cityTown: `${form.values.cityTown.toUpperCase()}`,
-          residentialAddress: `${form.values.residentialAddress.toUpperCase()}`,
-          emailAddress: `${form.values.emailAddress.toUpperCase()}`,
-          rentedOwned: `${form.values.rentedOwned.toUpperCase()}`,
-          landCareAgent: `${form.values.landCareAgent.toUpperCase()}`,
-          occupationEmployer: `${form.values.occupationEmployer.toUpperCase()}`,
-          employerNumber: `${form.values.employerNumber.toUpperCase()}`,
-          businessLocation: `${form.values.businessLocation.toUpperCase()}`,
-          businessAge: `${form.values.businessAge.toUpperCase()}`,
-          refereeName: `${form.values.refereeName.toUpperCase()}`,
-          refereeNumber: `${form.values.refereeNumber.toUpperCase()}`,
-          communityPosition: `${form.values.communityPosition.toUpperCase()}`,
-          mpesaCode: `${form.values.mpesaCode.toUpperCase()}`,
-          membershipAmount: `${form.values.membershipAmount.toUpperCase()}`,
-          nameKin: `${form.values.nameKin.toUpperCase()}`,
-          relationship: `${form.values.relationship.toUpperCase()}`,
-          residentialAddressKin: `${form.values.residentialAddressKin.toUpperCase()}`,
-          postalAddressKin: `${form.values.postalAddressKin.toUpperCase()}`,
-          postalCodeKin: `${form.values.postalCodeKin.toUpperCase()}`,
-          cityTownKin: `${form.values.cityTownKin.toUpperCase()}`,
-          numberKin: `${form.values.numberKin.toUpperCase()}`,
-          group: form.values.group,
-          maintained: form.values.maintained
-        },
-      ]);
-
-    console.log("Successful Write to Database")
       return setTimeout(() => {
         updateNotification({
           id: "submit",
           color: "teal",
-          title: "Member Registration",
+          title: `${res.data.firstname} ${res.data.lastName}`,
           message: "Member Registered Successfully!",
           icon: <IconCheck size={16} />,
           autoClose: 2000,
@@ -399,7 +309,7 @@ const CreateMember = ({ members }: { members: Member[] }) => {
       }, 2000);
     }
     setVisible(false);
-    console.log("Failed Write to Database")
+    console.log("Failed Write to Database");
     return setTimeout(() => {
       updateNotification({
         id: "submit",

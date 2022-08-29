@@ -1,4 +1,5 @@
 import type { NextApiRequest, NextApiResponse } from "next";
+import { supabase } from "../../lib/supabase";
 import { PrismaClient } from "@prisma/client";
 
 async function transaction(req: NextApiRequest, res: NextApiResponse) {
@@ -48,6 +49,7 @@ async function transaction(req: NextApiRequest, res: NextApiResponse) {
         group,
         maintained,
       } = req.body;
+      console.log(req.body)
       await prisma.members.create({
         data: {
           date: date,
@@ -92,6 +94,50 @@ async function transaction(req: NextApiRequest, res: NextApiResponse) {
           maintained: maintained,
         },
       });
+      await supabase.from("members").insert([
+        {
+          date: date,
+          branchName: branchName,
+          memberNumber: memberNumber,
+          firstName: firstName,
+          lastName: lastName,
+          dob: dob,
+          idPass: idPass,
+          kraPin: kraPin,
+          phoneNumber: phoneNumber,
+          gender: gender,
+          age: age,
+          religion: religion,
+          maritalStatus: maritalStatus,
+          spouseName: spouseName,
+          spouseNumber: spouseNumber,
+          postalAddress: postalAddress,
+          postalCode: postalCode,
+          cityTown: cityTown,
+          residentialAddress: residentialAddress,
+          emailAddress: emailAddress,
+          rentedOwned: rentedOwned,
+          landCareAgent: landCareAgent,
+          occupationEmployer: occupationEmployer,
+          employerNumber: employerNumber,
+          businessLocation: businessLocation,
+          businessAge: businessAge,
+          refereeName: refereeName,
+          refereeNumber: refereeNumber,
+          communityPosition: communityPosition,
+          mpesaCode: mpesaCode,
+          membershipAmount: membershipAmount,
+          nameKin: nameKin,
+          relationship: relationship,
+          residentialAddressKin: residentialAddressKin,
+          postalAddressKin: postalAddressKin,
+          postalCodeKin: postalCodeKin,
+          cityTownKin: cityTownKin,
+          numberKin: numberKin,
+          group: group,
+          maintained: maintained,
+        },
+      ]);
       res.status(200).json({ message: req.body });
     } catch (error) {
       console.log(error);
