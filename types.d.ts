@@ -178,6 +178,6 @@ export interface Member {
   postalCodeKin: string;
   cityTownKin: string;
   numberKin: string;
-  maintained?: string;
-  group?: string;
+  maintained?: boolean;
+  group?: boolean;
 }
