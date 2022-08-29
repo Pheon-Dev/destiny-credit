@@ -1,4 +1,5 @@
 import React, { FormEvent, useEffect, useState } from "react";
+import { PrismaClient } from "@prisma/client";
 import axios from "axios";
 import { supabase } from "../../lib/supabase";
 import { z } from "zod";
@@ -20,15 +21,19 @@ import { Member } from "../../types";
 import { showNotification, updateNotification } from "@mantine/notifications";
 
 export async function getStaticProps() {
+  const prisma = new PrismaClient();
   const { data, error } = await supabase
     .from("members")
     .select("*")
     .order("id");
 
+  const members = await prisma.members.findMany();
+
   if (error) return console.log({ error: error });
   return {
     props: {
       members: data,
+      /* list: members, */
     },
   };
 }
@@ -84,7 +89,7 @@ const schema = z.object({
   numberKin: z.string().min(2, { message: "Enter  Phone # (kin)" }),
 });
 
-const CreateMember = ({ members }: { members: Member[] }) => {
+const CreateMember = ({ members }: { members: Member[]; }) => {
   const [visible, setVisible] = useState(false);
   // const [ageResult, setAgeResult] = useState(0);
 
@@ -98,6 +103,7 @@ const CreateMember = ({ members }: { members: Member[] }) => {
         : "DC-00" + `${lencode}`
       : "DC-000" + `${lencode}`;
 
+  /* console.log(list) */
   const form = useForm({
     validate: zodResolver(schema),
     initialValues: {

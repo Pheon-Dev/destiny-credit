@@ -2,7 +2,7 @@ import type { NextApiRequest, NextApiResponse } from "next";
 import { supabase } from "../../lib/supabase";
 import { PrismaClient } from "@prisma/client";
 
-async function transaction(req: NextApiRequest, res: NextApiResponse) {
+async function register(req: NextApiRequest, res: NextApiResponse) {
   const prisma = new PrismaClient();
 
   async function main() {
@@ -156,4 +156,4 @@ async function transaction(req: NextApiRequest, res: NextApiResponse) {
     });
 }
 
-export default transaction;
+export default register;

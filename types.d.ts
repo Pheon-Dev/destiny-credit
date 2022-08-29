@@ -94,6 +94,50 @@ export interface MainLinkProps {
   data?: any;
 }
 
+export interface Members {
+  createdAt?: any;
+  date: Date;
+  branchName: string;
+  memberNumber: string;
+  firstName: string;
+  lastName: string;
+  dob: Date;
+  idPass: string;
+  kraPin: string;
+  mobileNumber: string;
+  gender: string;
+  age: string;
+  religion: string;
+  maritalStatus: string;
+  spouseName: string;
+  spouseNumber: string;
+  postalAddress: string;
+  postalCode: string;
+  cityTown: string;
+  residentialAddress: string;
+  emailAddress: string;
+  rentedOwned: string;
+  landCareAgent: string;
+  occupationEmployer: string;
+  employerNumber: string;
+  businessLocation: string;
+  businessAge: string;
+  refereeName: string;
+  refereeNumber: string;
+  communityPosition: string;
+  mpesaCode: string;
+  membershipAmount: string;
+  nameKin: string;
+  relationship: string;
+  residentialAddressKin: string;
+  postalAddressKin: string;
+  postalCodeKin: string;
+  cityTownKin: string;
+  numberKin: string;
+  maintained?: string;
+  group?: string;
+}
+
 export interface Member {
   date: Date;
   branchName: string;
