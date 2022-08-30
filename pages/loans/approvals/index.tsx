@@ -8,5 +8,4 @@ const Approvals = () => {
     </>
   );
 };
-
 export default Approvals;

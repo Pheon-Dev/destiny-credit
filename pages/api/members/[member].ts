@@ -1,26 +1,27 @@
 import type { NextApiRequest, NextApiResponse } from "next";
-import { supabase } from "../../lib/supabase";
+/* import { supabase } from "../../lib/supabase"; */
 import { PrismaClient } from "@prisma/client";
 
-async function members(req: NextApiRequest, res: NextApiResponse) {
+async function register(req: NextApiRequest, res: NextApiResponse) {
   const prisma = new PrismaClient();
 
   async function main() {
     try {
-      /* const members = await prisma.members.findMany(); */
-/* 0729991003 */
-const members = await prisma.members.update({
+      const {
+        id
+      } = req.body;
+
+      const member = await prisma.members.findMany({
         where: {
-          id: "d3db2051-2b19-4207-8bef-a59074043d47"
+          id: `${id}`
         },
-        data: {
-          phoneNumber: "0729991003"
-        }
       });
-      res.status(200).json({ members: members })
+      res.status(200).json({ member: member });
+      console.log(member)
+
       return {
-        props : { members }
-      }
+        props: { member }
+      };
     } catch (error) {
       console.log(error);
 
@@ -38,5 +39,4 @@ const members = await prisma.members.update({
     });
 }
 
-export default members;
-
+export default register;

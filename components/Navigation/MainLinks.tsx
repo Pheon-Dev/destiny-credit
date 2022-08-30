@@ -103,6 +103,44 @@ export function MainLinks() {
         }}
         label={
           <Text weight={700} size="md">
+            Loans
+          </Text>
+        }
+        icon={<IconCash size={16} stroke={1.5} />}
+        childrenOffset={24}
+      >
+        {loans_data.map((item: any, index: number) => (
+          <Link key={item.url} href={item.url}>
+            <NavLink
+              styles={{
+                root: {
+                  borderRadius: 6,
+                  margin: 2,
+                },
+              }}
+              label={<Text weight={500}>{item.name}</Text>}
+              active={loansActive === index}
+              onClick={() => {
+                setMembersActive(8);
+                setLoansActive(index);
+                setProductsActive(8);
+                setGroupsActive(8);
+                setReportsActive(8);
+                setDashboardActive(false);
+              }}
+            />
+          </Link>
+        ))}
+      </NavLink>
+      <NavLink
+        styles={{
+          root: {
+            borderRadius: 6,
+            margin: 2,
+          },
+        }}
+        label={
+          <Text weight={700} size="md">
             Groups
           </Text>
         }
@@ -162,44 +200,6 @@ export function MainLinks() {
                 setMembersActive(8);
                 setLoansActive(8);
                 setProductsActive(index);
-                setGroupsActive(8);
-                setReportsActive(8);
-                setDashboardActive(false);
-              }}
-            />
-          </Link>
-        ))}
-      </NavLink>
-      <NavLink
-        styles={{
-          root: {
-            borderRadius: 6,
-            margin: 2,
-          },
-        }}
-        label={
-          <Text weight={700} size="md">
-            Loans
-          </Text>
-        }
-        icon={<IconCash size={16} stroke={1.5} />}
-        childrenOffset={24}
-      >
-        {loans_data.map((item: any, index: number) => (
-          <Link key={item.url} href={item.url}>
-            <NavLink
-              styles={{
-                root: {
-                  borderRadius: 6,
-                  margin: 2,
-                },
-              }}
-              label={<Text weight={500}>{item.name}</Text>}
-              active={loansActive === index}
-              onClick={() => {
-                setMembersActive(8);
-                setLoansActive(index);
-                setProductsActive(8);
                 setGroupsActive(8);
                 setReportsActive(8);
                 setDashboardActive(false);
@@ -328,7 +328,7 @@ const loans_data = [
   {
     id: 0,
     name: "New Loan",
-    url: "/loans/create-loan/",
+    url: "/loans/maintenance/",
   },
   {
     id: 1,

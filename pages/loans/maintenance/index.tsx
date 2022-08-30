@@ -1,6 +1,6 @@
 import React from "react";
 
-const CreateLoan = () => {
+const Maintainance = () => {
   console.log("Create Loan Page")
   return (
     <>
@@ -9,6 +9,7 @@ const CreateLoan = () => {
   );
 };
 
-export default CreateLoan;
+export default Maintainance;
+
 
 

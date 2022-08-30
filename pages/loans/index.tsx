@@ -1,12 +1,14 @@
 import React from "react";
 
 const Loans = () => {
-  console.log("Loans Page")
+  console.log("All Loans Page")
   return (
     <>
-      <div>Loans</div>
+      <div>All Loans</div>
     </>
   );
 };
 
 export default Loans;
+
+

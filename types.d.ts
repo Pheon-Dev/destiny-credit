@@ -97,6 +97,7 @@ export interface MainLinkProps {
 export interface Members {
   createdAt?: Date;
   updatedAt?: Date;
+  id?: string;
   date: string;
   branchName: string;
   memberNumber: string;
