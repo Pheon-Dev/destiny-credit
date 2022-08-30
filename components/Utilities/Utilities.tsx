@@ -95,7 +95,7 @@ function StyledTabs(props: TabsProps) {
 
 export const forceReload = async () => {
   try {
-    const res = await axios.get("/api/mpesa");
+    const res = await axios.get("/api/transactions");
     const data = res.data;
     Router.replace(Router.asPath);
 

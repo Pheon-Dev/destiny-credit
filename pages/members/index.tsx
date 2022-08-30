@@ -51,6 +51,7 @@ export const getServerSideProps: GetServerSideProps = async () => {
 
   const prisma = new PrismaClient();
   let data = await prisma.members.findMany();
+
   data = JSON.parse(JSON.stringify(data))
 
   return {

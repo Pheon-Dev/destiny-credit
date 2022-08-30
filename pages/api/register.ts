@@ -1,5 +1,5 @@
 import type { NextApiRequest, NextApiResponse } from "next";
-import { supabase } from "../../lib/supabase";
+/* import { supabase } from "../../lib/supabase"; */
 import { PrismaClient } from "@prisma/client";
 
 async function register(req: NextApiRequest, res: NextApiResponse) {

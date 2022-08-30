@@ -46,7 +46,7 @@ export function TransactionsTable({
 function TransactionRow({ transaction }: { transaction: Transactions }) {
   return (
     <tr>
-      <td>{transaction.id}</td>
+      <td>{transaction.transID}</td>
       <td>
         {transaction.firstName +
           " " +
