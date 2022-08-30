@@ -4,7 +4,7 @@ import axios from "axios";
 import { supabase } from "../../lib/supabase";
 import { z } from "zod";
 import { useForm, zodResolver } from "@mantine/form";
-import { IconCalendar, IconCheck } from "@tabler/icons";
+import { IconAlertCircle, IconCalendar, IconCheck, IconX } from "@tabler/icons";
 import { DatePicker } from "@mantine/dates";
 import {
   LoadingOverlay,
@@ -17,27 +17,37 @@ import {
   Indicator,
 } from "@mantine/core";
 import { TitleText } from "../../components";
-import { Member } from "../../types";
+import { Members } from "../../types";
+import { GetServerSideProps } from "next";
+import { useRouter } from "next/router";
 import { showNotification, updateNotification } from "@mantine/notifications";
 
-export async function getStaticProps() {
-  /* const prisma = new PrismaClient(); */
-  const { data, error } = await supabase
-    .from("members")
-    .select("*")
-    .order("id");
+/* export async function getStaticProps() { */
+/*   const { data, error } = await supabase */
+/*     .from("members") */
+/*     .select("*") */
+/*     .order("id"); */
+/**/
+/**/
+/*   if (error) return console.log({ error: error }); */
+/*   return { */
+/*     props: { */
+/*       members: data, */
+/*     }, */
+/*   }; */
+/* } */
 
-  /* const members = await prisma.members.findMany(); */
+export const getServerSideProps: GetServerSideProps = async () => {
+  const prisma = new PrismaClient();
+  let data = await prisma.members.findMany();
+  data = JSON.parse(JSON.stringify(data));
 
-  if (error) return console.log({ error: error });
   return {
     props: {
       members: data,
-      /* list: members, */
     },
   };
-}
-
+};
 const schema = z.object({
   date: z.date({ required_error: "Enter Todays' Date" }),
   branchName: z.string().min(2, { message: "Enter Branch Name" }),
@@ -89,9 +99,8 @@ const schema = z.object({
   numberKin: z.string().min(2, { message: "Enter  Phone # (kin)" }),
 });
 
-const CreateMember = ({ members }: { members: Member[]; }) => {
-  const [visible, setVisible] = useState(false);
-  // const [ageResult, setAgeResult] = useState(0);
+const CreateMember = ({ members }: { members: Members[] }) => {
+  const router = useRouter();
 
   let lencode: number = members.length + 1;
   let memcode =
@@ -107,17 +116,17 @@ const CreateMember = ({ members }: { members: Member[]; }) => {
   const form = useForm({
     validate: zodResolver(schema),
     initialValues: {
-      date: new Date(),
+      date: "",
       branchName: "Eldoret",
       memberNumber: `${memcode}`,
       firstName: "",
       lastName: "",
-      dob: new Date(),
+      dob: "",
       idPass: "",
       kraPin: "",
       phoneNumber: "",
       gender: "",
-      age: `${0}`,
+      age: "0",
       religion: "",
       maritalStatus: "",
       spouseName: "NA",
@@ -208,128 +217,176 @@ const CreateMember = ({ members }: { members: Member[]; }) => {
     return () => (subscribe = false);
   }, [age_result]);
 
-  /* const handleSave = async (e: FormEvent<HTMLFormElement>) => { */
   const handleSave = async () => {
-    /* e.preventDefault(); */
-    if (
-      (form.values.date &&
-        form.values.branchName &&
-        form.values.memberNumber &&
-        form.values.firstName &&
-        form.values.lastName &&
-        form.values.dob &&
-        form.values.idPass &&
-        form.values.kraPin &&
-        form.values.phoneNumber &&
-        form.values.gender &&
-        form.values.age &&
-        form.values.religion &&
-        form.values.maritalStatus &&
-        form.values.spouseName &&
-        form.values.spouseNumber &&
-        form.values.postalAddress &&
-        form.values.postalCode &&
-        form.values.cityTown &&
-        form.values.residentialAddress &&
-        form.values.emailAddress &&
-        form.values.rentedOwned &&
-        form.values.landCareAgent &&
-        form.values.occupationEmployer &&
-        form.values.employerNumber &&
-        form.values.businessLocation &&
-        form.values.businessAge &&
-        form.values.refereeName &&
-        form.values.refereeNumber &&
-        form.values.communityPosition &&
-        form.values.mpesaCode &&
-        form.values.membershipAmount &&
-        form.values.nameKin &&
-        form.values.relationship &&
-        form.values.residentialAddressKin &&
-        form.values.postalAddressKin &&
-        form.values.postalCodeKin &&
-        form.values.cityTownKin &&
-        form.values.numberKin) ||
-      form.values.group ||
-      form.values.maintained
-    ) {
-      console.log("Writing to Database");
-      const res = await axios.request({
-        method: "POST",
-        url: "/api/register",
-        data: {
-          date: `${dash_today_date}`,
-          branchName: form.values.branchName.toUpperCase(),
-          memberNumber: form.values.memberNumber.toUpperCase(),
-          firstName: form.values.firstName.toUpperCase(),
-          lastName: form.values.lastName.toUpperCase(),
-          dob: `${dash_birth_date}`,
-          idPass: form.values.idPass.toUpperCase(),
-          kraPin: form.values.kraPin.toUpperCase(),
-          phoneNumber: form.values.phoneNumber.toUpperCase(),
-          gender: form.values.gender.toUpperCase(),
-          age: form.values.age.toUpperCase(),
-          religion: form.values.religion.toUpperCase(),
-          maritalStatus: form.values.maritalStatus.toUpperCase(),
-          spouseName: form.values.spouseName.toUpperCase(),
-          spouseNumber: form.values.spouseNumber.toUpperCase(),
-          postalAddress: form.values.postalAddress.toUpperCase(),
-          postalCode: form.values.postalCode.toUpperCase(),
-          cityTown: form.values.cityTown.toUpperCase(),
-          residentialAddress: form.values.residentialAddress.toUpperCase(),
-          emailAddress: form.values.emailAddress.toUpperCase(),
-          rentedOwned: form.values.rentedOwned.toUpperCase(),
-          landCareAgent: form.values.landCareAgent.toUpperCase(),
-          occupationEmployer: form.values.occupationEmployer.toUpperCase(),
-          employerNumber: form.values.employerNumber.toUpperCase(),
-          businessLocation: form.values.businessLocation.toUpperCase(),
-          businessAge: form.values.businessAge.toUpperCase(),
-          refereeName: form.values.refereeName.toUpperCase(),
-          refereeNumber: form.values.refereeNumber.toUpperCase(),
-          communityPosition: form.values.communityPosition.toUpperCase(),
-          mpesaCode: form.values.mpesaCode.toUpperCase(),
-          membershipAmount: form.values.membershipAmount.toUpperCase(),
-          nameKin: form.values.nameKin.toUpperCase(),
-          relationship: form.values.relationship.toUpperCase(),
-          residentialAddressKin:
-            form.values.residentialAddressKin.toUpperCase(),
-          postalAddressKin: form.values.postalAddressKin.toUpperCase(),
-          postalCodeKin: form.values.postalCodeKin.toUpperCase(),
-          cityTownKin: form.values.cityTownKin.toUpperCase(),
-          numberKin: form.values.numberKin.toUpperCase(),
-          group: false,
-          maintained: false,
-        },
-      });
+    try {
+      if (
+        (form.values.date &&
+          form.values.branchName &&
+          form.values.memberNumber &&
+          form.values.firstName &&
+          form.values.lastName &&
+          form.values.dob &&
+          form.values.idPass &&
+          form.values.kraPin &&
+          form.values.phoneNumber &&
+          form.values.gender &&
+          form.values.age &&
+          form.values.religion &&
+          form.values.maritalStatus &&
+          form.values.spouseName &&
+          form.values.spouseNumber &&
+          form.values.postalAddress &&
+          form.values.postalCode &&
+          form.values.cityTown &&
+          form.values.residentialAddress &&
+          form.values.emailAddress &&
+          form.values.rentedOwned &&
+          form.values.landCareAgent &&
+          form.values.occupationEmployer &&
+          form.values.employerNumber &&
+          form.values.businessLocation &&
+          form.values.businessAge &&
+          form.values.refereeName &&
+          form.values.refereeNumber &&
+          form.values.communityPosition &&
+          form.values.mpesaCode &&
+          form.values.membershipAmount &&
+          form.values.nameKin &&
+          form.values.relationship &&
+          form.values.residentialAddressKin &&
+          form.values.postalAddressKin &&
+          form.values.postalCodeKin &&
+          form.values.cityTownKin &&
+          form.values.numberKin) ||
+        form.values.group ||
+        form.values.maintained
+      ) {
+        const res = await axios.request({
+          method: "POST",
+          url: "/api/register",
+          data: {
+            date: `${dash_today_date}`,
+            branchName: form.values.branchName.toUpperCase(),
+            memberNumber: form.values.memberNumber.toUpperCase(),
+            firstName: form.values.firstName.toUpperCase(),
+            lastName: form.values.lastName.toUpperCase(),
+            dob: `${dash_birth_date}`,
+            idPass: form.values.idPass.toUpperCase(),
+            kraPin: form.values.kraPin.toUpperCase(),
+            phoneNumber: form.values.phoneNumber.toUpperCase(),
+            gender: form.values.gender.toUpperCase(),
+            age: form.values.age.toUpperCase(),
+            religion: form.values.religion.toUpperCase(),
+            maritalStatus: form.values.maritalStatus.toUpperCase(),
+            spouseName: form.values.spouseName.toUpperCase(),
+            spouseNumber: form.values.spouseNumber.toUpperCase(),
+            postalAddress: form.values.postalAddress.toUpperCase(),
+            postalCode: form.values.postalCode.toUpperCase(),
+            cityTown: form.values.cityTown.toUpperCase(),
+            residentialAddress: form.values.residentialAddress.toUpperCase(),
+            emailAddress: form.values.emailAddress.toUpperCase(),
+            rentedOwned: form.values.rentedOwned.toUpperCase(),
+            landCareAgent: form.values.landCareAgent.toUpperCase(),
+            occupationEmployer: form.values.occupationEmployer.toUpperCase(),
+            employerNumber: form.values.employerNumber.toUpperCase(),
+            businessLocation: form.values.businessLocation.toUpperCase(),
+            businessAge: form.values.businessAge.toUpperCase(),
+            refereeName: form.values.refereeName.toUpperCase(),
+            refereeNumber: form.values.refereeNumber.toUpperCase(),
+            communityPosition: form.values.communityPosition.toUpperCase(),
+            mpesaCode: form.values.mpesaCode.toUpperCase(),
+            membershipAmount: form.values.membershipAmount.toUpperCase(),
+            nameKin: form.values.nameKin.toUpperCase(),
+            relationship: form.values.relationship.toUpperCase(),
+            residentialAddressKin:
+              form.values.residentialAddressKin.toUpperCase(),
+            postalAddressKin: form.values.postalAddressKin.toUpperCase(),
+            postalCodeKin: form.values.postalCodeKin.toUpperCase(),
+            cityTownKin: form.values.cityTownKin.toUpperCase(),
+            numberKin: form.values.numberKin.toUpperCase(),
+            group: false,
+            maintained: false,
+          },
+        });
 
-      return setTimeout(() => {
+        local_today_date = "";
+        local_birth_date = "";
+        form.setFieldValue("date", "");
+        form.setFieldValue("branchName", "");
+        form.setFieldValue("memberNumber", "");
+        form.setFieldValue("firstName", "");
+        form.setFieldValue("lastName", "");
+        form.setFieldValue("dob", "");
+        form.setFieldValue("idPass", "");
+        form.setFieldValue("kraPin", "");
+        form.setFieldValue("phoneNumber", "");
+        form.setFieldValue("gender", "");
+        form.setFieldValue("age", "");
+        form.setFieldValue("religion", "");
+        form.setFieldValue("maritalStatus", "");
+        form.setFieldValue("spouseName", "");
+        form.setFieldValue("spouseNumber", "");
+        form.setFieldValue("postalAddress", "");
+        form.setFieldValue("postalCode", "");
+        form.setFieldValue("cityTown", "");
+        form.setFieldValue("residentialAddress", "");
+        form.setFieldValue("emailAddress", "");
+        form.setFieldValue("rentedOwned", "");
+        form.setFieldValue("landCareAgent", "");
+        form.setFieldValue("occupationEmployer", "");
+        form.setFieldValue("employerNumber", "");
+        form.setFieldValue("businessLocation", "");
+        form.setFieldValue("businessAge", "");
+        form.setFieldValue("refereeName", "");
+        form.setFieldValue("refereeNumber", "");
+        form.setFieldValue("communityPosition", "");
+        form.setFieldValue("mpesaCode", "");
+        form.setFieldValue("membershipAmount", "");
+        form.setFieldValue("nameKin", "");
+        form.setFieldValue("relationship", "");
+        form.setFieldValue("residentialAddressKin", "");
+        form.setFieldValue("postalAddressKin", "");
+        form.setFieldValue("postalCodeKin", "");
+        form.setFieldValue("cityTownKin", "");
+        form.setFieldValue("numberKin", "");
+        form.setFieldValue("group", false);
+        form.setFieldValue("maintained", false);
+
+        setTimeout(() => {
+          updateNotification({
+            id: "submit",
+            color: "teal",
+            title: `${res.data.firstname} ${res.data.lastName}`,
+            message: "Member Registered Successfully!",
+            icon: <IconCheck size={16} />,
+            autoClose: 5000,
+          });
+        }, 2000);
+        return router.push("/members");
+      }
+      setTimeout(() => {
         updateNotification({
           id: "submit",
-          color: "teal",
-          title: `${res.data.firstname} ${res.data.lastName}`,
-          message: "Member Registered Successfully!",
-          icon: <IconCheck size={16} />,
-          autoClose: 2000,
+          title: "Error Writing to Database",
+          message: "Please Try Again!",
+          color: "red",
+          icon: <IconAlertCircle size={16} />,
+          autoClose: 5000,
         });
-        setVisible(false);
+      }, 2000);
+    } catch (error) {
+      setTimeout(() => {
+        updateNotification({
+          id: "submit",
+          title: "Missing Fields",
+          message: `${error}. Highlighted Fields are missing!`,
+          color: "red",
+          icon: <IconX size={16} />,
+          autoClose: 5000,
+        });
       }, 2000);
     }
-    setVisible(false);
-    console.log("Failed Write to Database");
-    return setTimeout(() => {
-      updateNotification({
-        id: "submit",
-        title: "Missing Fields",
-        message: "Highlighted Fields are missing!",
-        color: "red",
-        icon: <IconCheck size={16} />,
-        autoClose: 2000,
-      });
-    }, 2000);
   };
-  // console.log(form.values.date)
-  // console.log(form.values.dob)
-  // console.log(form.values.age)
 
   return (
     <form
@@ -340,9 +397,6 @@ const CreateMember = ({ members }: { members: Member[]; }) => {
     //         });
     //     }}
     >
-      <div style={{ width: 400, position: "relative" }}>
-        <LoadingOverlay visible={visible} overlayBlur={2} />
-      </div>
       <Group position="center" m="md">
         <TitleText title="Member Registration" />
       </Group>
@@ -854,8 +908,8 @@ const CreateMember = ({ members }: { members: Member[]; }) => {
           variant="outline"
           onClick={() => {
             form.setFieldValue("memberNumber", `${memcode}`);
-            form.setFieldValue("date", new Date(local_today_date));
-            form.setFieldValue("dob", new Date(local_birth_date));
+            form.setFieldValue("date", `${new Date(local_today_date)}`);
+            form.setFieldValue("dob", `${new Date(local_birth_date)}`);
             {
               form.values.maritalStatus !== "married"
                 ? null
@@ -880,7 +934,6 @@ const CreateMember = ({ members }: { members: Member[]; }) => {
             form.setFieldValue("group", false);
             form.setFieldValue("maintained", false);
             form.validate();
-            setVisible((prev) => !prev);
             showNotification({
               id: "submit",
               title: "Member Registration",

@@ -12,11 +12,25 @@ datasource db {
   referentialIntegrity = "prisma"
 }
 
+model User {
+  id        String   @id @default(uuid())
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+  email     String
+  username  String
+  userId    String
+  role      Role     @default(BASIC)
+
+  @@unique([username, userId, email])
+  @@index(id)
+}
+
 model Members {
   id                    String   @id @default(uuid())
   createdAt             DateTime @default(now())
   updatedAt             DateTime @updatedAt
   date                  String?
+  registeredBy          String?
   branchName            String?
   memberNumber          String?
   firstName             String?
@@ -79,4 +93,9 @@ model Transactions {
   lastName          String?
 
   @@index(id)
+}
+
+enum Role {
+  BASIC
+  ADMIN
 }
