@@ -1,11 +1,13 @@
 import type { NextApiRequest, NextApiResponse } from "next";
 import formidable from "formidable";
 import { Fields } from "../../types";
+import { PrismaClient } from "@prisma/client";
 
 export default async function confirm(
   req: NextApiRequest,
   res: NextApiResponse
 ) {
+  const prisma = new PrismaClient();
   try {
     res.status(200).json({
       ResultCode: 0,
@@ -34,10 +36,27 @@ export default async function confirm(
           middleName: fields.MiddleName,
           lastName: fields.LastName,
         });
+        prisma.transactions.create({
+          data: {
+            transactionType: fields.TransactionType,
+            transID: fields.TransID,
+            transTime: fields.TransTime,
+            transAmount: fields.TransAmount,
+            businessShortCode: fields.BusinessShortCode,
+            billRefNumber: fields.BillRefNumber,
+            invoiceNumber: fields.InvoiceNumber,
+            orgAccountBalance: fields.OrgAccountBalance,
+            thirdPartyTransID: fields.ThirdPartyTransID,
+            msisdn: fields.MSISDN,
+            firstName: fields.FirstName,
+            middleName: fields.MiddleName,
+            lastName: fields.LastName,
+          },
+        });
         console.log(result);
       });
     });
-    // const body = JSON.stringify(data);
+    /* const body = JSON.stringify(data); */
     // console.log(body);
   } catch (error) {
     console.log(error);

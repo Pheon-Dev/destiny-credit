@@ -20,14 +20,15 @@ import { TitleText, MembersTable } from "../../components";
 import { Members } from "../../types";
 import { showNotification, updateNotification } from "@mantine/notifications";
 import { GetServerSideProps } from "next";
+import useSWR from "swr";
 
-const MembersList = ({ members }: { members: any }) => {
-  console.log(members);
+const MembersList = ({ data }: { data: Members[] }) => {
+  console.log(data);
   return (
     <>
       <div>
-      <Text>Members List</Text>
-        {/* <MembersTable members={members} /> */}
+        <Text>Members List</Text>
+        <MembersTable members={data} />
       </div>
     </>
   );
@@ -41,17 +42,20 @@ export const getServerSideProps: GetServerSideProps = async () => {
 
   /* if (error) return console.log({ error: error }); */
 
-  const res = await axios.request({
-    method: "GET",
-    /* url: "https://destiny-credit.vercel.app/api/members", */
-    url: "/api/members",
-  });
+  /* const res = await axios.request({ */
+  /*   method: "GET", */
+  /*   url: "/api/members", */
+  /* }); */
+  /**/
+  /* const data = res.data; */
 
-  const data = res.data;
+  const prisma = new PrismaClient();
+  let data = await prisma.members.findMany();
+  data = JSON.parse(JSON.stringify(data))
 
   return {
     props: {
-      members: data,
+      data,
     },
   };
 };

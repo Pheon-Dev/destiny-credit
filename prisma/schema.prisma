@@ -2,7 +2,7 @@
 // learn more about it in the docs: https://pris.ly/d/prisma-schema
 
 generator client {
-  provider       = "prisma-client-js"
+  provider        = "prisma-client-js"
   previewFeatures = ["referentialIntegrity"]
 }
 
@@ -13,7 +13,7 @@ datasource db {
 }
 
 model Members {
-  id                    Int      @id @default(autoincrement())
+  id                    String   @id @default(uuid())
   createdAt             DateTime @default(now())
   updatedAt             DateTime @updatedAt
   date                  String?
@@ -54,14 +54,14 @@ model Members {
   postalCodeKin         String?
   cityTownKin           String?
   numberKin             String?
-  group                 Boolean  @default(false)
-  maintained            Boolean  @default(false)
+  group                 Boolean? @default(false)
+  maintained            Boolean? @default(false)
 
   @@index(id)
 }
 
 model Transactions {
-  id                Int      @id @default(autoincrement())
+  id                String   @id @default(uuid())
   createdAt         DateTime @default(now())
   updatedAt         DateTime @updatedAt
   transactionType   String?
