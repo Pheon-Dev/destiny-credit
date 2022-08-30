@@ -68,8 +68,8 @@ export default async function handler(
       const log = response.data;
 
       if (log.data.length > 0) {
-        let counter: number = log.data.length;
-        while (counter !== 0) {
+        let counter: number = 0;
+        while (counter < log.data.length) {
           const data_res: string = log.data[counter]?.message
             .split("{")[1]
             .split("}")[0];
@@ -179,11 +179,11 @@ export default async function handler(
               ]);
             }
 
-            counter--;
+            counter++;
           }
 
           if (data.length !== 0) {
-            counter--;
+            counter++;
           }
         }
       }
