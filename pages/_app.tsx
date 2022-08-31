@@ -76,8 +76,8 @@ export default function App(props: AppProps & { colorScheme: ColorScheme }) {
                   hiddenBreakpoint="sm"
                   hidden={!opened}
                   // height={500}
-                  // width={{ base: 300 }}
-                  width={{ lg: 200, sm: 170 }}
+                  /* width={{ base: 200 }} */
+                  width={{ lg: 200, sm: 180 }}
                 >
                   <Navbar.Section grow component={ScrollArea} mx="-xs" px="xs" mt="xs">
                     <MainLinks />

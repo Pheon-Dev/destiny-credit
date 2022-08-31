@@ -10,7 +10,7 @@ async function register(req: NextApiRequest, res: NextApiResponse) {
       const {
         date,
         branchName,
-        memberNumber,
+        memberId,
         firstName,
         lastName,
         dob,
@@ -54,7 +54,7 @@ async function register(req: NextApiRequest, res: NextApiResponse) {
         data: {
           date: date,
           branchName: branchName,
-          memberNumber: memberNumber,
+          memberId: memberId,
           firstName: firstName,
           lastName: lastName,
           dob: dob,

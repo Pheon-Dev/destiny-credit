@@ -102,7 +102,7 @@ export interface Members {
   id?: string;
   date: string;
   branchName: string;
-  memberNumber: string;
+  memberId: string;
   firstName: string;
   lastName: string;
   dob: string;
@@ -149,7 +149,7 @@ export interface MemberProps extends SelectItemProps {
   id?: string;
   date: string;
   branchName: string;
-  memberNumber: string;
+  memberId: string;
   firstName: string;
   lastName: string;
   dob: string;

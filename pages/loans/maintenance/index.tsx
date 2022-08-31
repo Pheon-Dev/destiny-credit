@@ -17,11 +17,11 @@ const Maintainance = ({ data }: { data: Members[] }) => {
   const members = data.map((item) => ({ ...item, value: item.firstName + " " + item.lastName }));
 
   const AutoCompleteItem = forwardRef<HTMLDivElement, MemberProps>(
-    ({ firstName, lastName, memberNumber, ...others }: MemberProps, ref) => (
+    ({ firstName, lastName, memberId, ...others }: MemberProps, ref) => (
       <div ref={ref} {...others}>
         <Group noWrap>
           <div>
-            <Text>{memberNumber}: {firstName} {lastName}</Text>
+            <Text>{memberId}: {firstName} {lastName}</Text>
           </div>
         </Group>
       </div>

@@ -20,6 +20,7 @@ export function MainLinks() {
 
   return (
     <Box>
+    {/* <Box sx={{width: 200}}> */}
       <NavLink
         styles={{
           root: {

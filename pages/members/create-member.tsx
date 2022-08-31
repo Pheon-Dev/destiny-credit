@@ -51,7 +51,7 @@ export const getServerSideProps: GetServerSideProps = async () => {
 const schema = z.object({
   date: z.date({ required_error: "Enter Todays' Date" }),
   branchName: z.string().min(2, { message: "Enter Branch Name" }),
-  memberNumber: z.string().min(2, { message: "Enter Member Number" }),
+  memberId: z.string().min(2, { message: "Enter Member Number" }),
   firstName: z.string().min(2, { message: "Enter First Name" }),
   lastName: z.string().min(2, { message: "Enter Last Name" }),
   dob: z.date({ required_error: "Enter Date of Birth" }),
@@ -118,7 +118,7 @@ const CreateMember = ({ members }: { members: Members[] }) => {
     initialValues: {
       date: "",
       branchName: "Eldoret",
-      memberNumber: `${memcode}`,
+      memberId: `${memcode}`,
       firstName: "",
       lastName: "",
       dob: "",
@@ -222,7 +222,7 @@ const CreateMember = ({ members }: { members: Members[] }) => {
       if (
         (form.values.date &&
           form.values.branchName &&
-          form.values.memberNumber &&
+          form.values.memberId &&
           form.values.firstName &&
           form.values.lastName &&
           form.values.dob &&
@@ -267,7 +267,7 @@ const CreateMember = ({ members }: { members: Members[] }) => {
           data: {
             date: `${dash_today_date}`,
             branchName: form.values.branchName.toUpperCase(),
-            memberNumber: form.values.memberNumber.toUpperCase(),
+            memberId: form.values.memberId.toUpperCase(),
             firstName: form.values.firstName.toUpperCase(),
             lastName: form.values.lastName.toUpperCase(),
             dob: `${dash_birth_date}`,
@@ -313,7 +313,7 @@ const CreateMember = ({ members }: { members: Members[] }) => {
         local_birth_date = "";
         form.setFieldValue("date", "");
         form.setFieldValue("branchName", "");
-        form.setFieldValue("memberNumber", "");
+        form.setFieldValue("memberId", "");
         form.setFieldValue("firstName", "");
         form.setFieldValue("lastName", "");
         form.setFieldValue("dob", "");
@@ -440,7 +440,7 @@ const CreateMember = ({ members }: { members: Members[] }) => {
           <TextInput
             label="Member Number"
             placeholder="Member Number"
-            {...form.getInputProps("memberNumber")}
+            {...form.getInputProps("memberId")}
             disabled
           />
         </Grid.Col>
@@ -907,7 +907,7 @@ const CreateMember = ({ members }: { members: Members[] }) => {
           // type="submit"
           variant="outline"
           onClick={() => {
-            form.setFieldValue("memberNumber", `${memcode}`);
+            form.setFieldValue("memberId", `${memcode}`);
             form.setFieldValue("date", `${new Date(local_today_date)}`);
             form.setFieldValue("dob", `${new Date(local_birth_date)}`);
             {

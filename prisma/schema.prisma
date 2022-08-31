@@ -1,5 +1,6 @@
 // This is your Prisma schema file,
 // learn more about it in the docs: https://pris.ly/d/prisma-schema
+// https://excalidraw.com/#json=UlTwQ8RuSsDuHzC2ZT1Hs,rLKqjYar2u0RTqAcPzBZ-Q
 
 generator client {
   provider        = "prisma-client-js"
@@ -12,90 +13,205 @@ datasource db {
   referentialIntegrity = "prisma"
 }
 
-model User {
-  id        String   @id @default(uuid())
-  createdAt DateTime @default(now())
-  updatedAt DateTime @updatedAt
-  email     String
-  username  String
-  userId    String
-  role      Role     @default(BASIC)
+model Account {
+  id                       String   @id @default(cuid())
+  createdAt                DateTime @default(now())
+  updatedAt                DateTime @updatedAt
+  userId                   String
+  type                     String
+  provider                 String
+  providerAccountId        String
+  refresh_token            String?  @db.Text
+  access_token             String?  @db.Text
+  refresh_token_expires_in Int?
+  expires_at               Int?
+  token_type               String?
+  scope                    String?
+  id_token                 String?  @db.Text
+  session_state            String?
+  oauth_token_secret       String?
+  oauth_token              String?
 
-  @@unique([username, userId, email])
+  user User @relation(fields: [userId], references: [id], onDelete: Cascade)
+
+  @@unique([provider, providerAccountId])
+}
+
+model Session {
+  id           String   @id @default(cuid())
+  sessionToken String   @unique
+  expires      DateTime
+  user         User     @relation(fields: [userId], references: [id], onDelete: Cascade)
+  userId       String
+}
+
+model User {
+  id            String     @id @default(cuid())
+  createdAt     DateTime   @default(now())
+  updatedAt     DateTime   @updatedAt
+  name          String?
+  email         String?    @unique
+  password      String?
+  emailVerified DateTime?
+  image         String?
+  accounts      Account[]
+  sessions      Session[]
+  loans         Loans[]
+  members       Members[]
+  products      Products[]
+  payments      Payments[]
+  role          Role       @default(USER)
+}
+
+model VerificationToken {
+  identifier String
+  token      String   @unique
+  expires    DateTime
+
+  @@unique([identifier, token])
+}
+
+// model Profile {
+//   id        String   @id @default(uuid())
+//   bio  String @db.Text
+//     user User @relation(fields: [userId], references: [id], onDelete: Cascade)
+//   userId      Int @unique
+//
+//   @@index(id)
+// }
+
+model Members {
+  id                    String    @id @default(uuid())
+  createdAt             DateTime  @default(now())
+  updatedAt             DateTime  @updatedAt
+  date                  String
+  branchName            String
+  firstName             String
+  lastName              String
+  dob                   String
+  idPass                String
+  kraPin                String
+  phoneNumber           String
+  gender                String
+  age                   String
+  religion              String
+  maritalStatus         String
+  spouseName            String
+  spouseNumber          String
+  postalAddress         String
+  postalCode            String
+  cityTown              String
+  residentialAddress    String
+  emailAddress          String
+  rentedOwned           String
+  landCareAgent         String
+  occupationEmployer    String
+  employerNumber        String
+  businessLocation      String
+  businessAge           String
+  refereeName           String
+  refereeNumber         String
+  communityPosition     String
+  mpesaCode             String
+  membershipAmount      String
+  nameKin               String
+  relationship          String
+  residentialAddressKin String
+  postalAddressKin      String
+  postalCodeKin         String
+  cityTownKin           String
+  numberKin             String
+  loans                 Loans[]
+  group                 Boolean   @default(false)
+  ratings               Int       @default(0)
+  maintained            Boolean   @default(false)
+  User                  User?     @relation(fields: [memberId], references: [id])
+  memberId              String
+  Payments              Payments? @relation(fields: [paymentsId], references: [id])
+  paymentsId            String?
+
   @@index(id)
 }
 
-model Members {
-  id                    String   @id @default(uuid())
-  createdAt             DateTime @default(now())
-  updatedAt             DateTime @updatedAt
-  date                  String?
-  registeredBy          String?
-  branchName            String?
-  memberNumber          String?
-  firstName             String?
-  lastName              String?
-  dob                   String?
-  idPass                String?
-  kraPin                String?
-  phoneNumber           String?
-  gender                String?
-  age                   String?
-  religion              String?
-  maritalStatus         String?
-  spouseName            String?
-  spouseNumber          String?
-  postalAddress         String?
-  postalCode            String?
-  cityTown              String?
-  residentialAddress    String?
-  emailAddress          String?
-  rentedOwned           String?
-  landCareAgent         String?
-  occupationEmployer    String?
-  employerNumber        String?
-  businessLocation      String?
-  businessAge           String?
-  refereeName           String?
-  refereeNumber         String?
-  communityPosition     String?
-  mpesaCode             String?
-  membershipAmount      String?
-  nameKin               String?
-  relationship          String?
-  residentialAddressKin String?
-  postalAddressKin      String?
-  postalCodeKin         String?
-  cityTownKin           String?
-  numberKin             String?
-  group                 Boolean? @default(false)
-  maintained            Boolean? @default(false)
+model Products {
+  id             String   @id @default(uuid())
+  createdAt      DateTime @default(now())
+  updatedAt      DateTime @updatedAt
+  productId      String
+  productName    String
+  minimumRange   String
+  maximumRange   String
+  interestRate   String
+  frequency      String
+  maximumTenure  String
+  repaymentCycle String
+  processingFee  String
+  gracePeriod    String
+  penaltyRate    String
+  penaltyCharge  String
+  approved       Boolean  @default(false)
+  penaltyPayment String
+  user           User?    @relation(fields: [productId], references: [id])
+
+  @@index(id)
+}
+
+model Loans {
+  id          String     @id @default(uuid())
+  createdAt   DateTime   @default(now())
+  updatedAt   DateTime   @updatedAt
+  startDate   String
+  endDate     String
+  maintained  Boolean    @default(false)
+  approved    Boolean    @default(false)
+  disbursed   Boolean    @default(false)
+  member      Members[]
+  product     String
+  loanPayment Payments[]
+  user        User?      @relation(fields: [loanId], references: [id])
+  loanId      String
+
+  @@index(id)
+}
+
+model Payments {
+  id             String         @id @default(uuid())
+  createdAt      DateTime       @default(now())
+  updatedAt      DateTime       @updatedAt
+  paymentId      String
+  Loans          Loans[]
+  member         Members[]
+  transactions   Transactions[]
+  user           User?          @relation(fields: [paymentId], references: [id])
+  transactionsId String
 
   @@index(id)
 }
 
 model Transactions {
-  id                String   @id @default(uuid())
-  createdAt         DateTime @default(now())
-  updatedAt         DateTime @updatedAt
-  transactionType   String?
-  transID           String?
-  transTime         String?
-  transAmount       String?
-  businessShortCode String?
-  billRefNumber     String?
-  invoiceNumber     String?
-  orgAccountBalance String?
-  thirdPartyTransID String?
-  msisdn            String?
-  firstName         String?
-  middleName        String?
-  lastName          String?
+  id                String    @id @default(uuid())
+  createdAt         DateTime  @default(now())
+  updatedAt         DateTime  @updatedAt
+  transactionType   String
+  transID           String
+  transTime         String
+  transAmount       String
+  businessShortCode String
+  billRefNumber     String
+  invoiceNumber     String
+  orgAccountBalance String
+  thirdPartyTransID String
+  msisdn            String
+  firstName         String
+  middleName        String
+  lastName          String
+  Payments          Payments? @relation(fields: [paymentsId], references: [id])
+  paymentsId        String?
 
   @@index(id)
 }
 
 enum Role {
-  BASIC
+  USER
   ADMIN
 }

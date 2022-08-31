@@ -19,7 +19,7 @@ export function MembersTable({ members }: { members: Members[] }) {
         </thead>
         <tbody>
           {members?.map((member) => (
-            <MemberRow key={member.memberNumber} member={member} />
+            <MemberRow key={member.memberId} member={member} />
           ))}
         </tbody>
         <tfoot>
@@ -48,7 +48,7 @@ function MemberRow({ member }: { member: Members }) {
           : router.push("/loans/maintenance")
       }
     >
-      <td>{member.memberNumber}</td>
+      <td>{member.memberId}</td>
       <td>{member.firstName + " " + member.lastName}</td>
       <td>{member.phoneNumber}</td>
       <td>{member.idPass}</td>
