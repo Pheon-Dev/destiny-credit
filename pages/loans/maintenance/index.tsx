@@ -8,7 +8,7 @@ import {
   Text,
 } from "@mantine/core";
 
-const Maintenance = ({ data }: { data: Members[] }) => {
+export default function Maintenance({ data }: { data: Members[] }) {
   const [member, setMember] = useState('');
 
   const members = data.map((item) => ({ ...item, value: item.firstName + " " + item.lastName }));
@@ -57,6 +57,3 @@ export const getServerSideProps: GetServerSideProps = async () => {
   };
 };
 
-Maintenance.displayName = "Maintenance"
-
-export default Maintenance;
