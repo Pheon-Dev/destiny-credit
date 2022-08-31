@@ -8,6 +8,7 @@ import {
   IconBrandAsana,
 } from "@tabler/icons";
 import { Box, NavLink, Text } from "@mantine/core";
+import { NavLink as Linker } from "react-router-dom";
 import Link from "next/link";
 
 export function MainLinks() {
@@ -36,7 +37,6 @@ export function MainLinks() {
         icon={<IconHome size={16} stroke={1.5} />}
         childrenOffset={24}
       >
-        <Link href="/">
           <NavLink
             styles={{
               root: {
@@ -55,7 +55,6 @@ export function MainLinks() {
               setDashboardActive(true);
             }}
           />
-        </Link>
       </NavLink>
       <NavLink
         styles={{
