@@ -1,6 +1,6 @@
 import React, { forwardRef, useState } from "react";
 import { PrismaClient } from "@prisma/client";
-import { Members, MemberProps } from "../../../types";
+import { Members, MemberProps } from "../../types";
 import { GetServerSideProps } from "next";
 import {
   Autocomplete,
