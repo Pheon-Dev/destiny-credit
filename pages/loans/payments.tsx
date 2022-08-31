@@ -1,6 +1,6 @@
 import React from "react";
 
-const Payments = () => {
+const Page = () => {
   console.log("Payments Page")
   return (
     <>
@@ -9,6 +9,5 @@ const Payments = () => {
   );
 };
 
-Payments.displayName = "Payments"
-export default Payments;
+export default Page;
 

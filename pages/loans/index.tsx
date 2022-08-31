@@ -1,6 +1,6 @@
 import React from "react";
 
-const Loans = () => {
+const Page = () => {
   console.log("All Loans Page")
   return (
     <>
@@ -9,7 +9,6 @@ const Loans = () => {
   );
 };
 
-Loans.displayName = "Loans"
-export default Loans;
+export default Page;
 
 

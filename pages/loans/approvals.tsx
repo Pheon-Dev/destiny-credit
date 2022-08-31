@@ -1,6 +1,6 @@
 import React from "react";
 
-const Approvals = () => {
+const Page = () => {
   console.log("Approvals Page")
   return (
     <>
@@ -8,5 +8,4 @@ const Approvals = () => {
     </>
   );
 };
-Approvals.displayName = "Approvals"
-export default Approvals;
+export default Page;

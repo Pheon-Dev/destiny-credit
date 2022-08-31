@@ -1,6 +1,6 @@
 import React from "react";
 
-const Disburse = () => {
+const Page = () => {
   console.log("Disburse Page")
   return (
     <>
@@ -9,4 +9,4 @@ const Disburse = () => {
   );
 };
 
-export default Disburse;
+export default Page;

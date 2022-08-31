@@ -1,6 +1,6 @@
 import React from "react";
 
-const Approve = () => {
+const Page = () => {
   console.log("Approve Page")
   return (
     <>
@@ -9,4 +9,4 @@ const Approve = () => {
   );
 };
 
-export default Approve;
+export default Page;

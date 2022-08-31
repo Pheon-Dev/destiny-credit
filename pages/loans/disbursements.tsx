@@ -1,6 +1,6 @@
 import React from "react";
 
-const Disbursements = () => {
+const Page = () => {
   console.log("Disbursements Page")
   return (
     <>
@@ -9,6 +9,5 @@ const Disbursements = () => {
   );
 };
 
-Disbursements.displayName = "Disbursements"
-export default Disbursements;
+export default Page;
 
