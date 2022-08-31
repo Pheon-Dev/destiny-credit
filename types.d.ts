@@ -1,3 +1,5 @@
+import { SelectItemProps } from "@mantine/core";
+
 export interface Video {
   caption: string;
   video: {
@@ -140,13 +142,17 @@ export interface Members {
   group?: boolean;
 }
 
-export interface Member {
+export interface MemberProps extends SelectItemProps {
+  color: MantineColor;
+  createdAt?: Date;
+  updatedAt?: Date;
+  id?: string;
   date: string;
   branchName: string;
   memberNumber: string;
   firstName: string;
   lastName: string;
-  dob: Date;
+  dob: string;
   idPass: string;
   kraPin: string;
   phoneNumber: string;
@@ -179,6 +185,6 @@ export interface Member {
   postalCodeKin: string;
   cityTownKin: string;
   numberKin: string;
-  maintained?: boolean;
-  group?: boolean;
+  maintained: boolean;
+  group: boolean;
 }

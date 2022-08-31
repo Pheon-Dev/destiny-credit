@@ -17,7 +17,6 @@ async function register(req: NextApiRequest, res: NextApiResponse) {
         },
       });
       res.status(200).json({ member: member });
-      console.log(member)
 
       return {
         props: { member }

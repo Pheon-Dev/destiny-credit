@@ -1,15 +1,12 @@
 import React, { useEffect, useState } from "react";
 import { Text } from "@mantine/core";
 import axios from "axios";
-import { GetServerSideProps } from "next";
 import { useRouter } from "next/router";
-import { Members } from "../../types";
-import { PrismaClient } from "@prisma/client";
 
-const MemberDetail = ({ data }: { data: Members[] }) => {
+const MemberDetail = () => {
   const [member, setMember] = useState();
   const router = useRouter();
-  const id = router.query.id as string;
+  const id = router.query.member as string;
 
   const fetchMember = async () => {
     let subscribe = true;
@@ -39,17 +36,6 @@ const MemberDetail = ({ data }: { data: Members[] }) => {
       <Text>MemberDetail :</Text>
     </>
   );
-};
-
-export const getServerSideProps: GetServerSideProps = async () => {
-  const prisma = new PrismaClient();
-  let data = await prisma.members.findMany();
-  data = JSON.parse(JSON.stringify(data));
-  return {
-    props: {
-      data,
-    },
-  };
 };
 
 export default MemberDetail;

@@ -41,8 +41,12 @@ function MemberRow({ member }: { member: Members }) {
   const router = useRouter();
   return (
     <tr
-    style={{cursor: "pointer"}}
-    onClick={() => router.push(`/members/${member.id}`)}
+      style={{ cursor: "pointer" }}
+      onClick={() =>
+        member.maintained
+          ? router.push(`/members/${member.id}`)
+          : router.push("/loans/maintenance")
+      }
     >
       <td>{member.memberNumber}</td>
       <td>{member.firstName + " " + member.lastName}</td>
@@ -52,23 +56,27 @@ function MemberRow({ member }: { member: Members }) {
       <td>
         {member.maintained ? (
           <Badge
-          variant="gradient"
-          gradient={{
-              from: 'teal',
-              to: 'lime'
+            style={{ cursor: "pointer" }}
+            onClick={() => router.push(`/members/${member.id}`)}
+            variant="gradient"
+            gradient={{
+              from: "teal",
+              to: "lime",
             }}
           >
-          Maintained
+            Maintained
           </Badge>
         ) : (
           <Badge
-          variant="gradient"
-          gradient={{
-              from: 'indigo',
-              to: 'cyan'
+            style={{ cursor: "pointer" }}
+            onClick={() => router.push("/loans/maintenance")}
+            variant="gradient"
+            gradient={{
+              from: "indigo",
+              to: "cyan",
             }}
           >
-          Maintain
+            Maintain
           </Badge>
         )}
       </td>

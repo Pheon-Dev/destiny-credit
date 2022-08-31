@@ -1,15 +1,63 @@
-import React from "react";
+import React, { forwardRef, useState } from "react";
+import { PrismaClient } from "@prisma/client";
+import { Members, MemberProps } from "../../../types";
+import { GetServerSideProps } from "next";
+import {
+  Autocomplete,
+  Avatar,
+  Group,
+  MantineColor,
+  SelectItemProps,
+  Text,
+} from "@mantine/core";
 
-const Maintainance = () => {
-  console.log("Create Loan Page")
+const Maintainance = ({ data }: { data: Members[] }) => {
+  const [member, setMember] = useState('');
+
+  const members = data.map((item) => ({ ...item, value: item.firstName + " " + item.lastName }));
+
+  const AutoCompleteItem = forwardRef<HTMLDivElement, MemberProps>(
+    ({ firstName, lastName, memberNumber, ...others }: MemberProps, ref) => (
+      <div ref={ref} {...others}>
+        <Group noWrap>
+          <div>
+            <Text>{memberNumber}: {firstName} {lastName}</Text>
+          </div>
+        </Group>
+      </div>
+    )
+  );
+  /* console.log(members) */
   return (
-    <>
-      <div>Create Loan</div>
-    </>
+      <>
+      <Autocomplete
+        label="Select Customer"
+        placeholder="Select Customer"
+        itemComponent={AutoCompleteItem}
+        data={members}
+        value={member}
+        onChange={setMember}
+        filter={(value, item) =>
+          item.value.toLowerCase().includes(value.toLowerCase().trim()) ||
+          item.firstName.toLowerCase().includes(value.toLowerCase().trim())
+        }
+      />
+      </>
   );
 };
 
+export const getServerSideProps: GetServerSideProps = async () => {
+  const prisma = new PrismaClient();
+
+  let data = await prisma.members.findMany();
+
+  data = JSON.parse(JSON.stringify(data));
+
+  return {
+    props: {
+      data,
+    },
+  };
+};
+
 export default Maintainance;
-
-
-
