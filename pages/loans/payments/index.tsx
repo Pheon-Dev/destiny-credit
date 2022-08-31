@@ -9,5 +9,6 @@ const Payments = () => {
   );
 };
 
+Payments.displayName = "Payments"
 export default Payments;
 

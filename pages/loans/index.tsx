@@ -9,6 +9,7 @@ const Loans = () => {
   );
 };
 
+Loans.displayName = "Loans"
 export default Loans;
 
 

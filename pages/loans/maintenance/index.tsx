@@ -4,14 +4,11 @@ import { Members, MemberProps } from "../../../types";
 import { GetServerSideProps } from "next";
 import {
   Autocomplete,
-  Avatar,
   Group,
-  MantineColor,
-  SelectItemProps,
   Text,
 } from "@mantine/core";
 
-const Maintainance = ({ data }: { data: Members[] }) => {
+const Maintenance = ({ data }: { data: Members[] }) => {
   const [member, setMember] = useState('');
 
   const members = data.map((item) => ({ ...item, value: item.firstName + " " + item.lastName }));
@@ -60,4 +57,6 @@ export const getServerSideProps: GetServerSideProps = async () => {
   };
 };
 
-export default Maintainance;
+Maintenance.displayName = "Maintenance"
+
+export default Maintenance;

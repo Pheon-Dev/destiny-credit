@@ -9,5 +9,6 @@ const Disbursements = () => {
   );
 };
 
+Disbursements.displayName = "Disbursements"
 export default Disbursements;
 

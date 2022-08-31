@@ -8,4 +8,5 @@ const Approvals = () => {
     </>
   );
 };
+Approvals.displayName = "Approvals"
 export default Approvals;
