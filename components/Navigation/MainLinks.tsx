@@ -19,9 +19,18 @@ export function MainLinks() {
   const [reportsActive, setReportsActive] = useState(9);
   const [dashboardActive, setDashboardActive] = useState(true);
 
+  /* useEffect(() => { */
+  /*     let subs = true; */
+  /**/
+  /*     if (subs) { */
+  /*         setActive() */
+  /*       } */
+  /**/
+  /*     return () => {subs = false} */
+  /*   }, []) */
+
   return (
-    <Box>
-    {/* <Box sx={{width: 200}}> */}
+    <Box style={{padding: 2}}>
       <NavLink
         styles={{
           root: {

@@ -31,8 +31,7 @@ model Account {
   session_state            String?
   oauth_token_secret       String?
   oauth_token              String?
-
-  user User @relation(fields: [userId], references: [id], onDelete: Cascade)
+  user                     User     @relation(fields: [userId], references: [id], onDelete: Cascade)
 
   @@unique([provider, providerAccountId])
 }
@@ -81,9 +80,9 @@ model VerificationToken {
 // }
 
 model Members {
-  id                    String    @id @default(uuid())
-  createdAt             DateTime  @default(now())
-  updatedAt             DateTime  @updatedAt
+  id                    String   @id @default(uuid())
+  createdAt             DateTime @default(now())
+  updatedAt             DateTime @updatedAt
   date                  String
   branchName            String
   firstName             String
@@ -122,15 +121,48 @@ model Members {
   cityTownKin           String
   numberKin             String
   loans                 Loans[]
-  group                 Boolean   @default(false)
-  ratings               Int       @default(0)
-  maintained            Boolean   @default(false)
-  User                  User?     @relation(fields: [memberId], references: [id])
+  group                 Boolean  @default(false)
+  ratings               Int      @default(0)
+  maintained            Boolean  @default(false)
+  user                  User?    @relation(fields: [memberId], references: [id])
   memberId              String
-  Payments              Payments? @relation(fields: [paymentsId], references: [id])
-  paymentsId            String?
 
   @@index(id)
+}
+
+model Loans {
+  id         String     @id @default(uuid())
+  createdAt  DateTime   @default(now())
+  updatedAt  DateTime   @updatedAt
+  startDate  String
+  endDate    String
+  maintained Boolean    @default(false)
+  approved   Boolean    @default(false)
+  disbursed  Boolean    @default(false)
+  product    String
+  loanId     String
+  payment    Payments[]
+  member     Members    @relation(fields: [memberId], references: [id], onDelete: Cascade)
+  memberId   String
+  user       User?      @relation(fields: [userId], references: [id])
+  userId     String?
+
+  @@index([memberId])
+}
+
+model Payments {
+  id             String         @id @default(uuid())
+  createdAt      DateTime       @default(now())
+  updatedAt      DateTime       @updatedAt
+  paymentId      String
+  transactionsId String
+  transactions   Transactions[]
+  loan           Loans          @relation(fields: [loanId], references: [id])
+  loanId         String
+  user           User?          @relation(fields: [userId], references: [id])
+  userId         String?
+
+  @@index([loanId])
 }
 
 model Products {
@@ -151,41 +183,10 @@ model Products {
   penaltyCharge  String
   approved       Boolean  @default(false)
   penaltyPayment String
-  user           User?    @relation(fields: [productId], references: [id])
+  user           User?    @relation(fields: [userId], references: [id])
+  userId         String?
 
-  @@index(id)
-}
-
-model Loans {
-  id          String     @id @default(uuid())
-  createdAt   DateTime   @default(now())
-  updatedAt   DateTime   @updatedAt
-  startDate   String
-  endDate     String
-  maintained  Boolean    @default(false)
-  approved    Boolean    @default(false)
-  disbursed   Boolean    @default(false)
-  member      Members[]
-  product     String
-  loanPayment Payments[]
-  user        User?      @relation(fields: [loanId], references: [id])
-  loanId      String
-
-  @@index(id)
-}
-
-model Payments {
-  id             String         @id @default(uuid())
-  createdAt      DateTime       @default(now())
-  updatedAt      DateTime       @updatedAt
-  paymentId      String
-  Loans          Loans[]
-  member         Members[]
-  transactions   Transactions[]
-  user           User?          @relation(fields: [paymentId], references: [id])
-  transactionsId String
-
-  @@index(id)
+  @@index([userId])
 }
 
 model Transactions {
@@ -205,10 +206,10 @@ model Transactions {
   firstName         String
   middleName        String
   lastName          String
-  Payments          Payments? @relation(fields: [paymentsId], references: [id])
+  payments          Payments? @relation(fields: [paymentsId], references: [id])
   paymentsId        String?
 
-  @@index(id)
+  @@index([paymentsId])
 }
 
 enum Role {

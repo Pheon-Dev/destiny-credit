@@ -92,6 +92,7 @@ async function register(req: NextApiRequest, res: NextApiResponse) {
           numberKin: numberKin,
           group: group,
           maintained: maintained,
+          ratings: 0,
         },
       });
 

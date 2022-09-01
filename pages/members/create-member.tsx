@@ -1,7 +1,5 @@
-import React, { FormEvent, useEffect, useState } from "react";
-import { PrismaClient } from "@prisma/client";
+import React, { useEffect, useState } from "react";
 import axios from "axios";
-import { supabase } from "../../lib/supabase";
 import { z } from "zod";
 import { useForm, zodResolver } from "@mantine/form";
 import { IconAlertCircle, IconCalendar, IconCheck, IconX } from "@tabler/icons";
@@ -14,14 +12,25 @@ import {
   Divider,
   Group,
   Select,
-  Indicator,
-  Text,
 } from "@mantine/core";
 import { TitleText } from "../../components";
 import { Members } from "../../types";
-import { GetServerSideProps } from "next";
 import { useRouter } from "next/router";
 import { showNotification, updateNotification } from "@mantine/notifications";
+import { GetServerSideProps, GetStaticProps } from "next";
+import { PrismaClient } from "@prisma/client";
+
+export const getStaticProps: GetStaticProps = async () => {
+  const prisma = new PrismaClient();
+  let data = await prisma.members.findMany();
+  data = JSON.parse(JSON.stringify(data));
+
+  return {
+    props: {
+      members: data,
+    },
+  };
+};
 
 const schema = z.object({
   date: z.date({ required_error: "Enter Todays' Date" }),
@@ -74,9 +83,10 @@ const schema = z.object({
   numberKin: z.string().min(2, { message: "Enter  Phone # (kin)" }),
 });
 
-const CreateMember = ({members}: { members: Members[] }) => {
-  let lencode: number = members.length + 1;
+const CreateMember = ({ members }: { members: Members[] }) => {
   const router = useRouter();
+
+  let lencode: number = members.length + 1;
   let memcode =
     lencode > 9
       ? lencode > 99
@@ -86,7 +96,6 @@ const CreateMember = ({members}: { members: Members[] }) => {
         : "DC-00" + `${lencode}`
       : "DC-000" + `${lencode}`;
 
-  /* console.log(list) */
   const form = useForm({
     validate: zodResolver(schema),
     initialValues: {
@@ -924,44 +933,19 @@ const CreateMember = ({members}: { members: Members[] }) => {
   );
 };
 
-const Page = () => {
-  const [members, setMembers] = useState([]);
-  const [load, setLoad] = useState(true);
-
-  async function fetchMembers() {
-    let subscription = true;
-
-    if (subscription) {
-      const res = await axios.request({
-        method: "GET",
-        url: "/api/members",
-      });
-
-      const data = res.data.members;
-      setMembers(data);
-      members.length === 0 && setLoad(false);
-    }
-
-    return () => {
-      subscription = false;
-    };
-  }
-
-  useEffect(() => {
-    fetchMembers();
-  }, [members]);
-
-    return (
+const Page = ({ members }: { members: Members[] }) => {
+  return (
     <>
-      {(members.length >= 0 && <CreateMember members={members} />) || (
-        <LoadingOverlay
-          overlayBlur={2}
-          onClick={() => setLoad((prev) => !prev)}
-          visible={load}
-        />
-      )}
+      <CreateMember members={members} />
+      {/* {(members.length >= 0 && <CreateMember members={members} />) || ( */}
+      {/*   <LoadingOverlay */}
+      {/*     overlayBlur={2} */}
+      {/*     onClick={() => setLoad((prev) => !prev)} */}
+      {/*     visible={load} */}
+      {/*   /> */}
+      {/* )} */}
     </>
-    )
-  }
+  );
+};
 
 export default Page;
