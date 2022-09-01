@@ -1,33 +1,84 @@
-import React, { useState } from "react";
-import { PrismaClient } from "@prisma/client";
-import { MembersTable } from "../../components";
-import { Members } from "../../types";
-import { GetServerSideProps } from "next";
+import React, { useEffect, useState } from "react";
+import axios from "axios";
+import { Group, LoadingOverlay, Text } from "@mantine/core";
 
-const Page = ({ data }: { data: Members[] }) => {
-  /* console.log(data); */
+const MembersList = () => {
+  const [members, setMembers] = useState([]);
+
+  async function fetchMembers() {
+    let subscription = true;
+
+    if (subscription) {
+      const res = await axios.request({
+        method: "GET",
+        url: "/api/members",
+      });
+
+      const data = res.data.members;
+      setMembers(data);
+    }
+
+    return () => {
+      subscription = false;
+    };
+  }
+
+  useEffect(() => {
+    fetchMembers();
+  }, [members]);
+
   return (
     <>
-      <div>
-        <MembersTable members={data} />
-      </div>
+      <Group position="center">
+        <Text>Members List</Text>
+        <pre>{JSON.stringify(members, undefined, 2)}</pre>
+      </Group>
     </>
   );
 };
 
-export const getServerSideProps: GetServerSideProps = async () => {
-  const prisma = new PrismaClient();
+const ProductsList = () => {
+  const [products, setProducts] = useState([]);
 
-  let data = await prisma.members.findMany();
+  async function fetchProducts() {
+    let subscription = true;
 
-  data = JSON.parse(JSON.stringify(data));
+    if (subscription) {
+      const res = await axios.request({
+        method: "GET",
+        url: "/api/products",
+      });
 
-  return {
-    props: {
-      data,
-    },
-  };
+      const data = res.data.products;
+      setProducts(data);
+    }
+
+    return () => {
+      subscription = false;
+    };
+  }
+
+  useEffect(() => {
+    fetchProducts();
+  }, [products]);
+
+  return (
+    <>
+      <Group position="center">
+        <Text>Products List</Text>
+        <pre>{JSON.stringify(products, undefined, 2)}</pre>
+      </Group>
+    </>
+  );
+};
+
+const Page = () => {
+  return (
+    <>
+      <MembersList />
+      {/* <ProductsList /> */}
+    </>
+  );
 };
 
 export default Page;
-

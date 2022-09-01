@@ -20,32 +20,20 @@ import { showNotification, updateNotification } from "@mantine/notifications";
 import { GetServerSideProps, GetStaticProps } from "next";
 import { PrismaClient } from "@prisma/client";
 
-export const getStaticProps: GetStaticProps = async () => {
-  const prisma = new PrismaClient();
-  let data = await prisma.members.findMany();
-  data = JSON.parse(JSON.stringify(data));
-
-  return {
-    props: {
-      members: data,
-    },
-  };
-};
-
 const schema = z.object({
-  date: z.date({ required_error: "Enter Todays' Date" }),
+  date: z.date({ required_error: "Select Todays' Date" }),
   branchName: z.string().min(2, { message: "Enter Branch Name" }),
   memberId: z.string().min(2, { message: "Enter Member Number" }),
   firstName: z.string().min(2, { message: "Enter First Name" }),
   lastName: z.string().min(2, { message: "Enter Last Name" }),
-  dob: z.date({ required_error: "Enter Date of Birth" }),
+  dob: z.date({ required_error: "Select Date of Birth" }),
   idPass: z.string().min(2, { message: "Enter ID | Passport #" }),
   kraPin: z.string().min(2, { message: "Enter KRA PIN" }),
   phoneNumber: z.string().min(2, { message: "Enter Phone Number" }),
-  gender: z.string().min(2, { message: "Enter Gender" }),
-  age: z.string().min(2, { message: "Enter Age" }),
-  religion: z.string().min(2, { message: "Enter Religion" }),
-  maritalStatus: z.string().min(2, { message: "Enter Marital Status" }),
+  gender: z.string().min(2, { message: "Select Gender" }),
+  age: z.string().min(2, { message: "Select (Date | DOB)" }),
+  religion: z.string().min(2, { message: "Select Religion" }),
+  maritalStatus: z.string().min(2, { message: "Select Marital Status" }),
   spouseName: z.string().min(2, { message: "Enter Name (spouse)" }),
   spouseNumber: z.string().min(2, { message: "Enter Number (spouse)" }),
   postalAddress: z.string().min(2, { message: "Enter Postal Address" }),
@@ -55,7 +43,7 @@ const schema = z.object({
     .string()
     .min(2, { message: "Enter Residential Address" }),
   emailAddress: z.string().min(2, { message: "Enter Email Address" }),
-  rentedOwned: z.string().min(2, { message: "Enter Rented | Owned" }),
+  rentedOwned: z.string().min(2, { message: "Select Rented | Owned" }),
   landCareAgent: z
     .string()
     .min(2, { message: "Enter Landlord | Care Taker | Agent" }),
@@ -83,18 +71,8 @@ const schema = z.object({
   numberKin: z.string().min(2, { message: "Enter  Phone # (kin)" }),
 });
 
-const CreateMember = ({ members }: { members: Members[] }) => {
+const CreateMember = ({ memcode }: { memcode: string }) => {
   const router = useRouter();
-
-  let lencode: number = members.length + 1;
-  let memcode =
-    lencode > 9
-      ? lencode > 99
-        ? lencode > 999
-          ? lencode
-          : "DC-0" + `${lencode}`
-        : "DC-00" + `${lencode}`
-      : "DC-000" + `${lencode}`;
 
   const form = useForm({
     validate: zodResolver(schema),
@@ -339,7 +317,7 @@ const CreateMember = ({ members }: { members: Members[] }) => {
           updateNotification({
             id: "submit",
             color: "teal",
-            title: `${res.data.firstname} ${res.data.lastName}`,
+            title: `${res.data.firstName} ${res.data.lastName}`,
             message: "Member Registered Successfully!",
             icon: <IconCheck size={16} />,
             autoClose: 5000,
@@ -921,6 +899,7 @@ const CreateMember = ({ members }: { members: Members[] }) => {
               id: "submit",
               title: "Member Registration",
               message: "Writing Form Data to Database ...",
+              disallowClose: true,
               loading: true,
             });
             handleSave();
@@ -934,18 +913,39 @@ const CreateMember = ({ members }: { members: Members[] }) => {
 };
 
 const Page = ({ members }: { members: Members[] }) => {
+
+  let lencode: number = members.length + 1;
+  let memcode =
+    lencode > 9
+      ? lencode > 99
+        ? lencode > 999
+          ? lencode
+          : "DC-0" + `${lencode}`
+        : "DC-00" + `${lencode}`
+      : "DC-000" + `${lencode}`;
   return (
     <>
-      <CreateMember members={members} />
-      {/* {(members.length >= 0 && <CreateMember members={members} />) || ( */}
-      {/*   <LoadingOverlay */}
-      {/*     overlayBlur={2} */}
-      {/*     onClick={() => setLoad((prev) => !prev)} */}
-      {/*     visible={load} */}
-      {/*   /> */}
-      {/* )} */}
+      <CreateMember memcode={`${memcode}`} />
+      {(members && <CreateMember memcode={`${memcode}`} />) || (
+        <LoadingOverlay
+          overlayBlur={2}
+          visible
+        />
+      )}
     </>
   );
+};
+
+export const getStaticProps: GetStaticProps = async () => {
+  const prisma = new PrismaClient();
+  let data = await prisma.members.findMany();
+  data = JSON.parse(JSON.stringify(data));
+
+  return {
+    props: {
+      members: data,
+    },
+  };
 };
 
 export default Page;

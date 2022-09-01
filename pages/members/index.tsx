@@ -48,4 +48,8 @@ const MembersList = () => {
   );
 };
 
-export default MembersList;
+const Page = () => {
+    return <MembersList />
+  }
+
+export default Page;

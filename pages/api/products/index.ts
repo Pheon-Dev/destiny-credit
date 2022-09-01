@@ -1,26 +1,19 @@
 import type { NextApiRequest, NextApiResponse } from "next";
-/* import { supabase } from "../../lib/supabase"; */
 import { PrismaClient } from "@prisma/client";
 
-async function member(req: NextApiRequest, res: NextApiResponse) {
+async function products(req: NextApiRequest, res: NextApiResponse) {
   const prisma = new PrismaClient();
 
   async function main() {
     try {
-      const {
-        id
-      } = req.body;
+      const products = await prisma.products.findMany();
 
-      const member = await prisma.members.findMany({
-        where: {
-          id: `${id}`
-        },
-      });
-      res.status(200).json({ member: member });
+      res.status(200).json({ products: products });
 
       return {
-        props: { member }
+        props: { products },
       };
+
     } catch (error) {
       console.log(error);
 
@@ -38,4 +31,5 @@ async function member(req: NextApiRequest, res: NextApiResponse) {
     });
 }
 
-export default member;
+export default products;
+
