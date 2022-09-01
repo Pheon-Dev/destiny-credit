@@ -190,18 +190,18 @@ export interface MemberProps extends SelectItemProps {
 }
 
 interface Products {
-      productId: string,
-      productName: string,
-      minimumRange: string,
-      maximumRange: string,
-      interestRate: string,
-      frequency: string,
-      maximumTenure: string,
-      repaymentCycle: string,
-      processingFee: string,
-      gracePeriod: string,
-      penaltyRate: string,
-      penaltyCharge: string,
-      penaltyPayment: string,
-      approved: boolean,
+  productId: string;
+  productName: string;
+  minimumRange: string;
+  maximumRange: string;
+  interestRate: string;
+  frequency: string;
+  maximumTenure: string;
+  repaymentCycle: string;
+  processingFee: string;
+  gracePeriod: string;
+  penaltyRate: string;
+  penaltyCharge: string;
+  penaltyPayment: string;
+  approved: boolean;
 }

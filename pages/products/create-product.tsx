@@ -12,6 +12,7 @@ import {
   Divider,
   Group,
   Select,
+  Text,
 } from "@mantine/core";
 import { TitleText } from "../../components";
 import { Products } from "../../types";
@@ -21,7 +22,7 @@ import { GetStaticProps } from "next";
 import { PrismaClient } from "@prisma/client";
 
 const schema = z.object({
-  productId: z.string().min(2, { message: "Enter Member Number" }),
+  productId: z.string().min(2, { message: "Enter Product ID" }),
   productName: z.string().min(2, { message: "Enter Product Name" }),
   minimumRange: z.string().min(2, { message: "Enter Minimum Range" }),
   maximumRange: z.string().min(2, { message: "Enter Maximum Range" }),
@@ -42,7 +43,7 @@ const CreateProduct = ({ procode }: { procode: string }) => {
   const form = useForm({
     validate: zodResolver(schema),
     initialValues: {
-      productId: "",
+      productId: `${procode}`,
       productName: "",
       minimumRange: "",
       maximumRange: "",
@@ -80,7 +81,7 @@ const CreateProduct = ({ procode }: { procode: string }) => {
       ) {
         const res = await axios.request({
           method: "POST",
-          url: "/api/register",
+          url: "/api/products/create",
           data: {
             productId: form.values.productId.toUpperCase(),
             productName: form.values.productName.toUpperCase(),
@@ -129,8 +130,8 @@ const CreateProduct = ({ procode }: { procode: string }) => {
       setTimeout(() => {
         updateNotification({
           id: "submit",
-          title: "Error Writing to Database",
-          message: "Please Try Again!",
+          title: "Missing Fields",
+          message: "Please Make Sure All Fields Are Filled!",
           color: "red",
           icon: <IconAlertCircle size={16} />,
           autoClose: 5000,
@@ -160,7 +161,7 @@ const CreateProduct = ({ procode }: { procode: string }) => {
     //     }}
     >
       <Group position="center" m="md">
-        <TitleText title="Create New Product" />
+        <TitleText title="New Product" />
       </Group>
 
       <Grid grow>
@@ -176,18 +177,9 @@ const CreateProduct = ({ procode }: { procode: string }) => {
         <Grid.Col span={4}>
           <TextInput
             mt="md"
-            label="Minimum Range"
-            placeholder="Minimum Range"
-            {...form.getInputProps("minimumRange")}
-            required
-          />
-        </Grid.Col>
-        <Grid.Col span={4}>
-          <TextInput
-            mt="md"
-            label="Maximum Tenure"
-            placeholder="Maximum Tenure"
-            {...form.getInputProps("maximumTenure")}
+            label="Product ID"
+            placeholder="Product ID"
+            {...form.getInputProps("productId")}
             required
           />
         </Grid.Col>
@@ -200,6 +192,31 @@ const CreateProduct = ({ procode }: { procode: string }) => {
             label="Interest Rate"
             placeholder="Interest Rate"
             {...form.getInputProps("interestRate")}
+            required
+          />
+        </Grid.Col>
+        <Grid.Col span={4}>
+          <Select
+            mt="md"
+            label="Frequency (PA | PM)"
+            placeholder="Frequency (PA | PM)"
+            data={[
+              { value: "pm", label: "Per Month" },
+              { value: "pa", label: "Per Annum" },
+            ]}
+            {...form.getInputProps("frequency")}
+            required
+          />
+        </Grid.Col>
+      </Grid>
+
+      <Grid grow>
+        <Grid.Col span={4}>
+          <TextInput
+            mt="md"
+            label="Minimum Range"
+            placeholder="Minimum Range"
+            {...form.getInputProps("minimumRange")}
             required
           />
         </Grid.Col>
@@ -229,24 +246,6 @@ const CreateProduct = ({ procode }: { procode: string }) => {
             required
           />
         </Grid.Col>
-      </Grid>
-
-      <Grid grow>
-        <Grid.Col span={4}>
-          <Select
-            mt="md"
-            label="Frequency (PA | PM)"
-            placeholder="Frequency (PA | PM)"
-            data={[
-              { value: "pm", label: "Per Month" },
-              { value: "pa", label: "Per Annum" },
-            ]}
-            {...form.getInputProps("frequency")}
-            required
-          />
-        </Grid.Col>
-        {form.values.frequency === "pa" ? (
-          <>
             <Grid.Col span={4}>
               <TextInput
                 mt="md"
@@ -269,43 +268,7 @@ const CreateProduct = ({ procode }: { procode: string }) => {
             required
           />
             </Grid.Col>
-          </>
-        ) : (
-          <Grid.Col span={4}>
-          <Select
-            mt="md"
-            label="Penalty Charged as"
-            placeholder="Penalty Charged as"
-            data={[
-              { value: "installment", label: "% of Principal" },
-              { value: "principal", label: "% of Installment" },
-            ]}
-            {...form.getInputProps("penaltyCharge")}
-            required
-          />
-          </Grid.Col>
-        )}
       </Grid>
-
-      <Grid grow>
-        {form.values.frequency === "pa" ? (
-          <Grid.Col span={4}>
-          <Select
-            mt="md"
-            label="Penalty Charged as"
-            placeholder="Penalty Charged as"
-            data={[
-              { value: "installment", label: "% of Principal" },
-              { value: "principal", label: "% of Installment" },
-            ]}
-            {...form.getInputProps("penaltyCharge")}
-            required
-          />
-          </Grid.Col>
-        ) : null}
-      </Grid>
-
-
 
       <Grid grow>
         <Grid.Col span={4}>
@@ -317,6 +280,19 @@ const CreateProduct = ({ procode }: { procode: string }) => {
             required
           />
         </Grid.Col>
+          <Grid.Col span={4}>
+          <Select
+            mt="md"
+            label="Penalty Charged as"
+            placeholder="Penalty Charged as"
+            data={[
+              { value: "installment", label: "% of Principal" },
+              { value: "principal", label: "% of Installment" },
+            ]}
+            {...form.getInputProps("penaltyCharge")}
+            required
+          />
+          </Grid.Col>
         <Grid.Col span={4}>
           <TextInput
             mt="md"
@@ -328,7 +304,25 @@ const CreateProduct = ({ procode }: { procode: string }) => {
         </Grid.Col>
       </Grid>
 
+      <Grid grow>
+        <Grid.Col span={5}>
+          <TextInput
+            mt="md"
+            label="Maximum Tenure"
+            placeholder="Maximum Tenure"
+            {...form.getInputProps("maximumTenure")}
+            required
+          />
+        </Grid.Col>
+        <Grid.Col span={1}>
+        <Group position="center" mt="xl" pt="md">
+        <TitleText title={form.values.repaymentCycle === "daily" ? "Days" : form.values.repaymentCycle === "weekly" ? "Weeks" : "Months"} />
+        </Group>
+        </Grid.Col>
+      </Grid>
+
       <Divider mt="lg" variant="dashed" my="sm" />
+
       <Group position="center" mt="xl">
         <Button
           // type="submit"
@@ -349,7 +343,7 @@ const CreateProduct = ({ procode }: { procode: string }) => {
             form.validate();
             showNotification({
               id: "submit",
-              title: "Member Registration",
+              title: "New Product",
               message: "Writing Form Data to Database ...",
               disallowClose: true,
               loading: true,

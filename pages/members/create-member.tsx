@@ -23,7 +23,7 @@ import { PrismaClient } from "@prisma/client";
 const schema = z.object({
   date: z.date({ required_error: "Select Todays' Date" }),
   branchName: z.string().min(2, { message: "Enter Branch Name" }),
-  memberId: z.string().min(2, { message: "Enter Member Number" }),
+  memberId: z.string().min(2, { message: "Enter Member ID" }),
   firstName: z.string().min(2, { message: "Enter First Name" }),
   lastName: z.string().min(2, { message: "Enter Last Name" }),
   dob: z.date({ required_error: "Select Date of Birth" }),
@@ -328,8 +328,8 @@ const CreateMember = ({ memcode }: { memcode: string }) => {
       setTimeout(() => {
         updateNotification({
           id: "submit",
-          title: "Error Writing to Database",
-          message: "Please Try Again!",
+          title: "Missing Fields",
+          message: "Please Make Sure All Fields Are Filled!",
           color: "red",
           icon: <IconAlertCircle size={16} />,
           autoClose: 5000,
@@ -399,8 +399,8 @@ const CreateMember = ({ memcode }: { memcode: string }) => {
         </Grid.Col>
         <Grid.Col span={4}>
           <TextInput
-            label="Member Number"
-            placeholder="Member Number"
+            label="Member ID"
+            placeholder="Member ID"
             {...form.getInputProps("memberId")}
             disabled
           />
