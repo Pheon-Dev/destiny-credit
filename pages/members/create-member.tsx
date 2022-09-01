@@ -15,6 +15,7 @@ import {
   Group,
   Select,
   Indicator,
+  Text,
 } from "@mantine/core";
 import { TitleText } from "../../components";
 import { Members } from "../../types";
@@ -22,32 +23,6 @@ import { GetServerSideProps } from "next";
 import { useRouter } from "next/router";
 import { showNotification, updateNotification } from "@mantine/notifications";
 
-/* export async function getStaticProps() { */
-/*   const { data, error } = await supabase */
-/*     .from("members") */
-/*     .select("*") */
-/*     .order("id"); */
-/**/
-/**/
-/*   if (error) return console.log({ error: error }); */
-/*   return { */
-/*     props: { */
-/*       members: data, */
-/*     }, */
-/*   }; */
-/* } */
-
-export const getServerSideProps: GetServerSideProps = async () => {
-  const prisma = new PrismaClient();
-  let data = await prisma.members.findMany();
-  data = JSON.parse(JSON.stringify(data));
-
-  return {
-    props: {
-      members: data,
-    },
-  };
-};
 const schema = z.object({
   date: z.date({ required_error: "Enter Todays' Date" }),
   branchName: z.string().min(2, { message: "Enter Branch Name" }),
@@ -99,10 +74,9 @@ const schema = z.object({
   numberKin: z.string().min(2, { message: "Enter  Phone # (kin)" }),
 });
 
-const CreateMember = ({ members }: { members: Members[] }) => {
-  const router = useRouter();
-
+const CreateMember = ({members}: { members: Members[] }) => {
   let lencode: number = members.length + 1;
+  const router = useRouter();
   let memcode =
     lencode > 9
       ? lencode > 99
@@ -950,4 +924,44 @@ const CreateMember = ({ members }: { members: Members[] }) => {
   );
 };
 
-export default CreateMember;
+const Page = () => {
+  const [members, setMembers] = useState([]);
+  const [load, setLoad] = useState(true);
+
+  async function fetchMembers() {
+    let subscription = true;
+
+    if (subscription) {
+      const res = await axios.request({
+        method: "GET",
+        url: "/api/members",
+      });
+
+      const data = res.data.members;
+      setMembers(data);
+      members.length === 0 && setLoad(false);
+    }
+
+    return () => {
+      subscription = false;
+    };
+  }
+
+  useEffect(() => {
+    fetchMembers();
+  }, [members]);
+
+    return (
+    <>
+      {(members.length >= 0 && <CreateMember members={members} />) || (
+        <LoadingOverlay
+          overlayBlur={2}
+          onClick={() => setLoad((prev) => !prev)}
+          visible={load}
+        />
+      )}
+    </>
+    )
+  }
+
+export default Page;

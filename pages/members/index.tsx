@@ -1,32 +1,51 @@
-import React, { useState } from "react";
-import { PrismaClient } from "@prisma/client";
+import React, { useEffect, useState } from "react";
+import axios from "axios";
 import { MembersTable } from "../../components";
-import { Members } from "../../types";
-import { GetServerSideProps } from "next";
+import { Group, LoadingOverlay, Text } from "@mantine/core";
 
-const MembersList = ({ data }: { data: Members[] }) => {
-  /* console.log(data); */
+const MembersList = () => {
+  const [members, setMembers] = useState([]);
+  const [load, setLoad] = useState(true);
+
+  async function fetchMembers() {
+    let subscription = true;
+
+    if (subscription) {
+      const res = await axios.request({
+        method: "GET",
+        url: "/api/members",
+      });
+
+      const data = res.data.members;
+      setMembers(data);
+      members.length === 0 && setLoad(false);
+    }
+
+    return () => {
+      subscription = false;
+    };
+  }
+
+  useEffect(() => {
+    fetchMembers();
+  }, [members]);
+
   return (
     <>
-      <div>
-        <MembersTable members={data} />
-      </div>
+      {(members.length > 0 && <MembersTable members={members} />) || (
+        <LoadingOverlay
+          overlayBlur={2}
+          onClick={() => setLoad((prev) => !prev)}
+          visible={load}
+        />
+      )}
+      {members.length === 0 && (
+        <Group position="center">
+          <Text>No Registered Members</Text>
+        </Group>
+      )}
     </>
   );
-};
-
-export const getServerSideProps: GetServerSideProps = async () => {
-  const prisma = new PrismaClient();
-
-  let data = await prisma.members.findMany();
-
-  data = JSON.parse(JSON.stringify(data));
-
-  return {
-    props: {
-      data,
-    },
-  };
 };
 
 export default MembersList;
