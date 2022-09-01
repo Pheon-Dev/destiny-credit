@@ -190,6 +190,9 @@ export interface MemberProps extends SelectItemProps {
 }
 
 interface Products {
+  createdAt?: Date;
+  updatedAt?: Date;
+  id?: string;
   productId: string;
   productName: string;
   minimumRange: string;

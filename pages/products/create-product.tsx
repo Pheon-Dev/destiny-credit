@@ -180,6 +180,7 @@ const CreateProduct = ({ procode }: { procode: string }) => {
             label="Product ID"
             placeholder="Product ID"
             {...form.getInputProps("productId")}
+            disabled
             required
           />
         </Grid.Col>
@@ -363,9 +364,11 @@ const Page = ({ products }: { products: Products[] }) => {
   let procode =
     lencode > 9
       ? lencode > 99
+      ? lencode > 999
           ? lencode
           : "DC-P" + `${lencode}`
-      : "DC-P0" + `${lencode}`;
+          : "DC-P0" + `${lencode}`
+      : "DC-P00" + `${lencode}`;
   return (
     <>
       {(products && <CreateProduct procode={`${procode}`} />) || (
