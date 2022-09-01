@@ -37,6 +37,7 @@ export function MainLinks() {
         icon={<IconHome size={16} stroke={1.5} />}
         childrenOffset={24}
       >
+      <Link href="/">
           <NavLink
             styles={{
               root: {
@@ -55,6 +56,7 @@ export function MainLinks() {
               setDashboardActive(true);
             }}
           />
+            </Link>
       </NavLink>
       <NavLink
         styles={{

@@ -4,7 +4,6 @@ import type { AppProps } from "next/app";
 import { getCookie, setCookie } from "cookies-next";
 import Head from "next/head";
 import { NotificationsProvider } from "@mantine/notifications";
-import { BrowserRouter as Router } from "react-router-dom";
 
 import {
   MantineProvider,
@@ -58,7 +57,6 @@ export default function App(props: AppProps & { colorScheme: ColorScheme }) {
           content="minimum-scale=1, initial-scale=1, width=device-width"
         />
       </Head>
-      <Router>
         <MantineProvider
           withGlobalStyles
           withNormalizeCSS
@@ -125,7 +123,6 @@ export default function App(props: AppProps & { colorScheme: ColorScheme }) {
           </NotificationsProvider>
           </ColorSchemeProvider>
         </MantineProvider>
-        </Router>
     </>
   );
 }
