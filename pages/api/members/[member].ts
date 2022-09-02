@@ -1,5 +1,4 @@
 import type { NextApiRequest, NextApiResponse } from "next";
-/* import { supabase } from "../../lib/supabase"; */
 import { PrismaClient } from "@prisma/client";
 
 async function member(req: NextApiRequest, res: NextApiResponse) {
