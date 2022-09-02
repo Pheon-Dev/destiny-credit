@@ -9,4 +9,10 @@ const ScheduleReport = () => {
   );
 };
 
-export default ScheduleReport;
+
+const Page = () => {
+    return <ScheduleReport />
+  }
+
+export default Page;
+

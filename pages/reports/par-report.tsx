@@ -9,4 +9,8 @@ const ParReport = () => {
   );
 };
 
-export default ParReport;
+const Page = () => {
+    return <ParReport />
+  }
+
+export default Page;
