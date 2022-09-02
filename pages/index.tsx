@@ -7,14 +7,14 @@ import { Group, LoadingOverlay } from "@mantine/core";
 export default function Home() {
   const [transactions, setTransactions] = useState([]);
   const [load, setLoad] = useState(true);
-  const hello = trpc.useQuery(['hello', { text: 'client' }]);
+  /* const hello = trpc.useQuery(['hello', { text: 'client' }]); */
 
-  if (!hello.data) {
-      console.log("Loading ...")
-    }
-  if (hello.data) {
-      console.log(hello.data.greeting)
-    }
+  /* if (!hello.data) { */
+  /*     console.log("Loading ...") */
+  /*   } */
+  /* if (hello.data) { */
+  /*     console.log(hello.data.greeting) */
+  /*   } */
 
   async function fetchTransactions() {
     let subscription = true;

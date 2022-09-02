@@ -5,9 +5,7 @@ import { getCookie, setCookie } from "cookies-next";
 import Head from "next/head";
 import { NotificationsProvider } from "@mantine/notifications";
 import { withTRPC } from "@trpc/next";
-import { AppRouter } from "./api/trpc/[trpc]";
-
-const URL = process.env.NEXT_PUBLIC_VERCEL_URL;
+import type { AppRouter } from "./api/trpc/[trpc]";
 
 import {
   MantineProvider,
@@ -144,8 +142,8 @@ App.getInitialProps = ({ ctx }: { ctx: GetServerSidePropsContext }) => ({
 
 export default withTRPC<AppRouter>({
   config({ ctx }) {
-    const url = URL
-      ? `https://${URL}/api/trpc`
+  const url = process.env.NEXT_PUBLIC_VERCEL_URL
+      ? `https://${process.env.NEXT_PUBLIC_VERCEL_URL}/api/trpc`
       : "http://localhost:3000/api/trpc";
     return {
       url,

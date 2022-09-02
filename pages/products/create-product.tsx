@@ -30,8 +30,8 @@ const schema = z.object({
   frequency: z.string().min(2, { message: "Enter Frequency (PM | PA)" }),
   maximumTenure: z.string().min(2, { message: "Enter Maximum Tenure" }),
   repaymentCycle: z.string().min(2, { message: "Select Repayment Cycle" }),
-  processingFee: z.string().min(2, { message: "Enter Processing Fee (%)" }),
-  gracePeriod: z.string().min(2, { message: "Select Grace Period" }),
+  processingFee: z.string().min(1, { message: "Enter Processing Fee (%)" }),
+  gracePeriod: z.string().min(1, { message: "Select Grace Period" }),
   penaltyRate: z.string().min(2, { message: "Enter Penalty Rate (%)" }),
   penaltyCharge: z.string().min(2, { message: "Select Penalty Charge Method" }),
   penaltyPayment: z
@@ -93,7 +93,7 @@ const CreateProduct = ({ procode }: { procode: string }) => {
         form.values.gracePeriod &&
         form.values.penaltyRate &&
         form.values.penaltyCharge &&
-        form.values.penaltyPayment &&
+        form.values.penaltyPayment ||
         form.values.approved
       ) {
         console.log(
@@ -112,48 +112,47 @@ const CreateProduct = ({ procode }: { procode: string }) => {
           form.values.penaltyPayment,
           form.values.approved
         );
-        /* const res = await axios.request({ */
-        /*   method: "POST", */
-        /*   url: "/api/products/create", */
-        /*   data: { */
-        /*     productId: form.values.productId.toUpperCase(), */
-        /*     productName: form.values.productName.toUpperCase(), */
-        /*     minimumRange: form.values.minimumRange.toUpperCase(), */
-        /*     maximumRange: form.values.maximumRange.toUpperCase(), */
-        /*     interestRate: form.values.interestRate.toUpperCase(), */
-        /*     frequency: form.values.frequency.toUpperCase(), */
-        /*     maximumTenure: form.values.maximumTenure.toUpperCase(), */
-        /*     repaymentCycle: form.values.repaymentCycle.toUpperCase(), */
-        /*     processingFee: form.values.processingFee.toUpperCase(), */
-        /*     gracePeriod: form.values.gracePeriod.toUpperCase(), */
-        /*     penaltyRate: form.values.penaltyRate.toUpperCase(), */
-        /*     penaltyCharge: form.values.penaltyCharge.toUpperCase(), */
-        /*     penaltyPayment: form.values.penaltyPayment.toUpperCase(), */
-        /*     approved: false, */
-        /*   }, */
-        /* }); */
-        /**/
-        /* form.setFieldValue("productId", ""); */
-        /* form.setFieldValue("productName", ""); */
-        /* form.setFieldValue("minimumRange", ""); */
-        /* form.setFieldValue("maximumRange", ""); */
-        /* form.setFieldValue("interestRate", ""); */
-        /* form.setFieldValue("frequency", ""); */
-        /* form.setFieldValue("maximumTenure", ""); */
-        /* form.setFieldValue("repaymentCycle", ""); */
-        /* form.setFieldValue("processingFee", ""); */
-        /* form.setFieldValue("gracePeriod", ""); */
-        /* form.setFieldValue("penaltyRate", ""); */
-        /* form.setFieldValue("penaltyCharge", ""); */
-        /* form.setFieldValue("penaltyPayment", ""); */
-        /* form.setFieldValue("approved", false); */
+        const res = await axios.request({
+          method: "POST",
+          url: "/api/products/create",
+          data: {
+            productId: form.values.productId.toUpperCase(),
+            productName: form.values.productName.toUpperCase(),
+            minimumRange: form.values.minimumRange.toUpperCase(),
+            maximumRange: form.values.maximumRange.toUpperCase(),
+            interestRate: form.values.interestRate.toUpperCase(),
+            frequency: form.values.frequency.toUpperCase(),
+            maximumTenure: form.values.maximumTenure.toUpperCase(),
+            repaymentCycle: form.values.repaymentCycle.toUpperCase(),
+            processingFee: form.values.processingFee.toUpperCase(),
+            gracePeriod: form.values.gracePeriod.toUpperCase(),
+            penaltyRate: form.values.penaltyRate.toUpperCase(),
+            penaltyCharge: form.values.penaltyCharge.toUpperCase(),
+            penaltyPayment: form.values.penaltyPayment.toUpperCase(),
+            approved: false,
+          },
+        });
+
+        form.setFieldValue("productId", "");
+        form.setFieldValue("productName", "");
+        form.setFieldValue("minimumRange", "");
+        form.setFieldValue("maximumRange", "");
+        form.setFieldValue("interestRate", "");
+        form.setFieldValue("frequency", "");
+        form.setFieldValue("maximumTenure", "");
+        form.setFieldValue("repaymentCycle", "");
+        form.setFieldValue("processingFee", "");
+        form.setFieldValue("gracePeriod", "");
+        form.setFieldValue("penaltyRate", "");
+        form.setFieldValue("penaltyCharge", "");
+        form.setFieldValue("penaltyPayment", "");
+        form.setFieldValue("approved", false);
 
         setTimeout(() => {
           updateNotification({
             id: "submit",
             color: "teal",
-            /* title: `${res.data.productName} @ ${res.data.interestRate}%`, */
-            title: "New Product",
+            title: `${res.data.productName} @ ${res.data.interestRate}%`,
             message: "Product Created Successfully!",
             icon: <IconCheck size={16} />,
             autoClose: 5000,
@@ -395,11 +394,8 @@ const CreateProduct = ({ procode }: { procode: string }) => {
   );
 };
 
-const Page = () => {
-  /* const Page = ({ products }: { products: Products[] }) => { */
-  /* let lencode: number = products.length + 1; */
-  const products = true
-  let lencode: number = 1;
+const Page = ({ products }: { products: Products[] }) => {
+  let lencode: number = products.length + 1;
   let procode =
     lencode > 9
       ? lencode > 99
@@ -417,16 +413,16 @@ const Page = () => {
   );
 };
 
-/* export const getStaticProps: GetStaticProps = async () => { */
-/*   const prisma = new PrismaClient(); */
-/*   let data = await prisma.products.findMany(); */
-/*   data = JSON.parse(JSON.stringify(data)); */
-/**/
-/*   return { */
-/*     props: { */
-/*       products: data, */
-/*     }, */
-/*   }; */
-/* }; */
+export const getStaticProps: GetStaticProps = async () => {
+  const prisma = new PrismaClient();
+  let data = await prisma.products.findMany();
+  data = JSON.parse(JSON.stringify(data));
+
+  return {
+    props: {
+      products: data,
+    },
+  };
+};
 
 export default Page;

@@ -48,7 +48,7 @@ async function register(req: NextApiRequest, res: NextApiResponse) {
         group,
         maintained,
       } = req.body;
-      console.log(req.body)
+
       await prisma.members.create({
         data: {
           date: date,
@@ -95,6 +95,7 @@ async function register(req: NextApiRequest, res: NextApiResponse) {
         },
       });
 
+      console.log("Registered Successfully")
       res.status(200).json({ message: req.body });
     } catch (error) {
       console.log(error);

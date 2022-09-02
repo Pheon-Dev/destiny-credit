@@ -22,7 +22,7 @@ async function create(req: NextApiRequest, res: NextApiResponse) {
         penaltyPayment,
         approved,
       } = req.body;
-      console.log(req.body);
+
       await prisma.products.create({
         data: {
           productId: productId,
@@ -42,6 +42,7 @@ async function create(req: NextApiRequest, res: NextApiResponse) {
         },
       });
 
+      console.log("Created Successfully")
       res.status(200).json({ message: req.body });
     } catch (error) {
       console.log(error);
