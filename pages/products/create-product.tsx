@@ -394,7 +394,31 @@ const CreateProduct = ({ procode }: { procode: string }) => {
   );
 };
 
-const Page = ({ products }: { products: Products[] }) => {
+const Page = () => {
+  const [products, setProducts] = useState([]);
+
+  async function fetchMembers() {
+    let subscription = true;
+
+    if (subscription) {
+      const res = await axios.request({
+        method: "GET",
+        url: "/api/products",
+      });
+
+      const data = res.data.products;
+      setProducts(data);
+    }
+
+    return () => {
+      subscription = false;
+    };
+  }
+
+  useEffect(() => {
+    fetchMembers();
+  }, [products]);
+
   let lencode: number = products.length + 1;
   let procode =
     lencode > 9
@@ -411,18 +435,6 @@ const Page = ({ products }: { products: Products[] }) => {
       )}
     </>
   );
-};
-
-export const getStaticProps: GetStaticProps = async () => {
-  const prisma = new PrismaClient();
-  let data = await prisma.products.findMany();
-  data = JSON.parse(JSON.stringify(data));
-
-  return {
-    props: {
-      products: data,
-    },
-  };
 };
 
 export default Page;
