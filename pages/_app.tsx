@@ -5,8 +5,9 @@ import { getCookie, setCookie } from "cookies-next";
 import Head from "next/head";
 import { NotificationsProvider } from "@mantine/notifications";
 import { withTRPC } from "@trpc/next";
-import { AppType } from "next/dist/shared/lib/utils";
 import { AppRouter } from "./api/trpc/[trpc]";
+
+const URL = process.env.NEXT_PUBLIC_VERCEL_URL;
 
 import {
   MantineProvider,
@@ -61,11 +62,11 @@ function App(props: AppProps & { colorScheme: ColorScheme }) {
         />
       </Head>
 
-        <MantineProvider
-          withGlobalStyles
-          withNormalizeCSS
-          theme={{ colorScheme, loader: 'dots' }}
-        >
+      <MantineProvider
+        withGlobalStyles
+        withNormalizeCSS
+        theme={{ colorScheme, loader: "dots" }}
+      >
         <ColorSchemeProvider
           colorScheme={colorScheme}
           toggleColorScheme={toggleColorScheme}
@@ -83,7 +84,13 @@ function App(props: AppProps & { colorScheme: ColorScheme }) {
                   /* width={{ base: 200 }} */
                   width={{ lg: 200, sm: 180 }}
                 >
-                  <Navbar.Section grow component={ScrollArea} mx="-xs" px="xs" mt="xs">
+                  <Navbar.Section
+                    grow
+                    component={ScrollArea}
+                    mx="-xs"
+                    px="xs"
+                    mt="xs"
+                  >
                     <MainLinks />
                   </Navbar.Section>
                 </Navbar>
@@ -125,8 +132,8 @@ function App(props: AppProps & { colorScheme: ColorScheme }) {
               <Component {...pageProps} />
             </AppShell>
           </NotificationsProvider>
-          </ColorSchemeProvider>
-        </MantineProvider>
+        </ColorSchemeProvider>
+      </MantineProvider>
     </>
   );
 }
@@ -137,12 +144,25 @@ App.getInitialProps = ({ ctx }: { ctx: GetServerSidePropsContext }) => ({
 
 export default withTRPC<AppRouter>({
   config({ ctx }) {
-    const url = process.env.NEXT_PUBLIC_VERCEL_URL
-      ? `https://${process.env.NEXT_PUBLIC_VERCEL_URL}/api/trpc`
-      : 'http://localhost:3000/api/trpc';
+    const url = URL
+      ? `https://${URL}/api/trpc`
+      : "http://localhost:3000/api/trpc";
     return {
       url,
     };
   },
   ssr: true,
+  responseMeta({ clientErrors, ctx }) {
+    if (clientErrors.length) {
+      return {
+        status: clientErrors[0].data?.httpStatus ?? 500,
+      };
+    }
+
+    const ONE_DAY_IN_SECONDS = 60 * 60 * 24;
+
+    return {
+      "Cache-Control": `s-maxage=1, stale-while-revalidate=${ONE_DAY_IN_SECONDS}`,
+    };
+  },
 })(App);
