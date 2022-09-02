@@ -23,7 +23,7 @@ async function create(req: NextApiRequest, res: NextApiResponse) {
         approved,
       } = req.body;
 
-      await prisma.products.create({
+      await prisma.product.create({
         data: {
           productId: productId,
           productName: productName,

@@ -14,7 +14,7 @@ datasource db {
 }
 
 model Account {
-  id                       String   @id @default(cuid())
+  id                       String   @id @default(uuid())
   createdAt                DateTime @default(now())
   updatedAt                DateTime @updatedAt
   userId                   String
@@ -37,7 +37,7 @@ model Account {
 }
 
 model Session {
-  id           String   @id @default(cuid())
+  id           String   @id @default(uuid())
   sessionToken String   @unique
   expires      DateTime
   user         User     @relation(fields: [userId], references: [id], onDelete: Cascade)
@@ -45,21 +45,29 @@ model Session {
 }
 
 model User {
-  id            String     @id @default(cuid())
-  createdAt     DateTime   @default(now())
-  updatedAt     DateTime   @updatedAt
-  name          String?
-  email         String?    @unique
-  password      String?
-  emailVerified DateTime?
-  image         String?
-  accounts      Account[]
-  sessions      Session[]
-  loans         Loans[]
-  members       Members[]
-  products      Products[]
-  payments      Payments[]
-  role          Role       @default(USER)
+  id                String    @id @default(uuid())
+  createdAt         DateTime  @default(now())
+  updatedAt         DateTime  @updatedAt
+  name              String?
+  email             String?   @unique
+  password          String?
+  emailVerified     DateTime?
+  image             String?
+  accounts          Account[]
+  sessions          Session[]
+  registeredMembers Member[]  @relation("RegisteredBy")
+  approvedMembers   Member[]  @relation("ApprovedBy")
+  updatedMembers    Member[]  @relation("UpdatedBy")
+  maintainedLoans   Loan[]    @relation("MaintainedBy")
+  approvedLoans     Loan[]    @relation("ApprovedBy")
+  disbursedLoans    Loan[]    @relation("DisbursedBy")
+  updatedLoans      Loan[]    @relation("UpdatedBy")
+  handledPayments   Payment[] @relation("HandledBy")
+  updatedPayments   Payment[] @relation("UpdatedBy")
+  createdProducts   Product[] @relation("CreatedBy")
+  approvedProducts  Product[] @relation("ApprovedBy")
+  updatedProducts   Product[] @relation("UpdatedBy")
+  role              Role      @default(USER)
 }
 
 model VerificationToken {
@@ -70,21 +78,13 @@ model VerificationToken {
   @@unique([identifier, token])
 }
 
-// model Profile {
-//   id        String   @id @default(uuid())
-//   bio  String @db.Text
-//     user User @relation(fields: [userId], references: [id], onDelete: Cascade)
-//   userId      Int @unique
-//
-//   @@index(id)
-// }
-
-model Members {
+model Member {
   id                    String   @id @default(uuid())
   createdAt             DateTime @default(now())
   updatedAt             DateTime @updatedAt
   date                  String
   branchName            String
+  memberId              String
   firstName             String
   lastName              String
   dob                   String
@@ -120,52 +120,62 @@ model Members {
   postalCodeKin         String
   cityTownKin           String
   numberKin             String
-  loans                 Loans[]
+  loans                 Loan[]
   group                 Boolean  @default(false)
   ratings               Int      @default(0)
   maintained            Boolean  @default(false)
-  user                  User?    @relation(fields: [memberId], references: [id])
-  memberId              String
+  registrar             User?    @relation("RegisteredBy", fields: [registrarId], references: [id])
+  registrarId           String
+  approver              User?    @relation("ApprovedBy", fields: [approverId], references: [id])
+  approverId            String
+  updater               User?    @relation("UpdatedBy", fields: [updaterId], references: [id])
+  updaterId             String
 
-  @@index(id)
+  @@index([firstName, lastName, memberId, phoneNumber, id])
 }
 
-model Loans {
-  id         String     @id @default(uuid())
-  createdAt  DateTime   @default(now())
-  updatedAt  DateTime   @updatedAt
-  startDate  String
-  endDate    String
-  maintained Boolean    @default(false)
-  approved   Boolean    @default(false)
-  disbursed  Boolean    @default(false)
-  product    String
-  loanId     String
-  payment    Payments[]
-  member     Members    @relation(fields: [memberId], references: [id], onDelete: Cascade)
-  memberId   String
-  user       User?      @relation(fields: [userId], references: [id])
-  userId     String?
+model Loan {
+  id           String    @id @default(uuid())
+  createdAt    DateTime  @default(now())
+  updatedAt    DateTime  @updatedAt
+  startDate    String
+  endDate      String
+  maintained   Boolean   @default(false)
+  approved     Boolean   @default(false)
+  disbursed    Boolean   @default(false)
+  product      String
+  loanId       String
+  payment      Payment[]
+  member       Member    @relation(fields: [memberId], references: [id])
+  memberId     String
+  maintainer   User?     @relation("MaintainedBy", fields: [maintainerId], references: [id])
+  maintainerId String?
+  approver     User?     @relation("ApprovedBy", fields: [approverId], references: [id])
+  approverId   String?
+  disburser    User?     @relation("DisbursedBy", fields: [disburserId], references: [id])
+  disburserId  String?
+  updater      User?     @relation("UpdatedBy", fields: [updaterId], references: [id])
+  updaterId    String
 
-  @@index([memberId])
+  @@index([loanId, product, id])
 }
 
-model Payments {
-  id             String         @id @default(uuid())
-  createdAt      DateTime       @default(now())
-  updatedAt      DateTime       @updatedAt
-  paymentId      String
-  transactionsId String
-  transactions   Transactions[]
-  loan           Loans          @relation(fields: [loanId], references: [id])
-  loanId         String
-  user           User?          @relation(fields: [userId], references: [id])
-  userId         String?
+model Payment {
+  id        String   @id @default(uuid())
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+  paymentId String
+  loan      Loan     @relation(fields: [loanId], references: [id])
+  loanId    String
+  handler   User?    @relation("HandledBy", fields: [handlerId], references: [id])
+  handlerId String?
+  updater   User?    @relation("UpdatedBy", fields: [updaterId], references: [id])
+  updaterId String
 
-  @@index([loanId])
+  @@index([paymentId, id])
 }
 
-model Products {
+model Product {
   id             String   @id @default(uuid())
   createdAt      DateTime @default(now())
   updatedAt      DateTime @updatedAt
@@ -183,16 +193,20 @@ model Products {
   penaltyCharge  String
   approved       Boolean  @default(false)
   penaltyPayment String
-  user           User?    @relation(fields: [userId], references: [id])
-  userId         String?
+  creator        User?    @relation("CreatedBy", fields: [creatorId], references: [id])
+  creatorId      String?
+  approver       User?    @relation("ApprovedBy", fields: [approverId], references: [id])
+  approverId     String?
+  updater        User?    @relation("UpdatedBy", fields: [updaterId], references: [id])
+  updaterId      String
 
-  @@index([userId])
+  @@index([productName, productId])
 }
 
-model Transactions {
-  id                String    @id @default(uuid())
-  createdAt         DateTime  @default(now())
-  updatedAt         DateTime  @updatedAt
+model Transaction {
+  id                String   @id @default(uuid())
+  createdAt         DateTime @default(now())
+  updatedAt         DateTime @updatedAt
   transactionType   String
   transID           String
   transTime         String
@@ -206,10 +220,8 @@ model Transactions {
   firstName         String
   middleName        String
   lastName          String
-  payments          Payments? @relation(fields: [paymentsId], references: [id])
-  paymentsId        String?
 
-  @@index([paymentsId])
+  @@index([firstName, middleName, lastName, msisdn, billRefNumber])
 }
 
 enum Role {

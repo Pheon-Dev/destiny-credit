@@ -127,7 +127,7 @@ async function transactions(req: NextApiRequest, res: NextApiResponse) {
           });
 
             try {
-              const data = await prisma.transactions.findMany({
+              const data = await prisma.transaction.findMany({
                 where: {
                   transID: `${transID}`
                 }
@@ -138,7 +138,7 @@ async function transactions(req: NextApiRequest, res: NextApiResponse) {
               transactionType === "Pay Bill" ||
               transactionType === "Customer Merchant Payment"
             ) {
-              await prisma.transactions.create({
+              await prisma.transaction.create({
                 data: {
                   transactionType: transactionType,
                   transID: transID,

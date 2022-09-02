@@ -6,7 +6,7 @@ async function members(req: NextApiRequest, res: NextApiResponse) {
 
   async function main() {
     try {
-      const members = await prisma.members.findMany();
+      const members = await prisma.member.findMany();
 
       res.status(200).json({ members: members });
 

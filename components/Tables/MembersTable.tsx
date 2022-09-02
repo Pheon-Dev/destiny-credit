@@ -41,7 +41,7 @@ function MemberRow({ member }: { member: Members }) {
       onClick={() =>
         member.maintained
           ? router.push(`/members/${member.id}`)
-          : router.push("/loans/maintenance")
+          : router.push("/loans/create-loan")
       }
     >
       <td>{member.memberId}</td>
@@ -65,7 +65,7 @@ function MemberRow({ member }: { member: Members }) {
         ) : (
           <Badge
             style={{ cursor: "pointer" }}
-            onClick={() => router.push("/loans/maintenance")}
+            onClick={() => router.push("/loans/create-loan")}
             variant="gradient"
             gradient={{
               from: "indigo",

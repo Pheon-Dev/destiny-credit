@@ -339,7 +339,7 @@ const loans_data = [
   {
     id: 0,
     name: "New Loan",
-    url: "/loans/maintenance/",
+    url: "/loans/create-loan/",
   },
   {
     id: 1,

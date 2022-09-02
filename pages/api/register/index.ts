@@ -49,7 +49,7 @@ async function register(req: NextApiRequest, res: NextApiResponse) {
         maintained,
       } = req.body;
 
-      await prisma.members.create({
+      await prisma.member.create({
         data: {
           date: date,
           branchName: branchName,

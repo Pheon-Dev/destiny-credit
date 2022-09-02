@@ -10,7 +10,7 @@ async function member(req: NextApiRequest, res: NextApiResponse) {
         id
       } = req.body;
 
-      const member = await prisma.members.findMany({
+      const member = await prisma.member.findMany({
         where: {
           id: `${id}`
         },

@@ -10,7 +10,7 @@ async function product(req: NextApiRequest, res: NextApiResponse) {
         id
       } = req.body;
 
-      const product = await prisma.products.findMany({
+      const product = await prisma.product.findMany({
         where: {
           id: `${id}`
         },

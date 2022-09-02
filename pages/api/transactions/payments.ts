@@ -6,7 +6,7 @@ async function payments(req: NextApiRequest, res: NextApiResponse) {
 
   async function main() {
     try {
-      const transactions = await prisma.transactions.findMany();
+      const transactions = await prisma.transaction.findMany();
 
       res.status(200).json({ transactions: transactions });
 

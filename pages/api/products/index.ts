@@ -6,7 +6,7 @@ async function products(req: NextApiRequest, res: NextApiResponse) {
 
   async function main() {
     try {
-      const products = await prisma.products.findMany();
+      const products = await prisma.product.findMany();
 
       res.status(200).json({ products: products });
 
