@@ -8,22 +8,22 @@ async function create(req: NextApiRequest, res: NextApiResponse) {
   async function main() {
     try {
       const {
-      productId,
-      productName,
-      minimumRange,
-      maximumRange,
-      interestRate,
-      frequency,
-      maximumTenure,
-      repaymentCycle,
-      processingFee,
-      gracePeriod,
-      penaltyRate,
-      penaltyCharge,
-      penaltyPayment,
-      approved,
+        productId,
+        productName,
+        minimumRange,
+        maximumRange,
+        interestRate,
+        frequency,
+        maximumTenure,
+        repaymentCycle,
+        processingFee,
+        gracePeriod,
+        penaltyRate,
+        penaltyCharge,
+        penaltyPayment,
+        approved,
       } = req.body;
-      console.log(req.body)
+      console.log(req.body);
       await prisma.products.create({
         data: {
           productId: productId,
@@ -62,4 +62,3 @@ async function create(req: NextApiRequest, res: NextApiResponse) {
 }
 
 export default create;
-

@@ -898,7 +898,7 @@ const CreateMember = ({ memcode }: { memcode: string }) => {
             showNotification({
               id: "submit",
               title: "Member Registration",
-              message: "Writing Form Data to Database ...",
+              message: "Registering New Member ...",
               disallowClose: true,
               loading: true,
             });
@@ -913,7 +913,6 @@ const CreateMember = ({ memcode }: { memcode: string }) => {
 };
 
 const Page = ({ members }: { members: Members[] }) => {
-
   let lencode: number = members.length + 1;
   let memcode =
     lencode > 9
@@ -927,10 +926,7 @@ const Page = ({ members }: { members: Members[] }) => {
     <>
       <CreateMember memcode={`${memcode}`} />
       {(members && <CreateMember memcode={`${memcode}`} />) || (
-        <LoadingOverlay
-          overlayBlur={2}
-          visible
-        />
+        <LoadingOverlay overlayBlur={2} visible />
       )}
     </>
   );

@@ -4,6 +4,9 @@ import type { AppProps } from "next/app";
 import { getCookie, setCookie } from "cookies-next";
 import Head from "next/head";
 import { NotificationsProvider } from "@mantine/notifications";
+import { withTRPC } from "@trpc/next";
+import { AppType } from "next/dist/shared/lib/utils";
+import { AppRouter } from "./api/trpc/[trpc]";
 
 import {
   MantineProvider,
@@ -23,7 +26,7 @@ import {
 } from "@mantine/core";
 import { TitleText, MainLinks, Utilities } from "../components";
 
-export default function App(props: AppProps & { colorScheme: ColorScheme }) {
+function App(props: AppProps & { colorScheme: ColorScheme }) {
   const theme = useMantineTheme();
   const [opened, setOpened] = useState(false);
   const { Component, pageProps } = props;
@@ -57,6 +60,7 @@ export default function App(props: AppProps & { colorScheme: ColorScheme }) {
           content="minimum-scale=1, initial-scale=1, width=device-width"
         />
       </Head>
+
         <MantineProvider
           withGlobalStyles
           withNormalizeCSS
@@ -130,3 +134,15 @@ export default function App(props: AppProps & { colorScheme: ColorScheme }) {
 App.getInitialProps = ({ ctx }: { ctx: GetServerSidePropsContext }) => ({
   colorscheme: getCookie("mantine-color-scheme", ctx) || "dark",
 });
+
+export default withTRPC<AppRouter>({
+  config({ ctx }) {
+    const url = process.env.NEXT_PUBLIC_VERCEL_URL
+      ? `https://${process.env.NEXT_PUBLIC_VERCEL_URL}/api/trpc`
+      : 'http://localhost:3000/api/trpc';
+    return {
+      url,
+    };
+  },
+  ssr: true,
+})(App);
