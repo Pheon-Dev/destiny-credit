@@ -49,6 +49,12 @@ const authOptions: NextAuthOptions =
         }
         return token
       }
+    },
+    pages: {
+      signIn: "/auth/sign-in",
+      signOut: "/auth/sign-out",
+      error: "/auth/error",
+      newUser: "/auth/create-user",
     }
   }
 
