@@ -1,13 +1,10 @@
 import React from "react";
-import { Table, Badge, Text } from "@mantine/core";
+import { Table, Badge } from "@mantine/core";
 import { Members } from "../../types";
 import { useRouter } from "next/router";
 
 export function MembersTable({ members }: { members: Members[] }) {
-  return (
-    <>
-      <Table striped highlightOnHover horizontalSpacing="md">
-        <thead>
+  const Header = () => (
           <tr>
             <th>Code</th>
             <th>Names</th>
@@ -16,6 +13,12 @@ export function MembersTable({ members }: { members: Members[] }) {
             <th>Date</th>
             <th>Status</th>
           </tr>
+  );
+  return (
+    <>
+      <Table striped highlightOnHover horizontalSpacing="md">
+        <thead>
+          <Header />
         </thead>
         <tbody>
           {members?.map((member) => (
@@ -23,14 +26,7 @@ export function MembersTable({ members }: { members: Members[] }) {
           ))}
         </tbody>
         <tfoot>
-          <tr>
-            <th>Code</th>
-            <th>Names</th>
-            <th>Phone</th>
-            <th>ID</th>
-            <th>Date</th>
-            <th>Status</th>
-          </tr>
+          <Header />
         </tfoot>
       </Table>
     </>

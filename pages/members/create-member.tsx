@@ -14,11 +14,8 @@ import {
   Select,
 } from "@mantine/core";
 import { TitleText } from "../../components";
-import { Members } from "../../types";
 import { useRouter } from "next/router";
 import { showNotification, updateNotification } from "@mantine/notifications";
-import { GetServerSideProps, GetStaticProps } from "next";
-import { PrismaClient } from "@prisma/client";
 
 const schema = z.object({
   date: z.date({ required_error: "Select Todays' Date" }),

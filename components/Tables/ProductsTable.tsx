@@ -4,16 +4,21 @@ import { Products } from "../../types";
 import { useRouter } from "next/router";
 
 export function ProductsTable({ products }: { products: Products[] }) {
+  const Header = () => (
+    <tr>
+      <th>Code</th>
+      <th>Name</th>
+      <th>Cycle</th>
+      <th>Rate</th>
+      <th>Status</th>
+    </tr>
+  );
+
   return (
     <>
       <Table striped highlightOnHover horizontalSpacing="md">
         <thead>
-          <tr>
-            <th>Code</th>
-            <th>Name</th>
-            <th>Rate</th>
-            <th>Status</th>
-          </tr>
+          <Header />
         </thead>
         <tbody>
           {products?.map((product) => (
@@ -21,12 +26,7 @@ export function ProductsTable({ products }: { products: Products[] }) {
           ))}
         </tbody>
         <tfoot>
-          <tr>
-            <th>Code</th>
-            <th>Name</th>
-            <th>Rate</th>
-            <th>Status</th>
-          </tr>
+          <Header />
         </tfoot>
       </Table>
     </>
@@ -38,13 +38,12 @@ function ProductRow({ product }: { product: Products }) {
   return (
     <tr
       style={{ cursor: "pointer" }}
-      onClick={() =>
-           router.push(`/products/${product.id}`)
-      }
+      onClick={() => router.push(`/products/${product.id}`)}
     >
       <td>{product.productId}</td>
       <td>{product.productName}</td>
-      <td>{product.interestRate}</td>
+      <td>{product.repaymentCycle}</td>
+      <td>{product.interestRate} %</td>
       <td>
         {product.approved ? (
           <Badge
@@ -75,4 +74,3 @@ function ProductRow({ product }: { product: Products }) {
     </tr>
   );
 }
-

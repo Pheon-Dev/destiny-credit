@@ -7,18 +7,21 @@ export function TransactionsTable({
 }: {
   transactions: Transactions[];
 }) {
+  const Header = () => (
+          <tr>
+            <th>ID</th>
+            <th>Names</th>
+            <th>Amount</th>
+            <th>Phone</th>
+            <th>M-PESA</th>
+            <th>Type</th>
+          </tr>
+  );
   return (
     <>
       <Table striped highlightOnHover horizontalSpacing="md">
         <thead>
-          <tr>
-            <th>ID</th>
-            <th>NAMES</th>
-            <th>AMOUNT</th>
-            <th>PHONE</th>
-            <th>M-PESA</th>
-            <th>TYPE</th>
-          </tr>
+          <Header />
         </thead>
         <tbody>
           {transactions?.map((transaction) => (
@@ -29,14 +32,7 @@ export function TransactionsTable({
           ))}
         </tbody>
         <tfoot>
-          <tr>
-            <th>ID</th>
-            <th>NAMES</th>
-            <th>AMOUNT</th>
-            <th>PHONE</th>
-            <th>M-PESA</th>
-            <th>TYPE</th>
-          </tr>
+          <Header />
         </tfoot>
       </Table>
     </>

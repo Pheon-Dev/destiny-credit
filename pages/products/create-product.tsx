@@ -2,8 +2,7 @@ import React, { useEffect, useState } from "react";
 import axios from "axios";
 import { z } from "zod";
 import { useForm, zodResolver } from "@mantine/form";
-import { IconAlertCircle, IconCalendar, IconCheck, IconX } from "@tabler/icons";
-import { DatePicker } from "@mantine/dates";
+import { IconAlertCircle, IconCheck, IconX } from "@tabler/icons";
 import {
   LoadingOverlay,
   TextInput,
@@ -12,14 +11,10 @@ import {
   Divider,
   Group,
   Select,
-  Text,
 } from "@mantine/core";
 import { TitleText } from "../../components";
-import { Products } from "../../types";
 import { useRouter } from "next/router";
 import { showNotification, updateNotification } from "@mantine/notifications";
-import { GetStaticProps } from "next";
-import { PrismaClient } from "@prisma/client";
 
 const schema = z.object({
   productId: z.string().min(2, { message: "Enter Product ID" }),
