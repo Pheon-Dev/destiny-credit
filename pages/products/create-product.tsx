@@ -62,6 +62,10 @@ const CreateProduct = ({ procode }: { procode: string }) => {
     },
   });
 
+  useEffect(() => {
+    form.setFieldValue("productId", `${procode}`);
+  }, [procode]);
+
   const handleSave = async () => {
     console.table({
       productId: form.values.productId,
@@ -81,19 +85,19 @@ const CreateProduct = ({ procode }: { procode: string }) => {
     });
     try {
       if (
-        form.values.productId &&
-        form.values.productName &&
-        form.values.minimumRange &&
-        form.values.maximumRange &&
-        form.values.interestRate &&
-        form.values.frequency &&
-        form.values.maximumTenure &&
-        form.values.repaymentCycle &&
-        form.values.processingFee &&
-        form.values.gracePeriod &&
-        form.values.penaltyRate &&
-        form.values.penaltyCharge &&
-        form.values.penaltyPayment ||
+        (form.values.productId &&
+          form.values.productName &&
+          form.values.minimumRange &&
+          form.values.maximumRange &&
+          form.values.interestRate &&
+          form.values.frequency &&
+          form.values.maximumTenure &&
+          form.values.repaymentCycle &&
+          form.values.processingFee &&
+          form.values.gracePeriod &&
+          form.values.penaltyRate &&
+          form.values.penaltyCharge &&
+          form.values.penaltyPayment) ||
         form.values.approved
       ) {
         console.log(
@@ -419,8 +423,8 @@ const Page = () => {
     fetchMembers();
   }, [products]);
 
-  let lencode: number = products.length + 1;
-  let procode =
+  const lencode: number = products.length + 1;
+  const procode =
     lencode > 9
       ? lencode > 99
         ? lencode > 999

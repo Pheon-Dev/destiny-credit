@@ -120,6 +120,10 @@ const CreateMember = ({ memcode }: { memcode: string }) => {
     },
   });
 
+  useEffect(() => {
+    form.setFieldValue("memberId", `${memcode}`);
+  }, [memcode]);
+
   let today_date = new Date(form.values.date);
   let birth_date = new Date(form.values.dob);
   //
@@ -912,9 +916,34 @@ const CreateMember = ({ memcode }: { memcode: string }) => {
   );
 };
 
-const Page = ({ members }: { members: Members[] }) => {
-  let lencode: number = members.length + 1;
-  let memcode =
+const Page = () => {
+  const [members, setMembers] = useState([]);
+
+  async function fetchMembers() {
+    let subscription = true;
+
+    if (subscription) {
+      const res = await axios.request({
+        method: "GET",
+        url: "/api/members",
+      });
+
+      const data = res.data.members;
+      setMembers(data);
+    }
+
+    return () => {
+      subscription = false;
+    };
+  }
+
+  useEffect(() => {
+    fetchMembers();
+  }, [members]);
+
+  const lencode = members.length + 1;
+
+  const memcode =
     lencode > 9
       ? lencode > 99
         ? lencode > 999
@@ -924,24 +953,11 @@ const Page = ({ members }: { members: Members[] }) => {
       : "DC-000" + `${lencode}`;
   return (
     <>
-      <CreateMember memcode={`${memcode}`} />
       {(members && <CreateMember memcode={`${memcode}`} />) || (
         <LoadingOverlay overlayBlur={2} visible />
       )}
     </>
   );
-};
-
-export const getStaticProps: GetStaticProps = async () => {
-  const prisma = new PrismaClient();
-  let data = await prisma.members.findMany();
-  data = JSON.parse(JSON.stringify(data));
-
-  return {
-    props: {
-      members: data,
-    },
-  };
 };
 
 export default Page;
