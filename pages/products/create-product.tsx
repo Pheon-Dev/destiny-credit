@@ -395,8 +395,11 @@ const CreateProduct = ({ procode }: { procode: string }) => {
   );
 };
 
-const Page = ({ products }: { products: Products[] }) => {
-  let lencode: number = products.length + 1;
+const Page = () => {
+  /* const Page = ({ products }: { products: Products[] }) => { */
+  /* let lencode: number = products.length + 1; */
+  const products = true
+  let lencode: number = 1;
   let procode =
     lencode > 9
       ? lencode > 99
@@ -414,16 +417,16 @@ const Page = ({ products }: { products: Products[] }) => {
   );
 };
 
-export const getStaticProps: GetStaticProps = async () => {
-  const prisma = new PrismaClient();
-  let data = await prisma.products.findMany();
-  data = JSON.parse(JSON.stringify(data));
-
-  return {
-    props: {
-      products: data,
-    },
-  };
-};
+/* export const getStaticProps: GetStaticProps = async () => { */
+/*   const prisma = new PrismaClient(); */
+/*   let data = await prisma.products.findMany(); */
+/*   data = JSON.parse(JSON.stringify(data)); */
+/**/
+/*   return { */
+/*     props: { */
+/*       products: data, */
+/*     }, */
+/*   }; */
+/* }; */
 
 export default Page;
