@@ -24,10 +24,11 @@ import {
   IconLogout,
   IconX,
 } from "@tabler/icons";
-import { ColorSchemeToggle } from "../Theme/ColorSchemeToggle";
 import Router, { useRouter } from "next/router";
 import { signOut, useSession } from "next-auth/react";
 import { useEffect, useState } from "react";
+import { ActionIcon, Group, useMantineColorScheme } from "@mantine/core";
+import { IconSun, IconMoonStars } from "@tabler/icons";
 
 function StyledTabs(props: TabsProps) {
   return (
@@ -48,7 +49,7 @@ function StyledTabs(props: TabsProps) {
               : theme.colors.gray[4]
           }`,
           borderColor: theme.colors.blue[9],
-          padding: `${theme.spacing.xs} px ${theme.spacing.md}px`,
+          padding: `${theme.spacing.xs} px ${theme.spacing.md} px`,
           cursor: "pointer",
           fontSize: theme.fontSizes.sm,
           display: "flex",
@@ -86,6 +87,7 @@ function StyledTabs(props: TabsProps) {
 
         tabIcon: {
           marginRight: theme.spacing.xs,
+          marginLeft: theme.spacing.xs,
           display: "flex",
           alignItems: "center",
         },
@@ -133,6 +135,7 @@ export function Utilities() {
   const [scroll, scrollTo] = useWindowScroll();
   const { status, data } = useSession();
   const router = useRouter();
+  const { colorScheme, toggleColorScheme } = useMantineColorScheme();
 
   const handleSignOut = () => {
     try {
@@ -177,9 +180,10 @@ export function Utilities() {
           <StyledTabs defaultValue="apps">
             <Tabs.List>
               <Menu.Target>
-                <Tabs.Tab value="apps" icon={<IconCategory2 />}>
-                  Apps
-                </Tabs.Tab>
+                <Tabs.Tab
+                  value="apps"
+                  icon={<IconCategory2 style={{ padding: 2 }} />}
+                />
               </Menu.Target>
               {status === "authenticated" && (
                 <>
@@ -196,32 +200,43 @@ export function Utilities() {
                       forceReload();
                     }}
                     value="refresh"
-                    icon={<IconRefresh />}
-                  >
-                    Refresh
-                  </Tabs.Tab>
-                  <Tabs.Tab value="account" icon={<IconUser />}>
-                    Account
-                  </Tabs.Tab>
+                    icon={<IconArrowsLeftRight style={{ padding: 2 }} />}
+                  />
+                  <Tabs.Tab
+                    value="account"
+                    icon={<IconUser style={{ padding: 2 }} />}
+                  />
                 </>
               )}
             </Tabs.List>
           </StyledTabs>
         </Affix>
         <Menu.Dropdown>
-          {/* <Menu.Label>Apps</Menu.Label> */}
-          <div style={{ display: "inline-flex", padding: 6, paddingLeft: 8 }}>
-            <ColorSchemeToggle />
-            <Text style={{ paddingLeft: 6 }}>Theme</Text>
-          </div>
+          <Menu.Item
+            onClick={() => {
+              toggleColorScheme();
+            }}
+            icon={
+              colorScheme === "dark" ? (
+                <IconSun color="yellow" size={20} stroke={1.5} />
+              ) : (
+                <IconMoonStars color="blue" size={20} stroke={1.5} />
+              )
+            }
+          >
+              {colorScheme === "dark" ? (
+                "Light Theme"
+              ) : (
+                "Dark Theme"
+              )}
+          </Menu.Item>
+          <Menu.Divider />
           {status === "authenticated" && (
             <>
-              <Menu.Divider />
               <Menu.Item icon={<IconSettings size={20} />}>Settings</Menu.Item>
               <Menu.Item icon={<IconMessageCircle size={20} />} disabled>
                 Messages
               </Menu.Item>
-              <Menu.Divider />
               {/* Spotlight */}
               <Menu.Item
                 icon={<IconSearch size={20} />}
@@ -234,9 +249,10 @@ export function Utilities() {
               >
                 Search
               </Menu.Item>
-              <Menu.Item icon={<IconArrowsLeftRight size={20} />}>
+              <Menu.Item icon={<IconRefresh size={20} />}>
                 Reload Page
               </Menu.Item>
+              <Menu.Divider />
               <Menu.Item
                 onClick={() => {
                   showNotification({

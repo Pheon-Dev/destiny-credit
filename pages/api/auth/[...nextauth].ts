@@ -36,7 +36,7 @@ const authOptions: NextAuthOptions = {
         if (username === "DCL000" && password === "ADMIN")
           return { username: "Admin", id: "0" };
         throw new Error(
-          `Wrong ${username !== "DCL000" ? "User Name" : "Password"}!`
+          `Wrong User Name | Password!`
         );
       },
     }),
@@ -64,6 +64,10 @@ const authOptions: NextAuthOptions = {
     },
   },
   secret: `${SECRET}`,
+  jwt: {
+    secret: `${SECRET}`,
+    /* encode: , */
+  },
   pages: {
     signIn: "/auth/sign-in",
     /* signOut: "/auth/sign-out", */
