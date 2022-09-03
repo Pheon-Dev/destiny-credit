@@ -5,3 +5,4 @@ export { ProductsTable } from "./Tables/ProductsTable";
 export { MembersTable } from "./Tables/MembersTable";
 export { TitleText } from "./Text/TitleText";
 export { Utilities } from "./Utilities/Utilities";
+export { Protected } from "./Protected/Protected";

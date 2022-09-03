@@ -8,7 +8,6 @@ import {
   IconBrandAsana,
 } from "@tabler/icons";
 import { Box, NavLink, Text } from "@mantine/core";
-import { NavLink as Linker } from "react-router-dom";
 import Link from "next/link";
 
 export function MainLinks() {

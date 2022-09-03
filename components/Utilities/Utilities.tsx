@@ -17,11 +17,14 @@ import {
   IconMessageCircle,
   IconSearch,
   IconRefresh,
+IconArrowsLeftRight,
   IconUser,
   IconCheck,
+  IconLogout,
 } from "@tabler/icons";
 import { ColorSchemeToggle } from "../Theme/ColorSchemeToggle";
-import Router from "next/router";
+import Router, { useRouter } from "next/router";
+import { signOut, useSession } from "next-auth/react";
 
 function StyledTabs(props: TabsProps) {
   return (
@@ -124,6 +127,8 @@ export const forceReload = async () => {
 
 export function Utilities() {
   const [scroll, scrollTo] = useWindowScroll();
+  const { status, data } = useSession();
+  const router = useRouter()
 
   return (
     <>
@@ -144,6 +149,8 @@ export function Utilities() {
                   Apps
                 </Tabs.Tab>
               </Menu.Target>
+          {status === "authenticated" && (
+          <>
               <Tabs.Tab
                 onClick={() => {
                   showNotification({
@@ -161,9 +168,11 @@ export function Utilities() {
               >
                 Refresh
               </Tabs.Tab>
-              {/* <Tabs.Tab value="account" icon={<IconUser />}> */}
-              {/*   Account */}
-              {/* </Tabs.Tab> */}
+              <Tabs.Tab value="account" icon={<IconUser />}>
+                Account
+              </Tabs.Tab>
+              </>
+          )}
             </Tabs.List>
           </StyledTabs>
         </Affix>
@@ -173,12 +182,15 @@ export function Utilities() {
             <ColorSchemeToggle />
             <Text style={{ paddingLeft: 6 }}>Theme</Text>
           </div>
+          {status === "authenticated" && (
+          <>
           <Menu.Divider />
           <Menu.Item icon={<IconSettings size={20} />}>Settings</Menu.Item>
           <Menu.Item icon={<IconMessageCircle size={20} />} disabled>
             Messages
           </Menu.Item>
           <Menu.Divider />
+          {/* Spotlight */}
           <Menu.Item
             icon={<IconSearch size={20} />}
             rightSection={
@@ -190,6 +202,10 @@ export function Utilities() {
           >
             Search
           </Menu.Item>
+          <Menu.Item icon={<IconArrowsLeftRight size={20} />}>Reload Page</Menu.Item>
+              <Menu.Item icon={<IconLogout onClick={() => { signOut(); router.push("/auth/sign-in"); }} size={20} />} color="red">Sign Out</Menu.Item>
+              </>
+          )}
         </Menu.Dropdown>
       </Menu>
       <Affix position={{ bottom: 20, right: 20 }}>

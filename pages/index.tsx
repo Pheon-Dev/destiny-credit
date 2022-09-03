@@ -1,6 +1,6 @@
 import React, { useEffect, useState } from "react";
 import axios from "axios";
-import { TransactionsTable } from "../components";
+import { TransactionsTable, Protected } from "../components";
 import { trpc } from "../utils/trpc";
 import { Group, LoadingOverlay } from "@mantine/core";
 
@@ -38,7 +38,7 @@ export default function Home() {
   }, [transactions]);
 
   return (
-    <>
+    <Protected>
       {(transactions.length > 0 && (
         <TransactionsTable transactions={transactions} />
       )) || (
@@ -51,6 +51,6 @@ export default function Home() {
       {transactions.length === 0 && (
         <Group position="center">No New Transactions</Group>
       )}
-    </>
+    </Protected>
   );
 }

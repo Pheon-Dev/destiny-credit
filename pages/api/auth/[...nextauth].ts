@@ -10,21 +10,27 @@ const prisma = new PrismaClient()
 const authOptions: NextAuthOptions = 
 {
     adapter: PrismaAdapter(prisma),
+    session: {
+      strategy: "jwt"
+    },
     providers: [
       CredentialsProvider({
         name: "Credentials",
+        type: "credentials",
         credentials: {
-          username: { label: "UserID", type: "text", placeholder: "UserID" },
-          password: { label: "Password", type: "password", placeholder: "*******" },
+          /* username: { label: "DCL000", type: "text", placeholder: "User Name" }, */
+          /* password: { label: "Password", type: "password", placeholder: "*******" }, */
         },
         async authorize(credentials, req) {
-          const user = { id: 1, name: "John", email: "example@email.com" }
+          const { username, password } = credentials as { username: string; password: string; }
 
-          if (user) {
-            return user;
+          if (!username || !password) {
+            throw new Error(`${!username ? "User Name" : "Password"} is Missing!`)
           }
 
-          return null;
+          if (username === "DCL000" && password === "ADMIN") return {username: "Admin", id: "0"}
+            throw new Error(`Wrong ${username !== "DCL000" ? "User Name" : "Password"}!`)
+
         }
       })
     ],
@@ -53,7 +59,7 @@ const authOptions: NextAuthOptions =
     pages: {
       signIn: "/auth/sign-in",
       signOut: "/auth/sign-out",
-      error: "/auth/error",
+      /* error: "/auth/error", */
       newUser: "/auth/create-user",
     }
   }

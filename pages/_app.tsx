@@ -5,7 +5,9 @@ import { getCookie, setCookie } from "cookies-next";
 import Head from "next/head";
 import { NotificationsProvider } from "@mantine/notifications";
 import { withTRPC } from "@trpc/next";
+import { SessionProvider } from "next-auth/react";
 import type { AppRouter } from "./api/trpc/[trpc]";
+import { signOut, useSession } from "next-auth/react";
 
 import {
   MantineProvider,
@@ -49,6 +51,90 @@ function App(props: AppProps & { colorScheme: ColorScheme }) {
   }, []);
 
   if (isSSR) return null;
+  console.log(pageProps.session);
+
+  const Body = () => {
+  const { status, data } = useSession();
+  return (
+        <MantineProvider
+          withGlobalStyles
+          withNormalizeCSS
+          theme={{ colorScheme, loader: "dots" }}
+        >
+          <ColorSchemeProvider
+            colorScheme={colorScheme}
+            toggleColorScheme={toggleColorScheme}
+          >
+            <NotificationsProvider>
+              <AppShell
+                navbarOffsetBreakpoint="sm"
+                asideOffsetBreakpoint="sm"
+                navbar={
+                <>
+                {
+                  status === "authenticated" && (
+                      <Navbar
+                        p="xs"
+                        hiddenBreakpoint="sm"
+                        hidden={!opened}
+                        // height={500}
+                        /* width={{ base: 200 }} */
+                        width={{ lg: 200, sm: 180 }}
+                      >
+                        <Navbar.Section
+                          grow
+                          component={ScrollArea}
+                          mx="-xs"
+                          px="xs"
+                          mt="xs"
+                        >
+                          <MainLinks />
+                        </Navbar.Section>
+                      </Navbar>
+                  )}
+                  </>
+                }
+                // aside={
+                //   <MediaQuery smallerThan="sm" styles={{ display: "none" }}>
+                //     <Aside
+                //       p="md"
+                //       hiddenBreakpoint="sm"
+                //       width={{ sm: 200, lg: 300 }}
+                //     >
+                //       <Text>App SideBar</Text>
+                //     </Aside>
+                //   </MediaQuery>
+                // }
+                // footer={
+                //   <Footer height={60} p="md">
+                //     App Footer
+                //   </Footer>
+                // }
+                header={
+                  <Header height={70}>
+                    <Group sx={{ height: "100%" }} px={20} position="apart">
+                      <MediaQuery largerThan="sm" styles={{ display: "none" }}>
+                        <Burger
+                          opened={opened}
+                          onClick={() => setOpened((prev) => !prev)}
+                          size="sm"
+                          color={theme.colors.gray[6]}
+                          mr="xl"
+                        />
+                      </MediaQuery>
+                      <TitleText title="DESTINY CREDIT LTD" />
+                      <Utilities />
+                    </Group>
+                  </Header>
+                }
+              >
+                <Component {...pageProps} />
+              </AppShell>
+            </NotificationsProvider>
+          </ColorSchemeProvider>
+        </MantineProvider>
+  )
+    }
 
   return (
     <>
@@ -60,78 +146,9 @@ function App(props: AppProps & { colorScheme: ColorScheme }) {
         />
       </Head>
 
-      <MantineProvider
-        withGlobalStyles
-        withNormalizeCSS
-        theme={{ colorScheme, loader: "dots" }}
-      >
-        <ColorSchemeProvider
-          colorScheme={colorScheme}
-          toggleColorScheme={toggleColorScheme}
-        >
-          <NotificationsProvider>
-            <AppShell
-              navbarOffsetBreakpoint="sm"
-              asideOffsetBreakpoint="sm"
-              navbar={
-                <Navbar
-                  p="xs"
-                  hiddenBreakpoint="sm"
-                  hidden={!opened}
-                  // height={500}
-                  /* width={{ base: 200 }} */
-                  width={{ lg: 200, sm: 180 }}
-                >
-                  <Navbar.Section
-                    grow
-                    component={ScrollArea}
-                    mx="-xs"
-                    px="xs"
-                    mt="xs"
-                  >
-                    <MainLinks />
-                  </Navbar.Section>
-                </Navbar>
-              }
-              // aside={
-              //   <MediaQuery smallerThan="sm" styles={{ display: "none" }}>
-              //     <Aside
-              //       p="md"
-              //       hiddenBreakpoint="sm"
-              //       width={{ sm: 200, lg: 300 }}
-              //     >
-              //       <Text>App SideBar</Text>
-              //     </Aside>
-              //   </MediaQuery>
-              // }
-              // footer={
-              //   <Footer height={60} p="md">
-              //     App Footer
-              //   </Footer>
-              // }
-              header={
-                <Header height={70}>
-                  <Group sx={{ height: "100%" }} px={20} position="apart">
-                    <MediaQuery largerThan="sm" styles={{ display: "none" }}>
-                      <Burger
-                        opened={opened}
-                        onClick={() => setOpened((prev) => !prev)}
-                        size="sm"
-                        color={theme.colors.gray[6]}
-                        mr="xl"
-                      />
-                    </MediaQuery>
-                    <TitleText title="DESTINY CREDIT LTD" />
-                    <Utilities />
-                  </Group>
-                </Header>
-              }
-            >
-              <Component {...pageProps} />
-            </AppShell>
-          </NotificationsProvider>
-        </ColorSchemeProvider>
-      </MantineProvider>
+      <SessionProvider session={pageProps.session}>
+      <Body />
+      </SessionProvider>
     </>
   );
 }
@@ -142,7 +159,7 @@ App.getInitialProps = ({ ctx }: { ctx: GetServerSidePropsContext }) => ({
 
 export default withTRPC<AppRouter>({
   config({ ctx }) {
-  const url = process.env.NEXT_PUBLIC_VERCEL_URL
+    const url = process.env.NEXT_PUBLIC_VERCEL_URL
       ? `https://${process.env.NEXT_PUBLIC_VERCEL_URL}/api/trpc`
       : "http://localhost:3000/api/trpc";
     return {
