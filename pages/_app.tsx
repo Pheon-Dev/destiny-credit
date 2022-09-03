@@ -51,10 +51,11 @@ function App(props: AppProps & { colorScheme: ColorScheme }) {
   }, []);
 
   if (isSSR) return null;
-  console.log(pageProps.session);
+  /* console.log(pageProps.session); */
 
   const Body = () => {
   const { status, data } = useSession();
+  console.log(data);
   return (
         <MantineProvider
           withGlobalStyles
