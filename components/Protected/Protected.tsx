@@ -19,14 +19,14 @@ export const Protected: FC<Props> = ({ children }): JSX.Element => {
     return (
       <>
         {children}
-        <pre>{JSON.stringify(data.user, undefined, 2)}</pre>
-        <Button
-          onClick={() => {
-            signOut();
-          }}
-        >
-          Sign Out
-        </Button>
+        {/* <pre>{JSON.stringify(data.user, undefined, 2)}</pre> */}
+        {/* <Button */}
+        {/*   onClick={() => { */}
+        {/*     signOut(); */}
+        {/*   }} */}
+        {/* > */}
+        {/*   Sign Out */}
+        {/* </Button> */}
       </>
     );
 

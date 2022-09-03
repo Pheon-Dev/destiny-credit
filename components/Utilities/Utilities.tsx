@@ -8,6 +8,7 @@ import {
   Button,
   Affix,
   Transition,
+  LoadingOverlay,
 } from "@mantine/core";
 import { useWindowScroll } from "@mantine/hooks";
 import {
@@ -17,14 +18,16 @@ import {
   IconMessageCircle,
   IconSearch,
   IconRefresh,
-IconArrowsLeftRight,
+  IconArrowsLeftRight,
   IconUser,
   IconCheck,
   IconLogout,
+  IconX,
 } from "@tabler/icons";
 import { ColorSchemeToggle } from "../Theme/ColorSchemeToggle";
 import Router, { useRouter } from "next/router";
 import { signOut, useSession } from "next-auth/react";
+import { useEffect, useState } from "react";
 
 function StyledTabs(props: TabsProps) {
   return (
@@ -118,6 +121,7 @@ export const forceReload = async () => {
         id: "transactions-status",
         title: "Transaction Fetch Error!",
         message: `${error}. Please Try Again Later`,
+        icon: <IconX size={16} />,
         color: "red",
         autoClose: 4000,
       });
@@ -128,7 +132,35 @@ export const forceReload = async () => {
 export function Utilities() {
   const [scroll, scrollTo] = useWindowScroll();
   const { status, data } = useSession();
-  const router = useRouter()
+  const router = useRouter();
+
+  const handleSignOut = () => {
+    try {
+      setTimeout(() => {
+        updateNotification({
+          id: "sign-out-status",
+          color: "teal",
+          title: "Successful Sign Out!",
+          message: `Welcome Back Again Next Time, Goodbye!`,
+          icon: <IconCheck size={16} />,
+          autoClose: 8000,
+        });
+      });
+    } catch (error) {
+      setTimeout(() => {
+        updateNotification({
+          id: "sign-out-status",
+          title: "Sign Out Error!",
+          message: `${error}. Please Try Again!`,
+          icon: <IconX size={16} />,
+          color: "red",
+          autoClose: 4000,
+        });
+      });
+    }
+    signOut();
+    return router.push("/auth/sign-in");
+  };
 
   return (
     <>
@@ -149,30 +181,30 @@ export function Utilities() {
                   Apps
                 </Tabs.Tab>
               </Menu.Target>
-          {status === "authenticated" && (
-          <>
-              <Tabs.Tab
-                onClick={() => {
-                  showNotification({
-                    id: "transactions-status",
-                    color: "teal",
-                    title: "Loading Transactions",
-                    message: "Fetching Recent M-PESA Transactions ...",
-                    loading: true,
-                    autoClose: 50000,
-                  });
-                  forceReload();
-                }}
-                value="refresh"
-                icon={<IconRefresh />}
-              >
-                Refresh
-              </Tabs.Tab>
-              <Tabs.Tab value="account" icon={<IconUser />}>
-                Account
-              </Tabs.Tab>
-              </>
-          )}
+              {status === "authenticated" && (
+                <>
+                  <Tabs.Tab
+                    onClick={() => {
+                      showNotification({
+                        id: "transactions-status",
+                        color: "teal",
+                        title: "Loading Transactions",
+                        message: "Fetching Recent M-PESA Transactions ...",
+                        loading: true,
+                        autoClose: 50000,
+                      });
+                      forceReload();
+                    }}
+                    value="refresh"
+                    icon={<IconRefresh />}
+                  >
+                    Refresh
+                  </Tabs.Tab>
+                  <Tabs.Tab value="account" icon={<IconUser />}>
+                    Account
+                  </Tabs.Tab>
+                </>
+              )}
             </Tabs.List>
           </StyledTabs>
         </Affix>
@@ -183,28 +215,46 @@ export function Utilities() {
             <Text style={{ paddingLeft: 6 }}>Theme</Text>
           </div>
           {status === "authenticated" && (
-          <>
-          <Menu.Divider />
-          <Menu.Item icon={<IconSettings size={20} />}>Settings</Menu.Item>
-          <Menu.Item icon={<IconMessageCircle size={20} />} disabled>
-            Messages
-          </Menu.Item>
-          <Menu.Divider />
-          {/* Spotlight */}
-          <Menu.Item
-            icon={<IconSearch size={20} />}
-            rightSection={
-              <Text size="xs" color="dimmed">
-                CTRL+K
-              </Text>
-            }
-            disabled
-          >
-            Search
-          </Menu.Item>
-          <Menu.Item icon={<IconArrowsLeftRight size={20} />}>Reload Page</Menu.Item>
-              <Menu.Item icon={<IconLogout onClick={() => { signOut(); router.push("/auth/sign-in"); }} size={20} />} color="red">Sign Out</Menu.Item>
-              </>
+            <>
+              <Menu.Divider />
+              <Menu.Item icon={<IconSettings size={20} />}>Settings</Menu.Item>
+              <Menu.Item icon={<IconMessageCircle size={20} />} disabled>
+                Messages
+              </Menu.Item>
+              <Menu.Divider />
+              {/* Spotlight */}
+              <Menu.Item
+                icon={<IconSearch size={20} />}
+                rightSection={
+                  <Text size="xs" color="dimmed">
+                    CTRL+K
+                  </Text>
+                }
+                disabled
+              >
+                Search
+              </Menu.Item>
+              <Menu.Item icon={<IconArrowsLeftRight size={20} />}>
+                Reload Page
+              </Menu.Item>
+              <Menu.Item
+                onClick={() => {
+                  showNotification({
+                    id: "sign-out-status",
+                    color: "teal",
+                    title: "Sign Out",
+                    message: "Signing Out Destiny Credit LTD ...",
+                    loading: true,
+                    autoClose: 50000,
+                  });
+                  handleSignOut();
+                }}
+                icon={<IconLogout size={20} />}
+                color="red"
+              >
+                Sign Out
+              </Menu.Item>
+            </>
           )}
         </Menu.Dropdown>
       </Menu>

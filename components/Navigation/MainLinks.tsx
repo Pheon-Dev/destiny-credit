@@ -8,6 +8,7 @@ import {
   IconBrandAsana,
 } from "@tabler/icons";
 import { Box, NavLink, Text } from "@mantine/core";
+import { Protected } from "../Protected/Protected";
 import Link from "next/link";
 
 export function MainLinks() {
@@ -29,6 +30,7 @@ export function MainLinks() {
   /*   }, []) */
 
   return (
+  <Protected>
     <Box style={{padding: 2}}>
       <NavLink
         styles={{
@@ -295,7 +297,7 @@ export function MainLinks() {
         ))}
       </NavLink>
     </Box>
-  );
+  </Protected>);
 }
 
 const members_data = [
