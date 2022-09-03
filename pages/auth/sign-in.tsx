@@ -88,6 +88,7 @@ const Page: NextPage = (props): JSX.Element => {
           />
           <TextInput
             label="Password"
+            type="password"
             placeholder="*******"
             mt="sm"
             {...form.getInputProps("password")}

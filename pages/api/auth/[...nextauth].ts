@@ -4,6 +4,7 @@ import type { NextAuthOptions } from "next-auth";
 import CredentialsProvider from "next-auth/providers/credentials";
 import { PrismaClient } from "@prisma/client";
 import { PrismaAdapter } from "@next-auth/prisma-adapter";
+const SECRET = process.env.NEXT_PUBLIC_JWT_SECRET;
 
 const prisma = new PrismaClient();
 
@@ -62,6 +63,7 @@ const authOptions: NextAuthOptions = {
       return token;
     },
   },
+  secret: `${SECRET}`,
   pages: {
     signIn: "/auth/sign-in",
     /* signOut: "/auth/sign-out", */
