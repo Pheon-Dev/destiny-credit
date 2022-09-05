@@ -11,10 +11,10 @@ import {
   LoadingOverlay,
   Text,
   TextInput,
-  Center,
+  Card,
   Box,
   Grid,
-  Divider,
+  Badge,
   Select,
 } from "@mantine/core";
 import Router, { useRouter } from "next/router";
@@ -31,15 +31,20 @@ const schema = z.object({
   product: z.string().min(2, { message: "Product is Missing" }),
   amount: z.string().min(2, { message: "Amount is Missing" }),
   tenure: z.string().min(1, { message: "Tenure is Missing" }),
-  start: z.string().min(2, { message: "Start Date is Missing" }),
+  /* start: z.string().min(2, { message: "Start Date is Missing" }), */
 });
 
 const Page: NextPage = () => {
   const [active, setActive] = useState(0);
+  /* const [value, setValue] = useState(); */
+  const [sundays, setSundays] = useState(0);
+  const [products, setProducts] = useState([]);
+  const [members, setMembers] = useState([]);
+  const [status, setStatus] = useState(false);
 
   const nextStep = () => {
     form.validate();
-    form.setFieldValue("start", `${value}`);
+    /* form.setFieldValue("start", `${value}`); */
     showNotification({
       id: "maintainance-status",
       color: "teal",
@@ -49,28 +54,28 @@ const Page: NextPage = () => {
       autoClose: 50000,
     });
     handleSubmit();
-    if (form.values.tenure && form.values.amount && form.values.member && form.values.start) {
+    if (
+      form.values.tenure &&
+      form.values.amount &&
+      form.values.member &&
+      form.values.start
+    ) {
       return setActive((current) => (current < 3 ? current + 1 : current));
     }
-      setTimeout(() => {
-        updateNotification({
-          id: "maintainance-status",
-          color: "red",
-          title: "Missing Fields!",
-          message: `Please Fill All the Missing Fields`,
-          icon: <IconX size={16} />,
-          autoClose: 5000,
-        });
+    setTimeout(() => {
+      updateNotification({
+        id: "maintainance-status",
+        color: "red",
+        title: "Missing Fields!",
+        message: `Please Fill in All the Missing Fields`,
+        icon: <IconX size={16} />,
+        autoClose: 5000,
       });
+    });
   };
 
   const prevStep = () =>
     setActive((current) => (current > 0 ? current - 1 : current));
-
-  /* const [value, setValue] = useState(); */
-  const [products, setProducts] = useState([]);
-  const [members, setMembers] = useState([]);
-  const [status, setStatus] = useState(false);
 
   async function fetchMembersProducts() {
     let subscription = true;
@@ -118,21 +123,33 @@ const Page: NextPage = () => {
 
   const date = new Date();
   date.setDate(date.getDate() + Number(form.values.tenure));
-  const [value, setValue] = useState<DateRangePickerValue>([
-    new Date(),
-    new Date(date),
-  ]);
+  /* const [value, setValue] = useState<DateRangePickerValue>([ */
+  /*   new Date(), */
+  /*   new Date(date), */
+  /* ]); */
   useEffect(() => {
     let s = true;
 
     if (s) {
-      console.log(form.values);
+      let sundays = 0;
+      let counter = 0;
+      let term = +form.values.tenure;
+
+      while (counter < term + 1) {
+        const date = new Date();
+        date.setDate(date.getDate() + counter);
+        let day = date.getDay();
+        if (day === 0) {
+          setSundays((sundays += 1));
+        }
+        counter++;
+      }
     }
 
     return () => {
       s = false;
     };
-  }, [value, form.values.tenure, date]);
+  }, [form.values.tenure, date]);
 
   const handleSubmit = async () => {
     try {
@@ -164,12 +181,31 @@ const Page: NextPage = () => {
     }
   };
 
+  const Calculations = () => {
+    return (
+      <Card shadow="sm" p="lg" radius="md" m="xl" withBorder>
+        <Group position="apart" mt="md" mb="xs">
+          <Text weight={500}>Total Sundays</Text>
+          <Badge color="blue" variant="light">
+            {sundays} {sundays === 1 ? "sunday" : "sundays"}
+          </Badge>
+        </Group>
+        <Group position="apart" mt="md" mb="xs">
+          <Text weight={500}>Total Sundays</Text>
+          <Badge color="blue" variant="light">
+            {sundays} {sundays === 1 ? "sunday" : "sundays"}
+          </Badge>
+        </Group>
+      </Card>
+    );
+  };
   return (
     <Protected>
       <Stepper mt="lg" active={active} onStepClick={setActive} breakpoint="sm">
         <Stepper.Step
           label="Loan Maintenance"
           description="Select a Member & a Product."
+          loading={status}
         >
           <Box>
             <form>
@@ -239,6 +275,7 @@ const Page: NextPage = () => {
               {/* </Grid> */}
             </form>
           </Box>
+          <Calculations />
         </Stepper.Step>
         <Stepper.Step
           label="Add a Guarantor"
@@ -264,8 +301,8 @@ const Page: NextPage = () => {
         <Button onClick={nextStep}>Next</Button>
         {/* <Button onClick={nextStep}>Next</Button> */}
       </Group>
-            <pre>{JSON.stringify(members, undefined, 2)}</pre>
-            <pre>{JSON.stringify(products, undefined, 2)}</pre>
+      <pre>{JSON.stringify(members, undefined, 2)}</pre>
+      <pre>{JSON.stringify(products, undefined, 2)}</pre>
     </Protected>
   );
 };

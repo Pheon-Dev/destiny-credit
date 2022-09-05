@@ -4,7 +4,15 @@ import { signIn } from "next-auth/react";
 import { NextPage } from "next";
 import { z } from "zod";
 import { useForm, zodResolver } from "@mantine/form";
-import { TextInput, Center, Button, Box, Group, Text } from "@mantine/core";
+import {
+  TextInput,
+  Card,
+  Badge,
+  Button,
+  Box,
+  Group,
+  Text,
+} from "@mantine/core";
 import Router, { useRouter } from "next/router";
 import { showNotification, updateNotification } from "@mantine/notifications";
 import { IconCheck, IconX } from "@tabler/icons";
@@ -78,45 +86,58 @@ const Page: NextPage = (props): JSX.Element => {
   };
 
   return (
-    <Group position="center" mt="lg">
-      <Box sx={{ maxWidth: 340 }} mx="auto">
-        <form>
-          <TextInput
-            label="User Name"
-            placeholder="User Name ..."
-            {...form.getInputProps("username")}
-            required
-          />
-          <TextInput
-            label="Password"
-            type="password"
-            placeholder="*******"
-            mt="sm"
-            {...form.getInputProps("password")}
-            required
-          />
+    <Card
+      sx={{ maxWidth: 360 }}
+      mx="auto"
+      shadow="sm"
+      p="lg"
+      radius="md"
+      withBorder
+      style={{ marginTop: "200px" }}
+    >
+      <Card.Section>
+        <Box p="lg">
+          <form>
+            <TextInput
+              label="User Name"
+              placeholder="User Name ..."
+              {...form.getInputProps("username")}
+              required
+            />
+            <TextInput
+              label="Password"
+              type="password"
+              placeholder="*******"
+              mt="sm"
+              {...form.getInputProps("password")}
+              required
+            />
 
-          <Group position="right" mt="xl">
-            <Button
-              onClick={() => {
-            form.validate();
-                showNotification({
-                  id: "sing-in-status",
-                  color: "teal",
-                  title: "Signing In",
-                  message: `Validating User ${form.values.username} ...`,
-                  loading: true,
-                  autoClose: 50000,
-                });
-                handleSubmit();
-              }}
-            >
-              Sign In
-            </Button>
-          </Group>
-        </form>
-      </Box>
-    </Group>
+            <Group mt="xl">
+              <Button
+              variant="light"
+              color="blue"
+              fullWidth mt="md" radius="md"
+                onClick={() => {
+                  form.validate();
+                  showNotification({
+                    id: "sing-in-status",
+                    color: "teal",
+                    title: "Signing In",
+                    message: `Validating User ${form.values.username} ...`,
+                    loading: true,
+                    autoClose: 50000,
+                  });
+                  handleSubmit();
+                }}
+              >
+                Sign In
+              </Button>
+            </Group>
+          </form>
+        </Box>
+      </Card.Section>
+    </Card>
   );
 };
 
