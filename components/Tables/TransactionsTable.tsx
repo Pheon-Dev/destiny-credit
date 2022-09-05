@@ -2,6 +2,7 @@ import React from "react";
 import { Group, Table } from "@mantine/core";
 import { Transactions } from "../../types";
 import { TitleText } from "../../components";
+import Router, { useRouter } from "next/router";
 
 export function TransactionsTable({
   transactions,
@@ -14,7 +15,6 @@ export function TransactionsTable({
       <th>Names</th>
       <th>Amount</th>
       <th>Phone</th>
-      <th>M-PESA</th>
       <th>Type</th>
     </tr>
   );
@@ -44,6 +44,7 @@ export function TransactionsTable({
 }
 
 function TransactionRow({ transaction }: { transaction: Transactions }) {
+  const router = useRouter();
   const today = new Date()
   const date = today.toLocaleDateString()
 
@@ -52,7 +53,14 @@ function TransactionRow({ transaction }: { transaction: Transactions }) {
   return (
     <>
       {transaction.transTime.startsWith(time_str) && (
-        <tr>
+        <tr
+        style={{
+          cursor: transaction.billRefNumber !== "" ? "pointer" : "text"
+          }}
+        onClick={() => {
+        transaction.billRefNumber !== "" ? router.push(`/members/paid/${transaction.transID}`) : null
+          }
+          }>
           <td>{transaction.transID}</td>
           <td>
             {transaction.firstName +
@@ -63,7 +71,6 @@ function TransactionRow({ transaction }: { transaction: Transactions }) {
           </td>
           <td>{transaction.transAmount}</td>
           <td>{transaction.msisdn}</td>
-          <td>{transaction.transactionType === "Pay Bill" ? "Paybill" : "Till"}</td>
           {transaction.billRefNumber === "" ?
           <td>{transaction.transTime}</td>
           :
