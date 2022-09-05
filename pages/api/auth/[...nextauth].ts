@@ -10,12 +10,16 @@ import { hash, compare } from "bcryptjs";
 type Props = {
   password: string;
   hashedPassword: string;
-}
+};
 
 const SECRET = process.env.NEXT_PUBLIC_JWT_SECRET;
 
 const prisma = new PrismaClient();
 
+export async function verify({ password, hashedPassword }: Props) {
+  const isValid = compare(password, hashedPassword);
+  return isValid;
+}
 const authOptions: NextAuthOptions = {
   adapter: PrismaAdapter(prisma),
   session: {
@@ -40,48 +44,52 @@ const authOptions: NextAuthOptions = {
           );
         }
 
-        try {
-          let maybe_user = await prisma.user.findFirst({
-            where: {
-              username: username,
-            },
-            select: {
-              id: true,
-              username: true,
-              password: true,
-              role: true,
-            },
-          });
-          /* if (username === "DCL000" && password === "ADMIN") */
-          /*   return { username: "Admin", id: "0" }; */
-
-          if (!maybe_user) {
-            if (!username || !password)
-              throw new Error("Invalid Credentials!");
-          }
-          const hashed_password = await hash(password, 12)
-          maybe_user = await prisma.user.create({
-            data: {
-              username: username,
-              password: hashed_password
-            },
-            select: {
-              id: true,
-              username: true,
-              password: true,
-              role: true,
-            }
-          })
-
-          if (maybe_user) {
-            const isValid = await compare(password, maybe_user.password);
-            if (!isValid) {
-              throw new Error("Invalid User Credentials!")
-            }
-          }
-        } catch (error) {
-          console.log(error);
-        }
+        if (username === "DCL000" && password === "ADMIN")
+          return { username: "Admin", id: "0" };
+        /* try { */
+        /*   let maybe_user = await prisma.user.findFirst({ */
+        /*     where: { */
+        /*       username: username, */
+        /*     }, */
+        /*     select: { */
+        /*       id: true, */
+        /*       username: true, */
+        /*       password: true, */
+        /*       role: true, */
+        /*     }, */
+        /*   }); */
+        /**/
+        /*   if (!maybe_user) { */
+        /*     if (!username || !password) throw new Error("Invalid Credentials!"); */
+        /*     const hashed_password = await hash(password, 12); */
+        /*     maybe_user = await prisma.user.create({ */
+        /*       data: { */
+        /*         username: username, */
+        /*         password: hashed_password, */
+        /*       }, */
+        /*       select: { */
+        /*         id: true, */
+        /*         username: true, */
+        /*         password: true, */
+        /*         role: true, */
+        /*       }, */
+        /*     }); */
+        /*   } else { */
+        /*     const hashed_password = maybe_user.password; */
+        /*     const isValid = await verify(password, hashed_password); */
+        /*     if (!isValid) { */
+        /*       throw new Error("Invalid User Credentials!"); */
+        /*     } */
+        /*   } */
+        /**/
+        /*   return { */
+        /*     id: maybe_user.id, */
+        /*     username: maybe_user.username, */
+        /*     role: maybe_user.role, */
+        /*   }; */
+        /* } catch (error) { */
+        /*   console.log(error); */
+        /* } */
         throw new Error(`Wrong User Name | Password!`);
       },
     }),
@@ -102,7 +110,7 @@ const authOptions: NextAuthOptions = {
       /*   ...session, */
       /*   user: { */
       /*     ...session.user, */
-      /*     id: token., */
+      /*     username: token.username, */
       /*   } */
       /* } */
       /* session.accessToken = token.accessToken; */
@@ -113,9 +121,9 @@ const authOptions: NextAuthOptions = {
       /*   token.sub === account.access_token; */
       /* } */
       /* return token; */
-      if (account) {
-        token.accessToken === account.access_token;
-      }
+      /* if (account) { */
+      /*   token.accessToken === account.access_token; */
+      /* } */
       return token;
     },
   },
@@ -128,7 +136,7 @@ const authOptions: NextAuthOptions = {
     signIn: "/auth/sign-in",
     /* signOut: "/auth/sign-out", */
     /* error: "/auth/error", */
-    newUser: "/auth/create-user",
+    /* newUser: "/auth/create-user", */
   },
 };
 

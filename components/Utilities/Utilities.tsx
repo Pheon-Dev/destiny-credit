@@ -8,7 +8,7 @@ import {
   Button,
   Affix,
   Transition,
-  LoadingOverlay,
+  Tooltip,
 } from "@mantine/core";
 import { useWindowScroll } from "@mantine/hooks";
 import {
@@ -180,13 +180,15 @@ export function Utilities() {
           <StyledTabs defaultValue="apps">
             <Tabs.List>
               <Menu.Target>
+              <Tooltip label="Utilities" color="blue" withArrow>
                 <Tabs.Tab
                   value="apps"
                   icon={<IconCategory2 style={{ padding: 2 }} />}
-                />
+                /></Tooltip>
               </Menu.Target>
               {status === "authenticated" && (
-                <>
+              <>
+              <Tooltip color="blue" withArrow label="Refresh">
                   <Tabs.Tab
                     onClick={() => {
                       showNotification({
@@ -201,11 +203,12 @@ export function Utilities() {
                     }}
                     value="refresh"
                     icon={<IconArrowsLeftRight style={{ padding: 2 }} />}
-                  />
+                /></Tooltip>
+              <Tooltip color="blue" withArrow label="Account">
                   <Tabs.Tab
                     value="account"
                     icon={<IconUser style={{ padding: 2 }} />}
-                  />
+                /></Tooltip>
                 </>
               )}
             </Tabs.List>

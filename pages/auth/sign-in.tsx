@@ -76,13 +76,14 @@ const Page: NextPage = (props): JSX.Element => {
       });
     }
   };
+
   return (
     <Group position="center" mt="lg">
       <Box sx={{ maxWidth: 340 }} mx="auto">
         <form>
           <TextInput
             label="User Name"
-            placeholder="DCL000"
+            placeholder="User Name ..."
             {...form.getInputProps("username")}
             required
           />
@@ -98,6 +99,7 @@ const Page: NextPage = (props): JSX.Element => {
           <Group position="right" mt="xl">
             <Button
               onClick={() => {
+            form.validate();
                 showNotification({
                   id: "sing-in-status",
                   color: "teal",

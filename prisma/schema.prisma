@@ -226,4 +226,5 @@ model Transaction {
 enum Role {
   USER
   ADMIN
+  SUPAERADMIN
 }
