@@ -233,9 +233,9 @@ export function Utilities() {
                 "Dark Theme"
               )}
           </Menu.Item>
-          <Menu.Divider />
           {status === "authenticated" && (
             <>
+            <Menu.Divider />
               <Menu.Item icon={<IconSettings size={20} />}>Settings</Menu.Item>
               <Menu.Item icon={<IconMessageCircle size={20} />} disabled>
                 Messages

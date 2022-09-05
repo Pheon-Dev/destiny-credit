@@ -5,6 +5,5 @@ export { MembersTable } from "./Tables/MembersTable";
 export { TitleText } from "./Text/TitleText";
 export { Utilities } from "./Utilities/Utilities";
 export { Protected } from "./Protected/Protected";
-export { Maintenance } from "./Loan/Maintenance";
 export { Guarantors } from "./Loan/Guarantors";
 export { Collaterals } from "./Loan/Collaterals";

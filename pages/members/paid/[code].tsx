@@ -157,11 +157,11 @@ const CreateMember = ({ memcode }: { memcode: string }) => {
 
   useEffect(() => {
     form.setFieldValue("memberId", `${memcode}`);
-          form.setFieldValue("firstName", `${fName}`);
-          form.setFieldValue("lastName", `${mName} ${lName}`);
-          form.setFieldValue("id", `${mId}`);
-          form.setFieldValue("phoneNumber", `${pNumber}`);
-          form.setFieldValue("membershipAmount", `${amount}`);
+    form.setFieldValue("firstName", `${fName}`);
+    form.setFieldValue("lastName", `${mName} ${lName}`);
+    form.setFieldValue("id", `${mId}`);
+    form.setFieldValue("phoneNumber", `${pNumber}`);
+    form.setFieldValue("membershipAmount", `${amount}`);
   }, [memcode, transaction]);
 
   let today_date = new Date(form.values.date);
@@ -1001,4 +1001,3 @@ const Page = () => {
 };
 
 export default Page;
-
