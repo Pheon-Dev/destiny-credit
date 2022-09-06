@@ -49,10 +49,8 @@ const schema = z.object({
 
 const Page: NextPage = () => {
   const [active, setActive] = useState(0);
-  const [member, setMember] = useState();
   const [sundays, setSundays] = useState(0);
   const [products, setProducts] = useState([]);
-  const [product, setProduct] = useState([]);
   const [members, setMembers] = useState([]);
   const [status, setStatus] = useState(false);
   const [checked, setChecked] = useState(false);
@@ -60,7 +58,6 @@ const Page: NextPage = () => {
 
   const nextStep = () => {
     form.validate();
-    /* form.setFieldValue("start", `${value}`); */
     showNotification({
       id: "maintainance-status",
       color: "teal",

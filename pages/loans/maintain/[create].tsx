@@ -44,12 +44,10 @@ const schema = z.object({
   product: z.string().min(2, { message: "Product is Missing" }),
   amount: z.string().min(2, { message: "Amount is Missing" }),
   tenure: z.string().min(1, { message: "Tenure is Missing" }),
-  /* start: z.string().min(2, { message: "Start Date is Missing" }), */
 });
 
 const Page: NextPage = () => {
   const [active, setActive] = useState(0);
-  const [member, setMember] = useState([]);
   const [sundays, setSundays] = useState(0);
   const [products, setProducts] = useState([]);
   const [product, setProduct] = useState([]);
@@ -62,7 +60,6 @@ const Page: NextPage = () => {
 
   const nextStep = () => {
     form.validate();
-    /* form.setFieldValue("start", `${value}`); */
     showNotification({
       id: "maintainance-status",
       color: "teal",
@@ -95,7 +92,7 @@ const Page: NextPage = () => {
   const prevStep = () =>
     setActive((current) => (current > 0 ? current - 1 : current));
 
-  async function fetchMembersProducts() {
+  async function fetchMemberNProducts() {
     let subscription = true;
 
     if (subscription) {
@@ -115,9 +112,11 @@ const Page: NextPage = () => {
       const pros = pro.data.products;
 
       setProducts(pros);
-      /* setMember(mem.data.member[0]); */
       if (mem.data.member[0]?.firstName?.length > 0)
-        form.setFieldValue("member", `${mem.data.member[0].firstName} ${mem.data.member[0].lastName}`);
+        form.setFieldValue(
+          "member",
+          `${mem.data.member[0].firstName} ${mem.data.member[0].lastName}`
+        );
     }
 
     return () => {
@@ -126,11 +125,8 @@ const Page: NextPage = () => {
   }
 
   useEffect(() => {
-    fetchMembersProducts();
-    !member ? setStatus(true) : setStatus(false);
-    !products && setStatus(true);
-    products && setStatus(false);
-  }, [products, member]);
+    fetchMemberNProducts();
+  }, [products]);
 
   const form = useForm({
     validate: zodResolver(schema),
@@ -145,10 +141,7 @@ const Page: NextPage = () => {
 
   const date = new Date();
   date.setDate(date.getDate() + Number(form.values.tenure));
-  /* const [value, setValue] = useState<DateRangePickerValue>([ */
-  /*   new Date(), */
-  /*   new Date(date), */
-  /* ]); */
+
   async function fetchProduct() {
     const pr = await axios.request({
       method: "POST",
@@ -158,7 +151,7 @@ const Page: NextPage = () => {
       },
     });
 
-    setProduct(pr.data);
+    setProduct(pr.data?.product);
   }
 
   useEffect(() => {
@@ -186,7 +179,7 @@ const Page: NextPage = () => {
     return () => {
       s = false;
     };
-  }, [form.values.tenure, date, checked]);
+  }, [form.values.tenure, date, checked, product, sundays]);
 
   /* console.log(form.values.product); */
   const handleSubmit = async () => {
@@ -219,6 +212,100 @@ const Page: NextPage = () => {
     }
   };
 
+  const roundOff = (value: number) => {
+    return (
+      +value.toString().split(".")[1] > 0
+        ? +value.toString().split(".")[0] + 1
+        : +value.toString().split(".")[0] + 0
+    ).toString();
+  };
+
+  const renderDailyInterestAmount = (
+    rate: number,
+    principal: number,
+    tenure: number
+  ) => {
+    let multiplier = 30 / 4;
+    tenure =
+      tenure === 7
+        ? multiplier
+        : tenure === 14
+        ? multiplier * 2
+        : tenure === 21
+        ? multiplier * 3
+        : tenure;
+
+    return roundOff(((rate * principal) / 3000) * tenure);
+  };
+
+  const renderDailyInstallmentAmount = (
+    rate: number,
+    principal: number,
+    tenure: number
+  ) => {
+    let principalAmount = renderDailyInterestAmount(rate, principal, tenure);
+
+    return roundOff((+principalAmount + principal) / (tenure - sundays));
+  };
+
+  const renderWeeklyInterestAmount = (
+    rate: number,
+    principal: number,
+    tenure: number
+  ) => {
+    return roundOff(((rate * principal) / 400) * tenure);
+  };
+
+  const renderWeeklyInstallmentAmount = (
+    rate: number,
+    principal: number,
+    tenure: number
+  ) => {
+    let principalAmount = renderWeeklyInterestAmount(rate, principal, tenure);
+
+    return roundOff((+principalAmount + principal) / tenure);
+  };
+
+  const renderMonthlyInterestAmount = (
+    rate: number,
+    principal: number,
+    tenure: number
+  ) => {
+    return roundOff(((rate * principal) / 100) * tenure);
+  };
+
+  const renderMonthlyInstallmentAmount = (
+    rate: number,
+    principal: number,
+    tenure: number
+  ) => {
+    let principalAmount = renderMonthlyInterestAmount(rate, principal, tenure);
+
+    return roundOff((+principalAmount + principal) / tenure);
+  };
+
+  const renderProcessingFeeAmount = (rate: number, principal: number) => {
+    let proc_fee = roundOff((rate / 100) * principal);
+
+    return +proc_fee < 301 ? 300 : proc_fee;
+  };
+
+  const renderPenaltyAmount = (
+    penalty_rate: number,
+    interest_rate: number,
+    cycle: string,
+    principal: number,
+    tenure: number
+  ) => {
+    let installment =
+      cycle.toLowerCase() === "daily"
+        ? renderDailyInstallmentAmount(interest_rate, principal, tenure)
+        : cycle.toLowerCase() === "weekly"
+        ? renderWeeklyInstallmentAmount(interest_rate, principal, tenure)
+        : renderMonthlyInstallmentAmount(interest_rate, principal, tenure);
+    return roundOff((penalty_rate / 100) * +installment);
+  };
+
   const Review = () => {
     return (
       <Card shadow="sm" p="lg" radius="md" m="xl" withBorder>
@@ -243,10 +330,9 @@ const Page: NextPage = () => {
           </Group>
         </Card.Section>
         <Group position="apart" mt="md" mb="xs">
-          <Text weight={500}>Include Payments on Sunday.</Text>
-          <Text weight={500} size={12}>{`${sundays} ${
+          <Text weight={500}>Include Payments on Sunday. ({`${sundays} ${
             sundays === 1 ? "Sunday" : "Sundays"
-          }`}</Text>
+          }`})</Text>
           <Switch
             aria-label="Sundays"
             size="md"
@@ -271,12 +357,104 @@ const Page: NextPage = () => {
             }}
           />
         </Group>
-        <Group position="apart" mt="md" mb="xs">
-          <Text weight={500}>Total Sundays</Text>
-          <Badge color="blue" variant="light">
-            {sundays} {sundays === 1 ? "sunday" : "sundays"}
-          </Badge>
-        </Group>
+        {product
+          ? product?.map((_: Products) => (
+              <div key={_.id}>
+                <Group position="apart" mt="md" mb="xs">
+                  <Text weight={500}>Product</Text>
+                  <Text weight={500}>{_.productName}</Text>
+                </Group>
+                <Group position="apart" mt="md" mb="xs">
+                  <Text weight={500}>Interest Amount ({_.interestRate} %)</Text>
+                  {_.repaymentCycle.toLowerCase() === "daily" ? (
+                    <Text weight={500}>
+                      {renderDailyInterestAmount(
+                        +_.interestRate,
+                        +form.values.amount,
+                        +form.values.tenure
+                      )}.00
+                    </Text>
+                  ) : _.repaymentCycle.toLowerCase() === "weekly" ? (
+                    <Text weight={500}>
+                      {renderWeeklyInterestAmount(
+                        +_.interestRate,
+                        +form.values.amount,
+                        +form.values.tenure
+                      )}.00
+                    </Text>
+                  ) : (
+                    <Text weight={500}>
+                      {renderMonthlyInterestAmount(
+                        +_.interestRate,
+                        +form.values.amount,
+                        +form.values.tenure
+                      )}.00
+                    </Text>
+                  )}
+                </Group>
+                <Group position="apart" mt="md" mb="xs">
+                  <Text weight={500}>Installment Amount</Text>
+                  {_.repaymentCycle.toLowerCase() === "daily" ? (
+                    <Text weight={500}>
+                      {renderDailyInstallmentAmount(
+                        +_.interestRate,
+                        +form.values.amount,
+                        +form.values.tenure
+                      )}.00
+                    </Text>
+                  ) : _.repaymentCycle.toLowerCase() === "weekly" ? (
+                    <Text weight={500}>
+                      {renderWeeklyInstallmentAmount(
+                        +_.interestRate,
+                        +form.values.amount,
+                        +form.values.tenure
+                      )}.00
+                    </Text>
+                  ) : (
+                    <Text weight={500}>
+                      {renderMonthlyInstallmentAmount(
+                        +_.interestRate,
+                        +form.values.amount,
+                        +form.values.tenure
+                      )}.00
+                    </Text>
+                  )}
+                </Group>
+                <Group position="apart" mt="md" mb="xs">
+                  <Text weight={500}>Penalty Amount ({_.penaltyRate} %)</Text>
+                  <Text weight={500}>
+                    {renderPenaltyAmount(
+                      +_.penaltyRate,
+                      +_.interestRate,
+                      _.repaymentCycle,
+                      +form.values.amount,
+                      +form.values.tenure
+                      )}.00
+                  </Text>
+                </Group>
+                <Group position="apart" mt="md" mb="xs">
+                  <Text weight={500}>Processing Fee Amount ({_.processingFee} %)</Text>
+                  <Text weight={500}>
+                    {renderProcessingFeeAmount(
+                      +_.processingFee,
+                      +form.values.amount
+                      )}.00
+                  </Text>
+                </Group>
+                <Group position="apart" mt="md" mb="xs">
+                  <Text weight={500}>Repayment Cycle</Text>
+                  <Text weight={500}>{_.repaymentCycle}</Text>
+                </Group>
+                  {_.repaymentCycle.toLowerCase() === "daily" ? (
+                <Group position="apart" mt="md" mb="xs">
+                  <Text weight={500}>Grace Period</Text>
+                  <Text weight={500}>{_.gracePeriod} Day</Text>
+                </Group>
+                ): null
+                }
+              </div>
+            ))
+          : null}
       </Card>
     );
   };

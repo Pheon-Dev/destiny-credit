@@ -58,7 +58,7 @@ function TransactionRow({ transaction }: { transaction: Transactions }) {
           cursor: transaction.billRefNumber !== "" ? "pointer" : "text"
           }}
         onClick={() => {
-        transaction.billRefNumber !== "" ? router.push(`/members/paid/${transaction.transID}`) : null
+        transaction.billRefNumber !== "" ? router.push(`/members/paid/${transaction.transID}`) :  router.push(`/members/paid/${transaction.transID}`)
           }
           }>
           <td>{transaction.transID}</td>

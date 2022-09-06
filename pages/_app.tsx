@@ -35,7 +35,7 @@ function App(props: AppProps & { colorScheme: ColorScheme }) {
     props.colorScheme
   );
 
-  const [isSSR, setIsSSR] = useState(true);
+  /* const [isSSR, setIsSSR] = useState(true); */
 
   const toggleColorScheme = (value?: ColorScheme) => {
     const nextColorScheme =
@@ -46,11 +46,11 @@ function App(props: AppProps & { colorScheme: ColorScheme }) {
     });
   };
 
-  useEffect(() => {
-    setIsSSR(false);
-  }, []);
+  /* useEffect(() => { */
+  /*   setIsSSR(false); */
+  /* }, []); */
 
-  if (isSSR) return null;
+  /* if (isSSR) return null; */
 
   const AppContent = () => {
   /* console.log(pageProps.session); */
