@@ -103,8 +103,8 @@ const Page: NextPage = () => {
         method: "POST",
         url: `/api/members/${id}`,
         data: {
-            id: `${id}`
-          }
+          id: `${id}`,
+        },
       });
 
       const pro = await axios.request({
@@ -116,7 +116,8 @@ const Page: NextPage = () => {
 
       setProducts(pros);
       setMember(mem.data.member[0]);
-      if (member?.firstName?.length > 0) form.setFieldValue("member", `${member.firstName} ${member.lastName}`)
+      if (member?.firstName?.length > 0)
+        form.setFieldValue("member", `${member.firstName} ${member.lastName}`);
     }
 
     return () => {
@@ -149,20 +150,16 @@ const Page: NextPage = () => {
   /*   new Date(date), */
   /* ]); */
   async function fetchProduct() {
-      const pr = await axios.request({
-        method: "POST",
-        url: `/api/products/${form.values.product}`,
-        data: {
-            productName: `${form.values.product}`
-          }
-      });
+    const pr = await axios.request({
+      method: "POST",
+      url: `/api/products/${form.values.product}`,
+      data: {
+        productName: `${form.values.product}`,
+      },
+    });
 
-      setProduct(pr.data)
-
-    }
-
-    console.log(product)
-    console.log(form.values.product)
+    setProduct(pr.data);
+  }
 
   useEffect(() => {
     let s = true;
@@ -398,4 +395,3 @@ const Page: NextPage = () => {
 };
 
 export default Page;
-

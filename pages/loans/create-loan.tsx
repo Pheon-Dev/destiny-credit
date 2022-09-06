@@ -267,19 +267,19 @@ const Page: NextPage = () => {
   const product_data = products.map((_: Products) => [
     { key: _.id, value: `${_.id}`, label: `${_.productName}` },
   ]);
-  const member_data = members.map((_: Members) => ({ ..._, value: _.firstName + " " + _.lastName }));
-
-  const SelectMember = forwardRef<HTMLDivElement, Members>(
-    ({ firstName, lastName, ...others }: Members, ref) => (
-      <div ref={ref} {...others}>
-        <Group noWrap>
-          <div>
-            <Text>{firstName} {lastName}</Text>
-          </div>
-        </Group>
-      </div>
-    )
-  );
+  /* const member_data = members.map((_: Members) => ({ ..._, value: _.firstName + " " + _.lastName })); */
+  /**/
+  /* const SelectMember = forwardRef<HTMLDivElement, Members>( */
+  /*   ({ firstName, lastName, ...others }: Members, ref) => ( */
+  /*     <div ref={ref} {...others}> */
+  /*       <Group noWrap> */
+  /*         <div> */
+  /*           <Text>{firstName} {lastName}</Text> */
+  /*         </div> */
+  /*       </Group> */
+  /*     </div> */
+  /*   ) */
+  /* ); */
 
   return (
     <Protected>
@@ -293,36 +293,32 @@ const Page: NextPage = () => {
             <form>
               <Grid grow>
                 <Grid.Col span={4}>
-                  {/* <TextInput */}
-                  {/*   mt="md" */}
-                  {/*   label="Select Member" */}
-                  {/*   placeholder="Select Member ..." */}
-                  {/*   {...form.getInputProps("member")} */}
-                  {/*   required */}
-                  {/* /> */}
-                  <Autocomplete
+                  <TextInput
                     mt="md"
                     label="Select Member"
                     placeholder="Select Member ..."
-                    itemComponent={SelectMember}
-                    value={member}
-                    onChange={setMember}
-                    /* searchable */
-                    /* onSearchChange={() => console.log(form.values.member)} */
-                    /* maxDropdownHeight={300} */
-                    /* nothingFound="Members List is Empty" */
-                    data={member_data}
-                    filter={(value, item) => {
-                      item.value
-                        .toLowerCase()
-                        .includes(value.toLowerCase().trim()) ||
-                        item.firstName
-                          .toLowerCase()
-                          .includes(value.toLowerCase().trim());
-                    }}
                     {...form.getInputProps("member")}
                     required
                   />
+                  {/* <Autocomplete */}
+                  {/*   mt="md" */}
+                  {/*   label="Select Member" */}
+                  {/*   placeholder="Select Member ..." */}
+                  {/*   itemComponent={SelectMember} */}
+                  {/*   value={member} */}
+                  {/*   onChange={setMember} */}
+                  {/*   data={member_data} */}
+                  {/*   filter={(value, item) => { */}
+                  {/*     item.value */}
+                  {/*       .toLowerCase() */}
+                  {/*       .includes(value.toLowerCase().trim()) || */}
+                  {/*       item.firstName */}
+                  {/*         .toLowerCase() */}
+                  {/*         .includes(value.toLowerCase().trim()); */}
+                  {/*   }} */}
+                  {/*   {...form.getInputProps("member")} */}
+                  {/*   required */}
+                  {/* /> */}
                 </Grid.Col>
                 <Grid.Col span={4}>
                   {/* <TextInput */}
