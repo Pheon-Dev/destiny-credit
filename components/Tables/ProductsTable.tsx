@@ -38,7 +38,7 @@ function ProductRow({ product }: { product: Products }) {
   return (
     <tr
       style={{ cursor: "pointer" }}
-      onClick={() => router.push(`/products/${product.id}`)}
+      onClick={() => router.push(`/products/details/${product.id}`)}
     >
       <td>{product.productId}</td>
       <td>{product.productName}</td>
@@ -48,7 +48,7 @@ function ProductRow({ product }: { product: Products }) {
         {product.approved ? (
           <Badge
             style={{ cursor: "pointer" }}
-            onClick={() => router.push(`/products/${product.id}`)}
+            onClick={() => router.push(`/products/details/${product.id}`)}
             variant="gradient"
             gradient={{
               from: "teal",
@@ -60,7 +60,7 @@ function ProductRow({ product }: { product: Products }) {
         ) : (
           <Badge
             style={{ cursor: "pointer" }}
-            onClick={() => router.push(`/products/${product.id}`)}
+            onClick={() => router.push(`/products/details/${product.id}`)}
             variant="gradient"
             gradient={{
               from: "indigo",

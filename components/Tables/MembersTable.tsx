@@ -2,6 +2,7 @@ import React from "react";
 import { Table, Badge } from "@mantine/core";
 import { Members } from "../../types";
 import { useRouter } from "next/router";
+import { IconInfoCircle } from "@tabler/icons";
 
 export function MembersTable({ members }: { members: Members[] }) {
   const Header = () => (
@@ -12,6 +13,7 @@ export function MembersTable({ members }: { members: Members[] }) {
             <th>ID</th>
             <th>Date</th>
             <th>Status</th>
+            <th>Action</th>
           </tr>
   );
   return (
@@ -38,11 +40,6 @@ function MemberRow({ member }: { member: Members }) {
   return (
     <tr
       style={{ cursor: "pointer" }}
-      onClick={() =>
-        member.maintained
-          ? router.push(`/members/${member.id}`)
-          : router.push("/loans/create-loan")
-      }
     >
       <td>{member.memberId}</td>
       <td>{member.firstName + " " + member.lastName}</td>
@@ -65,7 +62,7 @@ function MemberRow({ member }: { member: Members }) {
         ) : (
           <Badge
             style={{ cursor: "pointer" }}
-            onClick={() => router.push("/loans/create-loan")}
+            onClick={() => router.push(`/loans/maintain/${member.id}`)}
             variant="gradient"
             gradient={{
               from: "indigo",
@@ -76,6 +73,9 @@ function MemberRow({ member }: { member: Members }) {
           </Badge>
         )}
       </td>
+      <td
+      onClick={() => router.push(`/members/${member.id}`)}
+      ><IconInfoCircle size={24} /></td>
     </tr>
   );
 }

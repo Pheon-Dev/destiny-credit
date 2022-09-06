@@ -7,12 +7,12 @@ async function product(req: NextApiRequest, res: NextApiResponse) {
   async function main() {
     try {
       const {
-        productName
+        id
       } = req.body;
 
       const product = await prisma.product.findMany({
         where: {
-          productName: `${productName}`
+          id: `${id}`
         },
       });
       res.status(200).json({ product: product });
@@ -38,3 +38,4 @@ async function product(req: NextApiRequest, res: NextApiResponse) {
 }
 
 export default product;
+

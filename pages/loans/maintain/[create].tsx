@@ -1,5 +1,5 @@
 import React, { useEffect, forwardRef, useState } from "react";
-import { Collaterals, Guarantors, Protected } from "../../components";
+import { Collaterals, Guarantors, Protected } from "../../../components";
 import { NextPage } from "next";
 import axios from "axios";
 import { z } from "zod";
@@ -37,7 +37,7 @@ import {
   DateRangePicker,
   DateRangePickerValue,
 } from "@mantine/dates";
-import { Members, Products } from "../../types";
+import { Members, Products } from "../../../types";
 
 const schema = z.object({
   member: z.string().min(2, { message: "User Name Missing" }),
@@ -49,7 +49,7 @@ const schema = z.object({
 
 const Page: NextPage = () => {
   const [active, setActive] = useState(0);
-  const [member, setMember] = useState();
+  const [member, setMember] = useState<Members>([]);
   const [sundays, setSundays] = useState(0);
   const [products, setProducts] = useState([]);
   const [product, setProduct] = useState([]);
@@ -57,6 +57,8 @@ const Page: NextPage = () => {
   const [status, setStatus] = useState(false);
   const [checked, setChecked] = useState(false);
   const [payoff, setPayoff] = useState(false);
+  const router = useRouter();
+  const id = router.query.create as string;
 
   const nextStep = () => {
     form.validate();
@@ -98,8 +100,11 @@ const Page: NextPage = () => {
 
     if (subscription) {
       const mem = await axios.request({
-        method: "GET",
-        url: "/api/members",
+        method: "POST",
+        url: `/api/members/${id}`,
+        data: {
+            id: `${id}`
+          }
       });
 
       const pro = await axios.request({
@@ -108,10 +113,10 @@ const Page: NextPage = () => {
       });
 
       const pros = pro.data.products;
-      const mems = mem.data.members;
 
       setProducts(pros);
-      setMembers(mems);
+      setMember(mem.data.member[0]);
+      if (member?.firstName?.length > 0) form.setFieldValue("member", `${member.firstName} ${member.lastName}`)
     }
 
     return () => {
@@ -121,13 +126,11 @@ const Page: NextPage = () => {
 
   useEffect(() => {
     fetchMembersProducts();
-    !members && setStatus(true);
-    members && setStatus(false);
+    !member ? setStatus(true) : setStatus(false);
     !products && setStatus(true);
     products && setStatus(false);
-  }, [members, products]);
+  }, [products, member]);
 
-  const router = useRouter();
   const form = useForm({
     validate: zodResolver(schema),
     initialValues: {
@@ -145,6 +148,22 @@ const Page: NextPage = () => {
   /*   new Date(), */
   /*   new Date(date), */
   /* ]); */
+  async function fetchProduct() {
+      const pr = await axios.request({
+        method: "POST",
+        url: `/api/products/${form.values.product}`,
+        data: {
+            productName: `${form.values.product}`
+          }
+      });
+
+      setProduct(pr.data)
+
+    }
+
+    console.log(product)
+    console.log(form.values.product)
+
   useEffect(() => {
     let s = true;
 
@@ -152,6 +171,7 @@ const Page: NextPage = () => {
       let sundays = 0;
       let counter = 0;
       let term = +form.values.tenure;
+      fetchProduct();
 
       while (counter < term + 1) {
         const date = new Date();
@@ -267,19 +287,6 @@ const Page: NextPage = () => {
   const product_data = products.map((_: Products) => [
     { key: _.id, value: `${_.id}`, label: `${_.productName}` },
   ]);
-  const member_data = members.map((_: Members) => ({ ..._, value: _.firstName + " " + _.lastName }));
-
-  const SelectMember = forwardRef<HTMLDivElement, Members>(
-    ({ firstName, lastName, ...others }: Members, ref) => (
-      <div ref={ref} {...others}>
-        <Group noWrap>
-          <div>
-            <Text>{firstName} {lastName}</Text>
-          </div>
-        </Group>
-      </div>
-    )
-  );
 
   return (
     <Protected>
@@ -293,45 +300,15 @@ const Page: NextPage = () => {
             <form>
               <Grid grow>
                 <Grid.Col span={4}>
-                  {/* <TextInput */}
-                  {/*   mt="md" */}
-                  {/*   label="Select Member" */}
-                  {/*   placeholder="Select Member ..." */}
-                  {/*   {...form.getInputProps("member")} */}
-                  {/*   required */}
-                  {/* /> */}
-                  <Autocomplete
+                  <TextInput
                     mt="md"
                     label="Select Member"
                     placeholder="Select Member ..."
-                    itemComponent={SelectMember}
-                    value={member}
-                    onChange={setMember}
-                    /* searchable */
-                    /* onSearchChange={() => console.log(form.values.member)} */
-                    /* maxDropdownHeight={300} */
-                    /* nothingFound="Members List is Empty" */
-                    data={member_data}
-                    filter={(value, item) => {
-                      item.value
-                        .toLowerCase()
-                        .includes(value.toLowerCase().trim()) ||
-                        item.firstName
-                          .toLowerCase()
-                          .includes(value.toLowerCase().trim());
-                    }}
                     {...form.getInputProps("member")}
                     required
                   />
                 </Grid.Col>
                 <Grid.Col span={4}>
-                  {/* <TextInput */}
-                  {/*   mt="md" */}
-                  {/*   label="Select Product" */}
-                  {/*   placeholder="Select Product ..." */}
-                  {/*   {...form.getInputProps("product")} */}
-                  {/*   required */}
-                  {/* /> */}
                   <Select
                     mt="md"
                     label="Select Product"
@@ -421,3 +398,4 @@ const Page: NextPage = () => {
 };
 
 export default Page;
+
