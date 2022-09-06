@@ -49,7 +49,7 @@ const schema = z.object({
 
 const Page: NextPage = () => {
   const [active, setActive] = useState(0);
-  const [member, setMember] = useState<Members>([]);
+  const [member, setMember] = useState([]);
   const [sundays, setSundays] = useState(0);
   const [products, setProducts] = useState([]);
   const [product, setProduct] = useState([]);
@@ -115,9 +115,9 @@ const Page: NextPage = () => {
       const pros = pro.data.products;
 
       setProducts(pros);
-      setMember(mem.data.member[0]);
-      if (member?.firstName?.length > 0)
-        form.setFieldValue("member", `${member.firstName} ${member.lastName}`);
+      /* setMember(mem.data.member[0]); */
+      if (mem.data.member[0]?.firstName?.length > 0)
+        form.setFieldValue("member", `${mem.data.member[0].firstName} ${mem.data.member[0].lastName}`);
     }
 
     return () => {
