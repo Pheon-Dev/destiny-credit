@@ -42,19 +42,30 @@ import { Members, Products } from "../../../types";
 const schema = z.object({
   member: z.string().min(2, { message: "User Name Missing" }),
   product: z.string().min(2, { message: "Product is Missing" }),
-  amount: z.string().min(2, { message: "Amount is Missing" }),
+  principal: z.string().min(2, { message: "Principal Amount is Missing" }),
   tenure: z.string().min(1, { message: "Tenure is Missing" }),
+  guarantorName: z.string().min(2, { message: "Guarantor Name is Missing" }),
+  guarantorPhone: z.string().min(2, { message: "Guarantor Phone Number is Missing" }),
+  guarantorId: z.string().min(2, { message: "Guarantor ID is Missing" }),
+  guarantorRelationship: z.string().min(2, { message: "Guarantor Relationship is Missing" }),
 });
 
 const Page: NextPage = () => {
   const [active, setActive] = useState(0);
   const [sundays, setSundays] = useState(0);
   const [products, setProducts] = useState([]);
-  const [product, setProduct] = useState([]);
-  const [members, setMembers] = useState([]);
+
+  const [intRate, setIntRate] = useState("");
+  const [proRate, setProRate] = useState("");
+  const [penRate, setPenRate] = useState("");
+  const [cycle, setCycle] = useState("");
+  const [proName, setProName] = useState("");
+  const [grace, setGrace] = useState("");
+
   const [status, setStatus] = useState(false);
   const [checked, setChecked] = useState(false);
   const [payoff, setPayoff] = useState(false);
+
   const router = useRouter();
   const id = router.query.create as string;
 
@@ -71,17 +82,47 @@ const Page: NextPage = () => {
     handleSubmit();
     if (
       form.values.tenure &&
-      form.values.amount &&
+      form.values.principal &&
       form.values.member &&
-      form.values.start
+      form.values.maintained &&
+      form.values.grace &&
+      form.values.installment &&
+      form.values.memberId &&
+      form.values.productId &&
+      form.values.payoff &&
+      form.values.penalty &&
+      form.values.processingFee &&
+      form.values.product &&
+      form.values.sundays &&
+      form.values.tenure &&
+      form.values.interest
     ) {
+      if (
+        form.values.guarantorPhone &&
+        form.values.guarantorRelationship &&
+        form.values.guarantorName &&
+        form.values.guarantorId
+      ) {
+        return console.log("Write to DB");
+      }
+      if (active === 1)
+        return setTimeout(() => {
+          updateNotification({
+            id: "maintainance-status",
+            color: "red",
+            title: "Guarantor Missing Fields!",
+            message: `Please Fill in All the Missing Fields`,
+            icon: <IconX size={16} />,
+            autoClose: 5000,
+          });
+        });
       return setActive((current) => (current < 3 ? current + 1 : current));
     }
     setTimeout(() => {
       updateNotification({
         id: "maintainance-status",
         color: "red",
-        title: "Missing Fields!",
+        title: "Loan Missing Fields!",
         message: `Please Fill in All the Missing Fields`,
         icon: <IconX size={16} />,
         autoClose: 5000,
@@ -96,6 +137,7 @@ const Page: NextPage = () => {
     let subscription = true;
 
     if (subscription) {
+      if (products.length < 1) setStatus(true);
       const mem = await axios.request({
         method: "POST",
         url: `/api/members/${id}`,
@@ -113,10 +155,13 @@ const Page: NextPage = () => {
 
       setProducts(pros);
       if (mem.data.member[0]?.firstName?.length > 0)
-        form.setFieldValue(
-          "member",
-          `${mem.data.member[0].firstName} ${mem.data.member[0].lastName}`
-        );
+        form.setFieldValue("memberId", `${mem.data.member[0].id}`);
+      form.setFieldValue("productId", `${id}`);
+      form.setFieldValue(
+        "member",
+        `${mem.data.member[0].firstName} ${mem.data.member[0].lastName}`
+      );
+      setStatus(false);
     }
 
     return () => {
@@ -126,21 +171,33 @@ const Page: NextPage = () => {
 
   useEffect(() => {
     fetchMemberNProducts();
-  }, [products]);
+  }, []);
 
   const form = useForm({
     validate: zodResolver(schema),
     initialValues: {
       member: "",
+      memberId: "",
       product: "",
-      amount: "",
+      productId: "",
+      principal: "",
       tenure: "",
-      start: "",
+      interest: "",
+      installment: "",
+      penalty: "",
+      processingFee: "",
+      payoff: "",
+      sundays: "",
+      grace: "",
+      maintained: false,
+      approved: false,
+      disbursed: false,
+      guarantorName: "",
+      guarantorPhone: "",
+      guarantorRelationship: "",
+      guarantorId: "",
     },
   });
-
-  const date = new Date();
-  date.setDate(date.getDate() + Number(form.values.tenure));
 
   async function fetchProduct() {
     const pr = await axios.request({
@@ -151,7 +208,16 @@ const Page: NextPage = () => {
       },
     });
 
-    setProduct(pr.data?.product);
+    pr.data?.product
+      ? pr.data?.product?.map((_: Products) => {
+          setIntRate(_.interestRate);
+          setPenRate(_.penaltyRate);
+          setCycle(_.repaymentCycle);
+          setProRate(_.processingFee);
+          setProName(_.productName);
+          setGrace(_.gracePeriod);
+        })
+      : null;
   }
 
   useEffect(() => {
@@ -174,12 +240,85 @@ const Page: NextPage = () => {
       }
 
       if (checked) setSundays(0);
+
+      form.setFieldValue("payoff", `${payoff}`);
+      form.setFieldValue("sundays", `${sundays}`);
+      form.setFieldValue("grace", `${grace}`);
+      form.setFieldValue("maintained", true);
+      form.setFieldValue("approved", false);
+      form.setFieldValue("disbursed", false);
+      form.setFieldValue(
+        "interest",
+        `${
+          cycle.toLowerCase() === "daily"
+            ? renderDailyInterestAmount(
+                +intRate,
+                +form.values.principal,
+                +form.values.tenure
+              )
+            : cycle.toLowerCase() === "weekly"
+            ? renderWeeklyInterestAmount(
+                +intRate,
+                +form.values.principal,
+                +form.values.tenure
+              )
+            : renderMonthlyInterestAmount(
+                +intRate,
+                +form.values.principal,
+                +form.values.tenure
+              )
+        }`
+      );
+      form.setFieldValue(
+        "installment",
+        `${
+          cycle.toLowerCase() === "daily"
+            ? renderDailyInstallmentAmount(
+                +intRate,
+                +form.values.principal,
+                +form.values.tenure
+              )
+            : cycle.toLowerCase() === "weekly"
+            ? renderWeeklyInstallmentAmount(
+                +intRate,
+                +form.values.principal,
+                +form.values.tenure
+              )
+            : renderMonthlyInstallmentAmount(
+                +intRate,
+                +form.values.principal,
+                +form.values.tenure
+              )
+        }`
+      );
+      form.setFieldValue(
+        "penalty",
+        `${renderPenaltyAmount(
+          +penRate,
+          +intRate,
+          cycle,
+          +form.values.principal,
+          +form.values.tenure
+        )}`
+      );
+      form.setFieldValue(
+        "processingFee",
+        `${renderProcessingFeeAmount(+proRate, +form.values.principal)}`
+      );
     }
 
     return () => {
       s = false;
     };
-  }, [form.values.tenure, date, checked, product, sundays]);
+  }, [
+    checked,
+    sundays,
+    intRate,
+    proName,
+    form.values.principal,
+    form.values.tenure,
+    form.values.product,
+  ]);
 
   /* console.log(form.values.product); */
   const handleSubmit = async () => {
@@ -194,6 +333,7 @@ const Page: NextPage = () => {
           autoClose: 8000,
         });
       });
+      console.log(form.values);
       /* router.push("/"); */
       /* const res = await axios.get("/api/"); */
       /* const data = res.data; */
@@ -330,9 +470,10 @@ const Page: NextPage = () => {
           </Group>
         </Card.Section>
         <Group position="apart" mt="md" mb="xs">
-          <Text weight={500}>Include Payments on Sunday. ({`${sundays} ${
-            sundays === 1 ? "Sunday" : "Sundays"
-          }`})</Text>
+          <Text weight={500}>
+            Include Payments on Sunday. (
+            {`${sundays} ${sundays === 1 ? "Sunday" : "Sundays"}`})
+          </Text>
           <Switch
             aria-label="Sundays"
             size="md"
@@ -357,104 +498,103 @@ const Page: NextPage = () => {
             }}
           />
         </Group>
-        {product
-          ? product?.map((_: Products) => (
-              <div key={_.id}>
-                <Group position="apart" mt="md" mb="xs">
-                  <Text weight={500}>Product</Text>
-                  <Text weight={500}>{_.productName}</Text>
-                </Group>
-                <Group position="apart" mt="md" mb="xs">
-                  <Text weight={500}>Interest Amount ({_.interestRate} %)</Text>
-                  {_.repaymentCycle.toLowerCase() === "daily" ? (
-                    <Text weight={500}>
-                      {renderDailyInterestAmount(
-                        +_.interestRate,
-                        +form.values.amount,
-                        +form.values.tenure
-                      )}.00
-                    </Text>
-                  ) : _.repaymentCycle.toLowerCase() === "weekly" ? (
-                    <Text weight={500}>
-                      {renderWeeklyInterestAmount(
-                        +_.interestRate,
-                        +form.values.amount,
-                        +form.values.tenure
-                      )}.00
-                    </Text>
-                  ) : (
-                    <Text weight={500}>
-                      {renderMonthlyInterestAmount(
-                        +_.interestRate,
-                        +form.values.amount,
-                        +form.values.tenure
-                      )}.00
-                    </Text>
-                  )}
-                </Group>
-                <Group position="apart" mt="md" mb="xs">
-                  <Text weight={500}>Installment Amount</Text>
-                  {_.repaymentCycle.toLowerCase() === "daily" ? (
-                    <Text weight={500}>
-                      {renderDailyInstallmentAmount(
-                        +_.interestRate,
-                        +form.values.amount,
-                        +form.values.tenure
-                      )}.00
-                    </Text>
-                  ) : _.repaymentCycle.toLowerCase() === "weekly" ? (
-                    <Text weight={500}>
-                      {renderWeeklyInstallmentAmount(
-                        +_.interestRate,
-                        +form.values.amount,
-                        +form.values.tenure
-                      )}.00
-                    </Text>
-                  ) : (
-                    <Text weight={500}>
-                      {renderMonthlyInstallmentAmount(
-                        +_.interestRate,
-                        +form.values.amount,
-                        +form.values.tenure
-                      )}.00
-                    </Text>
-                  )}
-                </Group>
-                <Group position="apart" mt="md" mb="xs">
-                  <Text weight={500}>Penalty Amount ({_.penaltyRate} %)</Text>
-                  <Text weight={500}>
-                    {renderPenaltyAmount(
-                      +_.penaltyRate,
-                      +_.interestRate,
-                      _.repaymentCycle,
-                      +form.values.amount,
-                      +form.values.tenure
-                      )}.00
-                  </Text>
-                </Group>
-                <Group position="apart" mt="md" mb="xs">
-                  <Text weight={500}>Processing Fee Amount ({_.processingFee} %)</Text>
-                  <Text weight={500}>
-                    {renderProcessingFeeAmount(
-                      +_.processingFee,
-                      +form.values.amount
-                      )}.00
-                  </Text>
-                </Group>
-                <Group position="apart" mt="md" mb="xs">
-                  <Text weight={500}>Repayment Cycle</Text>
-                  <Text weight={500}>{_.repaymentCycle}</Text>
-                </Group>
-                  {_.repaymentCycle.toLowerCase() === "daily" ? (
-                <Group position="apart" mt="md" mb="xs">
-                  <Text weight={500}>Grace Period</Text>
-                  <Text weight={500}>{_.gracePeriod} Day</Text>
-                </Group>
-                ): null
-                }
-              </div>
-            ))
-          : null}
+
+        <Group position="apart" mt="md" mb="xs">
+          <Text weight={500}>Product</Text>
+          <Text weight={500}>{proName}</Text>
+        </Group>
+        <Group position="apart" mt="md" mb="xs">
+          <Text weight={500}>Interest Amount ({intRate} %)</Text>
+          {cycle.toLowerCase() === "daily" ? (
+            <Text weight={500}>
+              {renderDailyInterestAmount(
+                +intRate,
+                +form.values.principal,
+                +form.values.tenure
+              )}
+              .00
+            </Text>
+          ) : cycle.toLowerCase() === "weekly" ? (
+            <Text weight={500}>
+              {renderWeeklyInterestAmount(
+                +intRate,
+                +form.values.principal,
+                +form.values.tenure
+              )}
+              .00
+            </Text>
+          ) : (
+            <Text weight={500}>
+              {renderMonthlyInterestAmount(
+                +intRate,
+                +form.values.principal,
+                +form.values.tenure
+              )}
+              .00
+            </Text>
+          )}
+        </Group>
+        <Group position="apart" mt="md" mb="xs">
+          <Text weight={500}>Installment Amount</Text>
+          {cycle.toLowerCase() === "daily" ? (
+            <Text weight={500}>
+              {renderDailyInstallmentAmount(
+                +intRate,
+                +form.values.principal,
+                +form.values.tenure
+              )}
+              .00
+            </Text>
+          ) : cycle.toLowerCase() === "weekly" ? (
+            <Text weight={500}>
+              {renderWeeklyInstallmentAmount(
+                +intRate,
+                +form.values.principal,
+                +form.values.tenure
+              )}
+              .00
+            </Text>
+          ) : (
+            <Text weight={500}>
+              {renderMonthlyInstallmentAmount(
+                +intRate,
+                +form.values.principal,
+                +form.values.tenure
+              )}
+              .00
+            </Text>
+          )}
+        </Group>
+        <Group position="apart" mt="md" mb="xs">
+          <Text weight={500}>Penalty Amount ({penRate} %)</Text>
+          <Text weight={500}>
+            {renderPenaltyAmount(
+              +penRate,
+              +intRate,
+              cycle,
+              +form.values.principal,
+              +form.values.tenure
+            )}
+            .00
+          </Text>
+        </Group>
+        <Group position="apart" mt="md" mb="xs">
+          <Text weight={500}>Processing Fee Amount ({proRate} %)</Text>
+          <Text weight={500}>
+            {renderProcessingFeeAmount(+proRate, +form.values.principal)}
+            .00
+          </Text>
+        </Group>
+        <Group position="apart" mt="md" mb="xs">
+          <Text weight={500}>Repayment Cycle</Text>
+          <Text weight={500}>{cycle}</Text>
+        </Group>
+        {cycle.toLowerCase() === "daily" ? (
+          <Group position="apart" mt="md" mb="xs">
+            <Text weight={500}>Grace Period</Text>
+            <Text weight={500}>{grace} Day</Text>
+          </Group>
+        ) : null}
       </Card>
     );
   };
@@ -500,9 +640,9 @@ const Page: NextPage = () => {
                   <TextInput
                     mt="md"
                     type="number"
-                    label="Enter Amount"
-                    placeholder="Enter Amount ..."
-                    {...form.getInputProps("amount")}
+                    label="Enter Principal Amount"
+                    placeholder="Enter Principal Amount ..."
+                    {...form.getInputProps("principal")}
                     required
                   />
                 </Grid.Col>
@@ -546,7 +686,77 @@ const Page: NextPage = () => {
           label="Add a Guarantor"
           description="Add a Guarantor to Guarantee this Loan"
         >
-          <Guarantors />
+          <Box>
+            <form>
+              <Grid grow>
+                <Grid.Col span={4}>
+                  <Autocomplete
+                    mt="md"
+                    label="Enter Guarantor Names"
+                    placeholder="Enter Guarantor Names ..."
+                    data={[
+                      { label: "Gname One", value: "gname1" },
+                      { label: "Gname Two", value: "gname2" },
+                      { label: "Gname Three", value: "gname3" },
+                    ]}
+                    {...form.getInputProps("guarantorName")}
+                    required
+                  />
+                </Grid.Col>
+                <Grid.Col span={4}>
+                  <TextInput
+                    mt="md"
+                    label="Phone Number"
+                    placeholder="Phone Number ..."
+                    {...form.getInputProps("guarantorPhone")}
+                    required
+                  />
+                </Grid.Col>
+              </Grid>
+
+              <Grid grow>
+                <Grid.Col span={4}>
+                  <TextInput
+                    mt="md"
+                    label="ID"
+                    placeholder="Enter ID ..."
+                    {...form.getInputProps("guarantorId")}
+                    required
+                  />
+                </Grid.Col>
+                <Grid.Col span={4}>
+                  <TextInput
+                    mt="md"
+                    label="Relationship"
+                    placeholder="Relationship ..."
+                    {...form.getInputProps("guarantorRelationship")}
+                    required
+                  />
+                </Grid.Col>
+              </Grid>
+
+              {/* <Grid grow> */}
+              {/*   <Grid.Col span={6}> */}
+              {/*     <DatePicker */}
+              {/*       mt="md" */}
+              {/*       label="Enter Start Date" */}
+              {/*       placeholder="Enter Start Date ..." */}
+              {/*       inputFormat="DD-MM-YYYY" */}
+              {/*       {...form.getInputProps("start")} */}
+              {/*       value={value} */}
+              {/*       onChange={setValue} */}
+              {/*     /> */}
+              {/*     <DateRangePicker */}
+              {/*       mt="md" */}
+              {/*       label="Enter Tenure" */}
+              {/*       placeholder="Enter Tenure ..." */}
+              {/*       value={value} */}
+              {/*       onChange={setValue} */}
+              {/*     /> */}
+              {/*   </Grid.Col> */}
+              {/* </Grid> */}
+            </form>
+          </Box>
         </Stepper.Step>
         <Stepper.Step
           label="Add Collaterals"
@@ -566,7 +776,6 @@ const Page: NextPage = () => {
         <Button onClick={nextStep}>Next</Button>
         {/* <Button onClick={nextStep}>Next</Button> */}
       </Group>
-      <pre>{JSON.stringify(members, undefined, 2)}</pre>
       <pre>{JSON.stringify(products, undefined, 2)}</pre>
     </Protected>
   );

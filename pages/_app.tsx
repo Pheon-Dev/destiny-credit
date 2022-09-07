@@ -60,7 +60,7 @@ function App(props: AppProps & { colorScheme: ColorScheme }) {
       <MantineProvider
         withGlobalStyles
         withNormalizeCSS
-        theme={{ colorScheme, loader: "dots" }}
+        theme={{ colorScheme: "dark", loader: "dots" }}
       >
         <ColorSchemeProvider
           colorScheme={colorScheme}

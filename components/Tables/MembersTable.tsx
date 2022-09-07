@@ -2,7 +2,7 @@ import React from "react";
 import { Table, Badge } from "@mantine/core";
 import { Members } from "../../types";
 import { useRouter } from "next/router";
-import { IconInfoCircle } from "@tabler/icons";
+import { IconEdit, IconInfoCircle } from "@tabler/icons";
 
 export function MembersTable({ members }: { members: Members[] }) {
   const Header = () => (
@@ -39,7 +39,7 @@ function MemberRow({ member }: { member: Members }) {
   const router = useRouter();
   return (
     <tr
-      style={{ cursor: "pointer" }}
+      style={{ cursor: "auto" }}
     >
       <td>{member.memberId}</td>
       <td>{member.firstName + " " + member.lastName}</td>
@@ -75,7 +75,7 @@ function MemberRow({ member }: { member: Members }) {
       </td>
       <td
       onClick={() => router.push(`/members/${member.id}`)}
-      ><IconInfoCircle size={24} /></td>
+      ><IconEdit size={24} /></td>
     </tr>
   );
 }
