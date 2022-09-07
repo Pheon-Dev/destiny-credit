@@ -44,29 +44,31 @@ model Session {
 }
 
 model User {
-  id                String    @id @default(uuid())
-  createdAt         DateTime  @default(now())
-  updatedAt         DateTime  @updatedAt
-  username          String?
-  email             String?   @unique
-  password          String?
-  emailVerified     DateTime?
-  image             String?
-  accounts          Account[]
-  sessions          Session[]
-  registeredMembers Member[]  @relation("RegisteredBy")
-  approvedMembers   Member[]  @relation("ApprovedBy")
-  updatedMembers    Member[]  @relation("UpdatedBy")
-  maintainedLoans   Loan[]    @relation("MaintainedBy")
-  approvedLoans     Loan[]    @relation("ApprovedBy")
-  disbursedLoans    Loan[]    @relation("DisbursedBy")
-  updatedLoans      Loan[]    @relation("UpdatedBy")
-  handledPayments   Payment[] @relation("HandledBy")
-  updatedPayments   Payment[] @relation("UpdatedBy")
-  createdProducts   Product[] @relation("CreatedBy")
-  approvedProducts  Product[] @relation("ApprovedBy")
-  updatedProducts   Product[] @relation("UpdatedBy")
-  role              Role      @default(USER)
+  id                 String       @id @default(uuid())
+  createdAt          DateTime     @default(now())
+  updatedAt          DateTime     @updatedAt
+  username           String?
+  email              String?      @unique
+  password           String?
+  emailVerified      DateTime?
+  image              String?
+  accounts           Account[]
+  sessions           Session[]
+  registeredMembers  Member[]     @relation("RegisteredBy")
+  approvedMembers    Member[]     @relation("ApprovedBy")
+  updatedMembers     Member[]     @relation("UpdatedBy")
+  maintainedLoans    Loan[]       @relation("MaintainedBy")
+  approvedLoans      Loan[]       @relation("ApprovedBy")
+  disbursedLoans     Loan[]       @relation("DisbursedBy")
+  updatedLoans       Loan[]       @relation("UpdatedBy")
+  handledPayments    Payment[]    @relation("HandledBy")
+  updatedPayments    Payment[]    @relation("UpdatedBy")
+  createdProducts    Product[]    @relation("CreatedBy")
+  approvedProducts   Product[]    @relation("ApprovedBy")
+  updatedProducts    Product[]    @relation("UpdatedBy")
+  updatedCollaterals Collateral[] @relation("UpdatedBy")
+  updatedGuarantors  Guarantor[]  @relation("UpdatedBy")
+  role               Role         @default(USER)
 }
 
 model VerificationToken {
@@ -78,9 +80,9 @@ model VerificationToken {
 }
 
 model Member {
-  id                    String   @id @default(uuid())
-  createdAt             DateTime @default(now())
-  updatedAt             DateTime @updatedAt
+  id                    String       @id @default(uuid())
+  createdAt             DateTime     @default(now())
+  updatedAt             DateTime     @updatedAt
   date                  String
   branchName            String
   memberId              String
@@ -120,15 +122,47 @@ model Member {
   cityTownKin           String
   numberKin             String
   loans                 Loan[]
-  group                 Boolean  @default(false)
-  ratings               Int      @default(0)
-  maintained            Boolean  @default(false)
-  registrar             User?    @relation("RegisteredBy", fields: [registrarId], references: [id])
+  collaterals           Collateral[]
+  guarantor             Guarantor[]
+  group                 Boolean      @default(false)
+  ratings               Int          @default(0)
+  maintained            Boolean      @default(false)
+  registrar             User?        @relation("RegisteredBy", fields: [registrarId], references: [id])
   registrarId           String?
-  approver              User?    @relation("ApprovedBy", fields: [approverId], references: [id])
+  approver              User?        @relation("ApprovedBy", fields: [approverId], references: [id])
   approverId            String?
+  updater               User?        @relation("UpdatedBy", fields: [updaterId], references: [id])
+  updaterId             String?
+
+  @@index(id)
+}
+
+model Guarantor {
+  id                    String   @id @default(uuid())
+  createdAt             DateTime @default(now())
+  updatedAt             DateTime @updatedAt
+  guarantorName         String
+  guarantorPhone        String
+  guarantorId           String
+  guarantorRelationship String
+  member                Member   @relation(fields: [memberId], references: [id])
+  memberId              String
   updater               User?    @relation("UpdatedBy", fields: [updaterId], references: [id])
   updaterId             String?
+
+  @@index(id)
+}
+
+model Collateral {
+  id        String   @id @default(uuid())
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+  item      String
+  value     String
+  member    Member   @relation(fields: [memberId], references: [id])
+  memberId  String
+  updater   User?    @relation("UpdatedBy", fields: [updaterId], references: [id])
+  updaterId String?
 
   @@index(id)
 }

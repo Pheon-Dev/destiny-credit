@@ -208,3 +208,15 @@ interface Products {
   penaltyPayment: string;
   approved: boolean;
 }
+
+interface Collaterals {
+  id?: string;
+  createdAt?: Date;
+  updatedAt?: Date;
+  item: string;
+  value: string;
+  member: string;
+  memberId: string;
+  updater: string;
+  updaterId: string;
+}

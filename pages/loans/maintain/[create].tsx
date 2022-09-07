@@ -31,6 +31,8 @@ import {
   IconEye,
   IconFileZip,
   IconInfoCircle,
+  IconMinus,
+  IconPlus,
   IconTrash,
   IconX,
 } from "@tabler/icons";
@@ -41,7 +43,7 @@ import {
 } from "@mantine/dates";
 import { Members, Products } from "../../../types";
 
-const schema = z.object({
+const loan_schema = z.object({
   member: z.string().min(2, { message: "User Name Missing" }),
   product: z.string().min(2, { message: "Product is Missing" }),
   principal: z.string().min(2, { message: "Principal Amount is Missing" }),
@@ -56,7 +58,7 @@ const schema = z.object({
   /*   .min(2, { message: "Guarantor Relationship is Missing" }), */
 });
 
-const schema_two = z.object({
+const guarantor_schema = z.object({
   guarantorName: z.string().min(2, { message: "Guarantor Name is Missing" }),
   guarantorPhone: z
     .string()
@@ -67,11 +69,18 @@ const schema_two = z.object({
     .min(2, { message: "Guarantor Relationship is Missing" }),
 });
 
+const collateral_schema = z.object({
+  item: z.string().min(2, { message: "Item is Missing" }),
+  value: z.string().min(2, { message: "Item Value is Missing" }),
+});
+
 const Page: NextPage = () => {
   const [active, setActive] = useState(0);
   const [sundays, setSundays] = useState(0);
   const [products, setProducts] = useState([]);
   const [members, setMembers] = useState([]);
+  const [collaterals, setCollaterals] = useState([]);
+  const [guarantors, setGuarantors] = useState([]);
 
   const [intRate, setIntRate] = useState("");
   const [proRate, setProRate] = useState("");
@@ -105,7 +114,10 @@ const Page: NextPage = () => {
         `Principal is Below Minimum Range of ${minRange} ...`
       );
     }
-    if (+form.values.principal > minRange && +form.values.principal > maxRange) {
+    if (
+      +form.values.principal > minRange &&
+      +form.values.principal > maxRange
+    ) {
       form.setFieldValue("principal", "");
       return form.setFieldError(
         "principal",
@@ -141,12 +153,12 @@ const Page: NextPage = () => {
       form.values.tenure &&
       form.values.interest
     ) {
-      if (active === 1) form_two.validate();
+      if (active === 1) guarantor_form.validate();
       if (
-        form_two.values.guarantorPhone &&
-        form_two.values.guarantorRelationship &&
-        form_two.values.guarantorName &&
-        form_two.values.guarantorId
+        guarantor_form.values.guarantorPhone &&
+        guarantor_form.values.guarantorRelationship &&
+        guarantor_form.values.guarantorName &&
+        guarantor_form.values.guarantorId
       ) {
         handleSubmit();
         return setActive((current) => (current < 3 ? current + 1 : current));
@@ -184,6 +196,22 @@ const Page: NextPage = () => {
 
     if (subscription) {
       if (products.length < 1) setStatus(true);
+      const gua = await axios.request({
+        method: "POST",
+        url: `/api/members/guarantor/${id}`,
+        data: {
+          id: `${id}`,
+        },
+      });
+
+      const col = await axios.request({
+        method: "POST",
+        url: `/api/members/collateral/${id}`,
+        data: {
+          id: `${id}`,
+        },
+      });
+
       const mem = await axios.request({
         method: "POST",
         url: `/api/members/${id}`,
@@ -206,6 +234,8 @@ const Page: NextPage = () => {
 
       setProducts(pros);
       setMembers(mems.data.members);
+      setCollaterals(col.data.collateral);
+      setGuarantors(gua.data.guarantor);
 
       if (mem.data.member[0]?.firstName?.length > 0)
         form.setFieldValue("memberId", `${mem.data.member[0].id}`);
@@ -227,7 +257,7 @@ const Page: NextPage = () => {
   }, [products, members]);
 
   const form = useForm({
-    validate: zodResolver(schema),
+    validate: zodResolver(loan_schema),
     initialValues: {
       member: "",
       memberId: "",
@@ -248,13 +278,21 @@ const Page: NextPage = () => {
     },
   });
 
-  const form_two = useForm({
-    validate: zodResolver(schema_two),
+  const guarantor_form = useForm({
+    validate: zodResolver(guarantor_schema),
     initialValues: {
       guarantorName: "",
       guarantorPhone: "",
       guarantorRelationship: "",
       guarantorId: "",
+    },
+  });
+
+  const collateral_form = useForm({
+    validate: zodResolver(collateral_schema),
+    initialValues: {
+      item: "",
+      value: "",
     },
   });
 
@@ -396,7 +434,10 @@ const Page: NextPage = () => {
       });
     }
 
-    if (+form.values.principal > minRange && +form.values.principal > maxRange) {
+    if (
+      +form.values.principal > minRange &&
+      +form.values.principal > maxRange
+    ) {
       /* form.setFieldValue("principal", ""); */
       form.setFieldError(
         "principal",
@@ -561,20 +602,23 @@ const Page: NextPage = () => {
   const findGuarantor = (name: string) => {
     return members.find((e: Members) => {
       if (e.firstName + " " + e.lastName === name) {
-        form_two.setFieldValue("guarantorPhone", `${e.phoneNumber}`);
-        form_two.setFieldValue("guarantorId", `${e.idPass}`);
+        guarantor_form.setFieldValue("guarantorPhone", `${e.phoneNumber}`);
+        guarantor_form.setFieldValue("guarantorId", `${e.idPass}`);
       }
     });
   };
 
   useEffect(() => {
     if (
-      form_two.values.guarantorName !== "" &&
-      form_two.values.guarantorName === form.values.member
+      guarantor_form.values.guarantorName !== "" &&
+      guarantor_form.values.guarantorName === form.values.member
     ) {
-      form_two.setFieldError("guarantorName", `${form.values.member} Cannot Self-Guarantee`);
-      form_two.setFieldValue("guarantorPhone", ``);
-      form_two.setFieldValue("guarantorId", ``);
+      guarantor_form.setFieldError(
+        "guarantorName",
+        `${form.values.member} Cannot Self-Guarantee`
+      );
+      guarantor_form.setFieldValue("guarantorPhone", ``);
+      guarantor_form.setFieldValue("guarantorId", ``);
       return showNotification({
         id: "guarantor-status",
         color: "red",
@@ -584,7 +628,7 @@ const Page: NextPage = () => {
         autoClose: false,
       });
     }
-    if (form_two.values.guarantorName !== form.values.member) {
+    if (guarantor_form.values.guarantorName !== form.values.member) {
       setTimeout(() => {
         updateNotification({
           id: "guarantor-status",
@@ -595,12 +639,12 @@ const Page: NextPage = () => {
           autoClose: 5000,
         });
       });
-      findGuarantor(form_two.values.guarantorName);
+      findGuarantor(guarantor_form.values.guarantorName);
     }
   }, [
-    form_two.values.guarantorName,
-    form_two.values.guarantorId,
-    form_two.values.guarantorPhone,
+    guarantor_form.values.guarantorName,
+    guarantor_form.values.guarantorId,
+    guarantor_form.values.guarantorPhone,
   ]);
 
   const Review = () => {
@@ -756,6 +800,9 @@ const Page: NextPage = () => {
     );
   };
 
+  /* console.log(collaterals) */
+  /* console.log(guarantors) */
+
   return (
     <Protected>
       <Stepper mt="lg" active={active} onStepClick={setActive} breakpoint="sm">
@@ -825,27 +872,6 @@ const Page: NextPage = () => {
                   />
                 </Grid.Col>
               </Grid>
-
-              {/* <Grid grow> */}
-              {/*   <Grid.Col span={6}> */}
-              {/*     <DatePicker */}
-              {/*       mt="md" */}
-              {/*       label="Enter Start Date" */}
-              {/*       placeholder="Enter Start Date ..." */}
-              {/*       inputFormat="DD-MM-YYYY" */}
-              {/*       {...form.getInputProps("start")} */}
-              {/*       value={value} */}
-              {/*       onChange={setValue} */}
-              {/*     /> */}
-              {/*     <DateRangePicker */}
-              {/*       mt="md" */}
-              {/*       label="Enter Tenure" */}
-              {/*       placeholder="Enter Tenure ..." */}
-              {/*       value={value} */}
-              {/*       onChange={setValue} */}
-              {/*     /> */}
-              {/*   </Grid.Col> */}
-              {/* </Grid> */}
             </form>
           </Box>
           <Review />
@@ -865,7 +891,7 @@ const Page: NextPage = () => {
                     placeholder="Enter Guarantor Names ..."
                     /* limit={6} */ // Default 5
                     data={guarantor_data?.map((p) => p[0].label)}
-                    {...form_two.getInputProps("guarantorName")}
+                    {...guarantor_form.getInputProps("guarantorName")}
                     required
                   />
                 </Grid.Col>
@@ -874,7 +900,7 @@ const Page: NextPage = () => {
                     mt="md"
                     label="Phone Number"
                     placeholder="Phone Number ..."
-                    {...form_two.getInputProps("guarantorPhone")}
+                    {...guarantor_form.getInputProps("guarantorPhone")}
                     required
                   />
                 </Grid.Col>
@@ -886,7 +912,7 @@ const Page: NextPage = () => {
                     mt="md"
                     label="ID"
                     placeholder="Enter ID ..."
-                    {...form_two.getInputProps("guarantorId")}
+                    {...guarantor_form.getInputProps("guarantorId")}
                     required
                   />
                 </Grid.Col>
@@ -895,32 +921,11 @@ const Page: NextPage = () => {
                     mt="md"
                     label="Relationship"
                     placeholder="Relationship ..."
-                    {...form_two.getInputProps("guarantorRelationship")}
+                    {...guarantor_form.getInputProps("guarantorRelationship")}
                     required
                   />
                 </Grid.Col>
               </Grid>
-
-              {/* <Grid grow> */}
-              {/*   <Grid.Col span={6}> */}
-              {/*     <DatePicker */}
-              {/*       mt="md" */}
-              {/*       label="Enter Start Date" */}
-              {/*       placeholder="Enter Start Date ..." */}
-              {/*       inputFormat="DD-MM-YYYY" */}
-              {/*       {...form.getInputProps("start")} */}
-              {/*       value={value} */}
-              {/*       onChange={setValue} */}
-              {/*     /> */}
-              {/*     <DateRangePicker */}
-              {/*       mt="md" */}
-              {/*       label="Enter Tenure" */}
-              {/*       placeholder="Enter Tenure ..." */}
-              {/*       value={value} */}
-              {/*       onChange={setValue} */}
-              {/*     /> */}
-              {/*   </Grid.Col> */}
-              {/* </Grid> */}
             </form>
           </Box>
         </Stepper.Step>
@@ -929,7 +934,64 @@ const Page: NextPage = () => {
           description="Lastly, Add Collaterals to Proceed."
           allowStepSelect={active > 2}
         >
-          <Collaterals />
+          <Box>
+            <Card shadow="sm" p="lg" radius="md" m="xl" withBorder>
+              <Card.Section withBorder inheritPadding py="xs">
+                <Group position="apart">
+                  <Text weight={700}>Add Collaterals</Text>
+                  <Menu withinPortal position="bottom-end" shadow="sm">
+                    <Menu.Target>
+                      <ActionIcon>
+                        <IconDots size={16} />
+                      </ActionIcon>
+                    </Menu.Target>
+
+                    <Menu.Dropdown>
+                      <Menu.Item icon={<IconFileZip size={14} />}>
+                        Download zip
+                      </Menu.Item>
+                      <Menu.Item icon={<IconEye size={14} />}>
+                        Preview all
+                      </Menu.Item>
+                      <Menu.Item icon={<IconTrash size={14} />} color="red">
+                        Delete all
+                      </Menu.Item>
+                    </Menu.Dropdown>
+                  </Menu>
+                </Group>
+              </Card.Section>
+              <Card.Section withBorder inheritPadding py="xs">
+                <form>
+                  <Grid grow columns={12}>
+                    <Grid.Col span={5}>
+                      <TextInput
+                        mt="md"
+                        label="Item Name"
+                        placeholder="Item Name ..."
+                        {...collateral_form.getInputProps("item")}
+                        required
+                      />
+                    </Grid.Col>
+                    <Grid.Col span={5}>
+                      <TextInput
+                        mt="md"
+                        label="Item Value"
+                        placeholder="Item Value ..."
+                        {...collateral_form.getInputProps("value")}
+                        required
+                      />
+                    </Grid.Col>
+                    <Grid.Col mt="md" span={2}>
+                      <Group position="apart" mt="xl" m="md">
+                        <IconPlus size={24} />
+                        <IconMinus size={24} />
+                      </Group>
+                    </Grid.Col>
+                  </Grid>
+                </form>
+              </Card.Section>
+            </Card>
+          </Box>
         </Stepper.Step>
         <Stepper.Completed>
           <Text>Loan Maintained Successfully</Text>
