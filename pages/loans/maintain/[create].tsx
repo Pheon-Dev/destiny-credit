@@ -29,6 +29,7 @@ import {
   IconDots,
   IconEye,
   IconFileZip,
+  IconInfoCircle,
   IconTrash,
   IconX,
 } from "@tabler/icons";
@@ -45,9 +46,13 @@ const schema = z.object({
   principal: z.string().min(2, { message: "Principal Amount is Missing" }),
   tenure: z.string().min(1, { message: "Tenure is Missing" }),
   guarantorName: z.string().min(2, { message: "Guarantor Name is Missing" }),
-  guarantorPhone: z.string().min(2, { message: "Guarantor Phone Number is Missing" }),
+  guarantorPhone: z
+    .string()
+    .min(2, { message: "Guarantor Phone Number is Missing" }),
   guarantorId: z.string().min(2, { message: "Guarantor ID is Missing" }),
-  guarantorRelationship: z.string().min(2, { message: "Guarantor Relationship is Missing" }),
+  guarantorRelationship: z
+    .string()
+    .min(2, { message: "Guarantor Relationship is Missing" }),
 });
 
 const Page: NextPage = () => {
@@ -62,7 +67,7 @@ const Page: NextPage = () => {
   const [cycle, setCycle] = useState("");
   const [proName, setProName] = useState("");
   const [grace, setGrace] = useState("");
-  const ref = useRef<HTMLInputElement>(null);
+  const [guarantor, setGuarantor] = useState("");
 
   const [status, setStatus] = useState(false);
   const [checked, setChecked] = useState(false);
@@ -148,19 +153,6 @@ const Page: NextPage = () => {
         },
       });
 
-/* console.log(ref.current.defaultValue.split(" ")[0]) */
-/* const fname = ref.current.defaultValue.split(" ")[0] */
-/* const lname = ref.current.defaultValue.split(" ")[1] */
-
-      /* const search = await axios.request({ */
-      /*   method: "POST", */
-      /*   url: `/api/members, search/${id}`, */
-      /*   data: { */
-      /*     firstName: `${fname}`, */
-      /*     lastName: `${lname}`, */
-      /*   }, */
-      /* }); */
-
       const pro = await axios.request({
         method: "GET",
         url: "/api/products",
@@ -193,7 +185,7 @@ const Page: NextPage = () => {
 
   useEffect(() => {
     fetchMemberNProducts();
-  }, []);
+  }, [products, members]);
 
   const form = useForm({
     validate: zodResolver(schema),
@@ -629,6 +621,47 @@ const Page: NextPage = () => {
     { key: _.id, value: `${_.id}`, label: `${_.firstName} ${_.lastName}` },
   ]);
 
+  const findGuarantor = (name: string) => {
+    return members.find((e: Members) => {
+      if (e.firstName + " " + e.lastName === name) {
+        form.setFieldValue("guarantorPhone", `${e.phoneNumber}`);
+        form.setFieldValue("guarantorId", `${e.idPass}`);
+      }
+    });
+  };
+
+  useEffect(() => {
+    if (form.values.guarantorName === form.values.member) {
+      form.setFieldValue("guarantorPhone", ``);
+      form.setFieldValue("guarantorId", ``);
+      return showNotification({
+        id: "guarantor-status",
+        color: "red",
+        title: "Guarantor Info",
+        message: `Member Cannot Self-Guarantee ...`,
+        icon: <IconInfoCircle size={24} />,
+        autoClose: false,
+      });
+    }
+    if (form.values.guarantorName !== form.values.member) {
+      setTimeout(() => {
+        updateNotification({
+          id: "guarantor-status",
+          color: "teal",
+          title: "Guarantor Info",
+          message: `Guarantor Selected Successfully`,
+          icon: <IconCheck size={16} />,
+          autoClose: 5000,
+        });
+      });
+      findGuarantor(form.values.guarantorName);
+    }
+  }, [
+    form.values.guarantorName,
+    form.values.guarantorId,
+    form.values.guarantorPhone,
+  ]);
+
   return (
     <Protected>
       <Stepper mt="lg" active={active} onStepClick={setActive} breakpoint="sm">
@@ -720,7 +753,7 @@ const Page: NextPage = () => {
                     mt="md"
                     label="Enter Guarantor Names"
                     placeholder="Enter Guarantor Names ..."
-                    ref={ref}
+                    /* ref={ref} */
                     /* data={[ */
                     /*   { label: "Gname One", value: "gname1" }, */
                     /*   { label: "Gname Two", value: "gname2" }, */
