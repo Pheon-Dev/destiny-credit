@@ -20,6 +20,7 @@ import {
   ActionIcon,
   Switch,
   Autocomplete,
+  NumberInput,
 } from "@mantine/core";
 import Router, { useRouter } from "next/router";
 import { showNotification, updateNotification } from "@mantine/notifications";
@@ -45,6 +46,17 @@ const schema = z.object({
   product: z.string().min(2, { message: "Product is Missing" }),
   principal: z.string().min(2, { message: "Principal Amount is Missing" }),
   tenure: z.string().min(1, { message: "Tenure is Missing" }),
+  /* guarantorName: z.string().min(2, { message: "Guarantor Name is Missing" }), */
+  /* guarantorPhone: z */
+  /*   .string() */
+  /*   .min(2, { message: "Guarantor Phone Number is Missing" }), */
+  /* guarantorId: z.string().min(2, { message: "Guarantor ID is Missing" }), */
+  /* guarantorRelationship: z */
+  /*   .string() */
+  /*   .min(2, { message: "Guarantor Relationship is Missing" }), */
+});
+
+const schema_two = z.object({
   guarantorName: z.string().min(2, { message: "Guarantor Name is Missing" }),
   guarantorPhone: z
     .string()
@@ -67,7 +79,9 @@ const Page: NextPage = () => {
   const [cycle, setCycle] = useState("");
   const [proName, setProName] = useState("");
   const [grace, setGrace] = useState("");
-  const [guarantor, setGuarantor] = useState("");
+  const [maxTenure, setMaxTenure] = useState(0);
+  const [maxRange, setMaxRange] = useState(0);
+  const [minRange, setMinRange] = useState(0);
 
   const [status, setStatus] = useState(false);
   const [checked, setChecked] = useState(false);
@@ -77,7 +91,28 @@ const Page: NextPage = () => {
   const id = router.query.create as string;
 
   const nextStep = () => {
-    form.validate();
+    if (form.values.principal.length > 0 && +form.values.principal < minRange) {
+      showNotification({
+        id: "range-status",
+        color: "red",
+        title: "Minimum Principal Range",
+        message: `Principal is Below Minimum Range of ${minRange} ...`,
+        icon: <IconInfoCircle size={24} />,
+      });
+      form.setFieldValue("principal", "");
+      return form.setFieldError(
+        "principal",
+        `Principal is Below Minimum Range of ${minRange} ...`
+      );
+    }
+    if (+form.values.principal > minRange && +form.values.principal > maxRange) {
+      form.setFieldValue("principal", "");
+      return form.setFieldError(
+        "principal",
+        `Principal Exceeds Maximum Range of KSHs. ${maxRange} ...`
+      );
+    }
+
     showNotification({
       id: "maintainance-status",
       color: "teal",
@@ -86,6 +121,8 @@ const Page: NextPage = () => {
       loading: true,
       autoClose: 50000,
     });
+    form.setFieldValue("principal", `${form.values.principal}`);
+    form.validate();
     handleSubmit();
     if (
       form.values.tenure &&
@@ -104,13 +141,15 @@ const Page: NextPage = () => {
       form.values.tenure &&
       form.values.interest
     ) {
+      if (active === 1) form_two.validate();
       if (
-        form.values.guarantorPhone &&
-        form.values.guarantorRelationship &&
-        form.values.guarantorName &&
-        form.values.guarantorId
+        form_two.values.guarantorPhone &&
+        form_two.values.guarantorRelationship &&
+        form_two.values.guarantorName &&
+        form_two.values.guarantorId
       ) {
-        return console.log("Write to DB");
+        handleSubmit();
+        return setActive((current) => (current < 3 ? current + 1 : current));
       }
       if (active === 1)
         return setTimeout(() => {
@@ -206,6 +245,12 @@ const Page: NextPage = () => {
       maintained: false,
       approved: false,
       disbursed: false,
+    },
+  });
+
+  const form_two = useForm({
+    validate: zodResolver(schema_two),
+    initialValues: {
       guarantorName: "",
       guarantorPhone: "",
       guarantorRelationship: "",
@@ -230,6 +275,9 @@ const Page: NextPage = () => {
           setProRate(_.processingFee);
           setProName(_.productName);
           setGrace(_.gracePeriod);
+          setMaxTenure(+_.maximumTenure);
+          setMaxRange(+_.maximumRange);
+          setMinRange(+_.minimumRange);
         })
       : null;
   }
@@ -319,6 +367,48 @@ const Page: NextPage = () => {
         "processingFee",
         `${renderProcessingFeeAmount(+proRate, +form.values.principal)}`
       );
+    }
+
+    if (form.values.tenure.length > 0 && +form.values.tenure > maxTenure) {
+      form.setFieldValue("tenure", "");
+      form.setFieldError(
+        "tenure",
+        `Principal Exceeds Maximum Tenure Range of ${maxTenure} ${
+          cycle.toLowerCase() === "daily"
+            ? "days"
+            : cycle.toLowerCase() === "weekly"
+            ? "weeks"
+            : "months"
+        } ...`
+      );
+      showNotification({
+        id: "range-status",
+        color: "red",
+        title: "Maximum Tenure Range",
+        message: `Principal Exceeds Maximum Tenure Range of ${maxTenure} ${
+          cycle.toLowerCase() === "daily"
+            ? "days"
+            : cycle.toLowerCase() === "weekly"
+            ? "weeks"
+            : "months"
+        } ...`,
+        icon: <IconInfoCircle size={24} />,
+      });
+    }
+
+    if (+form.values.principal > minRange && +form.values.principal > maxRange) {
+      /* form.setFieldValue("principal", ""); */
+      form.setFieldError(
+        "principal",
+        `Principal Exceeds Maximum Range of KSHs. ${maxRange} ...`
+      );
+      showNotification({
+        id: "range-status",
+        color: "red",
+        title: "Maximum Principal Range",
+        message: `Principal Exceeds Maximum Range of KSHs. ${maxRange} ...`,
+        icon: <IconInfoCircle size={24} />,
+      });
     }
 
     return () => {
@@ -459,6 +549,59 @@ const Page: NextPage = () => {
         : renderMonthlyInstallmentAmount(interest_rate, principal, tenure);
     return roundOff((penalty_rate / 100) * +installment);
   };
+
+  const product_data = products.map((_: Products) => [
+    { key: _.id, value: `${_.id}`, label: `${_.productName}` },
+  ]);
+
+  const guarantor_data = members.map((_: Members) => [
+    { key: _.id, value: `${_.id}`, label: `${_.firstName} ${_.lastName}` },
+  ]);
+
+  const findGuarantor = (name: string) => {
+    return members.find((e: Members) => {
+      if (e.firstName + " " + e.lastName === name) {
+        form_two.setFieldValue("guarantorPhone", `${e.phoneNumber}`);
+        form_two.setFieldValue("guarantorId", `${e.idPass}`);
+      }
+    });
+  };
+
+  useEffect(() => {
+    if (
+      form_two.values.guarantorName !== "" &&
+      form_two.values.guarantorName === form.values.member
+    ) {
+      form_two.setFieldError("guarantorName", `${form.values.member} Cannot Self-Guarantee`);
+      form_two.setFieldValue("guarantorPhone", ``);
+      form_two.setFieldValue("guarantorId", ``);
+      return showNotification({
+        id: "guarantor-status",
+        color: "red",
+        title: "Guarantor Info",
+        message: `Member Cannot Self-Guarantee ...`,
+        icon: <IconInfoCircle size={24} />,
+        autoClose: false,
+      });
+    }
+    if (form_two.values.guarantorName !== form.values.member) {
+      setTimeout(() => {
+        updateNotification({
+          id: "guarantor-status",
+          color: "teal",
+          title: "Guarantor Info",
+          message: `Guarantor Selected Successfully`,
+          icon: <IconCheck size={16} />,
+          autoClose: 5000,
+        });
+      });
+      findGuarantor(form_two.values.guarantorName);
+    }
+  }, [
+    form_two.values.guarantorName,
+    form_two.values.guarantorId,
+    form_two.values.guarantorPhone,
+  ]);
 
   const Review = () => {
     return (
@@ -613,55 +756,6 @@ const Page: NextPage = () => {
     );
   };
 
-  const product_data = products.map((_: Products) => [
-    { key: _.id, value: `${_.id}`, label: `${_.productName}` },
-  ]);
-
-  const guarantor_data = members.map((_: Members) => [
-    { key: _.id, value: `${_.id}`, label: `${_.firstName} ${_.lastName}` },
-  ]);
-
-  const findGuarantor = (name: string) => {
-    return members.find((e: Members) => {
-      if (e.firstName + " " + e.lastName === name) {
-        form.setFieldValue("guarantorPhone", `${e.phoneNumber}`);
-        form.setFieldValue("guarantorId", `${e.idPass}`);
-      }
-    });
-  };
-
-  useEffect(() => {
-    if (form.values.guarantorName === form.values.member) {
-      form.setFieldValue("guarantorPhone", ``);
-      form.setFieldValue("guarantorId", ``);
-      return showNotification({
-        id: "guarantor-status",
-        color: "red",
-        title: "Guarantor Info",
-        message: `Member Cannot Self-Guarantee ...`,
-        icon: <IconInfoCircle size={24} />,
-        autoClose: false,
-      });
-    }
-    if (form.values.guarantorName !== form.values.member) {
-      setTimeout(() => {
-        updateNotification({
-          id: "guarantor-status",
-          color: "teal",
-          title: "Guarantor Info",
-          message: `Guarantor Selected Successfully`,
-          icon: <IconCheck size={16} />,
-          autoClose: 5000,
-        });
-      });
-      findGuarantor(form.values.guarantorName);
-    }
-  }, [
-    form.values.guarantorName,
-    form.values.guarantorId,
-    form.values.guarantorPhone,
-  ]);
-
   return (
     <Protected>
       <Stepper mt="lg" active={active} onStepClick={setActive} breakpoint="sm">
@@ -669,6 +763,7 @@ const Page: NextPage = () => {
           label="Loan Maintenance"
           description="Select a Member & a Product."
           loading={status}
+          allowStepSelect={active > 0}
         >
           <Box>
             <form>
@@ -699,11 +794,25 @@ const Page: NextPage = () => {
                   <TextInput
                     mt="md"
                     type="number"
+                    min={0}
                     label="Enter Principal Amount"
                     placeholder="Enter Principal Amount ..."
                     {...form.getInputProps("principal")}
                     required
                   />
+                  {/* <NumberInput */}
+                  {/*   mt="md" */}
+                  {/*   label="Enter Principal Amount" */}
+                  {/*   placeholder="Enter Principal Amount ..." */}
+                  {/*   defaultValue={0} */}
+                  {/*   parser={(value) => value?.replace(/\KSHs.\s?|(,*)/g, '')} */}
+                  {/*   formatter={(value: string) => */}
+                  {/*   !Number.isNaN(parseFloat(value)) */}
+                  {/*   ? `KSHs. ${value}`.replace(/\B(?=(\d{3})+(?!\d))/g, ",") */}
+                  {/*   : 'KSHs. '} */}
+                  {/*   {...form.getInputProps("principal")} */}
+                  {/*   required */}
+                  {/* /> */}
                 </Grid.Col>
                 <Grid.Col span={4}>
                   <TextInput
@@ -744,6 +853,7 @@ const Page: NextPage = () => {
         <Stepper.Step
           label="Add a Guarantor"
           description="Add a Guarantor to Guarantee this Loan"
+          allowStepSelect={active > 1}
         >
           <Box>
             <form>
@@ -753,14 +863,9 @@ const Page: NextPage = () => {
                     mt="md"
                     label="Enter Guarantor Names"
                     placeholder="Enter Guarantor Names ..."
-                    /* ref={ref} */
-                    /* data={[ */
-                    /*   { label: "Gname One", value: "gname1" }, */
-                    /*   { label: "Gname Two", value: "gname2" }, */
-                    /*   { label: "Gname Three", value: "gname3" }, */
-                    /* ]} */
+                    /* limit={6} */ // Default 5
                     data={guarantor_data?.map((p) => p[0].label)}
-                    {...form.getInputProps("guarantorName")}
+                    {...form_two.getInputProps("guarantorName")}
                     required
                   />
                 </Grid.Col>
@@ -769,7 +874,7 @@ const Page: NextPage = () => {
                     mt="md"
                     label="Phone Number"
                     placeholder="Phone Number ..."
-                    {...form.getInputProps("guarantorPhone")}
+                    {...form_two.getInputProps("guarantorPhone")}
                     required
                   />
                 </Grid.Col>
@@ -781,7 +886,7 @@ const Page: NextPage = () => {
                     mt="md"
                     label="ID"
                     placeholder="Enter ID ..."
-                    {...form.getInputProps("guarantorId")}
+                    {...form_two.getInputProps("guarantorId")}
                     required
                   />
                 </Grid.Col>
@@ -790,7 +895,7 @@ const Page: NextPage = () => {
                     mt="md"
                     label="Relationship"
                     placeholder="Relationship ..."
-                    {...form.getInputProps("guarantorRelationship")}
+                    {...form_two.getInputProps("guarantorRelationship")}
                     required
                   />
                 </Grid.Col>
@@ -822,6 +927,7 @@ const Page: NextPage = () => {
         <Stepper.Step
           label="Add Collaterals"
           description="Lastly, Add Collaterals to Proceed."
+          allowStepSelect={active > 2}
         >
           <Collaterals />
         </Stepper.Step>

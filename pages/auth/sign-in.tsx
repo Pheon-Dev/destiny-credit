@@ -8,6 +8,7 @@ import {
   TextInput,
   Card,
   Badge,
+  PasswordInput,
   Button,
   Box,
   Group,
@@ -104,9 +105,10 @@ const Page: NextPage = (props): JSX.Element => {
               {...form.getInputProps("username")}
               required
             />
-            <TextInput
+            <PasswordInput
               label="Password"
               type="password"
+              /* description="password" */
               placeholder="*******"
               mt="sm"
               {...form.getInputProps("password")}
