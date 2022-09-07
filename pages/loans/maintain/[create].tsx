@@ -1,4 +1,4 @@
-import React, { useEffect, forwardRef, useState } from "react";
+import React, { useEffect, useRef, forwardRef, useState } from "react";
 import { Collaterals, Guarantors, Protected } from "../../../components";
 import { NextPage } from "next";
 import axios from "axios";
@@ -54,6 +54,7 @@ const Page: NextPage = () => {
   const [active, setActive] = useState(0);
   const [sundays, setSundays] = useState(0);
   const [products, setProducts] = useState([]);
+  const [members, setMembers] = useState([]);
 
   const [intRate, setIntRate] = useState("");
   const [proRate, setProRate] = useState("");
@@ -61,6 +62,7 @@ const Page: NextPage = () => {
   const [cycle, setCycle] = useState("");
   const [proName, setProName] = useState("");
   const [grace, setGrace] = useState("");
+  const ref = useRef<HTMLInputElement>(null);
 
   const [status, setStatus] = useState(false);
   const [checked, setChecked] = useState(false);
@@ -146,14 +148,34 @@ const Page: NextPage = () => {
         },
       });
 
+/* console.log(ref.current.defaultValue.split(" ")[0]) */
+/* const fname = ref.current.defaultValue.split(" ")[0] */
+/* const lname = ref.current.defaultValue.split(" ")[1] */
+
+      /* const search = await axios.request({ */
+      /*   method: "POST", */
+      /*   url: `/api/members, search/${id}`, */
+      /*   data: { */
+      /*     firstName: `${fname}`, */
+      /*     lastName: `${lname}`, */
+      /*   }, */
+      /* }); */
+
       const pro = await axios.request({
         method: "GET",
         url: "/api/products",
       });
 
+      const mems = await axios.request({
+        method: "GET",
+        url: "/api/members",
+      });
+
       const pros = pro.data.products;
 
       setProducts(pros);
+      setMembers(mems.data.members);
+
       if (mem.data.member[0]?.firstName?.length > 0)
         form.setFieldValue("memberId", `${mem.data.member[0].id}`);
       form.setFieldValue("productId", `${id}`);
@@ -603,6 +625,10 @@ const Page: NextPage = () => {
     { key: _.id, value: `${_.id}`, label: `${_.productName}` },
   ]);
 
+  const guarantor_data = members.map((_: Members) => [
+    { key: _.id, value: `${_.id}`, label: `${_.firstName} ${_.lastName}` },
+  ]);
+
   return (
     <Protected>
       <Stepper mt="lg" active={active} onStepClick={setActive} breakpoint="sm">
@@ -694,11 +720,13 @@ const Page: NextPage = () => {
                     mt="md"
                     label="Enter Guarantor Names"
                     placeholder="Enter Guarantor Names ..."
-                    data={[
-                      { label: "Gname One", value: "gname1" },
-                      { label: "Gname Two", value: "gname2" },
-                      { label: "Gname Three", value: "gname3" },
-                    ]}
+                    ref={ref}
+                    /* data={[ */
+                    /*   { label: "Gname One", value: "gname1" }, */
+                    /*   { label: "Gname Two", value: "gname2" }, */
+                    /*   { label: "Gname Three", value: "gname3" }, */
+                    /* ]} */
+                    data={guarantor_data?.map((p) => p[0].label)}
                     {...form.getInputProps("guarantorName")}
                     required
                   />
