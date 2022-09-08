@@ -215,8 +215,8 @@ interface Collaterals {
   updatedAt?: Date;
   item: string;
   value: string;
-  member: string;
+  member?: string;
   memberId: string;
-  updater: string;
-  updaterId: string;
+  updater?: string;
+  updaterId?: string;
 }

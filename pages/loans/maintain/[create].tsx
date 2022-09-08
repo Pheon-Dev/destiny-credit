@@ -1,5 +1,5 @@
 import React, { useEffect, useRef, forwardRef, useState } from "react";
-import { Collaterals, Guarantors, Protected } from "../../../components";
+import { Protected } from "../../../components";
 import { NextPage } from "next";
 import axios from "axios";
 import { z } from "zod";
@@ -21,6 +21,8 @@ import {
   Switch,
   Autocomplete,
   NumberInput,
+  Tooltip,
+  Modal,
 } from "@mantine/core";
 import Router, { useRouter } from "next/router";
 import { showNotification, updateNotification } from "@mantine/notifications";
@@ -41,7 +43,7 @@ import {
   DateRangePicker,
   DateRangePickerValue,
 } from "@mantine/dates";
-import { Members, Products } from "../../../types";
+import { Collaterals, Members, Products } from "../../../types";
 
 const loan_schema = z.object({
   member: z.string().min(2, { message: "User Name Missing" }),
@@ -76,10 +78,12 @@ const collateral_schema = z.object({
 
 const Page: NextPage = () => {
   const [active, setActive] = useState(0);
+  const [open, setOpen] = useState(false);
   const [sundays, setSundays] = useState(0);
   const [products, setProducts] = useState([]);
   const [members, setMembers] = useState([]);
   const [collaterals, setCollaterals] = useState([]);
+  const [collateral, setCollateral] = useState([]);
   const [guarantors, setGuarantors] = useState([]);
 
   const [intRate, setIntRate] = useState("");
@@ -135,7 +139,6 @@ const Page: NextPage = () => {
     });
     form.setFieldValue("principal", `${form.values.principal}`);
     form.validate();
-    handleSubmit();
     if (
       form.values.tenure &&
       form.values.principal &&
@@ -160,7 +163,6 @@ const Page: NextPage = () => {
         guarantor_form.values.guarantorName &&
         guarantor_form.values.guarantorId
       ) {
-        handleSubmit();
         return setActive((current) => (current < 3 ? current + 1 : current));
       }
       if (active === 1)
@@ -188,6 +190,39 @@ const Page: NextPage = () => {
     });
   };
 
+  const deleteCollateral = async (id: string) => {
+    try {
+      const col = await axios.request({
+        method: "POST",
+        url: "/api/members/collateral/delete",
+        data: {
+          id: `${id}`,
+        },
+      });
+      setTimeout(() => {
+        updateNotification({
+          id: "collateral-delete-status",
+          color: "red",
+          title: "Collateral Deletion",
+          message: "Collateral Successfully Deleted",
+          icon: <IconX size={16} />,
+          autoClose: 5000,
+        });
+      });
+    } catch (error) {
+      setTimeout(() => {
+        updateNotification({
+          id: "collateral-delete-status",
+          color: "red",
+          title: "Collateral Deletion Error",
+          message: "Collateral Unsuccessfully Deleted. Please Try Again.",
+          icon: <IconX size={16} />,
+          autoClose: 5000,
+        });
+      });
+    }
+  };
+
   const prevStep = () =>
     setActive((current) => (current > 0 ? current - 1 : current));
 
@@ -212,6 +247,11 @@ const Page: NextPage = () => {
         },
       });
 
+      const cols = await axios.request({
+        method: "GET",
+        url: "/api/members/collateral",
+      });
+
       const mem = await axios.request({
         method: "POST",
         url: `/api/members/${id}`,
@@ -234,7 +274,8 @@ const Page: NextPage = () => {
 
       setProducts(pros);
       setMembers(mems.data.members);
-      setCollaterals(col.data.collateral);
+      setCollaterals(cols.data.collaterals);
+      setCollateral(col.data.collateral);
       setGuarantors(gua.data.guarantor);
 
       if (mem.data.member[0]?.firstName?.length > 0)
@@ -470,7 +511,7 @@ const Page: NextPage = () => {
     try {
       setTimeout(() => {
         updateNotification({
-          id: "maintainance-status",
+          id: "submit-status",
           color: "teal",
           title: "Successful Loan Maintenance!",
           message: `Next Step is Adding a Loan Guarantor ...`,
@@ -486,9 +527,67 @@ const Page: NextPage = () => {
     } catch (error) {
       setTimeout(() => {
         updateNotification({
-          id: "maintainance-status",
+          id: "submit-status",
           title: "Maintenance Error!",
           message: `Please Try Maintaining Again!`,
+          icon: <IconX size={16} />,
+          color: "red",
+          autoClose: 4000,
+        });
+      });
+    }
+  };
+
+  const handleCollaterals = async () => {
+    try {
+      if (
+        form.values.memberId &&
+        collateral_form.values.item &&
+        collateral_form.values.value
+      ) {
+        const add = await axios.request({
+          method: "POST",
+          url: "/api/members/collateral/create",
+          data: {
+            memberId: form.values.memberId,
+            item: collateral_form.values.item.toUpperCase(),
+            value: collateral_form.values.value,
+          },
+        });
+        collateral_form.setFieldValue("item", "");
+        collateral_form.setFieldValue("value", "");
+        return setTimeout(() => {
+          updateNotification({
+            id: "collateral-status",
+            color: "teal",
+            title: "Collaterals",
+            message: `${add.data.item} @ ${add.data.value} Added Successfully as Collateral!`,
+            icon: <IconCheck size={16} />,
+            autoClose: 8000,
+          });
+        });
+      }
+
+      setTimeout(() => {
+        updateNotification({
+          id: "collateral-status",
+          title: "Collateral Error!",
+          message: `Please Try Adding Again!`,
+          icon: <IconX size={16} />,
+          color: "red",
+          autoClose: 4000,
+        });
+      });
+      /* router.push("/"); */
+      /* const res = await axios.get("/api/"); */
+      /* const data = res.data; */
+      /* return Router.replace(Router.asPath); */
+    } catch (error) {
+      setTimeout(() => {
+        updateNotification({
+          id: "collateral-status",
+          title: "Collateral Error!",
+          message: `Please Try Adding Again!`,
           icon: <IconX size={16} />,
           color: "red",
           autoClose: 4000,
@@ -800,6 +899,152 @@ const Page: NextPage = () => {
     );
   };
 
+  const preview = () => {
+    return (
+      <>
+        <Modal
+          opened={open}
+          onClose={() => setOpen(false)}
+          title="Preview Loan Details"
+        >
+          <Card shadow="sm" p="lg" radius="md" m="xl" withBorder>
+            <Card.Section withBorder inheritPadding py="xs">
+              <Group position="apart">
+                <Text weight={700}>{form.values.member}</Text>
+                <Menu withinPortal position="bottom-end" shadow="sm">
+                  <Menu.Target>
+                    <ActionIcon>
+                      <IconDots size={16} />
+                    </ActionIcon>
+                  </Menu.Target>
+
+                  <Menu.Dropdown>
+                    <Menu.Item icon={<IconFileZip size={14} />}>
+                      Download zip
+                    </Menu.Item>
+                    <Menu.Item icon={<IconEye size={14} />}>
+                      Preview all
+                    </Menu.Item>
+                    <Menu.Item icon={<IconTrash size={14} />} color="red">
+                      Delete all
+                    </Menu.Item>
+                  </Menu.Dropdown>
+                </Menu>
+              </Group>
+            </Card.Section>
+            <Card.Section withBorder inheritPadding py="xs">
+              <Grid grow>
+                <Grid.Col mt="xs" span={4}>
+                  <Text weight={500}>Loan Product</Text>
+                </Grid.Col>
+                <Grid.Col mt="xs" span={4}>
+                  <Text>{form.values.product}</Text>
+                </Grid.Col>
+              </Grid>
+              <Grid grow>
+                <Grid.Col mt="xs" span={4}>
+                  <Text weight={500}>Skipped Sundays</Text>
+                </Grid.Col>
+                <Grid.Col mt="xs" span={4}>
+                  <Text>{form.values.sundays} {sundays === 1 ? "Sunday" : "Sundays"}</Text>
+                </Grid.Col>
+              </Grid>
+              {payoff && (
+                  <Grid grow>
+                    <Grid.Col mt="xs" span={4}>
+                      <Text weight={500}>Payoff Amount</Text>
+                    </Grid.Col>
+                    <Grid.Col mt="xs" span={4}>
+                  <Text>{`KSHs. ${form.values.payoff}.00`.replace(/\B(?=(\d{3})+(?!\d))/g, ",")}</Text>
+                    </Grid.Col>
+                  </Grid>
+              )}
+              <Grid grow>
+                <Grid.Col mt="xs" span={4}>
+                  <Text weight={500}>Loan Tenure</Text>
+                </Grid.Col>
+                <Grid.Col mt="xs" span={4}>
+                  <Text>{form.values.tenure} {cycle.toLowerCase() === "daily" ? "Days" : cycle.toLowerCase() === "weeks" ? "Weeks" : "Months"}</Text>
+                </Grid.Col>
+              </Grid>
+              <Grid grow>
+                <Grid.Col mt="xs" span={4}>
+                  <Text weight={500}>Principal Amount</Text>
+                </Grid.Col>
+                <Grid.Col mt="xs" span={4}>
+                  <Text>{`KSHs. ${form.values.principal}.00`.replace(/\B(?=(\d{3})+(?!\d))/g, ",")}</Text>
+                </Grid.Col>
+              </Grid>
+              <Grid grow>
+                <Grid.Col mt="xs" span={4}>
+                  <Text weight={500}>Installment Amount</Text>
+                </Grid.Col>
+                <Grid.Col mt="xs" span={4}>
+                  <Text>{`KSHs. ${form.values.installment}.00`.replace(/\B(?=(\d{3})+(?!\d))/g, ",")}</Text>
+                </Grid.Col>
+              </Grid>
+              <Grid grow>
+                <Grid.Col mt="xs" span={4}>
+                  <Text weight={500}>Interest Amount</Text>
+                </Grid.Col>
+                <Grid.Col mt="xs" span={4}>
+                  <Text>{`KSHs. ${form.values.interest}.00`.replace(/\B(?=(\d{3})+(?!\d))/g, ",")}</Text>
+                </Grid.Col>
+              </Grid>
+              <Grid grow>
+                <Grid.Col mt="xs" span={4}>
+                  <Text weight={500}>Penalty Amount</Text>
+                </Grid.Col>
+                <Grid.Col mt="xs" span={4}>
+                  <Text>{`KSHs. ${form.values.penalty}.00`.replace(/\B(?=(\d{3})+(?!\d))/g, ",")}</Text>
+                </Grid.Col>
+              </Grid>
+              <Grid grow>
+                <Grid.Col mt="xs" span={4}>
+                  <Text weight={500}>Processing Fee</Text>
+                </Grid.Col>
+                <Grid.Col mt="xs" span={4}>
+                  <Text>{`KSHs. ${form.values.processingFee}.00`.replace(/\B(?=(\d{3})+(?!\d))/g, ",")}</Text>
+                </Grid.Col>
+              </Grid>
+              {form.values.grace === "1" && (
+              <Grid grow>
+                <Grid.Col mt="xs" span={4}>
+                  <Text weight={500}>Grace Period</Text>
+                </Grid.Col>
+                <Grid.Col mt="xs" span={4}>
+                  <Text>{form.values.grace} Day</Text>
+                </Grid.Col>
+              </Grid>
+              )}
+            <Group mt="xl">
+              <Button
+              variant="light"
+              color="blue"
+              fullWidth mt="md" radius="md"
+                onClick={() => {
+                  form.validate();
+                  showNotification({
+                    id: "submit-status",
+                    color: "teal",
+                    title: `${form.values.member}`,
+                    message: `Maintaining Loan For ${form.values.member} ...`,
+                    loading: true,
+                    autoClose: 50000,
+                  });
+                  handleSubmit();
+                }}
+              >
+                Submit
+              </Button>
+              </Group>
+            </Card.Section>
+          </Card>
+        </Modal>
+      </>
+    );
+  };
+
   /* console.log(collaterals) */
   /* console.log(guarantors) */
 
@@ -818,9 +1063,10 @@ const Page: NextPage = () => {
                 <Grid.Col span={4}>
                   <TextInput
                     mt="md"
-                    label="Select Member"
-                    placeholder="Select Member ..."
+                    label="Member"
+                    placeholder="Member ..."
                     {...form.getInputProps("member")}
+                    disabled={form.values.memberId.length > 0 ? false : true}
                     required
                   />
                 </Grid.Col>
@@ -831,6 +1077,7 @@ const Page: NextPage = () => {
                     placeholder="Select Product ..."
                     data={product_data?.map((p) => p[0].label)}
                     {...form.getInputProps("product")}
+                    disabled={form.values.memberId.length > 0 ? false : true}
                     required
                   />
                 </Grid.Col>
@@ -845,6 +1092,7 @@ const Page: NextPage = () => {
                     label="Enter Principal Amount"
                     placeholder="Enter Principal Amount ..."
                     {...form.getInputProps("principal")}
+                    disabled={maxRange > 0 ? false : true}
                     required
                   />
                   {/* <NumberInput */}
@@ -868,6 +1116,7 @@ const Page: NextPage = () => {
                     label="Enter Tenure"
                     placeholder="Enter Tenure ..."
                     {...form.getInputProps("tenure")}
+                    disabled={form.values.memberId.length > 0 ? false : true}
                     required
                   />
                 </Grid.Col>
@@ -960,6 +1209,42 @@ const Page: NextPage = () => {
                   </Menu>
                 </Group>
               </Card.Section>
+              {collaterals.length > 0 &&
+                collaterals.map((collateral: Collaterals, index: number) => (
+                  <Card.Section withBorder inheritPadding py="xs">
+                    <Grid grow columns={12}>
+                      <Grid.Col mt="md" span={1}>
+                        <Text>{index + 1}</Text>
+                      </Grid.Col>
+                      <Grid.Col mt="md" span={5}>
+                        <Text>{collateral.item}</Text>
+                      </Grid.Col>
+                      <Grid.Col mt="md" span={5}>
+                        <Text>{collateral.value}</Text>
+                      </Grid.Col>
+                      <Grid.Col mt="md" span={1}>
+                        <Tooltip color="red" label="Delete">
+                          <ActionIcon
+                            variant="light"
+                            onClick={() => {
+                              showNotification({
+                                id: "collateral-delete-status",
+                                color: "red",
+                                title: "Deleting Collateral",
+                                message: `Deleting ${collateral.item} worth KSHs. ${collateral.value} From Being Added to Collaterals ...`,
+                                loading: true,
+                                autoClose: 50000,
+                              });
+                              deleteCollateral(`${collateral.id}`);
+                            }}
+                          >
+                            <IconTrash size={24} color="red" />
+                          </ActionIcon>
+                        </Tooltip>
+                      </Grid.Col>
+                    </Grid>
+                  </Card.Section>
+                ))}
               <Card.Section withBorder inheritPadding py="xs">
                 <form>
                   <Grid grow columns={12}>
@@ -981,12 +1266,51 @@ const Page: NextPage = () => {
                         required
                       />
                     </Grid.Col>
-                    <Grid.Col mt="md" span={2}>
-                      <Group position="apart" mt="xl" m="md">
-                        <IconPlus size={24} />
-                        <IconMinus size={24} />
-                      </Group>
-                    </Grid.Col>
+                    {collateral_form.values.item.length > 0 &&
+                      collateral_form.values.value.length > 0 && (
+                        <Grid.Col mt="md" span={2}>
+                          <Group position="apart" mt="xl" m="md">
+                            <Tooltip label="Add" color="teal">
+                              <ActionIcon
+                                variant="light"
+                                onClick={() => {
+                                  showNotification({
+                                    id: "collateral-status",
+                                    color: "teal",
+                                    title: "Saving Collaterals",
+                                    message: `Saving Collateral Information ...`,
+                                    loading: true,
+                                    autoClose: 50000,
+                                  });
+                                  handleCollaterals();
+                                }}
+                              >
+                                <IconPlus color="teal" size={24} />
+                              </ActionIcon>
+                            </Tooltip>
+
+                            <Tooltip color="red" label="Clear">
+                              <ActionIcon
+                                variant="light"
+                                onClick={() => {
+                                  collateral_form.setFieldValue("item", "");
+                                  collateral_form.setFieldValue("value", "");
+                                  showNotification({
+                                    id: "collateral-status",
+                                    color: "orange",
+                                    title: "Removing Collateral",
+                                    message: `Removed ${collateral_form.values.item} worth KSHs. ${collateral_form.values.value} From Being Added to Collaterals.`,
+                                    icon: <IconCheck size={16} />,
+                                    autoClose: 3000,
+                                  });
+                                }}
+                              >
+                                <IconMinus size={24} color="red" />
+                              </ActionIcon>
+                            </Tooltip>
+                          </Group>
+                        </Grid.Col>
+                      )}
                   </Grid>
                 </form>
               </Card.Section>
@@ -999,12 +1323,20 @@ const Page: NextPage = () => {
       </Stepper>
 
       <Group position="center" mt="xl">
-        <Button variant="default" onClick={prevStep}>
-          Back
+        {active === 0 ? null : (
+          <Button variant="default" onClick={prevStep}>
+            Back
+          </Button>
+        )}
+        <Button
+          onClick={() => {
+            active === 2 ? setOpen(true) : nextStep();
+          }}
+        >
+          {active === 2 ? "Preview" : "Next"}
         </Button>
-        <Button onClick={nextStep}>Next</Button>
-        {/* <Button onClick={nextStep}>Next</Button> */}
       </Group>
+      {preview()}
       <pre>{JSON.stringify(products, undefined, 2)}</pre>
     </Protected>
   );
