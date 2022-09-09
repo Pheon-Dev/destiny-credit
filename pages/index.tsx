@@ -18,29 +18,26 @@ export default function Home() {
   /*   } */
 
   async function fetchTransactions() {
-    let subscription = true;
-    if (subscription) {
-      /* await axios.get("/api/transactions") */
-      const res = await axios.request({
-        method: "GET",
-        url: "/api/transactions/payments",
-      });
-      const data = res.data.transactions;
+    const controller = new AbortController();
+    const signal = controller.signal;
 
-      setTransactions(data);
-      transactions.length === 0 && setLoaded(true);
-    }
+    const res = await axios.request({
+      method: "GET",
+      url: "/api/transactions/payments",
+      signal,
+    });
+    const data = res.data.transactions;
+
+    setTransactions(data);
+    transactions.length === 0 && setLoaded(true);
     return () => {
-      subscription = false;
+      controller.abort();
     };
   }
 
   useEffect(() => {
     fetchTransactions();
-    /* setTimeout(() => { */
-    /*   transactions.length === 0 && setLoad(false); */
-    /* }, 8000); */
-  }, [transactions]);
+  }, []);
 
   return (
     <Protected>

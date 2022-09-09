@@ -114,16 +114,16 @@ async function transactions(req: NextApiRequest, res: NextApiResponse) {
             transactionType: transactionType,
             transAmount: transAmount,
             businessShortCode: businessShortCode,
-            billRefNumber: billRefNumber,
+            billRefNumber: billRefNumber.toUpperCase(),
             transID: transID,
             transTime: transTime,
             invoiceNumber: invoiceNumber,
             orgAccountBalance: orgAccountBalance,
             thirdPartyTransID: thirdPartyTransID,
             msisdn: msisdn,
-            firstName: firstName,
-            middleName: middleName,
-            lastName: lastName,
+            firstName: firstName.toUpperCase(),
+            middleName: middleName.toUpperCase(),
+            lastName: lastName.toUpperCase(),
           });
 
             try {
