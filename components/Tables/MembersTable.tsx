@@ -79,7 +79,9 @@ function MemberRow({ member, call }: { member: Members; call: string }) {
               </Badge>
             )}
           </td>
-          <td onClick={() => router.push(`/members/${member.id}`)}>
+          <td
+            style={{ cursor: "pointer" }}
+          onClick={() => router.push(`/members/${member.id}`)}>
             <IconEdit size={24} />
           </td>
         </tr>
@@ -104,7 +106,9 @@ function MemberRow({ member, call }: { member: Members; call: string }) {
               Maintain
             </Badge>
           </td>
-          <td onClick={() => router.push(`/members/${member.id}`)}>
+          <td
+            style={{ cursor: "pointer" }}
+          onClick={() => router.push(`/members/${member.id}`)}>
             <IconEdit size={24} />
           </td>
         </tr>
@@ -129,7 +133,9 @@ function MemberRow({ member, call }: { member: Members; call: string }) {
               Approve
             </Badge>
           </td>
-          <td onClick={() => router.push(`/members/${member.id}`)}>
+          <td
+            style={{ cursor: "pointer" }}
+          onClick={() => router.push(`/members/${member.id}`)}>
             <IconEdit size={24} />
           </td>
         </tr>

@@ -20,6 +20,7 @@ import {
   Autocomplete,
   Tooltip,
   Modal,
+  LoadingOverlay,
 } from "@mantine/core";
 import Router, { useRouter } from "next/router";
 import { showNotification, updateNotification } from "@mantine/notifications";
@@ -60,6 +61,7 @@ const collateral_schema = z.object({
 });
 
 const Page: NextPage = () => {
+  const [load, setLoad] = useState(false);
   const [active, setActive] = useState(0);
   const [open, setOpen] = useState(false);
   const [deleteModal, setDeleteModal] = useState(false);
@@ -226,7 +228,7 @@ const Page: NextPage = () => {
           color: "red",
           title: "Collateral Deletion",
           message: "Collateral Successfully Deleted",
-          icon: <IconX size={16} />,
+          icon: <IconCheck size={16} />,
           autoClose: 5000,
         });
       });
@@ -247,11 +249,8 @@ const Page: NextPage = () => {
   const prevStep = () =>
     setActive((current) => (current > 0 ? current - 1 : current));
 
-  async function fetchMemberNProducts() {
-    let subscription = true;
-
-    if (subscription) {
-      if (products.length < 1) setStatus(true);
+  const fetchCollaterals = async () => {
+    try {
       const col = await axios.request({
         method: "POST",
         url: `/api/members/collateral`,
@@ -259,7 +258,16 @@ const Page: NextPage = () => {
           id: `${id}`,
         },
       });
+      setCollaterals(
+        col.data.collaterals
+      );
+    } catch (error) {
+      console.log(error);
+    }
+  };
 
+  const fetchGuarantor = async () => {
+    try {
       const gua = await axios.request({
         method: "POST",
         url: `/api/members/guarantor`,
@@ -267,7 +275,14 @@ const Page: NextPage = () => {
           id: `${id}`,
         },
       });
+      setGuarantor(gua.data.guarantor);
+    } catch (error) {
+      console.log(error);
+    }
+  };
 
+  const fetchMember = async () => {
+    try {
       const mem = await axios.request({
         method: "POST",
         url: `/api/members/${id}`,
@@ -276,40 +291,62 @@ const Page: NextPage = () => {
         },
       });
 
-      const pro = await axios.request({
-        method: "GET",
-        url: "/api/products",
-      });
+      if (mem.data.member[0]?.firstName?.length > 0) {
+        form.setFieldValue("memberId", `${mem.data.member[0].id}`);
+        form.setFieldValue(
+          "member",
+          `${mem.data.member[0].firstName} ${mem.data.member[0].lastName}`
+        );
+      }
+    } catch (error) {
+      console.log(error);
+    }
+  };
 
+  const fetchMembers = async () => {
+    try {
       const mems = await axios.request({
         method: "GET",
         url: "/api/members",
       });
 
+      setMembers(mems.data.members);
+    } catch (error) {
+      console.log(error);
+    }
+  };
+
+  const fetchProducts = async () => {
+    try {
+      if (products.length < 1) setStatus(true);
+      const pro = await axios.request({
+        method: "GET",
+        url: "/api/products",
+      });
       const pros = pro.data.products;
 
       setProducts(pros);
-      setMembers(mems.data.members);
-      setCollaterals(col.data.collaterals);
-      setGuarantor(gua.data.guarantor);
-
-      if (mem.data.member[0]?.firstName?.length > 0)
-        form.setFieldValue("memberId", `${mem.data.member[0].id}`);
-      form.setFieldValue(
-        "member",
-        `${mem.data.member[0].firstName} ${mem.data.member[0].lastName}`
-      );
       setStatus(false);
+    } catch (error) {
+      console.log(error);
+    }
+  };
+
+  useEffect(() => {
+    let subscription = true;
+
+    if (subscription) {
+      fetchMembers();
+      fetchProducts();
+      fetchCollaterals();
+      fetchGuarantor();
+      fetchMember();
     }
 
     return () => {
       subscription = false;
     };
-  }
-
-  useEffect(() => {
-    fetchMemberNProducts();
-  }, [products, members, collaterals]);
+  }, [products]);
 
   const keyGen = (len: number) => {
     let random_string = "";
@@ -365,120 +402,122 @@ const Page: NextPage = () => {
     },
   });
 
-  async function fetchProduct() {
-    const pr = await axios.request({
-      method: "POST",
-      url: `/api/products/${form.values.product}`,
-      data: {
-        productName: `${form.values.product}`,
-      },
-    });
+  const fetchProduct = async () => {
+    try {
+      const pr = await axios.request({
+        method: "POST",
+        url: `/api/products/${form.values.product}`,
+        data: {
+          productName: `${form.values.product}`,
+        },
+      });
 
-    pr.data?.product
-      ? pr.data?.product?.map((_: Products) => {
-          form.setFieldValue("productId", `${_.id}`);
-          setIntRate(_.interestRate);
-          setPenRate(_.penaltyRate);
-          setCycle(_.repaymentCycle);
-          setProRate(_.processingFee);
-          setProName(_.productName);
-          setGrace(_.gracePeriod);
-          setMaxTenure(+_.maximumTenure);
-          setMaxRange(+_.maximumRange);
-          setMinRange(+_.minimumRange);
-        })
-      : null;
-  }
-
-  useEffect(() => {
-    let s = true;
-
-    if (s) {
-      let sundays = 0;
-      let counter = 0;
-      let term = +form.values.tenure;
-      fetchProduct();
-
-      while (counter < term + 1) {
-        const date = new Date();
-        date.setDate(date.getDate() + counter);
-        let day = date.getDay();
-        if (day === 0) {
-          setSundays((sundays += 1));
-        }
-        counter++;
-      }
-
-      if (checked) setSundays(0);
-      form.setFieldValue(
-        "guarantorId",
-        `${keyGen(8)}-${keyGen(4)}-${keyGen(4)}-${keyGen(4)}-${keyGen(12)}`
-      );
-      form.setFieldValue("payoff", `${payoffAmount}`);
-      form.setFieldValue("sundays", `${sundays}`);
-      form.setFieldValue("grace", `${grace}`);
-      form.setFieldValue("maintained", true);
-      form.setFieldValue("approved", false);
-      form.setFieldValue("disbursed", false);
-      form.setFieldValue(
-        "interest",
-        `${
-          cycle.toLowerCase() === "daily"
-            ? renderDailyInterestAmount(
-                +intRate,
-                +form.values.principal,
-                +form.values.tenure
-              )
-            : cycle.toLowerCase() === "weekly"
-            ? renderWeeklyInterestAmount(
-                +intRate,
-                +form.values.principal,
-                +form.values.tenure
-              )
-            : renderMonthlyInterestAmount(
-                +intRate,
-                +form.values.principal,
-                +form.values.tenure
-              )
-        }`
-      );
-      form.setFieldValue(
-        "installment",
-        `${
-          cycle.toLowerCase() === "daily"
-            ? renderDailyInstallmentAmount(
-                +intRate,
-                +form.values.principal,
-                +form.values.tenure
-              )
-            : cycle.toLowerCase() === "weekly"
-            ? renderWeeklyInstallmentAmount(
-                +intRate,
-                +form.values.principal,
-                +form.values.tenure
-              )
-            : renderMonthlyInstallmentAmount(
-                +intRate,
-                +form.values.principal,
-                +form.values.tenure
-              )
-        }`
-      );
-      form.setFieldValue(
-        "penalty",
-        `${renderPenaltyAmount(
-          +penRate,
-          +intRate,
-          cycle,
-          +form.values.principal,
-          +form.values.tenure
-        )}`
-      );
-      form.setFieldValue(
-        "processingFee",
-        `${renderProcessingFeeAmount(+proRate, +form.values.principal)}`
-      );
+      pr.data?.product
+        ? pr.data?.product?.map((_: Products) => {
+            form.setFieldValue("productId", `${_.id}`);
+            setIntRate(_.interestRate);
+            setPenRate(_.penaltyRate);
+            setCycle(_.repaymentCycle);
+            setProRate(_.processingFee);
+            setProName(_.productName);
+            setGrace(_.gracePeriod);
+            setMaxTenure(+_.maximumTenure);
+            setMaxRange(+_.maximumRange);
+            setMinRange(+_.minimumRange);
+          })
+        : null;
+    } catch (error) {
+      console.log(error);
     }
+  };
+
+  const calculateSundays = () => {
+    let sundays = 0;
+    let counter = 0;
+    let term = +form.values.tenure;
+
+    while (counter < term + 1) {
+      const date = new Date();
+      date.setDate(date.getDate() + counter);
+      let day = date.getDay();
+      if (day === 0) {
+        setSundays((sundays += 1));
+      }
+      counter++;
+    }
+
+    if (checked) setSundays(0);
+  };
+
+  const fillForm = () => {
+    form.setFieldValue(
+      "guarantorId",
+      `${keyGen(8)}-${keyGen(4)}-${keyGen(4)}-${keyGen(4)}-${keyGen(12)}`
+    );
+    form.setFieldValue("payoff", `${payoffAmount}`);
+    form.setFieldValue("sundays", `${sundays}`);
+    form.setFieldValue("grace", `${grace}`);
+    form.setFieldValue("maintained", true);
+    form.setFieldValue("approved", false);
+    form.setFieldValue("disbursed", false);
+    form.setFieldValue(
+      "interest",
+      `${
+        cycle.toLowerCase() === "daily"
+          ? renderDailyInterestAmount(
+              +intRate,
+              +form.values.principal,
+              +form.values.tenure
+            )
+          : cycle.toLowerCase() === "weekly"
+          ? renderWeeklyInterestAmount(
+              +intRate,
+              +form.values.principal,
+              +form.values.tenure
+            )
+          : renderMonthlyInterestAmount(
+              +intRate,
+              +form.values.principal,
+              +form.values.tenure
+            )
+      }`
+    );
+    form.setFieldValue(
+      "installment",
+      `${
+        cycle.toLowerCase() === "daily"
+          ? renderDailyInstallmentAmount(
+              +intRate,
+              +form.values.principal,
+              +form.values.tenure
+            )
+          : cycle.toLowerCase() === "weekly"
+          ? renderWeeklyInstallmentAmount(
+              +intRate,
+              +form.values.principal,
+              +form.values.tenure
+            )
+          : renderMonthlyInstallmentAmount(
+              +intRate,
+              +form.values.principal,
+              +form.values.tenure
+            )
+      }`
+    );
+    form.setFieldValue(
+      "penalty",
+      `${renderPenaltyAmount(
+        +penRate,
+        +intRate,
+        cycle,
+        +form.values.principal,
+        +form.values.tenure
+      )}`
+    );
+    form.setFieldValue(
+      "processingFee",
+      `${renderProcessingFeeAmount(+proRate, +form.values.principal)}`
+    );
 
     if (form.values.tenure.length > 0 && +form.values.tenure > maxTenure) {
       form.setFieldValue("tenure", "");
@@ -524,9 +563,18 @@ const Page: NextPage = () => {
         icon: <IconInfoCircle size={24} />,
       });
     }
+  };
 
+  useEffect(() => {
+    let subscribe = true;
+
+    if (subscribe) {
+      fetchProduct();
+      calculateSundays();
+      fillForm();
+    }
     return () => {
-      s = false;
+      subscribe = false;
     };
   }, [
     checked,
@@ -542,6 +590,7 @@ const Page: NextPage = () => {
 
   const handleSubmit = async () => {
     try {
+      setLoad(true);
       setOpen(false);
       const update = await axios.request({
         method: "POST",
@@ -584,6 +633,7 @@ const Page: NextPage = () => {
           memberName: form.values.member,
           productName: form.values.product,
           interest: form.values.interest,
+          cycle: cycle,
         },
       });
       setTimeout(() => {
@@ -653,6 +703,7 @@ const Page: NextPage = () => {
             value: collateral_form.values.value,
           },
         });
+        console.log(add)
         collateral_form.setFieldValue("item", "");
         collateral_form.setFieldValue("value", "");
         return setTimeout(() => {
@@ -683,6 +734,7 @@ const Page: NextPage = () => {
       /* const data = res.data; */
       /* return Router.replace(Router.asPath); */
     } catch (error) {
+        console.log(error)
       setTimeout(() => {
         updateNotification({
           id: "collateral-status",
@@ -807,7 +859,7 @@ const Page: NextPage = () => {
     });
   };
 
-  useEffect(() => {
+  const handleGuarantor = () => {
     if (
       guarantor_form.values.guarantorName !== "" &&
       guarantor_form.values.guarantorName === form.values.member
@@ -833,7 +885,10 @@ const Page: NextPage = () => {
       );
     }
 
-    if (guarantor_form.values.guarantorName !== "" && guarantor_form.values.guarantorName !== form.values.member) {
+    if (
+      guarantor_form.values.guarantorName !== "" &&
+      guarantor_form.values.guarantorName !== form.values.member
+    ) {
       setTimeout(() => {
         updateNotification({
           id: "guarantor-status",
@@ -848,15 +903,27 @@ const Page: NextPage = () => {
     }
 
     if (guarantor.length > 0 && !changeGuarantor) {
-        guarantor.map((_: Guarantors) => {
-              findGuarantor(_.guarantorName);
+      guarantor.map((_: Guarantors) => {
+        findGuarantor(_.guarantorName);
         guarantor_form.setFieldValue("guarantorPhone", `${_.guarantorPhone}`);
         guarantor_form.setFieldValue("guarantorId", `${_.guarantorId}`);
-        guarantor_form.setFieldValue("guarantorRelationship", `${_.guarantorRelationship}`);
+        guarantor_form.setFieldValue(
+          "guarantorRelationship",
+          `${_.guarantorRelationship}`
+        );
         guarantor_form.setFieldValue("guarantorName", `${_.guarantorName}`);
+      });
+    }
+    }
 
-        })
+  useEffect(() => {
+    let subscribe = true;
+    if (subscribe) {
+        handleGuarantor()
       }
+      return () => {
+          subscribe = false;
+        }
   }, [
     guarantor_form.values.guarantorName,
     guarantor_form.values.guarantorId,
@@ -1227,6 +1294,8 @@ const Page: NextPage = () => {
   };
 
   return (
+  <>
+      {!load && (
     <Protected>
       <Stepper mt="lg" active={active} onStepClick={setActive} breakpoint="sm">
         <Stepper.Step
@@ -1576,17 +1645,19 @@ const Page: NextPage = () => {
           </Button>
         )}
         {active === 1 && (
-                  <Button
-                  variant="light"
-                  color="teal"
-                  onClick={() => {
-                    setChangeGuarantor(true);
-        guarantor_form.setFieldValue("guarantorPhone", ``);
-        guarantor_form.setFieldValue("guarantorId", ``);
-        guarantor_form.setFieldValue("guarantorRelationship", ``);
-        guarantor_form.setFieldValue("guarantorName", ``);
-                    }}
-                  >Change Guarantor</Button>
+          <Button
+            variant="light"
+            color="teal"
+            onClick={() => {
+              setChangeGuarantor(true);
+              guarantor_form.setFieldValue("guarantorPhone", ``);
+              guarantor_form.setFieldValue("guarantorId", ``);
+              guarantor_form.setFieldValue("guarantorRelationship", ``);
+              guarantor_form.setFieldValue("guarantorName", ``);
+            }}
+          >
+            Change Guarantor
+          </Button>
         )}
         <Button
           onClick={() => {
@@ -1598,6 +1669,15 @@ const Page: NextPage = () => {
       </Group>
       {preview()}
     </Protected>
+    )}
+    {load && (
+        <LoadingOverlay
+          overlayBlur={2}
+          onClick={() => setLoad((prev) => !prev)}
+          visible={load}
+        />
+    )}
+  </>
   );
 };
 

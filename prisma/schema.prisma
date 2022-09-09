@@ -186,6 +186,7 @@ model Loan {
   productName   String
   memberName    String
   processingFee String
+  cycle         String
   guarantor     Guarantor @relation(fields: [guarantorId], references: [id])
   guarantorId   String
   payment       Payment[]

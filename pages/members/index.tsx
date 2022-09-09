@@ -2,6 +2,7 @@ import React, { useEffect, useState } from "react";
 import axios from "axios";
 import { MembersTable } from "../../components";
 import { Group, LoadingOverlay, Text } from "@mantine/core";
+import { NextPage } from "next";
 
 const MembersList = () => {
   const [members, setMembers] = useState([]);
@@ -28,11 +29,16 @@ const MembersList = () => {
 
   useEffect(() => {
     fetchMembers();
+    setTimeout(() => {
+      members.length === 0 && setLoad(false);
+    }, 8000);
   }, [members]);
 
   return (
     <>
-      {(members.length > 0 && <MembersTable members={members} call="all-members" />) || (
+      {(members.length > 0 && (
+        <MembersTable members={members} call="all-members" />
+      )) || (
         <LoadingOverlay
           overlayBlur={2}
           onClick={() => setLoad((prev) => !prev)}
@@ -48,8 +54,8 @@ const MembersList = () => {
   );
 };
 
-const Page = () => {
-    return <MembersList />
-  }
+const Page: NextPage = () => {
+  return <MembersList />;
+};
 
 export default Page;

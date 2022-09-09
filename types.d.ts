@@ -238,6 +238,7 @@ interface Loans {
   payoff: string;
   tenure: string;
   grace: string;
+  cycle: string;
   productName: string;
   memberName: string;
   processingFee: string;

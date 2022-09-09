@@ -1,47 +1,24 @@
 import React, { useEffect, useState } from "react";
-import { Protected } from "../../components";
-import { NextPage } from "next";
 import axios from "axios";
-import {
-  Group,
-  Stepper,
-  Button,
-  LoadingOverlay,
-  Text,
-  TextInput,
-  Card,
-  Box,
-  Grid,
-  Badge,
-  Select,
-  Menu,
-  ActionIcon,
-  Switch,
-  Autocomplete,
-} from "@mantine/core";
-import Router, { useRouter } from "next/router";
-import { showNotification, updateNotification } from "@mantine/notifications";
-import {
-  IconCheck,
-  IconX,
-} from "@tabler/icons";
-import { Loans } from "../../types";
+import { LoansTable } from "../../components";
+import { Group, LoadingOverlay, Text } from "@mantine/core";
 
-const Page: NextPage = () => {
+const LoansList = () => {
   const [loans, setLoans] = useState([]);
+  const [load, setLoad] = useState(true);
 
-  async function fetchMembers() {
+  async function fetchLoans() {
     let subscription = true;
 
     if (subscription) {
-      const mem = await axios.request({
+      const res = await axios.request({
         method: "GET",
-        url: `/api/loans`,
+        url: "/api/loans",
       });
 
-      const mems = mem.data.loans;
-
-      setLoans(mems);
+      const data = res.data.loans;
+      setLoans(data);
+      loans.length === 0 && setLoad(false);
     }
 
     return () => {
@@ -50,49 +27,29 @@ const Page: NextPage = () => {
   }
 
   useEffect(() => {
-    fetchMembers();
+    fetchLoans();
   }, [loans]);
-
-  const router = useRouter();
-
-  const handleSubmit = async () => {
-    try {
-      setTimeout(() => {
-        updateNotification({
-          id: "maintainance-status",
-          color: "teal",
-          title: "Successful Loan Maintenance!",
-          message: `Next Step is Adding a Loan Guarantor ...`,
-          icon: <IconCheck size={16} />,
-          autoClose: 8000,
-        });
-      });
-      /* router.push("/"); */
-      /* const res = await axios.get("/api/"); */
-      /* const data = res.data; */
-      /* return Router.replace(Router.asPath); */
-    } catch (error) {
-      setTimeout(() => {
-        updateNotification({
-          id: "maintainance-status",
-          title: "Maintenance Error!",
-          message: `Please Try Maintaining Again!`,
-          icon: <IconX size={16} />,
-          color: "red",
-          autoClose: 4000,
-        });
-      });
-    }
-  };
 
   return (
     <>
-    <Protected>
-    <Text>Members List For Approval</Text>
-    <pre>{JSON.stringify(loans, undefined, 2)}</pre>
-    </Protected>
+      {(loans.length > 0 && <LoansTable loans={loans} call="approvals" />) || (
+        <LoadingOverlay
+          overlayBlur={2}
+          onClick={() => setLoad((prev) => !prev)}
+          visible={load}
+        />
+      )}
+      {loans.length === 0 && (
+        <Group position="center">
+          <Text>No Disbursed loans</Text>
+        </Group>
+      )}
     </>
   );
 };
+
+const Page = () => {
+    return <LoansList />
+  }
 
 export default Page;

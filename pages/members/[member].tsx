@@ -2,8 +2,9 @@ import React, { useEffect, useState } from "react";
 import { Text } from "@mantine/core";
 import axios from "axios";
 import { useRouter } from "next/router";
+import { NextPage } from "next";
 
-const MemberDetail = () => {
+const Page: NextPage = () => {
   const [member, setMember] = useState();
   const router = useRouter();
   const id = router.query.member as string;
@@ -32,10 +33,10 @@ const MemberDetail = () => {
 
   return (
     <>
+    <Text>Member Page :</Text>
       <pre>{JSON.stringify(member, undefined, 2)}</pre>
-      <Text>MemberDetail :</Text>
     </>
   );
 };
 
-export default MemberDetail;
+export default Page;

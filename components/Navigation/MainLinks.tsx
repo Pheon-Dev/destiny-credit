@@ -6,10 +6,15 @@ import {
   IconCash,
   IconTag,
   IconBrandAsana,
+  IconX,
+  IconCheck,
 } from "@tabler/icons";
 import { Box, NavLink, Text } from "@mantine/core";
 import { Protected } from "../Protected/Protected";
 import Link from "next/link";
+import { useRouter } from "next/router";
+import axios from "axios";
+import { showNotification } from "@mantine/notifications";
 
 export function MainLinks() {
   const [membersActive, setMembersActive] = useState(9);
@@ -19,35 +24,48 @@ export function MainLinks() {
   const [reportsActive, setReportsActive] = useState(9);
   const [dashboardActive, setDashboardActive] = useState(true);
 
-  /* useEffect(() => { */
-  /*     let subs = true; */
-  /**/
-  /*     if (subs) { */
-  /*         setActive() */
-  /*       } */
-  /**/
-  /*     return () => {subs = false} */
-  /*   }, []) */
+  const router = useRouter();
+
+  const reload = async () => {
+    try {
+      const res = await axios.get("/api/transactions");
+      const data = res.data;
+      router.replace(router.asPath);
+      router.push("/");
+      return setTimeout(() => {
+        showNotification({
+          id: "transactions-status",
+          color: "teal",
+          title: data.message,
+          message: `${data.data.length} Recent Transactions as from ${data.from} to ${data.to}`,
+          icon: <IconCheck size={16} />,
+          autoClose: 8000,
+        });
+      });
+    } catch (error) {
+      return router.push("/");
+    }
+  };
 
   return (
-  <Protected>
-    <Box style={{padding: 2}}>
-      <NavLink
-        styles={{
-          root: {
-            borderRadius: 6,
-            margin: 2,
-          },
-        }}
-        label={
-          <Text weight={700} size="md">
-            Home
-          </Text>
-        }
-        icon={<IconHome size={16} stroke={1.5} />}
-        childrenOffset={24}
-      >
-      <Link href="/">
+    <Protected>
+      <Box style={{ padding: 2 }}>
+        <NavLink
+          styles={{
+            root: {
+              borderRadius: 6,
+              margin: 2,
+            },
+          }}
+          label={
+            <Text weight={700} size="md">
+              Home
+            </Text>
+          }
+          icon={<IconHome size={16} stroke={1.5} />}
+          childrenOffset={24}
+        >
+          <Link href="/">
           <NavLink
             styles={{
               root: {
@@ -64,27 +82,27 @@ export function MainLinks() {
               setGroupsActive(8);
               setReportsActive(8);
               setDashboardActive(true);
+              reload();
             }}
           />
-            </Link>
-      </NavLink>
-      <NavLink
-        styles={{
-          root: {
-            borderRadius: 6,
-            margin: 2,
-          },
-        }}
-        label={
-          <Text weight={700} size="md">
-            Members
-          </Text>
-        }
-        icon={<IconUsers size={16} stroke={1.5} />}
-        childrenOffset={24}
-      >
-        {members_data.map((item: any, index: number) => (
-          <Link key={item.url} href={item.url}>
+          </Link>
+        </NavLink>
+        <NavLink
+          styles={{
+            root: {
+              borderRadius: 6,
+              margin: 2,
+            },
+          }}
+          label={
+            <Text weight={700} size="md">
+              Members
+            </Text>
+          }
+          icon={<IconUsers size={16} stroke={1.5} />}
+          childrenOffset={24}
+        >
+          {members_data.map((item: any, index: number) => (
             <NavLink
               styles={{
                 root: {
@@ -101,28 +119,28 @@ export function MainLinks() {
                 setGroupsActive(8);
                 setReportsActive(8);
                 setDashboardActive(false);
+                router.push(`${item.url}`);
               }}
+              key={item.url}
             />
-          </Link>
-        ))}
-      </NavLink>
-      <NavLink
-        styles={{
-          root: {
-            borderRadius: 6,
-            margin: 2,
-          },
-        }}
-        label={
-          <Text weight={700} size="md">
-            Loans
-          </Text>
-        }
-        icon={<IconCash size={16} stroke={1.5} />}
-        childrenOffset={24}
-      >
-        {loans_data.map((item: any, index: number) => (
-          <Link key={item.url} href={item.url}>
+          ))}
+        </NavLink>
+        <NavLink
+          styles={{
+            root: {
+              borderRadius: 6,
+              margin: 2,
+            },
+          }}
+          label={
+            <Text weight={700} size="md">
+              Loans
+            </Text>
+          }
+          icon={<IconCash size={16} stroke={1.5} />}
+          childrenOffset={24}
+        >
+          {loans_data.map((item: any, index: number) => (
             <NavLink
               styles={{
                 root: {
@@ -139,165 +157,167 @@ export function MainLinks() {
                 setGroupsActive(8);
                 setReportsActive(8);
                 setDashboardActive(false);
+                router.push(`${item.url}`);
               }}
+              key={item.url}
             />
-          </Link>
-        ))}
-      </NavLink>
-      <NavLink
-        styles={{
-          root: {
-            borderRadius: 6,
-            margin: 2,
-          },
-        }}
-        label={
-          <Text weight={700} size="md">
-            Groups
-          </Text>
-        }
-        icon={<IconBrandAsana size={16} stroke={1.5} />}
-        childrenOffset={24}
-      >
-        {groups_data.map((item: any, index: number) => (
-          <Link key={item.url} href={item.url}>
-            <NavLink
-              styles={{
-                root: {
-                  borderRadius: 6,
-                  margin: 2,
-                },
+          ))}
+        </NavLink>
+        <NavLink
+          styles={{
+            root: {
+              borderRadius: 6,
+              margin: 2,
+            },
+          }}
+          label={
+            <Text weight={700} size="md">
+              Groups
+            </Text>
+          }
+          icon={<IconBrandAsana size={16} stroke={1.5} />}
+          childrenOffset={24}
+        >
+          {groups_data.map((item: any, index: number) => (
+              <NavLink
+                styles={{
+                  root: {
+                    borderRadius: 6,
+                    margin: 2,
+                  },
+                }}
+                label={<Text weight={500}>{item.name}</Text>}
+                active={groupsActive === index}
+                onClick={() => {
+                  setMembersActive(8);
+                  setLoansActive(8);
+                  setProductsActive(8);
+                  setGroupsActive(index);
+                  setReportsActive(8);
+                  setDashboardActive(false);
+                router.push(`${item.url}`);
               }}
-              label={<Text weight={500}>{item.name}</Text>}
-              active={groupsActive === index}
-              onClick={() => {
-                setMembersActive(8);
-                setLoansActive(8);
-                setProductsActive(8);
-                setGroupsActive(index);
-                setReportsActive(8);
-                setDashboardActive(false);
+              key={item.url}
+              />
+          ))}
+        </NavLink>
+        <NavLink
+          styles={{
+            root: {
+              borderRadius: 6,
+              margin: 2,
+            },
+          }}
+          label={
+            <Text weight={700} size="md">
+              Products
+            </Text>
+          }
+          icon={<IconTag size={16} stroke={1.5} />}
+          childrenOffset={24}
+        >
+          {products_data.map((item: any, index: number) => (
+              <NavLink
+                styles={{
+                  root: {
+                    borderRadius: 6,
+                    margin: 2,
+                  },
+                }}
+                label={<Text weight={500}>{item.name}</Text>}
+                active={productsActive === index}
+                onClick={() => {
+                  setMembersActive(8);
+                  setLoansActive(8);
+                  setProductsActive(index);
+                  setGroupsActive(8);
+                  setReportsActive(8);
+                  setDashboardActive(false);
+                router.push(`${item.url}`);
               }}
-            />
-          </Link>
-        ))}
-      </NavLink>
-      <NavLink
-        styles={{
-          root: {
-            borderRadius: 6,
-            margin: 2,
-          },
-        }}
-        label={
-          <Text weight={700} size="md">
-            Products
-          </Text>
-        }
-        icon={<IconTag size={16} stroke={1.5} />}
-        childrenOffset={24}
-      >
-        {products_data.map((item: any, index: number) => (
-          <Link key={item.url} href={item.url}>
-            <NavLink
-              styles={{
-                root: {
-                  borderRadius: 6,
-                  margin: 2,
-                },
-              }}
-              label={<Text weight={500}>{item.name}</Text>}
-              active={productsActive === index}
-              onClick={() => {
-                setMembersActive(8);
-                setLoansActive(8);
-                setProductsActive(index);
-                setGroupsActive(8);
-                setReportsActive(8);
-                setDashboardActive(false);
-              }}
-            />
-          </Link>
-        ))}
-      </NavLink>
-      {/* <NavLink */}
-      {/*   styles={{ */}
-      {/*     root: { */}
-      {/*       borderRadius: 6, */}
-      {/*       margin: 2, */}
-      {/*     }, */}
-      {/*   }} */}
+              key={item.url}
+              />
+          ))}
+        </NavLink>
+        {/* <NavLink */}
+        {/*   styles={{ */}
+        {/*     root: { */}
+        {/*       borderRadius: 6, */}
+        {/*       margin: 2, */}
+        {/*     }, */}
+        {/*   }} */}
         {/* label={ */}
         {/*   <Text weight={700} size="md"> */}
         {/*     Apps */}
         {/*   </Text> */}
         {/* } */}
-      {/*   icon={<IconApps size={16} stroke={1.5} />} */}
-      {/*   childrenOffset={24} */}
-      {/* > */}
-      {/*   {apps_data.map((item: any, index: number) => ( */}
-      {/*     <Link key={item.url} href={item.url}> */}
-      {/*       <NavLink */}
-      {/*         styles={{ */}
-      {/*           root: { */}
-      {/*             borderRadius: 6, */}
-      {/*             margin: 2, */}
-      {/*           }, */}
-      {/*         }} */}
-      {/* label={<Text weight={500}>{item.name}</Text>} */}
-      {/*         active={reportsActive === index} */}
-      {/*         onClick={() => { */}
-      {/*           setMembersActive(8); */}
-      {/*           setLoansActive(8); */}
-      {/*           setProductsActive(8); */}
-      {/*           setGroupsActive(8); */}
-      {/*           setReportsActive(index); */}
-      {/*           setDashboardActive(false); */}
-      {/*         }} */}
-      {/*       /> */}
-      {/*     </Link> */}
-      {/*   ))} */}
-      {/* </NavLink> */}
-      <NavLink
-        styles={{
-          root: {
-            borderRadius: 6,
-            margin: 2,
-          },
-        }}
-        label={
-          <Text weight={700} size="md">
-            Reports
-          </Text>
-        }
-        icon={<IconReport size={16} stroke={1.5} />}
-        childrenOffset={24}
-      >
-        {reports_data.map((item: any, index: number) => (
-          <Link key={item.url} href={item.url}>
-            <NavLink
-              styles={{
-                root: {
-                  borderRadius: 6,
-                  margin: 2,
-                },
+        {/*   icon={<IconApps size={16} stroke={1.5} />} */}
+        {/*   childrenOffset={24} */}
+        {/* > */}
+        {/*   {apps_data.map((item: any, index: number) => ( */}
+        {/*     <Link key={item.url} href={item.url}> */}
+        {/*       <NavLink */}
+        {/*         styles={{ */}
+        {/*           root: { */}
+        {/*             borderRadius: 6, */}
+        {/*             margin: 2, */}
+        {/*           }, */}
+        {/*         }} */}
+        {/* label={<Text weight={500}>{item.name}</Text>} */}
+        {/*         active={reportsActive === index} */}
+        {/*         onClick={() => { */}
+        {/*           setMembersActive(8); */}
+        {/*           setLoansActive(8); */}
+        {/*           setProductsActive(8); */}
+        {/*           setGroupsActive(8); */}
+        {/*           setReportsActive(index); */}
+        {/*           setDashboardActive(false); */}
+        {/*         }} */}
+        {/*       /> */}
+        {/*     </Link> */}
+        {/*   ))} */}
+        {/* </NavLink> */}
+        <NavLink
+          styles={{
+            root: {
+              borderRadius: 6,
+              margin: 2,
+            },
+          }}
+          label={
+            <Text weight={700} size="md">
+              Reports
+            </Text>
+          }
+          icon={<IconReport size={16} stroke={1.5} />}
+          childrenOffset={24}
+        >
+          {reports_data.map((item: any, index: number) => (
+              <NavLink
+                styles={{
+                  root: {
+                    borderRadius: 6,
+                    margin: 2,
+                  },
+                }}
+                label={<Text weight={500}>{item.name}</Text>}
+                active={reportsActive === index}
+                onClick={() => {
+                  setMembersActive(8);
+                  setLoansActive(8);
+                  setProductsActive(8);
+                  setGroupsActive(8);
+                  setReportsActive(index);
+                  setDashboardActive(false);
+                router.push(`${item.url}`);
               }}
-              label={<Text weight={500}>{item.name}</Text>}
-              active={reportsActive === index}
-              onClick={() => {
-                setMembersActive(8);
-                setLoansActive(8);
-                setProductsActive(8);
-                setGroupsActive(8);
-                setReportsActive(index);
-                setDashboardActive(false);
-              }}
-            />
-          </Link>
-        ))}
-      </NavLink>
-    </Box>
-  </Protected>);
+              key={item.url}
+              />
+          ))}
+        </NavLink>
+      </Box>
+    </Protected>
+  );
 }
 
 const members_data = [

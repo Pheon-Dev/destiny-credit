@@ -1,0 +1,41 @@
+import type { NextApiRequest, NextApiResponse } from "next";
+import { PrismaClient } from "@prisma/client";
+
+async function loan(req: NextApiRequest, res: NextApiResponse) {
+  const prisma = new PrismaClient();
+
+  async function main() {
+    try {
+      const {
+        id
+      } = req.body;
+
+      const loan = await prisma.loan.findMany({
+        where: {
+          id: `${id}`
+        },
+      });
+      res.status(200).json({ loan: loan });
+
+      return {
+        props: { loan }
+      };
+    } catch (error) {
+      console.log(error);
+
+      res.status(500).json({ message: "Something went wrong", error });
+    }
+  }
+  main()
+    .then(async () => {
+      await prisma.$disconnect();
+    })
+    .catch(async (e) => {
+      console.error(e);
+      await prisma.$disconnect();
+      process.exit(1);
+    });
+}
+
+export default loan;
+

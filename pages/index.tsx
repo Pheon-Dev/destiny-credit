@@ -19,6 +19,7 @@ export default function Home() {
   async function fetchTransactions() {
     let subscription = true;
     if (subscription) {
+      /* await axios.get("/api/transactions") */
       const res = await axios.request({
         method: "GET",
         url: "/api/transactions/payments",
@@ -35,6 +36,9 @@ export default function Home() {
 
   useEffect(() => {
     fetchTransactions();
+    /* setTimeout(() => { */
+    /*   transactions.length === 0 && setLoad(false); */
+    /* }, 8000); */
   }, [transactions]);
 
   return (

@@ -41,7 +41,7 @@ const MembersList = () => {
       )}
       {members.length === 0 && (
         <Group position="center">
-          <Text>No Registered Members</Text>
+          <Text>No Maintained Loans</Text>
         </Group>
       )}
     </>
