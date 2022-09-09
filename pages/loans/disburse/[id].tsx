@@ -24,7 +24,7 @@ import {
 } from "@tabler/icons";
 import { Loans } from "../../../types";
 
-const Approve = () => {
+const Disburse = () => {
   const [loan, setLoan] = useState([]);
   const [load, setLoad] = useState(true);
 
@@ -35,7 +35,7 @@ const Approve = () => {
     try {
       const res = await axios.request({
         method: "POST",
-        url: `/api/loans/approve`,
+        url: `/api/loans/disburse`,
         data: {
           id: `${id}`,
         },
@@ -62,10 +62,10 @@ const Approve = () => {
     try {
       const req = await axios.request({
         method: "POST",
-        url: "/api/loans/approve",
+        url: "/api/loans/disburse",
         data: {
           id: id,
-          approved: true,
+          disbursed: true,
         },
       });
       if (req.status === 200) {
@@ -73,8 +73,8 @@ const Approve = () => {
           updateNotification({
             id: "submit-status",
             color: "teal",
-            title: `Loan Approval`,
-            message: `Loan Was Successfully Approved`,
+            title: `Loan Disbursement`,
+            message: `Loan Was Successfully Disbursed`,
             icon: <IconCheck size={16} />,
             autoClose: 8000,
           });
@@ -88,8 +88,8 @@ const Approve = () => {
           updateNotification({
             id: "submit-status",
             color: "red",
-            title: `Loan Approval`,
-            message: `Loan Was not Successfully Approved. Please Try Again.`,
+            title: `Loan Disbursement`,
+            message: `Loan Was not Successfully Disbursed. Please Try Again.`,
             icon: <IconX size={16} />,
             autoClose: 8000,
           });
@@ -264,14 +264,14 @@ const Approve = () => {
                         id: "submit-status",
                         color: "teal",
                         title: `${_.memberName}`,
-                        message: `Approving Loan For ${_.memberName} ...`,
+                        message: `Disbursing Loan For ${_.memberName} ...`,
                         loading: true,
                         autoClose: 50000,
                       });
                       handleSubmit();
                     }}
                   >
-                    Approve Loan
+                    Disburse Loan
                   </Button>
                 </Group>
               </Card.Section>
@@ -292,7 +292,7 @@ const Approve = () => {
 const Page: NextPage = () => {
   return (
     <Protected>
-      <Approve />
+      <Disburse />
     </Protected>
   );
 };

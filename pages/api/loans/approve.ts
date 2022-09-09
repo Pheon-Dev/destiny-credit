@@ -7,7 +7,8 @@ async function loan(req: NextApiRequest, res: NextApiResponse) {
   async function main() {
     try {
       const {
-        id
+        id,
+        approved
       } = req.body;
 
       const loan = await prisma.loan.findMany({
@@ -15,6 +16,18 @@ async function loan(req: NextApiRequest, res: NextApiResponse) {
           id: `${id}`
         },
       });
+      if (approved) {
+      await prisma.loan.update({
+        where: {
+          id: `${id}`,
+        },
+        data: {
+          approved: approved,
+        },
+      });
+      }
+
+
       res.status(200).json({ loan: loan });
 
       return {

@@ -2,7 +2,7 @@ import React from "react";
 import { Table, Badge } from "@mantine/core";
 import { Loans } from "../../types";
 import { useRouter } from "next/router";
-import { IconEdit, IconInfoCircle } from "@tabler/icons";
+import { IconEdit } from "@tabler/icons";
 
 export function LoansTable({ loans, call }: { loans: Loans[]; call: string }) {
   const Header = () => (
@@ -11,6 +11,7 @@ export function LoansTable({ loans, call }: { loans: Loans[]; call: string }) {
       <th>Principal</th>
       <th>Interest</th>
       <th>Installment</th>
+      <th>Tenure</th>
       <th>Status</th>
       <th>Action</th>
     </tr>
@@ -41,9 +42,10 @@ function LoanRow({ loan, call }: { loan: Loans; call: string }) {
       {call === "approvals" && (
         <tr style={{ cursor: "auto" }}>
           <td>{loan.memberName}</td>
-          <td>{`${loan.principal}.00`.replace(/\B(?=(\d{3})+(?!\d))/g, ",")}</td>
-          <td>{`${loan.interest}.00`.replace(/\B(?=(\d{3})+(?!\d))/g, ",")}</td>
-          <td>{`${loan.installment}.00`.replace(/\B(?=(\d{3})+(?!\d))/g, ",")}</td>
+          <td>{`${loan.principal}`.replace(/\B(?=(\d{3})+(?!\d))/g, ",")}</td>
+          <td>{`${loan.interest}`.replace(/\B(?=(\d{3})+(?!\d))/g, ",")}</td>
+          <td>{`${loan.installment}`.replace(/\B(?=(\d{3})+(?!\d))/g, ",")}</td>
+          <td>{loan.tenure} {loan.cycle === "daily" ? "Days" : loan.cycle === "weekly" ? "Weeks" : "Months" }</td>
           <td>
             {loan.approved ? (
               <Badge
@@ -68,6 +70,48 @@ function LoanRow({ loan, call }: { loan: Loans; call: string }) {
                 }}
               >
                 Approve
+              </Badge>
+            )}
+          </td>
+          <td
+            style={{ cursor: "pointer" }}
+            onClick={() => router.push(`/loans/${loan.id}`)}
+          >
+            <IconEdit size={24} />
+          </td>
+        </tr>
+      )}
+      {call === "disbursements" && (
+        <tr style={{ cursor: "auto" }}>
+          <td>{loan.memberName}</td>
+          <td>{`${loan.principal}`.replace(/\B(?=(\d{3})+(?!\d))/g, ",")}</td>
+          <td>{`${loan.interest}`.replace(/\B(?=(\d{3})+(?!\d))/g, ",")}</td>
+          <td>{`${loan.installment}`.replace(/\B(?=(\d{3})+(?!\d))/g, ",")}</td>
+          <td>{loan.tenure} {loan.cycle === "daily" ? "Days" : loan.cycle === "weekly" ? "Weeks" : "Months" }</td>
+          <td>
+            {loan.disbursed ? (
+              <Badge
+                style={{ cursor: "pointer" }}
+                onClick={() => router.push(`/loans/payments/${loan.id}`)}
+                variant="gradient"
+                gradient={{
+                  from: "teal",
+                  to: "lime",
+                }}
+              >
+                Disbursed
+              </Badge>
+            ) : (
+              <Badge
+                style={{ cursor: "pointer" }}
+                onClick={() => router.push(`/loans/disburse/${loan.id}`)}
+                variant="gradient"
+                gradient={{
+                  from: "indigo",
+                  to: "cyan",
+                }}
+              >
+                Disburse
               </Badge>
             )}
           </td>

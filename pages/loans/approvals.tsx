@@ -28,6 +28,9 @@ const LoansList = () => {
 
   useEffect(() => {
     fetchLoans();
+    setTimeout(() => {
+      loans.length === 0 && setLoad(false);
+    }, 8000);
   }, [loans]);
 
   return (
@@ -41,7 +44,7 @@ const LoansList = () => {
       )}
       {loans.length === 0 && (
         <Group position="center">
-          <Text>No Disbursed loans</Text>
+          <Text>No Maintained loans</Text>
         </Group>
       )}
     </>

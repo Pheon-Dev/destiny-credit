@@ -1,27 +1,37 @@
 import type { NextApiRequest, NextApiResponse } from "next";
 import { PrismaClient } from "@prisma/client";
 
-async function register(req: NextApiRequest, res: NextApiResponse) {
+async function loan(req: NextApiRequest, res: NextApiResponse) {
   const prisma = new PrismaClient();
 
   async function main() {
     try {
       const {
         id,
-        maintained,
+        disbursed
       } = req.body;
 
-      await prisma.member.update({
+      const loan = await prisma.loan.findMany({
+        where: {
+          id: `${id}`
+        },
+      });
+      if (disbursed) {
+      await prisma.loan.update({
         where: {
           id: `${id}`,
         },
         data: {
-          maintained: maintained,
+          disbursed: disbursed,
         },
       });
+      }
 
-      console.log("Updated Successfully")
-      res.status(200).json({ message: req.body });
+      res.status(200).json({ loan: loan });
+
+      return {
+        props: { loan }
+      };
     } catch (error) {
       console.log(error);
 
@@ -39,5 +49,6 @@ async function register(req: NextApiRequest, res: NextApiResponse) {
     });
 }
 
-export default register;
+export default loan;
+
 
