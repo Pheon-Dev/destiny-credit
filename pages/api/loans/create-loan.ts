@@ -29,7 +29,6 @@ async function create(req: NextApiRequest, res: NextApiResponse) {
 
       await prisma.loan.create({
         data: {
-          guarantorId: `${guarantorId}`,
           memberId: memberId,
           tenure: tenure,
           principal: principal,
@@ -47,6 +46,7 @@ async function create(req: NextApiRequest, res: NextApiResponse) {
           productName: productName,
           interest: interest,
           cycle: cycle,
+          guarantorId: guarantorId,
         },
       });
 

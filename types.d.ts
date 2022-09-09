@@ -243,7 +243,7 @@ interface Loans {
   memberName: string;
   processingFee: string;
   guarantor: string;
-  guarantorId: string;
+  guarantorId?: string;
   product: string;
   productId: string;
   member: string;

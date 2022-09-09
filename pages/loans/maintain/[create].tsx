@@ -3,6 +3,7 @@ import { Protected } from "../../../components";
 import { NextPage } from "next";
 import axios from "axios";
 import { z } from "zod";
+import { v4 as uuidV4 } from "uuid";
 import { useForm, zodResolver } from "@mantine/form";
 import {
   Group,
@@ -348,19 +349,6 @@ const Page: NextPage = () => {
     };
   }, [products]);
 
-  const keyGen = (len: number) => {
-    let random_string = "";
-    let char = "abcdefghijklmnopqrstuvwxyz1234567890";
-    let i: number;
-
-    for (i = 0; i < len; i++) {
-      random_string =
-        random_string + char.charAt(Math.floor(Math.random() * char.length));
-    }
-
-    return random_string;
-  };
-
   const form = useForm({
     validate: zodResolver(loan_schema),
     initialValues: {
@@ -450,10 +438,7 @@ const Page: NextPage = () => {
   };
 
   const fillForm = () => {
-    form.setFieldValue(
-      "guarantorId",
-      `${keyGen(8)}-${keyGen(4)}-${keyGen(4)}-${keyGen(4)}-${keyGen(12)}`
-    );
+    form.setFieldValue("guarantorId", uuidV4().toString());
     form.setFieldValue("payoff", `${payoffAmount}`);
     form.setFieldValue("sundays", `${sundays}`);
     form.setFieldValue("grace", `${grace}`);
