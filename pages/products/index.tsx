@@ -6,6 +6,7 @@ import { Group, LoadingOverlay, Text } from "@mantine/core";
 const ProductsList = () => {
   const [products, setProducts] = useState([]);
   const [load, setLoad] = useState(true);
+  const [loaded, setLoaded] = useState(false);
 
   async function fetchProducts() {
     let subscription = true;
@@ -18,7 +19,7 @@ const ProductsList = () => {
 
       const data = res.data.products;
       setProducts(data);
-      products.length === 0 && setLoad(false);
+      products.length === 0 && setLoaded(true);
     }
 
     return () => {
@@ -39,7 +40,7 @@ const ProductsList = () => {
           visible={load}
         />
       )}
-      {products.length === 0 && (
+      {loaded && products.length === 0 && (
         <Group position="center">
           <Text>No Registered products</Text>
         </Group>

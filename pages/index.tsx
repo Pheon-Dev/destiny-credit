@@ -7,6 +7,7 @@ import { Group, LoadingOverlay } from "@mantine/core";
 export default function Home() {
   const [transactions, setTransactions] = useState([]);
   const [load, setLoad] = useState(true);
+  const [loaded, setLoaded] = useState(false);
 
   /* const hello = trpc.useQuery(['hello', { text: 'client' }]); */
   /* if (!hello.data) { */
@@ -27,7 +28,7 @@ export default function Home() {
       const data = res.data.transactions;
 
       setTransactions(data);
-      transactions.length === 0 && setLoad((prev) => !prev);
+      transactions.length === 0 && setLoaded(true);
     }
     return () => {
       subscription = false;
@@ -52,7 +53,7 @@ export default function Home() {
           visible={load}
         />
       )}
-      {transactions.length === 0 && (
+      {loaded && transactions.length === 0 && (
         <Group position="center">No New Transactions</Group>
       )}
     </Protected>

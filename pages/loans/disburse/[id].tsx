@@ -60,6 +60,7 @@ const Disburse = () => {
 
   const handleSubmit = async () => {
     try {
+      setLoad(true)
       const req = await axios.request({
         method: "POST",
         url: "/api/loans/disburse",
@@ -101,7 +102,7 @@ const Disburse = () => {
 
   return (
     <>
-      {(loan.length > 0 && (
+      {!load && (loan.length > 0 && (
         <>
           {loan.map((_: Loans) => (
             <Card key={_.id} shadow="sm" p="lg" radius="md" m="xl" withBorder>
@@ -278,7 +279,8 @@ const Disburse = () => {
             </Card>
           ))}
         </>
-      )) || (
+      ))}
+      {load && (
         <LoadingOverlay
           overlayBlur={2}
           onClick={() => setLoad((prev) => !prev)}

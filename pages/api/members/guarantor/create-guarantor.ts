@@ -11,7 +11,7 @@ async function create(req: NextApiRequest, res: NextApiResponse) {
         guarantorName,
         guarantorPhone,
         guarantorRelationship,
-        guarantorId,
+        guarantorID,
         memberId,
       } = req.body;
 
@@ -21,7 +21,7 @@ async function create(req: NextApiRequest, res: NextApiResponse) {
           guarantorName: guarantorName,
           guarantorPhone: guarantorPhone,
           guarantorRelationship: guarantorRelationship,
-          guarantorId: guarantorId,
+          guarantorID: guarantorID,
           memberId: memberId,
         },
       });

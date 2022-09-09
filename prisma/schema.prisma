@@ -143,7 +143,7 @@ model Guarantor {
   updatedAt             DateTime @updatedAt
   guarantorName         String
   guarantorPhone        String
-  guarantorId           String
+  guarantorID           String
   guarantorRelationship String
   member                Member   @relation(fields: [memberId], references: [id])
   memberId              String

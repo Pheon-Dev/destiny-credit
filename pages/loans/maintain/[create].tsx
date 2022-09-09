@@ -49,7 +49,7 @@ const guarantor_schema = z.object({
   guarantorPhone: z
     .string()
     .min(2, { message: "Guarantor Phone Number is Missing" }),
-  guarantorId: z.string().min(2, { message: "Guarantor ID is Missing" }),
+  guarantorID: z.string().min(2, { message: "Guarantor ID is Missing" }),
   guarantorRelationship: z
     .string()
     .min(2, { message: "Guarantor Relationship is Missing" }),
@@ -184,7 +184,7 @@ const Page: NextPage = () => {
         guarantor_form.values.guarantorPhone &&
         guarantor_form.values.guarantorRelationship &&
         guarantor_form.values.guarantorName &&
-        guarantor_form.values.guarantorId
+        guarantor_form.values.guarantorID
       ) {
         return setActive((current) => (current < 3 ? current + 1 : current));
       }
@@ -390,7 +390,7 @@ const Page: NextPage = () => {
       guarantorName: "",
       guarantorPhone: "",
       guarantorRelationship: "",
-      guarantorId: "",
+      guarantorID: "",
     },
   });
 
@@ -608,7 +608,7 @@ const Page: NextPage = () => {
           guarantorName: guarantor_form.values.guarantorName,
           guarantorPhone: guarantor_form.values.guarantorPhone,
           guarantorRelationship: guarantor_form.values.guarantorRelationship,
-          guarantorId: guarantor_form.values.guarantorId,
+          guarantorID: guarantor_form.values.guarantorID,
           memberId: form.values.memberId,
         },
       });
@@ -668,7 +668,7 @@ const Page: NextPage = () => {
       guarantor_form.setFieldValue("guarantorName", "");
       guarantor_form.setFieldValue("guarantorPhone", "");
       guarantor_form.setFieldValue("guarantorRelationship", "");
-      guarantor_form.setFieldValue("guarantorId", "");
+      guarantor_form.setFieldValue("guarantorID", "");
       const res = await axios.get("/api/loans");
       const data = res.data;
       Router.replace(Router.asPath);
@@ -854,7 +854,7 @@ const Page: NextPage = () => {
     return members.find((e: Members) => {
       if (e.firstName + " " + e.lastName === name) {
         guarantor_form.setFieldValue("guarantorPhone", `${e.phoneNumber}`);
-        guarantor_form.setFieldValue("guarantorId", `${e.idPass}`);
+        guarantor_form.setFieldValue("guarantorID", `${e.idPass}`);
       }
     });
   };
@@ -869,7 +869,7 @@ const Page: NextPage = () => {
         `${form.values.member} Cannot Self-Guarantee`
       );
       guarantor_form.setFieldValue("guarantorPhone", ``);
-      guarantor_form.setFieldValue("guarantorId", ``);
+      guarantor_form.setFieldValue("guarantorID", ``);
       showNotification({
         id: "guarantor-status",
         color: "red",
@@ -906,7 +906,7 @@ const Page: NextPage = () => {
       guarantor.map((_: Guarantors) => {
         findGuarantor(_.guarantorName);
         guarantor_form.setFieldValue("guarantorPhone", `${_.guarantorPhone}`);
-        guarantor_form.setFieldValue("guarantorId", `${_.guarantorId}`);
+        guarantor_form.setFieldValue("guarantorID", `${_.guarantorID}`);
         guarantor_form.setFieldValue(
           "guarantorRelationship",
           `${_.guarantorRelationship}`
@@ -926,7 +926,7 @@ const Page: NextPage = () => {
         }
   }, [
     guarantor_form.values.guarantorName,
-    guarantor_form.values.guarantorId,
+    guarantor_form.values.guarantorID,
     guarantor_form.values.guarantorPhone,
     form.values.principal,
     form.values.tenure,
@@ -1408,7 +1408,7 @@ const Page: NextPage = () => {
                     mt="md"
                     label="ID"
                     placeholder="Enter ID ..."
-                    {...guarantor_form.getInputProps("guarantorId")}
+                    {...guarantor_form.getInputProps("guarantorID")}
                     required
                   />
                 </Grid.Col>
@@ -1651,7 +1651,7 @@ const Page: NextPage = () => {
             onClick={() => {
               setChangeGuarantor(true);
               guarantor_form.setFieldValue("guarantorPhone", ``);
-              guarantor_form.setFieldValue("guarantorId", ``);
+              guarantor_form.setFieldValue("guarantorID", ``);
               guarantor_form.setFieldValue("guarantorRelationship", ``);
               guarantor_form.setFieldValue("guarantorName", ``);
             }}

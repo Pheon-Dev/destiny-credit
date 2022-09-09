@@ -69,6 +69,7 @@ const schema = z.object({
 });
 
 const CreateMember = ({ memcode }: { memcode: string }) => {
+  const [load, setLoad] = useState(false);
   const router = useRouter();
 
   const form = useForm({
@@ -118,7 +119,13 @@ const CreateMember = ({ memcode }: { memcode: string }) => {
   });
 
   useEffect(() => {
-    form.setFieldValue("memberId", `${memcode}`);
+    let subscribe = true;
+    if (subscribe) {
+      form.setFieldValue("memberId", `${memcode}`);
+    }
+    return () => {
+      subscribe = false;
+    };
   }, [memcode]);
 
   let today_date = new Date(form.values.date);
@@ -177,7 +184,7 @@ const CreateMember = ({ memcode }: { memcode: string }) => {
       }
     }
     return () => (subscribe = false);
-  }, [age_result]);
+  }, [age_result, form.values.date, form.values.dob]);
 
   const handleSave = async () => {
     try {
@@ -223,6 +230,7 @@ const CreateMember = ({ memcode }: { memcode: string }) => {
         form.values.group ||
         form.values.maintained
       ) {
+      setLoad(true);
         const res = await axios.request({
           method: "POST",
           url: "/api/register",
@@ -351,14 +359,9 @@ const CreateMember = ({ memcode }: { memcode: string }) => {
   };
 
   return (
-    <form
-    //     onSubmit={() => {
-    //       form.onSubmit((values) => {
-    //           console.log(values);
-    // handleSave();
-    //         });
-    //     }}
-    >
+  <>
+    {!load && (
+        <form>
       <Group position="center" m="md">
         <TitleText title="Member Registration" />
       </Group>
@@ -910,6 +913,15 @@ const CreateMember = ({ memcode }: { memcode: string }) => {
         </Button>
       </Group>
     </form>
+    )}
+    {load && (
+        <LoadingOverlay
+          overlayBlur={2}
+          onClick={() => setLoad((prev) => !prev)}
+          visible={load}
+        />
+    )}
+    </>
   );
 };
 
@@ -920,13 +932,17 @@ const Page = () => {
     let subscription = true;
 
     if (subscription) {
-      const res = await axios.request({
-        method: "GET",
-        url: "/api/members",
-      });
+      try {
+        const res = await axios.request({
+          method: "GET",
+          url: "/api/members",
+        });
 
-      const data = res.data.members;
-      setMembers(data);
+        const data = res.data.members;
+        setMembers(data);
+      } catch (error) {
+        console.log(error);
+      }
     }
 
     return () => {

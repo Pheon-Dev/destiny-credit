@@ -7,6 +7,7 @@ import { NextPage } from "next";
 const MembersList = () => {
   const [members, setMembers] = useState([]);
   const [load, setLoad] = useState(true);
+  const [loaded, setLoaded] = useState(false);
 
   async function fetchMembers() {
     let subscription = true;
@@ -19,7 +20,7 @@ const MembersList = () => {
 
       const data = res.data.members;
       setMembers(data);
-      members.length === 0 && setLoad(false);
+      members.length === 0 && setLoaded(false);
     }
 
     return () => {
@@ -30,7 +31,7 @@ const MembersList = () => {
   useEffect(() => {
     fetchMembers();
     setTimeout(() => {
-      members.length === 0 && setLoad(false);
+      members.length === 0 && setLoad(true);
     }, 8000);
   }, [members]);
 
@@ -45,7 +46,7 @@ const MembersList = () => {
           visible={load}
         />
       )}
-      {members.length === 0 && (
+      {loaded && members.length === 0 && (
         <Group position="center">
           <Text>No Registered Members</Text>
         </Group>

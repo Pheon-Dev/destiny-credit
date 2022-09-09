@@ -215,7 +215,7 @@ interface Guarantors {
   updatedAt?: Date;
   guarantorName: string;
   guarantorPhone: string;
-  guarantorId: string;
+  guarantorID: string;
   guarantorRelationship: string;
   member?: string;
   memberId: string;

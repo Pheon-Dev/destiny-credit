@@ -6,6 +6,7 @@ import { Group, LoadingOverlay, Text } from "@mantine/core";
 const LoansList = () => {
   const [loans, setLoans] = useState([]);
   const [load, setLoad] = useState(true);
+  const [loaded, setLoaded] = useState(false);
 
   async function fetchLoans() {
     let subscription = true;
@@ -18,7 +19,7 @@ const LoansList = () => {
 
       const data = res.data.loans;
       setLoans(data);
-      loans.length === 0 && setLoad(false);
+      loans.length === 0 && setLoaded(true);
     }
 
     return () => {
@@ -42,7 +43,7 @@ const LoansList = () => {
           visible={load}
         />
       )}
-      {loans.length === 0 && (
+      {loaded && loans.length === 0 && (
         <Group position="center">
           <Text>No Approved loans</Text>
         </Group>

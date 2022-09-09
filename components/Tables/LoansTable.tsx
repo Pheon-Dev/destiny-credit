@@ -45,7 +45,7 @@ function LoanRow({ loan, call }: { loan: Loans; call: string }) {
           <td>{`${loan.principal}`.replace(/\B(?=(\d{3})+(?!\d))/g, ",")}</td>
           <td>{`${loan.interest}`.replace(/\B(?=(\d{3})+(?!\d))/g, ",")}</td>
           <td>{`${loan.installment}`.replace(/\B(?=(\d{3})+(?!\d))/g, ",")}</td>
-          <td>{loan.tenure} {loan.cycle === "daily" ? "Days" : loan.cycle === "weekly" ? "Weeks" : "Months" }</td>
+          <td>{loan.tenure} {loan.cycle.toLowerCase() === "daily" ? "Days" : loan.cycle.toLowerCase() === "weekly" ? "Weeks" : "Months" }</td>
           <td>
             {loan.approved ? (
               <Badge
@@ -87,7 +87,7 @@ function LoanRow({ loan, call }: { loan: Loans; call: string }) {
           <td>{`${loan.principal}`.replace(/\B(?=(\d{3})+(?!\d))/g, ",")}</td>
           <td>{`${loan.interest}`.replace(/\B(?=(\d{3})+(?!\d))/g, ",")}</td>
           <td>{`${loan.installment}`.replace(/\B(?=(\d{3})+(?!\d))/g, ",")}</td>
-          <td>{loan.tenure} {loan.cycle === "daily" ? "Days" : loan.cycle === "weekly" ? "Weeks" : "Months" }</td>
+          <td>{loan.tenure} {loan.cycle.toLowerCase() === "daily" ? "Days" : loan.cycle.toLowerCase() === "weekly" ? "Weeks" : "Months" }</td>
           <td>
             {loan.disbursed ? (
               <Badge

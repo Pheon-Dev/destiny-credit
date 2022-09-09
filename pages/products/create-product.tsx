@@ -35,6 +35,7 @@ const schema = z.object({
 });
 
 const CreateProduct = ({ procode }: { procode: string }) => {
+  const [load, setLoad] = useState(false);
   const router = useRouter();
 
   const form = useForm({
@@ -62,22 +63,6 @@ const CreateProduct = ({ procode }: { procode: string }) => {
   }, [procode]);
 
   const handleSave = async () => {
-    console.table({
-      productId: form.values.productId,
-      productName: form.values.productName,
-      minimumRange: form.values.minimumRange,
-      maximumRange: form.values.maximumRange,
-      interestRate: form.values.interestRate,
-      frequency: form.values.frequency,
-      maximumTenure: form.values.maximumTenure,
-      repaymentCycle: form.values.repaymentCycle,
-      processingFee: form.values.processingFee,
-      gracePeriod: form.values.gracePeriod,
-      penaltyRate: form.values.penaltyRate,
-      penaltyCharge: form.values.penaltyCharge,
-      penaltyPayment: form.values.penaltyPayment,
-      approved: form.values.approved,
-    });
     try {
       if (
         (form.values.productId &&
@@ -95,22 +80,7 @@ const CreateProduct = ({ procode }: { procode: string }) => {
           form.values.penaltyPayment) ||
         form.values.approved
       ) {
-        console.log(
-          form.values.productId,
-          form.values.productName,
-          form.values.minimumRange,
-          form.values.maximumRange,
-          form.values.interestRate,
-          form.values.frequency,
-          form.values.maximumTenure,
-          form.values.repaymentCycle,
-          form.values.processingFee,
-          form.values.gracePeriod,
-          form.values.penaltyRate,
-          form.values.penaltyCharge,
-          form.values.penaltyPayment,
-          form.values.approved
-        );
+      setLoad(true);
         const res = await axios.request({
           method: "POST",
           url: "/api/products/create",
@@ -184,14 +154,9 @@ const CreateProduct = ({ procode }: { procode: string }) => {
   };
 
   return (
-    <form
-    //     onSubmit={() => {
-    //       form.onSubmit((values) => {
-    //           console.log(values);
-    // handleSave();
-    //         });
-    //     }}
-    >
+  <>
+    {!load && (
+        <form>
       <Group position="center" m="md">
         <TitleText title="New Product" />
       </Group>
@@ -390,6 +355,15 @@ const CreateProduct = ({ procode }: { procode: string }) => {
         </Button>
       </Group>
     </form>
+    )}
+    {load && (
+        <LoadingOverlay
+          overlayBlur={2}
+          onClick={() => setLoad((prev) => !prev)}
+          visible={load}
+        />
+    )}
+    </>
   );
 };
 
