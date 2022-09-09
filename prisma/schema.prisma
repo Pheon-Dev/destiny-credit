@@ -149,6 +149,7 @@ model Guarantor {
   memberId              String
   updater               User?    @relation("UpdatedBy", fields: [updaterId], references: [id])
   updaterId             String?
+  Loan                  Loan[]
 
   @@index(id)
 }
@@ -168,27 +169,38 @@ model Collateral {
 }
 
 model Loan {
-  id           String    @id @default(uuid())
-  createdAt    DateTime  @default(now())
-  updatedAt    DateTime  @updatedAt
-  startDate    String
-  endDate      String
-  maintained   Boolean   @default(false)
-  approved     Boolean   @default(false)
-  disbursed    Boolean   @default(false)
-  product      String
-  loanId       String
-  payment      Payment[]
-  member       Member    @relation(fields: [memberId], references: [id])
-  memberId     String
-  maintainer   User?     @relation("MaintainedBy", fields: [maintainerId], references: [id])
-  maintainerId String?
-  approver     User?     @relation("ApprovedBy", fields: [approverId], references: [id])
-  approverId   String?
-  disburser    User?     @relation("DisbursedBy", fields: [disburserId], references: [id])
-  disburserId  String?
-  updater      User?     @relation("UpdatedBy", fields: [updaterId], references: [id])
-  updaterId    String?
+  id            String    @id @default(uuid())
+  createdAt     DateTime  @default(now())
+  updatedAt     DateTime  @updatedAt
+  maintained    Boolean   @default(false)
+  approved      Boolean   @default(false)
+  disbursed     Boolean   @default(false)
+  principal     String
+  interest      String
+  installment   String
+  penalty       String
+  sundays       String
+  payoff        String
+  tenure        String
+  grace         String
+  productName   String
+  memberName    String
+  processingFee String
+  guarantor     Guarantor @relation(fields: [guarantorId], references: [id])
+  guarantorId   String
+  payment       Payment[]
+  product       Product   @relation(fields: [productId], references: [id])
+  productId     String
+  member        Member    @relation(fields: [memberId], references: [id])
+  memberId      String
+  maintainer    User?     @relation("MaintainedBy", fields: [maintainerId], references: [id])
+  maintainerId  String?
+  approver      User?     @relation("ApprovedBy", fields: [approverId], references: [id])
+  approverId    String?
+  disburser     User?     @relation("DisbursedBy", fields: [disburserId], references: [id])
+  disburserId   String?
+  updater       User?     @relation("UpdatedBy", fields: [updaterId], references: [id])
+  updaterId     String?
 
   @@index(id)
 }
@@ -232,6 +244,7 @@ model Product {
   approverId     String?
   updater        User?    @relation("UpdatedBy", fields: [updaterId], references: [id])
   updaterId      String?
+  Loan           Loan[]
 
   @@index(id)
 }

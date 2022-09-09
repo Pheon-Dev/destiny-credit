@@ -209,6 +209,55 @@ interface Products {
   approved: boolean;
 }
 
+interface Guarantors {
+  id?: string;
+  createdAt?: Date;
+  updatedAt?: Date;
+  guarantorName: string;
+  guarantorPhone: string;
+  guarantorId: string;
+  guarantorRelationship: string;
+  member?: string;
+  memberId: string;
+  updater?: string;
+  updaterId?: string;
+}
+
+interface Loans {
+  id?: string;
+  createdAt?: Date;
+  updatedAt?: Date;
+  maintained: string;
+  approved: string;
+  disbursed: string;
+  principal: string;
+  interest: string;
+  installment: string;
+  penalty: string;
+  sundays: string;
+  payoff: string;
+  tenure: string;
+  grace: string;
+  productName: string;
+  memberName: string;
+  processingFee: string;
+  guarantor: string;
+  guarantorId: string;
+  product: string;
+  productId: string;
+  member: string;
+  memberId: string;
+  payment?: string;
+  maintainer?: string;
+  maintainerId?: string;
+  approver?: string;
+  approverId?: string;
+  disburser?: string;
+  disburserId?: string;
+  updater?: string;
+  updaterId?: string;
+}
+
 interface Collaterals {
   id?: string;
   createdAt?: Date;

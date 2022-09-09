@@ -32,7 +32,7 @@ const MembersList = () => {
 
   return (
     <>
-      {(members.length > 0 && <MembersTable members={members} />) || (
+      {(members.length > 0 && <MembersTable members={members} call="all-members" />) || (
         <LoadingOverlay
           overlayBlur={2}
           onClick={() => setLoad((prev) => !prev)}

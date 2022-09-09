@@ -1,4 +1,4 @@
-import React, { useEffect, useRef, forwardRef, useState } from "react";
+import React, { useEffect, useState } from "react";
 import { Protected } from "../../../components";
 import { NextPage } from "next";
 import axios from "axios";
@@ -8,26 +8,22 @@ import {
   Group,
   Stepper,
   Button,
-  LoadingOverlay,
   Text,
   TextInput,
   Card,
   Box,
   Grid,
-  Badge,
   Select,
   Menu,
   ActionIcon,
   Switch,
   Autocomplete,
-  NumberInput,
   Tooltip,
   Modal,
 } from "@mantine/core";
 import Router, { useRouter } from "next/router";
 import { showNotification, updateNotification } from "@mantine/notifications";
 import {
-  IconAlertCircle,
   IconCheck,
   IconDots,
   IconEye,
@@ -38,26 +34,13 @@ import {
   IconTrash,
   IconX,
 } from "@tabler/icons";
-import {
-  DatePicker,
-  DateRangePicker,
-  DateRangePickerValue,
-} from "@mantine/dates";
-import { Collaterals, Members, Products } from "../../../types";
+import { Collaterals, Guarantors, Members, Products } from "../../../types";
 
 const loan_schema = z.object({
   member: z.string().min(2, { message: "User Name Missing" }),
   product: z.string().min(2, { message: "Product is Missing" }),
   principal: z.string().min(2, { message: "Principal Amount is Missing" }),
   tenure: z.string().min(1, { message: "Tenure is Missing" }),
-  /* guarantorName: z.string().min(2, { message: "Guarantor Name is Missing" }), */
-  /* guarantorPhone: z */
-  /*   .string() */
-  /*   .min(2, { message: "Guarantor Phone Number is Missing" }), */
-  /* guarantorId: z.string().min(2, { message: "Guarantor ID is Missing" }), */
-  /* guarantorRelationship: z */
-  /*   .string() */
-  /*   .min(2, { message: "Guarantor Relationship is Missing" }), */
 });
 
 const guarantor_schema = z.object({
@@ -79,12 +62,14 @@ const collateral_schema = z.object({
 const Page: NextPage = () => {
   const [active, setActive] = useState(0);
   const [open, setOpen] = useState(false);
+  const [deleteModal, setDeleteModal] = useState(false);
+  const [collateralId, setCollateralId] = useState("");
   const [sundays, setSundays] = useState(0);
   const [products, setProducts] = useState([]);
   const [members, setMembers] = useState([]);
   const [collaterals, setCollaterals] = useState([]);
-  const [collateral, setCollateral] = useState([]);
-  const [guarantors, setGuarantors] = useState([]);
+  const [guarantor, setGuarantor] = useState([]);
+  const [changeGuarantor, setChangeGuarantor] = useState(false);
 
   const [intRate, setIntRate] = useState("");
   const [proRate, setProRate] = useState("");
@@ -95,6 +80,7 @@ const Page: NextPage = () => {
   const [maxTenure, setMaxTenure] = useState(0);
   const [maxRange, setMaxRange] = useState(0);
   const [minRange, setMinRange] = useState(0);
+  const [payoffAmount, setPayoffAmount] = useState(0);
 
   const [status, setStatus] = useState(false);
   const [checked, setChecked] = useState(false);
@@ -137,6 +123,41 @@ const Page: NextPage = () => {
       loading: true,
       autoClose: 50000,
     });
+    try {
+      active === 0 &&
+        setTimeout(() => {
+          updateNotification({
+            id: "maintainance-status",
+            color: "teal",
+            title: "Step One Completed",
+            message: `Next Step is Adding a Loan Guarantor ...`,
+            icon: <IconCheck size={16} />,
+            autoClose: 8000,
+          });
+        });
+      active === 1 &&
+        setTimeout(() => {
+          updateNotification({
+            id: "maintainance-status",
+            color: "teal",
+            title: "Step Two Completed",
+            message: `Next Step is Adding Collaterals ...`,
+            icon: <IconCheck size={16} />,
+            autoClose: 8000,
+          });
+        });
+    } catch (error) {
+      setTimeout(() => {
+        updateNotification({
+          id: "maintainance-status",
+          title: "Maintenance Error!",
+          message: `Please Try Maintaining Again!`,
+          icon: <IconX size={16} />,
+          color: "red",
+          autoClose: 4000,
+        });
+      });
+    }
     form.setFieldValue("principal", `${form.values.principal}`);
     form.validate();
     if (
@@ -231,25 +252,20 @@ const Page: NextPage = () => {
 
     if (subscription) {
       if (products.length < 1) setStatus(true);
-      const gua = await axios.request({
-        method: "POST",
-        url: `/api/members/guarantor/${id}`,
-        data: {
-          id: `${id}`,
-        },
-      });
-
       const col = await axios.request({
         method: "POST",
-        url: `/api/members/collateral/${id}`,
+        url: `/api/members/collateral`,
         data: {
           id: `${id}`,
         },
       });
 
-      const cols = await axios.request({
-        method: "GET",
-        url: "/api/members/collateral",
+      const gua = await axios.request({
+        method: "POST",
+        url: `/api/members/guarantor`,
+        data: {
+          id: `${id}`,
+        },
       });
 
       const mem = await axios.request({
@@ -274,13 +290,11 @@ const Page: NextPage = () => {
 
       setProducts(pros);
       setMembers(mems.data.members);
-      setCollaterals(cols.data.collaterals);
-      setCollateral(col.data.collateral);
-      setGuarantors(gua.data.guarantor);
+      setCollaterals(col.data.collaterals);
+      setGuarantor(gua.data.guarantor);
 
       if (mem.data.member[0]?.firstName?.length > 0)
         form.setFieldValue("memberId", `${mem.data.member[0].id}`);
-      form.setFieldValue("productId", `${id}`);
       form.setFieldValue(
         "member",
         `${mem.data.member[0].firstName} ${mem.data.member[0].lastName}`
@@ -295,7 +309,20 @@ const Page: NextPage = () => {
 
   useEffect(() => {
     fetchMemberNProducts();
-  }, [products, members]);
+  }, [products, members, collaterals]);
+
+  const keyGen = (len: number) => {
+    let random_string = "";
+    let char = "abcdefghijklmnopqrstuvwxyz1234567890";
+    let i: number;
+
+    for (i = 0; i < len; i++) {
+      random_string =
+        random_string + char.charAt(Math.floor(Math.random() * char.length));
+    }
+
+    return random_string;
+  };
 
   const form = useForm({
     validate: zodResolver(loan_schema),
@@ -313,6 +340,7 @@ const Page: NextPage = () => {
       payoff: "",
       sundays: "",
       grace: "",
+      guarantorId: "",
       maintained: false,
       approved: false,
       disbursed: false,
@@ -348,6 +376,7 @@ const Page: NextPage = () => {
 
     pr.data?.product
       ? pr.data?.product?.map((_: Products) => {
+          form.setFieldValue("productId", `${_.id}`);
           setIntRate(_.interestRate);
           setPenRate(_.penaltyRate);
           setCycle(_.repaymentCycle);
@@ -381,8 +410,11 @@ const Page: NextPage = () => {
       }
 
       if (checked) setSundays(0);
-
-      form.setFieldValue("payoff", `${payoff}`);
+      form.setFieldValue(
+        "guarantorId",
+        `${keyGen(8)}-${keyGen(4)}-${keyGen(4)}-${keyGen(4)}-${keyGen(12)}`
+      );
+      form.setFieldValue("payoff", `${payoffAmount}`);
       form.setFieldValue("sundays", `${sundays}`);
       form.setFieldValue("grace", `${grace}`);
       form.setFieldValue("maintained", true);
@@ -504,26 +536,93 @@ const Page: NextPage = () => {
     form.values.principal,
     form.values.tenure,
     form.values.product,
+    collateral_form.values.item,
+    collateral_form.values.value,
   ]);
 
-  /* console.log(form.values.product); */
   const handleSubmit = async () => {
     try {
+      setOpen(false);
+      const update = await axios.request({
+        method: "POST",
+        url: "/api/members/update",
+        data: {
+          id: id,
+          maintained: form.values.maintained,
+        },
+      });
+      const guarantor = await axios.request({
+        method: "POST",
+        url: "/api/members/guarantor/create-guarantor",
+        data: {
+          id: form.values.guarantorId,
+          guarantorName: guarantor_form.values.guarantorName,
+          guarantorPhone: guarantor_form.values.guarantorPhone,
+          guarantorRelationship: guarantor_form.values.guarantorRelationship,
+          guarantorId: guarantor_form.values.guarantorId,
+          memberId: form.values.memberId,
+        },
+      });
+      const loan = await axios.request({
+        method: "POST",
+        url: "/api/loans/create-loan",
+        data: {
+          guarantorId: form.values.guarantorId,
+          memberId: form.values.memberId,
+          tenure: form.values.tenure,
+          principal: form.values.principal,
+          maintained: form.values.maintained,
+          approved: form.values.approved,
+          disbursed: form.values.disbursed,
+          grace: form.values.grace,
+          installment: form.values.installment,
+          productId: form.values.productId,
+          payoff: form.values.payoff,
+          penalty: form.values.penalty,
+          processingFee: form.values.processingFee,
+          sundays: form.values.sundays,
+          memberName: form.values.member,
+          productName: form.values.product,
+          interest: form.values.interest,
+        },
+      });
       setTimeout(() => {
         updateNotification({
           id: "submit-status",
           color: "teal",
-          title: "Successful Loan Maintenance!",
-          message: `Next Step is Adding a Loan Guarantor ...`,
+          title: `${loan.data.message.memberName}`,
+          message: `Loan Was Successfully Maintained and is Guaranteed by ${guarantor.data.message.guarantorName}.`,
           icon: <IconCheck size={16} />,
           autoClose: 8000,
         });
       });
-      console.log(form.values);
-      /* router.push("/"); */
-      /* const res = await axios.get("/api/"); */
-      /* const data = res.data; */
-      /* return Router.replace(Router.asPath); */
+      form.setFieldValue("item", "");
+      form.setFieldValue("value", "");
+      form.setFieldValue("guarantorId", "");
+      form.setFieldValue("memberId", "");
+      form.setFieldValue("tenure", "");
+      form.setFieldValue("principal", "");
+      form.setFieldValue("maintained", false);
+      form.setFieldValue("approved", false);
+      form.setFieldValue("disbursed", false);
+      form.setFieldValue("grace", "");
+      form.setFieldValue("installment", "");
+      form.setFieldValue("productId", "");
+      form.setFieldValue("payoff", "");
+      form.setFieldValue("penalty", "");
+      form.setFieldValue("processingFee", "");
+      form.setFieldValue("sundays", "");
+      form.setFieldValue("memberName", "");
+      form.setFieldValue("productName", "");
+      form.setFieldValue("interest", "");
+      guarantor_form.setFieldValue("guarantorName", "");
+      guarantor_form.setFieldValue("guarantorPhone", "");
+      guarantor_form.setFieldValue("guarantorRelationship", "");
+      guarantor_form.setFieldValue("guarantorId", "");
+      const res = await axios.get("/api/loans");
+      const data = res.data;
+      Router.replace(Router.asPath);
+      return router.push("/loans/approvals");
     } catch (error) {
       setTimeout(() => {
         updateNotification({
@@ -561,11 +660,12 @@ const Page: NextPage = () => {
             id: "collateral-status",
             color: "teal",
             title: "Collaterals",
-            message: `${add.data.item} @ ${add.data.value} Added Successfully as Collateral!`,
+            message: `${add.data.message.item} @ ${add.data.message.value} Added Successfully as Collateral!`,
             icon: <IconCheck size={16} />,
             autoClose: 8000,
           });
         });
+        /* await axios.get("/api/members/collateral"); */
       }
 
       setTimeout(() => {
@@ -718,16 +818,22 @@ const Page: NextPage = () => {
       );
       guarantor_form.setFieldValue("guarantorPhone", ``);
       guarantor_form.setFieldValue("guarantorId", ``);
-      return showNotification({
+      showNotification({
         id: "guarantor-status",
         color: "red",
         title: "Guarantor Info",
-        message: `Member Cannot Self-Guarantee ...`,
+        message: `${guarantor_form.values.guarantorName} Cannot Self-Guarantee a Loan ...`,
         icon: <IconInfoCircle size={24} />,
-        autoClose: false,
+        autoClose: 5000,
       });
+      guarantor_form.setFieldValue("guarantorName", ``);
+      return guarantor_form.setFieldError(
+        "guarantorName",
+        `${guarantor_form.values.guarantorName} Cannot Self-Guarantee a Loan ...`
+      );
     }
-    if (guarantor_form.values.guarantorName !== form.values.member) {
+
+    if (guarantor_form.values.guarantorName !== "" && guarantor_form.values.guarantorName !== form.values.member) {
       setTimeout(() => {
         updateNotification({
           id: "guarantor-status",
@@ -740,10 +846,23 @@ const Page: NextPage = () => {
       });
       findGuarantor(guarantor_form.values.guarantorName);
     }
+
+    if (guarantor.length > 0 && !changeGuarantor) {
+        guarantor.map((_: Guarantors) => {
+              findGuarantor(_.guarantorName);
+        guarantor_form.setFieldValue("guarantorPhone", `${_.guarantorPhone}`);
+        guarantor_form.setFieldValue("guarantorId", `${_.guarantorId}`);
+        guarantor_form.setFieldValue("guarantorRelationship", `${_.guarantorRelationship}`);
+        guarantor_form.setFieldValue("guarantorName", `${_.guarantorName}`);
+
+        })
+      }
   }, [
     guarantor_form.values.guarantorName,
     guarantor_form.values.guarantorId,
     guarantor_form.values.guarantorPhone,
+    form.values.principal,
+    form.values.tenure,
   ]);
 
   const Review = () => {
@@ -946,25 +1065,39 @@ const Page: NextPage = () => {
                   <Text weight={500}>Skipped Sundays</Text>
                 </Grid.Col>
                 <Grid.Col mt="xs" span={4}>
-                  <Text>{form.values.sundays} {sundays === 1 ? "Sunday" : "Sundays"}</Text>
+                  <Text>
+                    {form.values.sundays} {sundays === 1 ? "Sunday" : "Sundays"}
+                  </Text>
                 </Grid.Col>
               </Grid>
               {payoff && (
-                  <Grid grow>
-                    <Grid.Col mt="xs" span={4}>
-                      <Text weight={500}>Payoff Amount</Text>
-                    </Grid.Col>
-                    <Grid.Col mt="xs" span={4}>
-                  <Text>{`KSHs. ${form.values.payoff}.00`.replace(/\B(?=(\d{3})+(?!\d))/g, ",")}</Text>
-                    </Grid.Col>
-                  </Grid>
+                <Grid grow>
+                  <Grid.Col mt="xs" span={4}>
+                    <Text weight={500}>Payoff Amount</Text>
+                  </Grid.Col>
+                  <Grid.Col mt="xs" span={4}>
+                    <Text>
+                      {`KSHs. ${form.values.payoff}.00`.replace(
+                        /\B(?=(\d{3})+(?!\d))/g,
+                        ","
+                      )}
+                    </Text>
+                  </Grid.Col>
+                </Grid>
               )}
               <Grid grow>
                 <Grid.Col mt="xs" span={4}>
                   <Text weight={500}>Loan Tenure</Text>
                 </Grid.Col>
                 <Grid.Col mt="xs" span={4}>
-                  <Text>{form.values.tenure} {cycle.toLowerCase() === "daily" ? "Days" : cycle.toLowerCase() === "weeks" ? "Weeks" : "Months"}</Text>
+                  <Text>
+                    {form.values.tenure}{" "}
+                    {cycle.toLowerCase() === "daily"
+                      ? "Days"
+                      : cycle.toLowerCase() === "weeks"
+                      ? "Weeks"
+                      : "Months"}
+                  </Text>
                 </Grid.Col>
               </Grid>
               <Grid grow>
@@ -972,7 +1105,12 @@ const Page: NextPage = () => {
                   <Text weight={500}>Principal Amount</Text>
                 </Grid.Col>
                 <Grid.Col mt="xs" span={4}>
-                  <Text>{`KSHs. ${form.values.principal}.00`.replace(/\B(?=(\d{3})+(?!\d))/g, ",")}</Text>
+                  <Text>
+                    {`KSHs. ${form.values.principal}.00`.replace(
+                      /\B(?=(\d{3})+(?!\d))/g,
+                      ","
+                    )}
+                  </Text>
                 </Grid.Col>
               </Grid>
               <Grid grow>
@@ -980,7 +1118,12 @@ const Page: NextPage = () => {
                   <Text weight={500}>Installment Amount</Text>
                 </Grid.Col>
                 <Grid.Col mt="xs" span={4}>
-                  <Text>{`KSHs. ${form.values.installment}.00`.replace(/\B(?=(\d{3})+(?!\d))/g, ",")}</Text>
+                  <Text>
+                    {`KSHs. ${form.values.installment}.00`.replace(
+                      /\B(?=(\d{3})+(?!\d))/g,
+                      ","
+                    )}
+                  </Text>
                 </Grid.Col>
               </Grid>
               <Grid grow>
@@ -988,7 +1131,12 @@ const Page: NextPage = () => {
                   <Text weight={500}>Interest Amount</Text>
                 </Grid.Col>
                 <Grid.Col mt="xs" span={4}>
-                  <Text>{`KSHs. ${form.values.interest}.00`.replace(/\B(?=(\d{3})+(?!\d))/g, ",")}</Text>
+                  <Text>
+                    {`KSHs. ${form.values.interest}.00`.replace(
+                      /\B(?=(\d{3})+(?!\d))/g,
+                      ","
+                    )}
+                  </Text>
                 </Grid.Col>
               </Grid>
               <Grid grow>
@@ -996,7 +1144,12 @@ const Page: NextPage = () => {
                   <Text weight={500}>Penalty Amount</Text>
                 </Grid.Col>
                 <Grid.Col mt="xs" span={4}>
-                  <Text>{`KSHs. ${form.values.penalty}.00`.replace(/\B(?=(\d{3})+(?!\d))/g, ",")}</Text>
+                  <Text>
+                    {`KSHs. ${form.values.penalty}.00`.replace(
+                      /\B(?=(\d{3})+(?!\d))/g,
+                      ","
+                    )}
+                  </Text>
                 </Grid.Col>
               </Grid>
               <Grid grow>
@@ -1004,39 +1157,67 @@ const Page: NextPage = () => {
                   <Text weight={500}>Processing Fee</Text>
                 </Grid.Col>
                 <Grid.Col mt="xs" span={4}>
-                  <Text>{`KSHs. ${form.values.processingFee}.00`.replace(/\B(?=(\d{3})+(?!\d))/g, ",")}</Text>
+                  <Text>
+                    {`KSHs. ${form.values.processingFee}.00`.replace(
+                      /\B(?=(\d{3})+(?!\d))/g,
+                      ","
+                    )}
+                  </Text>
                 </Grid.Col>
               </Grid>
               {form.values.grace === "1" && (
-              <Grid grow>
-                <Grid.Col mt="xs" span={4}>
-                  <Text weight={500}>Grace Period</Text>
-                </Grid.Col>
-                <Grid.Col mt="xs" span={4}>
-                  <Text>{form.values.grace} Day</Text>
-                </Grid.Col>
-              </Grid>
+                <Grid grow>
+                  <Grid.Col mt="xs" span={4}>
+                    <Text weight={500}>Grace Period</Text>
+                  </Grid.Col>
+                  <Grid.Col mt="xs" span={4}>
+                    <Text>{form.values.grace} Day</Text>
+                  </Grid.Col>
+                </Grid>
               )}
-            <Group mt="xl">
-              <Button
-              variant="light"
-              color="blue"
-              fullWidth mt="md" radius="md"
-                onClick={() => {
-                  form.validate();
-                  showNotification({
-                    id: "submit-status",
-                    color: "teal",
-                    title: `${form.values.member}`,
-                    message: `Maintaining Loan For ${form.values.member} ...`,
-                    loading: true,
-                    autoClose: 50000,
-                  });
-                  handleSubmit();
-                }}
-              >
-                Submit
-              </Button>
+              <Card.Section withBorder inheritPadding mt="md" py="xs">
+                <Group position="apart">
+                  <Text weight={700}>Collaterals</Text>
+                </Group>
+              </Card.Section>
+              {collaterals.length > 0 &&
+                collaterals.map((collateral: Collaterals, index: number) => (
+                  <Grid key={collateral.id} grow>
+                    <Grid.Col mt="md" span={4}>
+                      <Text>{collateral.item}</Text>
+                    </Grid.Col>
+                    <Grid.Col mt="md" span={4}>
+                      <Text>
+                        {`KSHs. ${collateral.value}.00`.replace(
+                          /\B(?=(\d{3})+(?!\d))/g,
+                          ","
+                        )}
+                      </Text>
+                    </Grid.Col>
+                  </Grid>
+                ))}
+              <Group mt="xl">
+                <Button
+                  variant="light"
+                  color="blue"
+                  fullWidth
+                  mt="md"
+                  radius="md"
+                  onClick={() => {
+                    form.validate();
+                    showNotification({
+                      id: "submit-status",
+                      color: "teal",
+                      title: `${form.values.member}`,
+                      message: `Maintaining Loan For ${form.values.member} ...`,
+                      loading: true,
+                      autoClose: 50000,
+                    });
+                    handleSubmit();
+                  }}
+                >
+                  Submit
+                </Button>
               </Group>
             </Card.Section>
           </Card>
@@ -1044,9 +1225,6 @@ const Page: NextPage = () => {
       </>
     );
   };
-
-  /* console.log(collaterals) */
-  /* console.log(guarantors) */
 
   return (
     <Protected>
@@ -1211,39 +1389,108 @@ const Page: NextPage = () => {
               </Card.Section>
               {collaterals.length > 0 &&
                 collaterals.map((collateral: Collaterals, index: number) => (
-                  <Card.Section withBorder inheritPadding py="xs">
-                    <Grid grow columns={12}>
-                      <Grid.Col mt="md" span={1}>
-                        <Text>{index + 1}</Text>
-                      </Grid.Col>
-                      <Grid.Col mt="md" span={5}>
-                        <Text>{collateral.item}</Text>
-                      </Grid.Col>
-                      <Grid.Col mt="md" span={5}>
-                        <Text>{collateral.value}</Text>
-                      </Grid.Col>
-                      <Grid.Col mt="md" span={1}>
-                        <Tooltip color="red" label="Delete">
-                          <ActionIcon
-                            variant="light"
-                            onClick={() => {
-                              showNotification({
-                                id: "collateral-delete-status",
-                                color: "red",
-                                title: "Deleting Collateral",
-                                message: `Deleting ${collateral.item} worth KSHs. ${collateral.value} From Being Added to Collaterals ...`,
-                                loading: true,
-                                autoClose: 50000,
-                              });
-                              deleteCollateral(`${collateral.id}`);
-                            }}
-                          >
-                            <IconTrash size={24} color="red" />
-                          </ActionIcon>
-                        </Tooltip>
-                      </Grid.Col>
-                    </Grid>
-                  </Card.Section>
+                  <div key={collateral.id}>
+                    <Card.Section withBorder inheritPadding py="xs">
+                      <Grid grow columns={12}>
+                        <Grid.Col mt="md" span={1}>
+                          <Text>{index + 1}</Text>
+                        </Grid.Col>
+                        <Grid.Col mt="md" span={5}>
+                          <Text>{collateral.item}</Text>
+                        </Grid.Col>
+                        <Grid.Col mt="md" span={5}>
+                          <Text>
+                            {`KSHs. ${collateral.value}.00`.replace(
+                              /\B(?=(\d{3})+(?!\d))/g,
+                              ","
+                            )}
+                          </Text>
+                        </Grid.Col>
+                        <Grid.Col mt="md" span={1}>
+                          <Tooltip color="red" label="Delete">
+                            <ActionIcon
+                              variant="light"
+                              onClick={() => {
+                                showNotification({
+                                  id: "collateral-delete-status",
+                                  color: "red",
+                                  title: "Deleting Collateral",
+                                  message: `Deleting ${collateral.item} worth KSHs. ${collateral.value} From Being Added to Collaterals ...`,
+                                  disallowClose: true,
+                                  autoClose: false,
+                                  loading: true,
+                                });
+                                setDeleteModal(true);
+                                setCollateralId(`${collateral.id}`);
+                              }}
+                            >
+                              <IconTrash size={24} color="red" />
+                            </ActionIcon>
+                          </Tooltip>
+                        </Grid.Col>
+                      </Grid>
+                    </Card.Section>
+                    <Modal
+                      opened={deleteModal}
+                      onClose={() => {
+                        setDeleteModal(false);
+                        deleteModal &&
+                          setTimeout(() => {
+                            updateNotification({
+                              id: "collateral-delete-status",
+                              color: "teal",
+                              title: "Collateral Deletion",
+                              message: `${collateral.item} Was not Deleted From Collaterals.`,
+                              icon: <IconCheck size={16} />,
+                              autoClose: 8000,
+                            });
+                          });
+                      }}
+                      title={`Delete Collateral`}
+                    >
+                      <Card shadow="sm" p="lg" radius="md" m="xl" withBorder>
+                        <Card.Section withBorder inheritPadding py="xs">
+                          <Group position="apart">
+                            <Text weight={700}>{collateral.item}</Text>
+                            <Text>
+                              {`KSHs. ${collateral.value}.00`.replace(
+                                /\B(?=(\d{3})+(?!\d))/g,
+                                ","
+                              )}
+                            </Text>
+                          </Group>
+                        </Card.Section>
+                        <Card.Section withBorder inheritPadding py="xs">
+                          <Text>
+                            Would You Wish to Proceed and delete{" "}
+                            {collateral.item} worth{" "}
+                            {`KSHs. ${collateral.value}.00`.replace(
+                              /\B(?=(\d{3})+(?!\d))/g,
+                              ","
+                            )}{" "}
+                            from Collaterals
+                          </Text>
+                        </Card.Section>
+                        <Card.Section withBorder inheritPadding py="xs">
+                          <Group mt="xl">
+                            <Button
+                              variant="light"
+                              color="red"
+                              fullWidth
+                              mt="md"
+                              radius="md"
+                              onClick={() => {
+                                setDeleteModal(false);
+                                deleteCollateral(`${collateralId}`);
+                              }}
+                            >
+                              Proceed
+                            </Button>
+                          </Group>
+                        </Card.Section>
+                      </Card>
+                    </Modal>
+                  </div>
                 ))}
               <Card.Section withBorder inheritPadding py="xs">
                 <form>
@@ -1328,6 +1575,19 @@ const Page: NextPage = () => {
             Back
           </Button>
         )}
+        {active === 1 && (
+                  <Button
+                  variant="light"
+                  color="teal"
+                  onClick={() => {
+                    setChangeGuarantor(true);
+        guarantor_form.setFieldValue("guarantorPhone", ``);
+        guarantor_form.setFieldValue("guarantorId", ``);
+        guarantor_form.setFieldValue("guarantorRelationship", ``);
+        guarantor_form.setFieldValue("guarantorName", ``);
+                    }}
+                  >Change Guarantor</Button>
+        )}
         <Button
           onClick={() => {
             active === 2 ? setOpen(true) : nextStep();
@@ -1337,7 +1597,6 @@ const Page: NextPage = () => {
         </Button>
       </Group>
       {preview()}
-      <pre>{JSON.stringify(products, undefined, 2)}</pre>
     </Protected>
   );
 };

@@ -1,7 +1,7 @@
 import type { NextApiRequest, NextApiResponse } from "next";
 import { PrismaClient } from "@prisma/client";
 
-async function collaterals(req: NextApiRequest, res: NextApiResponse) {
+async function guarantor(req: NextApiRequest, res: NextApiResponse) {
   const prisma = new PrismaClient();
 
   async function main() {
@@ -10,16 +10,16 @@ async function collaterals(req: NextApiRequest, res: NextApiResponse) {
         id
       } = req.body;
 
-      const collaterals = await prisma.collateral.findMany({
+      const guarantor = await prisma.guarantor.findMany({
         where: {
           memberId: `${id}`
         },
       });
 
-      res.status(200).json({ collaterals: collaterals });
+      res.status(200).json({ guarantor: guarantor });
 
       return {
-        props: { collaterals },
+        props: { guarantor },
       };
 
     } catch (error) {
@@ -39,5 +39,6 @@ async function collaterals(req: NextApiRequest, res: NextApiResponse) {
     });
 }
 
-export default collaterals;
+export default guarantor;
+
 

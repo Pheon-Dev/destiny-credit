@@ -1,27 +1,27 @@
 import type { NextApiRequest, NextApiResponse } from "next";
 import { PrismaClient } from "@prisma/client";
 
-async function collaterals(req: NextApiRequest, res: NextApiResponse) {
+async function register(req: NextApiRequest, res: NextApiResponse) {
   const prisma = new PrismaClient();
 
   async function main() {
     try {
       const {
-        id
+        id,
+        maintained,
       } = req.body;
 
-      const collaterals = await prisma.collateral.findMany({
+      await prisma.member.update({
         where: {
-          memberId: `${id}`
+          id: `${id}`,
+        },
+        data: {
+          maintained: maintained,
         },
       });
 
-      res.status(200).json({ collaterals: collaterals });
-
-      return {
-        props: { collaterals },
-      };
-
+      console.log("Registered Successfully")
+      res.status(200).json({ message: req.body });
     } catch (error) {
       console.log(error);
 
@@ -39,5 +39,5 @@ async function collaterals(req: NextApiRequest, res: NextApiResponse) {
     });
 }
 
-export default collaterals;
+export default register;
 
