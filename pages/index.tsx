@@ -9,13 +9,14 @@ export default function Home() {
   const [load, setLoad] = useState(true);
   const [loaded, setLoaded] = useState(false);
 
-  /* const hello = trpc.useQuery(['hello', { text: 'client' }]); */
-  /* if (!hello.data) { */
-  /*     console.log("Loading ...") */
-  /*   } */
-  /* if (hello.data) { */
-  /*     console.log(hello.data.greeting) */
-  /*   } */
+  const hello = trpc.useQuery(['hello', { text: 'client' }]);
+  if (!hello.data) {
+      console.log("Loading ...")
+    }
+  if (hello.data) {
+      console.log(hello.data.greeting)
+    }
+    /* console.log(hello) */
 
   async function fetchTransactions() {
     const controller = new AbortController();
