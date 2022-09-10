@@ -8,31 +8,35 @@ const LoansList = () => {
   const [load, setLoad] = useState(true);
   const [loaded, setLoaded] = useState(false);
 
-  async function fetchLoans() {
-    let subscription = true;
-
-    if (subscription) {
+  async function fetchLoans(signal: AbortSignal) {
+    try {
       const res = await axios.request({
         method: "GET",
         url: "/api/loans",
+        signal,
       });
 
       const data = res.data.loans;
       setLoans(data);
       loans.length === 0 && setLoaded(true);
+    } catch (error) {
+      console.log(error);
     }
-
-    return () => {
-      subscription = false;
-    };
   }
 
   useEffect(() => {
-    fetchLoans();
+    const controller = new AbortController();
+    const signal = controller.signal;
+
+    fetchLoans(signal);
+
     setTimeout(() => {
       loans.length === 0 && setLoad(false);
     }, 8000);
-  }, [loans]);
+    return () => {
+      controller.abort();
+    };
+  }, []);
 
   return (
     <>

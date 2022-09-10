@@ -1,7 +1,7 @@
 import React, { useEffect, useState } from "react";
 import axios from "axios";
 import { NextPage } from "next";
-import { Protected } from "../../../components";
+import { Protected, TitleText } from "../../../components";
 import {
   Group,
   Button,
@@ -11,6 +11,7 @@ import {
   Menu,
   ActionIcon,
   LoadingOverlay,
+  Divider,
 } from "@mantine/core";
 import { useRouter } from "next/router";
 import { showNotification, updateNotification } from "@mantine/notifications";
@@ -27,15 +28,23 @@ import { Loans } from "../../../types";
 const Disburse = () => {
   const [loan, setLoan] = useState([]);
   const [load, setLoad] = useState(true);
+  const date = new Date();
+  const disbursedOn =
+    date.toLocaleDateString().split("/")[0] +
+    "-" +
+    date.toLocaleDateString().split("/")[1] +
+    "-" +
+    date.toLocaleDateString().split("/")[2];
 
   const router = useRouter();
   const id = router.query.id as string;
 
-  const fetchLoan = async () => {
+  const fetchLoan = async (signal: AbortSignal) => {
     try {
       const res = await axios.request({
         method: "POST",
         url: `/api/loans/disburse`,
+        signal,
         data: {
           id: `${id}`,
         },
@@ -48,24 +57,25 @@ const Disburse = () => {
   };
 
   useEffect(() => {
-    let subscribe = true;
-    if (subscribe) {
-      fetchLoan();
-    }
+    const controller = new AbortController();
+    const signal = controller.signal;
+
+    fetchLoan(signal);
 
     return () => {
-      subscribe = false;
+      controller.abort();
     };
   }, []);
 
   const handleSubmit = async () => {
     try {
-      setLoad(true)
+      setLoad(true);
       const req = await axios.request({
         method: "POST",
         url: "/api/loans/disburse",
         data: {
           id: id,
+          disbursedOn: disbursedOn,
           disbursed: true,
         },
       });
@@ -80,9 +90,7 @@ const Disburse = () => {
             autoClose: 8000,
           });
         });
-        const res = await axios.get("/api/loans");
-        router.replace(router.asPath);
-        return router.push("/loans/disbursements");
+        return router.push("/loans/payments");
       }
       if (req.status !== 200)
         setTimeout(() => {
@@ -102,13 +110,13 @@ const Disburse = () => {
 
   return (
     <>
-      {!load && (loan.length > 0 && (
+      {!load && loan.length > 0 && (
         <>
           {loan.map((_: Loans) => (
             <Card key={_.id} shadow="sm" p="lg" radius="md" m="xl" withBorder>
               <Card.Section withBorder inheritPadding py="xs">
                 <Group position="apart">
-                  <Text weight={700}>{_.memberName}</Text>
+                  <TitleText title={`${_.memberName}`} />
                   <Menu withinPortal position="bottom-end" shadow="sm">
                     <Menu.Target>
                       <ActionIcon>
@@ -254,6 +262,27 @@ const Disburse = () => {
                     </Grid.Col>
                   </Grid>
                 )}
+                <Divider variant="dotted" my="xl" />
+                <Grid grow>
+                  <Grid.Col mt="xs" span={4}>
+                    <Text weight={500}>First Installment Date</Text>
+                  </Grid.Col>
+                  <Grid.Col mt="xs" span={4}>
+                    <Text>
+                      {_.startDate}
+                    </Text>
+                  </Grid.Col>
+                </Grid>
+                <Grid grow>
+                  <Grid.Col mt="xs" span={4}>
+                    <Text weight={500}>Disbursement Date</Text>
+                  </Grid.Col>
+                  <Grid.Col mt="xs" span={4}>
+                    <Text>
+                      {disbursedOn}
+                    </Text>
+                  </Grid.Col>
+                </Grid>
                 <Group mt="xl" position="center">
                   <Button
                     variant="gradient"
@@ -278,8 +307,9 @@ const Disburse = () => {
               </Card.Section>
             </Card>
           ))}
+          <pre>{JSON.stringify(loan, undefined, 2)}</pre>
         </>
-      ))}
+      )}
       {load && (
         <LoadingOverlay
           overlayBlur={2}

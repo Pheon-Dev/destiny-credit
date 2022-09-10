@@ -8,7 +8,8 @@ async function loan(req: NextApiRequest, res: NextApiResponse) {
     try {
       const {
         id,
-        disbursed
+        disbursed,
+        disbursedOn
       } = req.body;
 
       const loan = await prisma.loan.findMany({
@@ -23,6 +24,7 @@ async function loan(req: NextApiRequest, res: NextApiResponse) {
         },
         data: {
           disbursed: disbursed,
+          disbursedOn: disbursedOn,
         },
       });
       }

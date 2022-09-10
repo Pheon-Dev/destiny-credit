@@ -1,5 +1,5 @@
 import React, { useEffect, useState } from "react";
-import { Protected } from "../../../components";
+import { Protected, TitleText } from "../../../components";
 import { NextPage } from "next";
 import axios from "axios";
 import { z } from "zod";
@@ -64,9 +64,11 @@ const collateral_schema = z.object({
 const Page: NextPage = () => {
   const [load, setLoad] = useState(false);
   const [active, setActive] = useState(0);
+  const [reviewsible, setReviewsible] = useState(false);
   const [open, setOpen] = useState(false);
   const [deleteModal, setDeleteModal] = useState(false);
   const [collateralId, setCollateralId] = useState("");
+  const [startDate, setStartDate] = useState("");
   const [sundays, setSundays] = useState(0);
   const [products, setProducts] = useState([]);
   const [members, setMembers] = useState([]);
@@ -91,6 +93,47 @@ const Page: NextPage = () => {
 
   const router = useRouter();
   const id = router.query.create as string;
+
+  const form = useForm({
+    validate: zodResolver(loan_schema),
+    initialValues: {
+      member: "",
+      memberId: "",
+      product: "",
+      productId: "",
+      principal: "",
+      tenure: "",
+      interest: "",
+      installment: "",
+      penalty: "",
+      processingFee: "",
+      payoff: "",
+      sundays: "",
+      grace: "",
+      guarantorId: "",
+      maintained: false,
+      approved: false,
+      disbursed: false,
+    },
+  });
+
+  const guarantor_form = useForm({
+    validate: zodResolver(guarantor_schema),
+    initialValues: {
+      guarantorName: "",
+      guarantorPhone: "",
+      guarantorRelationship: "",
+      guarantorID: "",
+    },
+  });
+
+  const collateral_form = useForm({
+    validate: zodResolver(collateral_schema),
+    initialValues: {
+      item: "",
+      value: "",
+    },
+  });
 
   const nextStep = () => {
     if (form.values.principal.length > 0 && +form.values.principal < minRange) {
@@ -250,33 +293,35 @@ const Page: NextPage = () => {
   const prevStep = () =>
     setActive((current) => (current > 0 ? current - 1 : current));
 
-  const fetchCollaterals = async () => {
+  const fetchCollaterals = async (signal: AbortSignal) => {
     try {
+      if (collaterals.length > 0) return;
       const col = await axios.request({
         method: "POST",
         url: `/api/members/collateral`,
         data: {
           id: `${id}`,
         },
+        signal,
       });
-      setCollaterals(
-        col.data.collaterals
-      );
+      return setCollaterals(col.data.collaterals);
     } catch (error) {
       console.log(error);
     }
   };
 
-  const fetchGuarantor = async () => {
+  const fetchGuarantor = async (signal: AbortSignal) => {
     try {
+      if (guarantor.length > 0) return;
       const gua = await axios.request({
         method: "POST",
         url: `/api/members/guarantor`,
         data: {
           id: `${id}`,
         },
+        signal,
       });
-      setGuarantor(gua.data.guarantor);
+      return setGuarantor(gua.data.guarantor);
     } catch (error) {
       console.log(error);
     }
@@ -284,6 +329,7 @@ const Page: NextPage = () => {
 
   const fetchMember = async () => {
     try {
+      if (form.values.member.length > 0) return;
       const mem = await axios.request({
         method: "POST",
         url: `/api/members/${id}`,
@@ -299,6 +345,7 @@ const Page: NextPage = () => {
           `${mem.data.member[0].firstName} ${mem.data.member[0].lastName}`
         );
       }
+      return;
     } catch (error) {
       console.log(error);
     }
@@ -306,12 +353,13 @@ const Page: NextPage = () => {
 
   const fetchMembers = async () => {
     try {
+      if (members.length > 0) return;
       const mems = await axios.request({
         method: "GET",
         url: "/api/members",
       });
 
-      setMembers(mems.data.members);
+      return setMembers(mems.data.members);
     } catch (error) {
       console.log(error);
     }
@@ -319,6 +367,7 @@ const Page: NextPage = () => {
 
   const fetchProducts = async () => {
     try {
+      if (products.length > 0) return;
       if (products.length < 1) setStatus(true);
       const pro = await axios.request({
         method: "GET",
@@ -326,72 +375,17 @@ const Page: NextPage = () => {
       });
       const pros = pro.data.products;
 
-      setProducts(pros);
       setStatus(false);
+      setProducts(pros);
     } catch (error) {
       console.log(error);
     }
   };
 
-  useEffect(() => {
-    let subscription = true;
-
-    if (subscription) {
-      fetchMembers();
-      fetchProducts();
-      fetchCollaterals();
-      fetchGuarantor();
-      fetchMember();
-    }
-
-    return () => {
-      subscription = false;
-    };
-  }, [products]);
-
-  const form = useForm({
-    validate: zodResolver(loan_schema),
-    initialValues: {
-      member: "",
-      memberId: "",
-      product: "",
-      productId: "",
-      principal: "",
-      tenure: "",
-      interest: "",
-      installment: "",
-      penalty: "",
-      processingFee: "",
-      payoff: "",
-      sundays: "",
-      grace: "",
-      guarantorId: "",
-      maintained: false,
-      approved: false,
-      disbursed: false,
-    },
-  });
-
-  const guarantor_form = useForm({
-    validate: zodResolver(guarantor_schema),
-    initialValues: {
-      guarantorName: "",
-      guarantorPhone: "",
-      guarantorRelationship: "",
-      guarantorID: "",
-    },
-  });
-
-  const collateral_form = useForm({
-    validate: zodResolver(collateral_schema),
-    initialValues: {
-      item: "",
-      value: "",
-    },
-  });
 
   const fetchProduct = async () => {
     try {
+      setReviewsible(true)
       const pr = await axios.request({
         method: "POST",
         url: `/api/products/${form.values.product}`,
@@ -400,7 +394,7 @@ const Page: NextPage = () => {
         },
       });
 
-      pr.data?.product
+       pr.data?.product
         ? pr.data?.product?.map((_: Products) => {
             form.setFieldValue("productId", `${_.id}`);
             setIntRate(_.interestRate);
@@ -414,18 +408,46 @@ const Page: NextPage = () => {
             setMinRange(+_.minimumRange);
           })
         : null;
+      setReviewsible(false)
     } catch (error) {
       console.log(error);
     }
   };
 
+  useEffect(() => {
+    const controller = new AbortController();
+    const signal = controller.signal;
+
+    fetchCollaterals(signal);
+    fetchGuarantor(signal);
+
+    return () => {
+      controller.abort();
+    };
+  }, [form.values.product]);
+
+  useEffect(() => {
+    let subscribe = true;
+
+    if(subscribe) {
+    fetchMembers();
+    fetchMember();
+    fetchProducts();
+    fetchProduct();
+      }
+
+    return () => {
+      subscribe = false;
+    };
+  }, [products, form.values.product]);
+
   const calculateSundays = () => {
     let sundays = 0;
     let counter = 0;
     let term = +form.values.tenure;
+    const date = new Date();
 
     while (counter < term + 1) {
-      const date = new Date();
       date.setDate(date.getDate() + counter);
       let day = date.getDay();
       if (day === 0) {
@@ -552,12 +574,12 @@ const Page: NextPage = () => {
 
   useEffect(() => {
     let subscribe = true;
-
     if (subscribe) {
-      fetchProduct();
-      calculateSundays();
-      fillForm();
-    }
+    calculateSundays();
+    fillForm();
+      }
+
+
     return () => {
       subscribe = false;
     };
@@ -569,6 +591,7 @@ const Page: NextPage = () => {
     form.values.principal,
     form.values.tenure,
     form.values.product,
+    form.values.productId,
     collateral_form.values.item,
     collateral_form.values.value,
   ]);
@@ -688,7 +711,7 @@ const Page: NextPage = () => {
             value: collateral_form.values.value,
           },
         });
-        console.log(add)
+        console.log(add);
         collateral_form.setFieldValue("item", "");
         collateral_form.setFieldValue("value", "");
         return setTimeout(() => {
@@ -701,7 +724,6 @@ const Page: NextPage = () => {
             autoClose: 8000,
           });
         });
-        /* await axios.get("/api/members/collateral"); */
       }
 
       setTimeout(() => {
@@ -714,12 +736,8 @@ const Page: NextPage = () => {
           autoClose: 4000,
         });
       });
-      /* router.push("/"); */
-      /* const res = await axios.get("/api/"); */
-      /* const data = res.data; */
-      /* return Router.replace(Router.asPath); */
     } catch (error) {
-        console.log(error)
+      console.log(error);
       setTimeout(() => {
         updateNotification({
           id: "collateral-status",
@@ -899,16 +917,16 @@ const Page: NextPage = () => {
         guarantor_form.setFieldValue("guarantorName", `${_.guarantorName}`);
       });
     }
-    }
+  };
 
   useEffect(() => {
     let subscribe = true;
     if (subscribe) {
-        handleGuarantor()
-      }
-      return () => {
-          subscribe = false;
-        }
+      handleGuarantor();
+    }
+    return () => {
+      subscribe = false;
+    };
   }, [
     guarantor_form.values.guarantorName,
     guarantor_form.values.guarantorID,
@@ -919,27 +937,16 @@ const Page: NextPage = () => {
 
   const Review = () => {
     return (
-      <Card shadow="sm" p="lg" radius="md" m="xl" withBorder>
+    <>
+      <Card style={{
+        position: "relative"
+        }} shadow="sm" p="lg" radius="md" m="xl" withBorder>
         <Card.Section withBorder inheritPadding py="xs">
           <Group position="apart">
-            <Text weight={700}>Review</Text>
-            {/* <Menu withinPortal position="bottom-end" shadow="sm"> */}
-            {/*   <Menu.Target> */}
-            {/*     <ActionIcon> */}
-            {/*       <IconDots size={16} /> */}
-            {/*     </ActionIcon> */}
-            {/*   </Menu.Target> */}
-            {/**/}
-            {/*   <Menu.Dropdown> */}
-            {/*     <Menu.Item icon={<IconFileZip size={14} />}>Download zip</Menu.Item> */}
-            {/*     <Menu.Item icon={<IconEye size={14} />}>Preview all</Menu.Item> */}
-            {/*     <Menu.Item icon={<IconTrash size={14} />} color="red"> */}
-            {/*       Delete all */}
-            {/*     </Menu.Item> */}
-            {/*   </Menu.Dropdown> */}
-            {/* </Menu> */}
+            <TitleText title="Review" />
           </Group>
         </Card.Section>
+        <LoadingOverlay visible={reviewsible} overlayBlur={2} />
         <Group position="apart" mt="md" mb="xs">
           <Text weight={500}>
             Include Payments on Sunday. (
@@ -1067,6 +1074,7 @@ const Page: NextPage = () => {
           </Group>
         ) : null}
       </Card>
+    </>
     );
   };
 
@@ -1081,7 +1089,7 @@ const Page: NextPage = () => {
           <Card shadow="sm" p="lg" radius="md" m="xl" withBorder>
             <Card.Section withBorder inheritPadding py="xs">
               <Group position="apart">
-                <Text weight={700}>{form.values.member}</Text>
+                <TitleText title={`${form.values.member}`} />
                 <Menu withinPortal position="bottom-end" shadow="sm">
                   <Menu.Target>
                     <ActionIcon>
@@ -1229,7 +1237,7 @@ const Page: NextPage = () => {
               )}
               <Card.Section withBorder inheritPadding mt="md" py="xs">
                 <Group position="apart">
-                  <Text weight={700}>Collaterals</Text>
+                  <TitleText title={`Collaterals`} />
                 </Group>
               </Card.Section>
               {collaterals.length > 0 &&
@@ -1279,390 +1287,414 @@ const Page: NextPage = () => {
   };
 
   return (
-  <>
+    <>
       {!load && (
-    <Protected>
-      <Stepper mt="lg" active={active} onStepClick={setActive} breakpoint="sm">
-        <Stepper.Step
-          label="Loan Maintenance"
-          description="Select a Member & a Product."
-          loading={status}
-          allowStepSelect={active > 0}
-        >
-          <Box>
-            <form>
-              <Grid grow>
-                <Grid.Col span={4}>
-                  <TextInput
-                    mt="md"
-                    label="Member"
-                    placeholder="Member ..."
-                    {...form.getInputProps("member")}
-                    disabled={form.values.memberId.length > 0 ? false : true}
-                    required
-                  />
-                </Grid.Col>
-                <Grid.Col span={4}>
-                  <Select
-                    mt="md"
-                    label="Select Product"
-                    placeholder="Select Product ..."
-                    data={product_data?.map((p) => p[0].label)}
-                    {...form.getInputProps("product")}
-                    disabled={form.values.memberId.length > 0 ? false : true}
-                    required
-                  />
-                </Grid.Col>
-              </Grid>
-
-              <Grid grow>
-                <Grid.Col span={4}>
-                  <TextInput
-                    mt="md"
-                    type="number"
-                    min={0}
-                    label="Enter Principal Amount"
-                    placeholder="Enter Principal Amount ..."
-                    {...form.getInputProps("principal")}
-                    disabled={maxRange > 0 ? false : true}
-                    required
-                  />
-                  {/* <NumberInput */}
-                  {/*   mt="md" */}
-                  {/*   label="Enter Principal Amount" */}
-                  {/*   placeholder="Enter Principal Amount ..." */}
-                  {/*   defaultValue={0} */}
-                  {/*   parser={(value) => value?.replace(/\KSHs.\s?|(,*)/g, '')} */}
-                  {/*   formatter={(value: string) => */}
-                  {/*   !Number.isNaN(parseFloat(value)) */}
-                  {/*   ? `KSHs. ${value}`.replace(/\B(?=(\d{3})+(?!\d))/g, ",") */}
-                  {/*   : 'KSHs. '} */}
-                  {/*   {...form.getInputProps("principal")} */}
-                  {/*   required */}
-                  {/* /> */}
-                </Grid.Col>
-                <Grid.Col span={4}>
-                  <TextInput
-                    mt="md"
-                    type="number"
-                    label="Enter Tenure"
-                    placeholder="Enter Tenure ..."
-                    {...form.getInputProps("tenure")}
-                    disabled={form.values.memberId.length > 0 ? false : true}
-                    required
-                  />
-                </Grid.Col>
-              </Grid>
-            </form>
-          </Box>
-          <Review />
-        </Stepper.Step>
-        <Stepper.Step
-          label="Add a Guarantor"
-          description="Add a Guarantor to Guarantee this Loan"
-          allowStepSelect={active > 1}
-        >
-          <Box>
-            <form>
-              <Grid grow>
-                <Grid.Col span={4}>
-                  <Autocomplete
-                    mt="md"
-                    label="Enter Guarantor Names"
-                    placeholder="Enter Guarantor Names ..."
-                    /* limit={6} */ // Default 5
-                    data={guarantor_data?.map((p) => p[0].label)}
-                    {...guarantor_form.getInputProps("guarantorName")}
-                    required
-                  />
-                </Grid.Col>
-                <Grid.Col span={4}>
-                  <TextInput
-                    mt="md"
-                    label="Phone Number"
-                    placeholder="Phone Number ..."
-                    {...guarantor_form.getInputProps("guarantorPhone")}
-                    required
-                  />
-                </Grid.Col>
-              </Grid>
-
-              <Grid grow>
-                <Grid.Col span={4}>
-                  <TextInput
-                    mt="md"
-                    label="ID"
-                    placeholder="Enter ID ..."
-                    {...guarantor_form.getInputProps("guarantorID")}
-                    required
-                  />
-                </Grid.Col>
-                <Grid.Col span={4}>
-                  <TextInput
-                    mt="md"
-                    label="Relationship"
-                    placeholder="Relationship ..."
-                    {...guarantor_form.getInputProps("guarantorRelationship")}
-                    required
-                  />
-                </Grid.Col>
-              </Grid>
-            </form>
-          </Box>
-        </Stepper.Step>
-        <Stepper.Step
-          label="Add Collaterals"
-          description="Lastly, Add Collaterals to Proceed."
-          allowStepSelect={active > 2}
-        >
-          <Box>
-            <Card shadow="sm" p="lg" radius="md" m="xl" withBorder>
-              <Card.Section withBorder inheritPadding py="xs">
-                <Group position="apart">
-                  <Text weight={700}>Add Collaterals</Text>
-                  <Menu withinPortal position="bottom-end" shadow="sm">
-                    <Menu.Target>
-                      <ActionIcon>
-                        <IconDots size={16} />
-                      </ActionIcon>
-                    </Menu.Target>
-
-                    <Menu.Dropdown>
-                      <Menu.Item icon={<IconFileZip size={14} />}>
-                        Download zip
-                      </Menu.Item>
-                      <Menu.Item icon={<IconEye size={14} />}>
-                        Preview all
-                      </Menu.Item>
-                      <Menu.Item icon={<IconTrash size={14} />} color="red">
-                        Delete all
-                      </Menu.Item>
-                    </Menu.Dropdown>
-                  </Menu>
-                </Group>
-              </Card.Section>
-              {collaterals.length > 0 &&
-                collaterals.map((collateral: Collaterals, index: number) => (
-                  <div key={collateral.id}>
-                    <Card.Section withBorder inheritPadding py="xs">
-                      <Grid grow columns={12}>
-                        <Grid.Col mt="md" span={1}>
-                          <Text>{index + 1}</Text>
-                        </Grid.Col>
-                        <Grid.Col mt="md" span={5}>
-                          <Text>{collateral.item}</Text>
-                        </Grid.Col>
-                        <Grid.Col mt="md" span={5}>
-                          <Text>
-                            {`KSHs. ${collateral.value}.00`.replace(
-                              /\B(?=(\d{3})+(?!\d))/g,
-                              ","
-                            )}
-                          </Text>
-                        </Grid.Col>
-                        <Grid.Col mt="md" span={1}>
-                          <Tooltip color="red" label="Delete">
-                            <ActionIcon
-                              variant="light"
-                              onClick={() => {
-                                showNotification({
-                                  id: "collateral-delete-status",
-                                  color: "red",
-                                  title: "Deleting Collateral",
-                                  message: `Deleting ${collateral.item} worth KSHs. ${collateral.value} From Being Added to Collaterals ...`,
-                                  disallowClose: true,
-                                  autoClose: false,
-                                  loading: true,
-                                });
-                                setDeleteModal(true);
-                                setCollateralId(`${collateral.id}`);
-                              }}
-                            >
-                              <IconTrash size={24} color="red" />
-                            </ActionIcon>
-                          </Tooltip>
-                        </Grid.Col>
-                      </Grid>
-                    </Card.Section>
-                    <Modal
-                      opened={deleteModal}
-                      onClose={() => {
-                        setDeleteModal(false);
-                        deleteModal &&
-                          setTimeout(() => {
-                            updateNotification({
-                              id: "collateral-delete-status",
-                              color: "teal",
-                              title: "Collateral Deletion",
-                              message: `${collateral.item} Was not Deleted From Collaterals.`,
-                              icon: <IconCheck size={16} />,
-                              autoClose: 8000,
-                            });
-                          });
-                      }}
-                      title={`Delete Collateral`}
-                    >
-                      <Card shadow="sm" p="lg" radius="md" m="xl" withBorder>
-                        <Card.Section withBorder inheritPadding py="xs">
-                          <Group position="apart">
-                            <Text weight={700}>{collateral.item}</Text>
-                            <Text>
-                              {`KSHs. ${collateral.value}.00`.replace(
-                                /\B(?=(\d{3})+(?!\d))/g,
-                                ","
-                              )}
-                            </Text>
-                          </Group>
-                        </Card.Section>
-                        <Card.Section withBorder inheritPadding py="xs">
-                          <Text>
-                            Would You Wish to Proceed and delete{" "}
-                            {collateral.item} worth{" "}
-                            {`KSHs. ${collateral.value}.00`.replace(
-                              /\B(?=(\d{3})+(?!\d))/g,
-                              ","
-                            )}{" "}
-                            from Collaterals
-                          </Text>
-                        </Card.Section>
-                        <Card.Section withBorder inheritPadding py="xs">
-                          <Group mt="xl">
-                            <Button
-                              variant="light"
-                              color="red"
-                              fullWidth
-                              mt="md"
-                              radius="md"
-                              onClick={() => {
-                                setDeleteModal(false);
-                                deleteCollateral(`${collateralId}`);
-                              }}
-                            >
-                              Proceed
-                            </Button>
-                          </Group>
-                        </Card.Section>
-                      </Card>
-                    </Modal>
-                  </div>
-                ))}
-              <Card.Section withBorder inheritPadding py="xs">
+        <Protected>
+          <Stepper
+            mt="lg"
+            active={active}
+            onStepClick={setActive}
+            breakpoint="sm"
+          >
+            <Stepper.Step
+              label="Loan Maintenance"
+              description="Select a Member & a Product."
+              loading={status}
+              allowStepSelect={active > 0}
+            >
+              <Box>
                 <form>
-                  <Grid grow columns={12}>
-                    <Grid.Col span={5}>
+                  <Grid grow>
+                    <Grid.Col span={4}>
                       <TextInput
                         mt="md"
-                        label="Item Name"
-                        placeholder="Item Name ..."
-                        {...collateral_form.getInputProps("item")}
+                        label="Member"
+                        placeholder="Member ..."
+                        {...form.getInputProps("member")}
+                        disabled={
+                          form.values.memberId.length > 0 ? false : true
+                        }
                         required
                       />
                     </Grid.Col>
-                    <Grid.Col span={5}>
-                      <TextInput
+                    <Grid.Col span={4}>
+                      <Select
                         mt="md"
-                        label="Item Value"
-                        placeholder="Item Value ..."
-                        {...collateral_form.getInputProps("value")}
+                        label="Select Product"
+                        placeholder="Select Product ..."
+                        data={product_data?.map((p) => p[0].label)}
+                        {...form.getInputProps("product")}
+                        disabled={
+                          form.values.memberId.length > 0 ? false : true
+                        }
                         required
                       />
                     </Grid.Col>
-                    {collateral_form.values.item.length > 0 &&
-                      collateral_form.values.value.length > 0 && (
-                        <Grid.Col mt="md" span={2}>
-                          <Group position="apart" mt="xl" m="md">
-                            <Tooltip label="Add" color="teal">
-                              <ActionIcon
-                                variant="light"
-                                onClick={() => {
-                                  showNotification({
-                                    id: "collateral-status",
-                                    color: "teal",
-                                    title: "Saving Collaterals",
-                                    message: `Saving Collateral Information ...`,
-                                    loading: true,
-                                    autoClose: 50000,
-                                  });
-                                  handleCollaterals();
-                                }}
-                              >
-                                <IconPlus color="teal" size={24} />
-                              </ActionIcon>
-                            </Tooltip>
+                  </Grid>
 
-                            <Tooltip color="red" label="Clear">
-                              <ActionIcon
-                                variant="light"
-                                onClick={() => {
-                                  collateral_form.setFieldValue("item", "");
-                                  collateral_form.setFieldValue("value", "");
-                                  showNotification({
-                                    id: "collateral-status",
-                                    color: "orange",
-                                    title: "Removing Collateral",
-                                    message: `Removed ${collateral_form.values.item} worth KSHs. ${collateral_form.values.value} From Being Added to Collaterals.`,
-                                    icon: <IconCheck size={16} />,
-                                    autoClose: 3000,
-                                  });
-                                }}
-                              >
-                                <IconMinus size={24} color="red" />
-                              </ActionIcon>
-                            </Tooltip>
-                          </Group>
-                        </Grid.Col>
-                      )}
+                  <Grid grow>
+                    <Grid.Col span={4}>
+                      <TextInput
+                        mt="md"
+                        type="number"
+                        min={0}
+                        label="Enter Principal Amount"
+                        placeholder="Enter Principal Amount ..."
+                        {...form.getInputProps("principal")}
+                        disabled={maxRange > 0 ? false : true}
+                        required
+                      />
+                      {/* <NumberInput */}
+                      {/*   mt="md" */}
+                      {/*   label="Enter Principal Amount" */}
+                      {/*   placeholder="Enter Principal Amount ..." */}
+                      {/*   defaultValue={0} */}
+                      {/*   parser={(value) => value?.replace(/\KSHs.\s?|(,*)/g, '')} */}
+                      {/*   formatter={(value: string) => */}
+                      {/*   !Number.isNaN(parseFloat(value)) */}
+                      {/*   ? `KSHs. ${value}`.replace(/\B(?=(\d{3})+(?!\d))/g, ",") */}
+                      {/*   : 'KSHs. '} */}
+                      {/*   {...form.getInputProps("principal")} */}
+                      {/*   required */}
+                      {/* /> */}
+                    </Grid.Col>
+                    <Grid.Col span={4}>
+                      <TextInput
+                        mt="md"
+                        type="number"
+                        label="Enter Tenure"
+                        placeholder="Enter Tenure ..."
+                        {...form.getInputProps("tenure")}
+                        disabled={
+                          form.values.memberId.length > 0 ? false : true
+                        }
+                        required
+                      />
+                    </Grid.Col>
                   </Grid>
                 </form>
-              </Card.Section>
-            </Card>
-          </Box>
-        </Stepper.Step>
-        <Stepper.Completed>
-          <Text>Loan Maintained Successfully</Text>
-        </Stepper.Completed>
-      </Stepper>
+              </Box>
+              <Review />
+            </Stepper.Step>
+            <Stepper.Step
+              label="Add a Guarantor"
+              description="Add a Guarantor to Guarantee this Loan"
+              allowStepSelect={active > 1}
+            >
+              <Box>
+                <form>
+                  <Grid grow>
+                    <Grid.Col span={4}>
+                      <Autocomplete
+                        mt="md"
+                        label="Enter Guarantor Names"
+                        placeholder="Enter Guarantor Names ..."
+                        /* limit={6} */ // Default 5
+                        data={guarantor_data?.map((p) => p[0].label)}
+                        {...guarantor_form.getInputProps("guarantorName")}
+                        required
+                      />
+                    </Grid.Col>
+                    <Grid.Col span={4}>
+                      <TextInput
+                        mt="md"
+                        label="Phone Number"
+                        placeholder="Phone Number ..."
+                        {...guarantor_form.getInputProps("guarantorPhone")}
+                        required
+                      />
+                    </Grid.Col>
+                  </Grid>
 
-      <Group position="center" mt="xl">
-        {active === 0 ? null : (
-          <Button variant="default" onClick={prevStep}>
-            Back
-          </Button>
-        )}
-        {active === 1 && (
-          <Button
-            variant="light"
-            color="teal"
-            onClick={() => {
-              setChangeGuarantor(true);
-              guarantor_form.setFieldValue("guarantorPhone", ``);
-              guarantor_form.setFieldValue("guarantorID", ``);
-              guarantor_form.setFieldValue("guarantorRelationship", ``);
-              guarantor_form.setFieldValue("guarantorName", ``);
-            }}
-          >
-            Change Guarantor
-          </Button>
-        )}
-        <Button
-          onClick={() => {
-            active === 2 ? setOpen(true) : nextStep();
-          }}
-        >
-          {active === 2 ? "Preview" : "Next"}
-        </Button>
-      </Group>
-      {preview()}
-    </Protected>
-    )}
-    {load && (
+                  <Grid grow>
+                    <Grid.Col span={4}>
+                      <TextInput
+                        mt="md"
+                        label="ID"
+                        placeholder="Enter ID ..."
+                        {...guarantor_form.getInputProps("guarantorID")}
+                        required
+                      />
+                    </Grid.Col>
+                    <Grid.Col span={4}>
+                      <TextInput
+                        mt="md"
+                        label="Relationship"
+                        placeholder="Relationship ..."
+                        {...guarantor_form.getInputProps(
+                          "guarantorRelationship"
+                        )}
+                        required
+                      />
+                    </Grid.Col>
+                  </Grid>
+                </form>
+              </Box>
+            </Stepper.Step>
+            <Stepper.Step
+              label="Add Collaterals"
+              description="Lastly, Add Collaterals to Proceed."
+              allowStepSelect={active > 2}
+            >
+              <Box>
+                <Card shadow="sm" p="lg" radius="md" m="xl" withBorder>
+                  <Card.Section withBorder inheritPadding py="xs">
+                    <Group position="apart">
+                      <TitleText title={`Add Collaterals`} />
+                      <Menu withinPortal position="bottom-end" shadow="sm">
+                        <Menu.Target>
+                          <ActionIcon>
+                            <IconDots size={16} />
+                          </ActionIcon>
+                        </Menu.Target>
+
+                        <Menu.Dropdown>
+                          <Menu.Item icon={<IconFileZip size={14} />}>
+                            Download zip
+                          </Menu.Item>
+                          <Menu.Item icon={<IconEye size={14} />}>
+                            Preview all
+                          </Menu.Item>
+                          <Menu.Item icon={<IconTrash size={14} />} color="red">
+                            Delete all
+                          </Menu.Item>
+                        </Menu.Dropdown>
+                      </Menu>
+                    </Group>
+                  </Card.Section>
+                  {collaterals.length > 0 &&
+                    collaterals.map(
+                      (collateral: Collaterals, index: number) => (
+                        <div key={collateral.id}>
+                          <Card.Section withBorder inheritPadding py="xs">
+                            <Grid grow columns={12}>
+                              <Grid.Col mt="md" span={1}>
+                                <Text>{index + 1}</Text>
+                              </Grid.Col>
+                              <Grid.Col mt="md" span={5}>
+                                <Text>{collateral.item}</Text>
+                              </Grid.Col>
+                              <Grid.Col mt="md" span={5}>
+                                <Text>
+                                  {`KSHs. ${collateral.value}.00`.replace(
+                                    /\B(?=(\d{3})+(?!\d))/g,
+                                    ","
+                                  )}
+                                </Text>
+                              </Grid.Col>
+                              <Grid.Col mt="md" span={1}>
+                                <Tooltip color="red" label="Delete">
+                                  <ActionIcon
+                                    variant="light"
+                                    onClick={() => {
+                                      showNotification({
+                                        id: "collateral-delete-status",
+                                        color: "red",
+                                        title: "Deleting Collateral",
+                                        message: `Deleting ${collateral.item} worth KSHs. ${collateral.value} From Being Added to Collaterals ...`,
+                                        disallowClose: true,
+                                        autoClose: false,
+                                        loading: true,
+                                      });
+                                      setDeleteModal(true);
+                                      setCollateralId(`${collateral.id}`);
+                                    }}
+                                  >
+                                    <IconTrash size={24} color="red" />
+                                  </ActionIcon>
+                                </Tooltip>
+                              </Grid.Col>
+                            </Grid>
+                          </Card.Section>
+                          <Modal
+                            opened={deleteModal}
+                            onClose={() => {
+                              setDeleteModal(false);
+                              deleteModal &&
+                                setTimeout(() => {
+                                  updateNotification({
+                                    id: "collateral-delete-status",
+                                    color: "teal",
+                                    title: "Collateral Deletion",
+                                    message: `${collateral.item} Was not Deleted From Collaterals.`,
+                                    icon: <IconCheck size={16} />,
+                                    autoClose: 8000,
+                                  });
+                                });
+                            }}
+                            title={`Delete Collateral`}
+                          >
+                            <Card
+                              shadow="sm"
+                              p="lg"
+                              radius="md"
+                              m="xl"
+                              withBorder
+                            >
+                              <Card.Section withBorder inheritPadding py="xs">
+                                <Group position="apart">
+                                  <TitleText title={`${collateral.item}`} />
+                                  <Text>
+                                    {`KSHs. ${collateral.value}.00`.replace(
+                                      /\B(?=(\d{3})+(?!\d))/g,
+                                      ","
+                                    )}
+                                  </Text>
+                                </Group>
+                              </Card.Section>
+                              <Card.Section withBorder inheritPadding py="xs">
+                                <Text>
+                                  Would You Wish to Proceed and delete{" "}
+                                  {collateral.item} worth{" "}
+                                  {`KSHs. ${collateral.value}.00`.replace(
+                                    /\B(?=(\d{3})+(?!\d))/g,
+                                    ","
+                                  )}{" "}
+                                  from Collaterals
+                                </Text>
+                              </Card.Section>
+                              <Card.Section withBorder inheritPadding py="xs">
+                                <Group mt="xl">
+                                  <Button
+                                    variant="light"
+                                    color="red"
+                                    fullWidth
+                                    mt="md"
+                                    radius="md"
+                                    onClick={() => {
+                                      setDeleteModal(false);
+                                      deleteCollateral(`${collateralId}`);
+                                    }}
+                                  >
+                                    Proceed
+                                  </Button>
+                                </Group>
+                              </Card.Section>
+                            </Card>
+                          </Modal>
+                        </div>
+                      )
+                    )}
+                  <Card.Section withBorder inheritPadding py="xs">
+                    <form>
+                      <Grid grow columns={12}>
+                        <Grid.Col span={5}>
+                          <TextInput
+                            mt="md"
+                            label="Item Name"
+                            placeholder="Item Name ..."
+                            {...collateral_form.getInputProps("item")}
+                            required
+                          />
+                        </Grid.Col>
+                        <Grid.Col span={5}>
+                          <TextInput
+                            mt="md"
+                            label="Item Value"
+                            placeholder="Item Value ..."
+                            {...collateral_form.getInputProps("value")}
+                            required
+                          />
+                        </Grid.Col>
+                        {collateral_form.values.item.length > 0 &&
+                          collateral_form.values.value.length > 0 && (
+                            <Grid.Col mt="md" span={2}>
+                              <Group position="apart" mt="xl" m="md">
+                                <Tooltip label="Add" color="teal">
+                                  <ActionIcon
+                                    variant="light"
+                                    onClick={() => {
+                                      showNotification({
+                                        id: "collateral-status",
+                                        color: "teal",
+                                        title: "Saving Collaterals",
+                                        message: `Saving Collateral Information ...`,
+                                        loading: true,
+                                        autoClose: 50000,
+                                      });
+                                      handleCollaterals();
+                                    }}
+                                  >
+                                    <IconPlus color="teal" size={24} />
+                                  </ActionIcon>
+                                </Tooltip>
+
+                                <Tooltip color="red" label="Clear">
+                                  <ActionIcon
+                                    variant="light"
+                                    onClick={() => {
+                                      collateral_form.setFieldValue("item", "");
+                                      collateral_form.setFieldValue(
+                                        "value",
+                                        ""
+                                      );
+                                      showNotification({
+                                        id: "collateral-status",
+                                        color: "orange",
+                                        title: "Removing Collateral",
+                                        message: `Removed ${collateral_form.values.item} worth KSHs. ${collateral_form.values.value} From Being Added to Collaterals.`,
+                                        icon: <IconCheck size={16} />,
+                                        autoClose: 3000,
+                                      });
+                                    }}
+                                  >
+                                    <IconMinus size={24} color="red" />
+                                  </ActionIcon>
+                                </Tooltip>
+                              </Group>
+                            </Grid.Col>
+                          )}
+                      </Grid>
+                    </form>
+                  </Card.Section>
+                </Card>
+              </Box>
+            </Stepper.Step>
+            <Stepper.Completed>
+              <Text>Loan Maintained Successfully</Text>
+            </Stepper.Completed>
+          </Stepper>
+
+          <Group position="center" mt="xl">
+            {active === 0 ? null : (
+              <Button variant="default" onClick={prevStep}>
+                Back
+              </Button>
+            )}
+            {active === 1 && (
+              <Button
+                variant="light"
+                color="teal"
+                onClick={() => {
+                  setChangeGuarantor(true);
+                  guarantor_form.setFieldValue("guarantorPhone", ``);
+                  guarantor_form.setFieldValue("guarantorID", ``);
+                  guarantor_form.setFieldValue("guarantorRelationship", ``);
+                  guarantor_form.setFieldValue("guarantorName", ``);
+                }}
+              >
+                Change Guarantor
+              </Button>
+            )}
+            <Button
+              onClick={() => {
+                active === 2 ? setOpen(true) : nextStep();
+              }}
+            >
+              {active === 2 ? "Preview" : "Next"}
+            </Button>
+          </Group>
+          {preview()}
+        </Protected>
+      )}
+      {load && (
         <LoadingOverlay
           overlayBlur={2}
           onClick={() => setLoad((prev) => !prev)}
           visible={load}
         />
-    )}
-  </>
+      )}
+    </>
   );
 };
 

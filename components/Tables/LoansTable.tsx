@@ -39,7 +39,7 @@ function LoanRow({ loan, call }: { loan: Loans; call: string }) {
   const router = useRouter();
   return (
     <>
-      {call === "approvals" && (
+      {call === "approvals" && !loan.disbursed && (
         <tr style={{ cursor: "auto" }}>
           <td>{loan.memberName}</td>
           <td>{`${loan.principal}`.replace(/\B(?=(\d{3})+(?!\d))/g, ",")}</td>
@@ -81,7 +81,7 @@ function LoanRow({ loan, call }: { loan: Loans; call: string }) {
           </td>
         </tr>
       )}
-      {call === "disbursements" && (
+      {call === "disbursements" && loan.approved && (
         <tr style={{ cursor: "auto" }}>
           <td>{loan.memberName}</td>
           <td>{`${loan.principal}`.replace(/\B(?=(\d{3})+(?!\d))/g, ",")}</td>

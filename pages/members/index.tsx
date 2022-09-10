@@ -9,10 +9,8 @@ const MembersList = () => {
   const [load, setLoad] = useState(true);
   const [loaded, setLoaded] = useState(false);
 
-  async function fetchMembers() {
-    let subscription = true;
-
-    if (subscription) {
+  const fetchMembers = async (signal: AbortSignal) => {
+    try {
       const res = await axios.request({
         method: "GET",
         url: "/api/members",
@@ -21,19 +19,24 @@ const MembersList = () => {
       const data = res.data.members;
       setMembers(data);
       members.length === 0 && setLoaded(false);
+    } catch (error) {
+      console.log(error);
     }
-
-    return () => {
-      subscription = false;
-    };
-  }
+  };
 
   useEffect(() => {
-    fetchMembers();
+    const controller = new AbortController();
+    const signal = controller.signal;
+
+    fetchMembers(signal);
+
     setTimeout(() => {
       members.length === 0 && setLoad(true);
     }, 8000);
-  }, [members]);
+    return () => {
+      controller.abort();
+    };
+  }, []);
 
   return (
     <>

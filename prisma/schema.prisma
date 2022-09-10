@@ -57,6 +57,7 @@ model User {
   registeredMembers  Member[]     @relation("RegisteredBy")
   approvedMembers    Member[]     @relation("ApprovedBy")
   updatedMembers     Member[]     @relation("UpdatedBy")
+  officiatesLoans    Loan[]       @relation("CreditOfficer")
   maintainedLoans    Loan[]       @relation("MaintainedBy")
   approvedLoans      Loan[]       @relation("ApprovedBy")
   disbursedLoans     Loan[]       @relation("DisbursedBy")
@@ -169,54 +170,77 @@ model Collateral {
 }
 
 model Loan {
-  id            String    @id @default(uuid())
-  createdAt     DateTime  @default(now())
-  updatedAt     DateTime  @updatedAt
-  maintained    Boolean   @default(false)
-  approved      Boolean   @default(false)
-  disbursed     Boolean   @default(false)
-  principal     String
-  interest      String
-  installment   String
-  penalty       String
-  sundays       String
-  payoff        String
-  tenure        String
-  grace         String
-  productName   String
-  memberName    String
-  processingFee String
-  cycle         String
-  guarantor     Guarantor @relation(fields: [guarantorId], references: [id])
-  guarantorId   String
-  payment       Payment[]
-  product       Product   @relation(fields: [productId], references: [id])
-  productId     String
-  member        Member    @relation(fields: [memberId], references: [id])
-  memberId      String
-  maintainer    User?     @relation("MaintainedBy", fields: [maintainerId], references: [id])
-  maintainerId  String?
-  approver      User?     @relation("ApprovedBy", fields: [approverId], references: [id])
-  approverId    String?
-  disburser     User?     @relation("DisbursedBy", fields: [disburserId], references: [id])
-  disburserId   String?
-  updater       User?     @relation("UpdatedBy", fields: [updaterId], references: [id])
-  updaterId     String?
+  id               String    @id @default(uuid())
+  createdAt        DateTime  @default(now())
+  updatedAt        DateTime  @updatedAt
+  maintained       Boolean   @default(false)
+  approved         Boolean   @default(false)
+  disbursed        Boolean   @default(false)
+  defaulted        Boolean?  @default(false)
+  cleared          Boolean?  @default(false)
+  principal        String
+  interest         String
+  installment      String
+  penalty          String
+  sundays          String
+  payoff           String
+  tenure           String
+  grace            String
+  productName      String
+  memberName       String
+  processingFee    String
+  cycle            String
+  loanRef          String?
+  disbursedOn      String?
+  startDate        String?
+  paymentCounter   String?
+  paymentCount     String?
+  paymentDay       String?
+  paymentStatus    String?
+  paymentPenalties String?
+  payment          Payment[]
+  member           Member    @relation(fields: [memberId], references: [id])
+  memberId         String
+  product          Product   @relation(fields: [productId], references: [id])
+  productId        String
+  guarantor        Guarantor @relation(fields: [guarantorId], references: [id])
+  guarantorId      String
+  creditOfficer    User?     @relation("CreditOfficer", fields: [creditOfficerId], references: [id])
+  creditOfficerId  String?
+  maintainer       User?     @relation("MaintainedBy", fields: [maintainerId], references: [id])
+  maintainerId     String?
+  approver         User?     @relation("ApprovedBy", fields: [approverId], references: [id])
+  approverId       String?
+  disburser        User?     @relation("DisbursedBy", fields: [disburserId], references: [id])
+  disburserId      String?
+  updater          User?     @relation("UpdatedBy", fields: [updaterId], references: [id])
+  updaterId        String?
 
   @@index(id)
 }
 
 model Payment {
-  id        String   @id @default(uuid())
-  createdAt DateTime @default(now())
-  updatedAt DateTime @updatedAt
-  paymentId String
-  loan      Loan     @relation(fields: [loanId], references: [id])
-  loanId    String
-  handler   User?    @relation("HandledBy", fields: [handlerId], references: [id])
-  handlerId String?
-  updater   User?    @relation("UpdatedBy", fields: [updaterId], references: [id])
-  updaterId String?
+  id            String   @id @default(uuid())
+  createdAt     DateTime @default(now())
+  updatedAt     DateTime @updatedAt
+  amount        String
+  outsArrears   String
+  paidArrears   String
+  outsPenalty   String
+  paidPenalty   String
+  outsInterest  String
+  paidInterest  String
+  outsPrincipal String
+  paidPrincipal String
+  outsBalance   String
+  currInstDate  String
+  nextInstDate  String
+  loan          Loan     @relation(fields: [loanId], references: [id])
+  loanId        String
+  handler       User?    @relation("HandledBy", fields: [handlerId], references: [id])
+  handlerId     String?
+  updater       User?    @relation("UpdatedBy", fields: [updaterId], references: [id])
+  updaterId     String?
 
   @@index(id)
 }

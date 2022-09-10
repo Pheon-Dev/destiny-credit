@@ -9,35 +9,39 @@ export default function Home() {
   const [load, setLoad] = useState(true);
   const [loaded, setLoaded] = useState(false);
 
-  const hello = trpc.useQuery(['hello', { text: 'client' }]);
-  if (!hello.data) {
-      console.log("Loading ...")
+  const hello = trpc.useQuery(["hello", { text: "client" }]);
+  /* const hello = trpc.useQuery(["transactions"]); */
+  /* if (!hello.data) { */
+  /*     console.log("Loading ...") */
+  /*   } */
+  /* if (hello.data) { */
+  /*     console.log(hello.data.greeting) */
+  /*   } */
+  /* console.log(hello) */
+
+  async function fetchTransactions(signal: AbortSignal) {
+    try {
+      const res = await axios.request({
+        method: "GET",
+        url: "/api/transactions/payments",
+        signal,
+      });
+      const data = res.data.transactions;
+
+      setTransactions(data);
+      transactions.length === 0 && setLoaded(true);
+    } catch (error) {
+      console.log(error);
     }
-  if (hello.data) {
-      console.log(hello.data.greeting)
-    }
-    /* console.log(hello) */
-
-  async function fetchTransactions() {
-    const controller = new AbortController();
-    const signal = controller.signal;
-
-    const res = await axios.request({
-      method: "GET",
-      url: "/api/transactions/payments",
-      signal,
-    });
-    const data = res.data.transactions;
-
-    setTransactions(data);
-    transactions.length === 0 && setLoaded(true);
-    return () => {
-      controller.abort();
-    };
   }
 
   useEffect(() => {
-    fetchTransactions();
+    const controller = new AbortController();
+    const signal = controller.signal;
+    fetchTransactions(signal);
+    return () => {
+      controller.abort();
+    };
   }, []);
 
   return (

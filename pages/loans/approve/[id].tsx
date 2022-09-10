@@ -31,11 +31,12 @@ const Approve = () => {
   const router = useRouter();
   const id = router.query.id as string;
 
-  const fetchLoan = async () => {
+  const fetchLoan = async (signal: AbortSignal) => {
     try {
       const res = await axios.request({
         method: "POST",
         url: `/api/loans/approve`,
+        signal,
         data: {
           id: `${id}`,
         },
@@ -48,13 +49,12 @@ const Approve = () => {
   };
 
   useEffect(() => {
-    let subscribe = true;
-    if (subscribe) {
-      fetchLoan();
-    }
+    const controller = new AbortController();
+    const signal = controller.signal;
 
+      fetchLoan(signal);
     return () => {
-      subscribe = false;
+      controller.abort();
     };
   }, []);
 
@@ -80,8 +80,6 @@ const Approve = () => {
             autoClose: 8000,
           });
         });
-        const res = await axios.get("/api/loans");
-        router.replace(router.asPath);
         return router.push("/loans/disbursements");
       }
       if (req.status !== 200)

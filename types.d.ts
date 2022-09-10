@@ -242,6 +242,14 @@ interface Loans {
   productName: string;
   memberName: string;
   processingFee: string;
+  loanRef: string;
+  disbursedOn?:string;
+  startDate?: string;
+  paymentCounter?: string;
+  paymentCount?: string;
+  paymentDay?: string;
+  paymentStatus?: string;
+  paymentPenalties?: string;
   guarantor: string;
   guarantorId?: string;
   product: string;
