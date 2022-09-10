@@ -70,6 +70,7 @@ const Page: NextPage = () => {
   const [collateralId, setCollateralId] = useState("");
   const [startDate, setStartDate] = useState("");
   const [loanRef, setLoanRef] = useState("");
+  const [loanLen, setLoanLen] = useState(0);
   const [memberCode, setMemberCode] = useState("");
   const [sundays, setSundays] = useState(0);
   const [products, setProducts] = useState([]);
@@ -137,6 +138,7 @@ const Page: NextPage = () => {
     },
   });
 
+  /* console.log(loanRef); */
   const nextStep = () => {
     if (form.values.principal.length > 0 && +form.values.principal < minRange) {
       showNotification({
@@ -331,7 +333,7 @@ const Page: NextPage = () => {
 
   const fetchLoans = async () => {
     try {
-      if (loanRef.length > 0) return;
+      if (loanRef.startsWith("DC-")) return;
       const res = await axios.request({
         method: "POST",
         url: `/api/loans/${id}`,
@@ -340,13 +342,7 @@ const Page: NextPage = () => {
         },
       });
       const len = res.data.loans.length + 1;
-      setLoanRef(
-        len < 10
-          ? memberCode + `-00${len}`
-          : len < 100
-          ? memberCode + `-0${len}`
-          : memberCode + `-${len}`
-      );
+      setLoanLen(len)
       return;
     } catch (error) {
       console.log(error);
@@ -451,22 +447,36 @@ const Page: NextPage = () => {
     };
   }, [form.values.product]);
 
-  const calculateSundays = () => {
-    let sundays = 0;
+  const calcuDates = (grace: number, cycle: string) => {
     let counter = 0;
     let term = +form.values.tenure;
-    const date = new Date();
+    const sundate = new Date();
+    let total_sundays = 0;
 
-    while (counter < term + 1) {
-      date.setDate(date.getDate() + counter);
-      let day = date.getDay();
+    while (counter < term + 0) {
+      sundate.setDate(sundate.getDate() + 1);
+      let day = sundate.getDay();
       if (day === 0) {
-        setSundays((sundays += 1));
+        total_sundays += 1;
       }
       counter++;
     }
 
+    if (!checked) setSundays(total_sundays);
     if (checked) setSundays(0);
+    /* if (sundays === 5) setSundays(4); */
+      setLoanRef(
+        loanLen > 9
+          ? loanLen > 99
+            ? memberCode + `-${loanLen}`
+            : memberCode + `-0${loanLen}`
+          : memberCode + `-00${loanLen}`
+      );
+
+      const date = new Date()
+    date.setDate(grace === 1 ? date.getDate() + 2 : date.getDate() + 0)
+    date.setDate(date.getDay() === 0 ? date.getDate() + 1 : date.getDate() + 0)
+
     const startsOn =
       date.toLocaleDateString().split("/")[0] +
       "-" +
@@ -474,8 +484,8 @@ const Page: NextPage = () => {
       "-" +
       date.toLocaleDateString().split("/")[2];
     setStartDate(startsOn);
-    setLoanRef(memberCode + "-" + "1");
-  };
+
+    }
 
   const fillForm = () => {
     form.setFieldValue("guarantorId", uuidV4().toString());
@@ -590,7 +600,6 @@ const Page: NextPage = () => {
     }
   };
 
-
   useEffect(() => {
     let subscribe = true;
 
@@ -600,8 +609,9 @@ const Page: NextPage = () => {
       fetchProducts();
       fetchProduct();
       fetchLoans();
-      calculateSundays();
+      /* calculateSundays(); */
       fillForm();
+      calcuDates(+grace, cycle.toLowerCase());
     }
 
     return () => {
@@ -976,10 +986,11 @@ const Page: NextPage = () => {
           <Card.Section withBorder inheritPadding py="xs">
             <Group position="apart">
               <TitleText title="Review" />
-              <Group>
-                <Text weight={500}>First Installment Date</Text>
+                <Text weight={500}>{loanRef.startsWith("-") ? null : loanRef}</Text>
+                {/* <Text weight={500}>First Installment Date</Text> */}
+                <Tooltip label="First Installment Date" color="blue" position="top" withArrow>
                 <Text weight={500}>{startDate}</Text>
-              </Group>
+                </Tooltip>
             </Group>
           </Card.Section>
           <LoadingOverlay visible={reviewsible} overlayBlur={2} />
@@ -1380,19 +1391,6 @@ const Page: NextPage = () => {
                         disabled={maxRange > 0 ? false : true}
                         required
                       />
-                      {/* <NumberInput */}
-                      {/*   mt="md" */}
-                      {/*   label="Enter Principal Amount" */}
-                      {/*   placeholder="Enter Principal Amount ..." */}
-                      {/*   defaultValue={0} */}
-                      {/*   parser={(value) => value?.replace(/\KSHs.\s?|(,*)/g, '')} */}
-                      {/*   formatter={(value: string) => */}
-                      {/*   !Number.isNaN(parseFloat(value)) */}
-                      {/*   ? `KSHs. ${value}`.replace(/\B(?=(\d{3})+(?!\d))/g, ",") */}
-                      {/*   : 'KSHs. '} */}
-                      {/*   {...form.getInputProps("principal")} */}
-                      {/*   required */}
-                      {/* /> */}
                     </Grid.Col>
                     <Grid.Col span={4}>
                       <TextInput
