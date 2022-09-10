@@ -69,6 +69,8 @@ const Page: NextPage = () => {
   const [deleteModal, setDeleteModal] = useState(false);
   const [collateralId, setCollateralId] = useState("");
   const [startDate, setStartDate] = useState("");
+  const [loanRef, setLoanRef] = useState("");
+  const [memberCode, setMemberCode] = useState("");
   const [sundays, setSundays] = useState(0);
   const [products, setProducts] = useState([]);
   const [members, setMembers] = useState([]);
@@ -259,7 +261,7 @@ const Page: NextPage = () => {
 
   const deleteCollateral = async (id: string) => {
     try {
-      const col = await axios.request({
+      const res = await axios.request({
         method: "POST",
         url: "/api/members/collateral/delete",
         data: {
@@ -296,7 +298,7 @@ const Page: NextPage = () => {
   const fetchCollaterals = async (signal: AbortSignal) => {
     try {
       if (collaterals.length > 0) return;
-      const col = await axios.request({
+      const res = await axios.request({
         method: "POST",
         url: `/api/members/collateral`,
         data: {
@@ -304,7 +306,7 @@ const Page: NextPage = () => {
         },
         signal,
       });
-      return setCollaterals(col.data.collaterals);
+      return setCollaterals(res.data.collaterals);
     } catch (error) {
       console.log(error);
     }
@@ -313,7 +315,7 @@ const Page: NextPage = () => {
   const fetchGuarantor = async (signal: AbortSignal) => {
     try {
       if (guarantor.length > 0) return;
-      const gua = await axios.request({
+      const res = await axios.request({
         method: "POST",
         url: `/api/members/guarantor`,
         data: {
@@ -321,7 +323,31 @@ const Page: NextPage = () => {
         },
         signal,
       });
-      return setGuarantor(gua.data.guarantor);
+      return setGuarantor(res.data.guarantor);
+    } catch (error) {
+      console.log(error);
+    }
+  };
+
+  const fetchLoans = async () => {
+    try {
+      if (loanRef.length > 0) return;
+      const res = await axios.request({
+        method: "POST",
+        url: `/api/loans/${id}`,
+        data: {
+          memberId: `${id}`,
+        },
+      });
+      const len = res.data.loans.length + 1;
+      setLoanRef(
+        len < 10
+          ? memberCode + `-00${len}`
+          : len < 100
+          ? memberCode + `-0${len}`
+          : memberCode + `-${len}`
+      );
+      return;
     } catch (error) {
       console.log(error);
     }
@@ -330,7 +356,7 @@ const Page: NextPage = () => {
   const fetchMember = async () => {
     try {
       if (form.values.member.length > 0) return;
-      const mem = await axios.request({
+      const res = await axios.request({
         method: "POST",
         url: `/api/members/${id}`,
         data: {
@@ -338,11 +364,12 @@ const Page: NextPage = () => {
         },
       });
 
-      if (mem.data.member[0]?.firstName?.length > 0) {
-        form.setFieldValue("memberId", `${mem.data.member[0].id}`);
+      if (res.data.member[0]?.firstName?.length > 0) {
+        setMemberCode(res.data.member[0].memberId);
+        form.setFieldValue("memberId", `${res.data.member[0].id}`);
         form.setFieldValue(
           "member",
-          `${mem.data.member[0].firstName} ${mem.data.member[0].lastName}`
+          `${res.data.member[0].firstName} ${res.data.member[0].lastName}`
         );
       }
       return;
@@ -354,12 +381,12 @@ const Page: NextPage = () => {
   const fetchMembers = async () => {
     try {
       if (members.length > 0) return;
-      const mems = await axios.request({
+      const res = await axios.request({
         method: "GET",
         url: "/api/members",
       });
 
-      return setMembers(mems.data.members);
+      return setMembers(res.data.members);
     } catch (error) {
       console.log(error);
     }
@@ -369,24 +396,23 @@ const Page: NextPage = () => {
     try {
       if (products.length > 0) return;
       if (products.length < 1) setStatus(true);
-      const pro = await axios.request({
+      const res = await axios.request({
         method: "GET",
         url: "/api/products",
       });
-      const pros = pro.data.products;
 
       setStatus(false);
-      setProducts(pros);
+      setProducts(res.data.products);
     } catch (error) {
       console.log(error);
     }
   };
 
-
   const fetchProduct = async () => {
     try {
-      setReviewsible(true)
-      const pr = await axios.request({
+      if (form.values.product !== proName) setReviewsible(true);
+      if (form.values.product === proName) return setReviewsible(false);
+      const res = await axios.request({
         method: "POST",
         url: `/api/products/${form.values.product}`,
         data: {
@@ -394,8 +420,8 @@ const Page: NextPage = () => {
         },
       });
 
-       pr.data?.product
-        ? pr.data?.product?.map((_: Products) => {
+      res.data?.product
+        ? res.data?.product?.map((_: Products) => {
             form.setFieldValue("productId", `${_.id}`);
             setIntRate(_.interestRate);
             setPenRate(_.penaltyRate);
@@ -408,7 +434,6 @@ const Page: NextPage = () => {
             setMinRange(+_.minimumRange);
           })
         : null;
-      setReviewsible(false)
     } catch (error) {
       console.log(error);
     }
@@ -426,21 +451,6 @@ const Page: NextPage = () => {
     };
   }, [form.values.product]);
 
-  useEffect(() => {
-    let subscribe = true;
-
-    if(subscribe) {
-    fetchMembers();
-    fetchMember();
-    fetchProducts();
-    fetchProduct();
-      }
-
-    return () => {
-      subscribe = false;
-    };
-  }, [products, form.values.product]);
-
   const calculateSundays = () => {
     let sundays = 0;
     let counter = 0;
@@ -457,6 +467,14 @@ const Page: NextPage = () => {
     }
 
     if (checked) setSundays(0);
+    const startsOn =
+      date.toLocaleDateString().split("/")[0] +
+      "-" +
+      date.toLocaleDateString().split("/")[1] +
+      "-" +
+      date.toLocaleDateString().split("/")[2];
+    setStartDate(startsOn);
+    setLoanRef(memberCode + "-" + "1");
   };
 
   const fillForm = () => {
@@ -572,18 +590,25 @@ const Page: NextPage = () => {
     }
   };
 
+
   useEffect(() => {
     let subscribe = true;
-    if (subscribe) {
-    calculateSundays();
-    fillForm();
-      }
 
+    if (subscribe) {
+      fetchMembers();
+      fetchMember();
+      fetchProducts();
+      fetchProduct();
+      fetchLoans();
+      calculateSundays();
+      fillForm();
+    }
 
     return () => {
       subscribe = false;
     };
   }, [
+    products,
     checked,
     sundays,
     intRate,
@@ -937,144 +962,155 @@ const Page: NextPage = () => {
 
   const Review = () => {
     return (
-    <>
-      <Card style={{
-        position: "relative"
-        }} shadow="sm" p="lg" radius="md" m="xl" withBorder>
-        <Card.Section withBorder inheritPadding py="xs">
-          <Group position="apart">
-            <TitleText title="Review" />
-          </Group>
-        </Card.Section>
-        <LoadingOverlay visible={reviewsible} overlayBlur={2} />
-        <Group position="apart" mt="md" mb="xs">
-          <Text weight={500}>
-            Include Payments on Sunday. (
-            {`${sundays} ${sundays === 1 ? "Sunday" : "Sundays"}`})
-          </Text>
-          <Switch
-            aria-label="Sundays"
-            size="md"
-            onLabel="ON"
-            offLabel="OFF"
-            checked={checked}
-            onChange={(event) => {
-              setChecked(event.currentTarget.checked);
-            }}
-          />
-        </Group>
-        <Group position="apart" mt="md" mb="xs">
-          <Text weight={500}>Loan Payoff</Text>
-          <Switch
-            aria-label="Payoff"
-            size="md"
-            onLabel="ON"
-            offLabel="OFF"
-            checked={payoff}
-            onChange={(event) => {
-              setPayoff(event.currentTarget.checked);
-            }}
-          />
-        </Group>
-
-        <Group position="apart" mt="md" mb="xs">
-          <Text weight={500}>Product</Text>
-          <Text weight={500}>{proName}</Text>
-        </Group>
-        <Group position="apart" mt="md" mb="xs">
-          <Text weight={500}>Interest Amount ({intRate} %)</Text>
-          {cycle.toLowerCase() === "daily" ? (
-            <Text weight={500}>
-              {renderDailyInterestAmount(
-                +intRate,
-                +form.values.principal,
-                +form.values.tenure
-              )}
-              .00
-            </Text>
-          ) : cycle.toLowerCase() === "weekly" ? (
-            <Text weight={500}>
-              {renderWeeklyInterestAmount(
-                +intRate,
-                +form.values.principal,
-                +form.values.tenure
-              )}
-              .00
-            </Text>
-          ) : (
-            <Text weight={500}>
-              {renderMonthlyInterestAmount(
-                +intRate,
-                +form.values.principal,
-                +form.values.tenure
-              )}
-              .00
-            </Text>
-          )}
-        </Group>
-        <Group position="apart" mt="md" mb="xs">
-          <Text weight={500}>Installment Amount</Text>
-          {cycle.toLowerCase() === "daily" ? (
-            <Text weight={500}>
-              {renderDailyInstallmentAmount(
-                +intRate,
-                +form.values.principal,
-                +form.values.tenure
-              )}
-              .00
-            </Text>
-          ) : cycle.toLowerCase() === "weekly" ? (
-            <Text weight={500}>
-              {renderWeeklyInstallmentAmount(
-                +intRate,
-                +form.values.principal,
-                +form.values.tenure
-              )}
-              .00
-            </Text>
-          ) : (
-            <Text weight={500}>
-              {renderMonthlyInstallmentAmount(
-                +intRate,
-                +form.values.principal,
-                +form.values.tenure
-              )}
-              .00
-            </Text>
-          )}
-        </Group>
-        <Group position="apart" mt="md" mb="xs">
-          <Text weight={500}>Penalty Amount ({penRate} %)</Text>
-          <Text weight={500}>
-            {renderPenaltyAmount(
-              +penRate,
-              +intRate,
-              cycle,
-              +form.values.principal,
-              +form.values.tenure
-            )}
-            .00
-          </Text>
-        </Group>
-        <Group position="apart" mt="md" mb="xs">
-          <Text weight={500}>Processing Fee Amount ({proRate} %)</Text>
-          <Text weight={500}>
-            {renderProcessingFeeAmount(+proRate, +form.values.principal)}
-            .00
-          </Text>
-        </Group>
-        <Group position="apart" mt="md" mb="xs">
-          <Text weight={500}>Repayment Cycle</Text>
-          <Text weight={500}>{cycle}</Text>
-        </Group>
-        {cycle.toLowerCase() === "daily" ? (
+      <>
+        <Card
+          style={{
+            position: "relative",
+          }}
+          shadow="sm"
+          p="lg"
+          radius="md"
+          m="xl"
+          withBorder
+        >
+          <Card.Section withBorder inheritPadding py="xs">
+            <Group position="apart">
+              <TitleText title="Review" />
+              <Group>
+                <Text weight={500}>First Installment Date</Text>
+                <Text weight={500}>{startDate}</Text>
+              </Group>
+            </Group>
+          </Card.Section>
+          <LoadingOverlay visible={reviewsible} overlayBlur={2} />
           <Group position="apart" mt="md" mb="xs">
-            <Text weight={500}>Grace Period</Text>
-            <Text weight={500}>{grace} Day</Text>
+            <Text weight={500}>
+              Include Payments on Sunday. (
+              {`${sundays} ${sundays === 1 ? "Sunday" : "Sundays"}`})
+            </Text>
+            <Switch
+              aria-label="Sundays"
+              size="md"
+              onLabel="ON"
+              offLabel="OFF"
+              checked={checked}
+              onChange={(event) => {
+                setChecked(event.currentTarget.checked);
+              }}
+            />
           </Group>
-        ) : null}
-      </Card>
-    </>
+          <Group position="apart" mt="md" mb="xs">
+            <Text weight={500}>Loan Payoff</Text>
+            <Switch
+              aria-label="Payoff"
+              size="md"
+              onLabel="ON"
+              offLabel="OFF"
+              checked={payoff}
+              onChange={(event) => {
+                setPayoff(event.currentTarget.checked);
+              }}
+            />
+          </Group>
+
+          <Group position="apart" mt="md" mb="xs">
+            <Text weight={500}>Product</Text>
+            <Text weight={500}>{proName}</Text>
+          </Group>
+          <Group position="apart" mt="md" mb="xs">
+            <Text weight={500}>Interest Amount ({intRate} %)</Text>
+            {cycle.toLowerCase() === "daily" ? (
+              <Text weight={500}>
+                {renderDailyInterestAmount(
+                  +intRate,
+                  +form.values.principal,
+                  +form.values.tenure
+                )}
+                .00
+              </Text>
+            ) : cycle.toLowerCase() === "weekly" ? (
+              <Text weight={500}>
+                {renderWeeklyInterestAmount(
+                  +intRate,
+                  +form.values.principal,
+                  +form.values.tenure
+                )}
+                .00
+              </Text>
+            ) : (
+              <Text weight={500}>
+                {renderMonthlyInterestAmount(
+                  +intRate,
+                  +form.values.principal,
+                  +form.values.tenure
+                )}
+                .00
+              </Text>
+            )}
+          </Group>
+          <Group position="apart" mt="md" mb="xs">
+            <Text weight={500}>Installment Amount</Text>
+            {cycle.toLowerCase() === "daily" ? (
+              <Text weight={500}>
+                {renderDailyInstallmentAmount(
+                  +intRate,
+                  +form.values.principal,
+                  +form.values.tenure
+                )}
+                .00
+              </Text>
+            ) : cycle.toLowerCase() === "weekly" ? (
+              <Text weight={500}>
+                {renderWeeklyInstallmentAmount(
+                  +intRate,
+                  +form.values.principal,
+                  +form.values.tenure
+                )}
+                .00
+              </Text>
+            ) : (
+              <Text weight={500}>
+                {renderMonthlyInstallmentAmount(
+                  +intRate,
+                  +form.values.principal,
+                  +form.values.tenure
+                )}
+                .00
+              </Text>
+            )}
+          </Group>
+          <Group position="apart" mt="md" mb="xs">
+            <Text weight={500}>Penalty Amount ({penRate} %)</Text>
+            <Text weight={500}>
+              {renderPenaltyAmount(
+                +penRate,
+                +intRate,
+                cycle,
+                +form.values.principal,
+                +form.values.tenure
+              )}
+              .00
+            </Text>
+          </Group>
+          <Group position="apart" mt="md" mb="xs">
+            <Text weight={500}>Processing Fee Amount ({proRate} %)</Text>
+            <Text weight={500}>
+              {renderProcessingFeeAmount(+proRate, +form.values.principal)}
+              .00
+            </Text>
+          </Group>
+          <Group position="apart" mt="md" mb="xs">
+            <Text weight={500}>Repayment Cycle</Text>
+            <Text weight={500}>{cycle}</Text>
+          </Group>
+          {cycle.toLowerCase() === "daily" ? (
+            <Group position="apart" mt="md" mb="xs">
+              <Text weight={500}>Grace Period</Text>
+              <Text weight={500}>{grace} Day</Text>
+            </Group>
+          ) : null}
+        </Card>
+      </>
     );
   };
 
