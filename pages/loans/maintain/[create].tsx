@@ -37,6 +37,7 @@ import {
   IconX,
 } from "@tabler/icons";
 import { Collaterals, Guarantors, Members, Products } from "../../../types";
+/* import { DatePicker } from "@mantine/dates"; */
 
 const loan_schema = z.object({
   member: z.string().min(2, { message: "User Name Missing" }),
@@ -263,7 +264,7 @@ const Page: NextPage = () => {
 
   const deleteCollateral = async (id: string) => {
     try {
-      const res = await axios.request({
+      await axios.request({
         method: "POST",
         url: "/api/members/collateral/delete",
         data: {
@@ -342,7 +343,7 @@ const Page: NextPage = () => {
         },
       });
       const len = res.data.loans.length + 1;
-      setLoanLen(len)
+      setLoanLen(len);
       return;
     } catch (error) {
       console.log(error);
@@ -465,17 +466,17 @@ const Page: NextPage = () => {
     if (!checked) setSundays(total_sundays);
     if (checked) setSundays(0);
     /* if (sundays === 5) setSundays(4); */
-      setLoanRef(
-        loanLen > 9
-          ? loanLen > 99
-            ? memberCode + `-${loanLen}`
-            : memberCode + `-0${loanLen}`
-          : memberCode + `-00${loanLen}`
-      );
+    setLoanRef(
+      loanLen > 9
+        ? loanLen > 99
+          ? memberCode + `-${loanLen}`
+          : memberCode + `-0${loanLen}`
+        : memberCode + `-00${loanLen}`
+    );
 
-      const date = new Date()
-    date.setDate(grace === 1 ? date.getDate() + 2 : date.getDate() + 0)
-    date.setDate(date.getDay() === 0 ? date.getDate() + 1 : date.getDate() + 0)
+    const date = new Date();
+    date.setDate(grace === 1 ? date.getDate() + 2 : date.getDate() + 0);
+    date.setDate(date.getDay() === 0 ? date.getDate() + 1 : date.getDate() + 0);
 
     const startsOn =
       date.toLocaleDateString().split("/")[0] +
@@ -484,8 +485,7 @@ const Page: NextPage = () => {
       "-" +
       date.toLocaleDateString().split("/")[2];
     setStartDate(startsOn);
-
-    }
+  };
 
   const fillForm = () => {
     form.setFieldValue("guarantorId", uuidV4().toString());
@@ -635,7 +635,7 @@ const Page: NextPage = () => {
     try {
       setLoad(true);
       setOpen(false);
-      const update = await axios.request({
+      await axios.request({
         method: "POST",
         url: "/api/members/update",
         data: {
@@ -643,6 +643,7 @@ const Page: NextPage = () => {
           maintained: form.values.maintained,
         },
       });
+
       const guarantor = await axios.request({
         method: "POST",
         url: "/api/members/guarantor/create-guarantor",
@@ -655,6 +656,7 @@ const Page: NextPage = () => {
           memberId: form.values.memberId,
         },
       });
+
       const loan = await axios.request({
         method: "POST",
         url: "/api/loans/create-loan",
@@ -677,8 +679,11 @@ const Page: NextPage = () => {
           productName: form.values.product,
           interest: form.values.interest,
           cycle: cycle,
+          startDate: startDate,
+          loanRef: loanRef,
         },
       });
+
       setTimeout(() => {
         updateNotification({
           id: "submit-status",
@@ -689,6 +694,7 @@ const Page: NextPage = () => {
           autoClose: 8000,
         });
       });
+
       form.setFieldValue("item", "");
       form.setFieldValue("value", "");
       form.setFieldValue("guarantorId", "");
@@ -708,13 +714,39 @@ const Page: NextPage = () => {
       form.setFieldValue("memberName", "");
       form.setFieldValue("productName", "");
       form.setFieldValue("interest", "");
+
       guarantor_form.setFieldValue("guarantorName", "");
       guarantor_form.setFieldValue("guarantorPhone", "");
       guarantor_form.setFieldValue("guarantorRelationship", "");
       guarantor_form.setFieldValue("guarantorID", "");
-      const res = await axios.get("/api/loans");
-      const data = res.data;
-      Router.replace(Router.asPath);
+
+      setLoad(false);
+      setActive(0);
+      setReviewsible(false);
+      setOpen(false);
+      setDeleteModal(false);
+      setCollateralId("");
+      setStartDate("");
+      setLoanRef("");
+      setLoanLen(0);
+      setMemberCode("");
+      setSundays(0);
+      setProducts([]);
+      setMembers([]);
+      setCollaterals([]);
+      setGuarantor([]);
+      setChangeGuarantor(false);
+      setIntRate("");
+      setProRate("");
+      setPenRate("");
+      setCycle("");
+      setProName("");
+      setGrace("");
+      setMaxTenure(0);
+      setMaxRange(0);
+      setMinRange(0);
+      setPayoffAmount(0);
+
       return router.push("/loans/approvals");
     } catch (error) {
       setTimeout(() => {
@@ -746,7 +778,7 @@ const Page: NextPage = () => {
             value: collateral_form.values.value,
           },
         });
-        console.log(add);
+
         collateral_form.setFieldValue("item", "");
         collateral_form.setFieldValue("value", "");
         return setTimeout(() => {
@@ -772,12 +804,11 @@ const Page: NextPage = () => {
         });
       });
     } catch (error) {
-      console.log(error);
       setTimeout(() => {
         updateNotification({
           id: "collateral-status",
           title: "Collateral Error!",
-          message: `Please Try Adding Again!`,
+          message: `${error}. Please Try Adding Again!`,
           icon: <IconX size={16} />,
           color: "red",
           autoClose: 4000,
@@ -986,11 +1017,9 @@ const Page: NextPage = () => {
           <Card.Section withBorder inheritPadding py="xs">
             <Group position="apart">
               <TitleText title="Review" />
-                <Text weight={500}>{loanRef.startsWith("-") ? null : loanRef}</Text>
-                {/* <Text weight={500}>First Installment Date</Text> */}
-                <Tooltip label="First Installment Date" color="blue" position="top" withArrow>
-                <Text weight={500}>{startDate}</Text>
-                </Tooltip>
+              <Text weight={500}>
+                {loanRef.startsWith("-") ? null : loanRef}
+              </Text>
             </Group>
           </Card.Section>
           <LoadingOverlay visible={reviewsible} overlayBlur={2} />
@@ -1120,6 +1149,18 @@ const Page: NextPage = () => {
               <Text weight={500}>{grace} Day</Text>
             </Group>
           ) : null}
+          {cycle.toLowerCase() === "daily" && (
+            <Group position="apart" mt="md" mb="xs">
+              <Text weight={500}>First Installment Date</Text>
+              <Text weight={500}>{startDate}</Text>
+              {/* <DatePicker */}
+              {/*   value={startDate} */}
+              {/*   onChange={setStartDate} */}
+              {/*   placeholder={`${startDate}`} */}
+              {/*   inputFormat="DD-MM-YYYY" */}
+              {/* /> */}
+            </Group>
+          )}
         </Card>
       </>
     );
@@ -1396,7 +1437,19 @@ const Page: NextPage = () => {
                       <TextInput
                         mt="md"
                         type="number"
-                        label="Enter Tenure"
+                        label={`Enter Tenure : ${form.values.tenure} ${
+                          cycle.toLowerCase() === "daily"
+                            ? +form.values.tenure === 1
+                              ? "Day"
+                              : "Days"
+                            : cycle.toLowerCase() === "weekly"
+                            ? +form.values.tenure === 1
+                              ? "Week"
+                              : "Weeks"
+                            : +form.values.tenure === 1
+                            ? "Month"
+                            : "Months"
+                        }`}
                         placeholder="Enter Tenure ..."
                         {...form.getInputProps("tenure")}
                         disabled={

@@ -25,6 +25,8 @@ async function create(req: NextApiRequest, res: NextApiResponse) {
         productName,
         interest,
         cycle,
+        startDate,
+        loanRef,
       } = req.body;
 
       await prisma.loan.create({
@@ -47,6 +49,8 @@ async function create(req: NextApiRequest, res: NextApiResponse) {
           interest: interest,
           cycle: cycle,
           guarantorId: guarantorId,
+          startDate: startDate,
+          loanRef: loanRef,
         },
       });
 
