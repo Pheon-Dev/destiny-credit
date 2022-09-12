@@ -71,5 +71,17 @@ export const loansRouter = createRouter()
       });
     },
   })
+  .query("member", {
+    input: z.object({
+      id: z.string(),
+    }),
+    resolve: async ({ input }) => {
+      return await prisma.loan.findMany({
+        where: {
+          memberId: input.id,
+        },
+      });
+    },
+  })
 
 

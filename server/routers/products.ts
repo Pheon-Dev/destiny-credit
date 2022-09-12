@@ -30,6 +30,18 @@ export const productsRouter = createRouter()
       return await prisma.product.findMany();
     },
   })
+  .query("product", {
+    input: z.object({
+      productName: z.string(),
+    }),
+    resolve: async ({ input }) => {
+      return await prisma.product.findFirst({
+        where: {
+          productName: input.productName,
+        },
+      });
+    },
+  })
   .mutation("create-product", {
     input: z.object({
       productId: z.string(),

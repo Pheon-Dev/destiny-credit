@@ -1,7 +1,6 @@
-import React, { useEffect, useState } from "react";
+import React, { useCallback, useEffect, useState } from "react";
 import { Protected, TitleText } from "../../../components";
 import { NextPage } from "next";
-import axios from "axios";
 import { z } from "zod";
 import { v4 as uuidV4 } from "uuid";
 import { useForm, zodResolver } from "@mantine/form";
@@ -36,7 +35,8 @@ import {
   IconTrash,
   IconX,
 } from "@tabler/icons";
-import { Collaterals, Guarantors, Members, Products } from "../../../types";
+import { trpc } from "../../../utils/trpc";
+import { Collateral, Guarantor, Loan, Member, Product } from "@prisma/client";
 /* import { DatePicker } from "@mantine/dates"; */
 
 const loan_schema = z.object({
@@ -71,27 +71,14 @@ const Page: NextPage = () => {
   const [collateralId, setCollateralId] = useState("");
   const [startDate, setStartDate] = useState("");
   const [loanRef, setLoanRef] = useState("");
-  const [loanLen, setLoanLen] = useState(0);
   const [memberCode, setMemberCode] = useState("");
   const [sundays, setSundays] = useState(0);
-  const [products, setProducts] = useState([]);
-  const [members, setMembers] = useState([]);
-  const [collaterals, setCollaterals] = useState([]);
-  const [guarantor, setGuarantor] = useState([]);
+  /* const [collaterals, setCollaterals] = useState([]); */
+  /* const [guarantor, setGuarantor] = useState([]); */
   const [changeGuarantor, setChangeGuarantor] = useState(false);
 
-  const [intRate, setIntRate] = useState("");
-  const [proRate, setProRate] = useState("");
-  const [penRate, setPenRate] = useState("");
-  const [cycle, setCycle] = useState("");
-  const [proName, setProName] = useState("");
-  const [grace, setGrace] = useState("");
-  const [maxTenure, setMaxTenure] = useState(0);
-  const [maxRange, setMaxRange] = useState(0);
-  const [minRange, setMinRange] = useState(0);
   const [payoffAmount, setPayoffAmount] = useState(0);
 
-  const [status, setStatus] = useState(false);
   const [checked, setChecked] = useState(false);
   const [payoff, setPayoff] = useState(false);
 
@@ -139,6 +126,58 @@ const Page: NextPage = () => {
     },
   });
 
+  const utils = trpc.useContext();
+
+  const collaterals = trpc.useQuery(["members.collaterals"]) || [];
+  const {data: guarantor } = trpc.useQuery(["members.guarantor", {id: id}]) || [];
+
+  const delete_collateral = trpc.useMutation(["members.collateral-delete"], {
+    onSuccess: async () => {
+      try {
+        updateNotification({
+          id: "collateral-delete-status",
+          color: "red",
+          title: "Collateral Deletion",
+          message: "Collateral Successfully Deleted",
+          icon: <IconCheck size={16} />,
+          autoClose: 5000,
+        });
+        await utils.invalidateQueries(["members.collaterals"]);
+      } catch (error) {
+        updateNotification({
+          id: "collateral-delete-status",
+          color: "red",
+          title: "Collateral Deletion Error",
+          message: "Collateral Unsuccessfully Deleted. Please Try Again.",
+          icon: <IconX size={16} />,
+          autoClose: 5000,
+        });
+      }
+    },
+  });
+
+const { data: loans } = trpc.useQuery(["loans.member", { id: id }]) || [];
+const loans_data = loans?.map((l: Loan) => l) || []
+const loanLen = loans_data?.length + 1;
+
+  const { data: members, status: members_status } = trpc.useQuery(["members.members"]) || [];
+  const members_data = members?.map((m: Member) => m) || [];
+
+  const { data: products, status: products_status } = trpc.useQuery(["products.products"]) || [];
+  const products_data = products?.map((p: Product) => p) || [];
+
+  const product = trpc.useQuery(["products.product", {productName: form.values.product}])
+  const pro_data = product?.data
+
+const intRate = pro_data?.interestRate || 0
+const penRate = pro_data?.penaltyRate || 0
+const cycle = pro_data?.repaymentCycle || ""
+const proRate = pro_data?.processingFee || 0
+const proName = pro_data?.productName || ""
+const grace = pro_data?.gracePeriod || 0
+const maxTenure = pro_data?.maximumTenure || 0
+const maxRange = pro_data?.maximumRange || 0
+const minRange = pro_data?.minimumRange || 0
   /* console.log(loanRef); */
   const nextStep = () => {
     if (form.values.principal.length > 0 && +form.values.principal < minRange) {
@@ -262,191 +301,8 @@ const Page: NextPage = () => {
     });
   };
 
-  const deleteCollateral = async (id: string) => {
-    try {
-      await axios.request({
-        method: "POST",
-        url: "/api/members/collateral/delete",
-        data: {
-          id: `${id}`,
-        },
-      });
-      setTimeout(() => {
-        updateNotification({
-          id: "collateral-delete-status",
-          color: "red",
-          title: "Collateral Deletion",
-          message: "Collateral Successfully Deleted",
-          icon: <IconCheck size={16} />,
-          autoClose: 5000,
-        });
-      });
-    } catch (error) {
-      setTimeout(() => {
-        updateNotification({
-          id: "collateral-delete-status",
-          color: "red",
-          title: "Collateral Deletion Error",
-          message: "Collateral Unsuccessfully Deleted. Please Try Again.",
-          icon: <IconX size={16} />,
-          autoClose: 5000,
-        });
-      });
-    }
-  };
-
   const prevStep = () =>
     setActive((current) => (current > 0 ? current - 1 : current));
-
-  const fetchCollaterals = async (signal: AbortSignal) => {
-    try {
-      if (collaterals.length > 0) return;
-      const res = await axios.request({
-        method: "POST",
-        url: `/api/members/collateral`,
-        data: {
-          id: `${id}`,
-        },
-        signal,
-      });
-      return setCollaterals(res.data.collaterals);
-    } catch (error) {
-      console.log(error);
-    }
-  };
-
-  const fetchGuarantor = async (signal: AbortSignal) => {
-    try {
-      if (guarantor.length > 0) return;
-      const res = await axios.request({
-        method: "POST",
-        url: `/api/members/guarantor`,
-        data: {
-          id: `${id}`,
-        },
-        signal,
-      });
-      return setGuarantor(res.data.guarantor);
-    } catch (error) {
-      console.log(error);
-    }
-  };
-
-  const fetchLoans = async () => {
-    try {
-      if (loanRef.startsWith("DC-")) return;
-      const res = await axios.request({
-        method: "POST",
-        url: `/api/loans/${id}`,
-        data: {
-          memberId: `${id}`,
-        },
-      });
-      const len = res.data.loans.length + 1;
-      setLoanLen(len);
-      return;
-    } catch (error) {
-      console.log(error);
-    }
-  };
-
-  const fetchMember = async () => {
-    try {
-      if (form.values.member.length > 0) return;
-      const res = await axios.request({
-        method: "POST",
-        url: `/api/members/${id}`,
-        data: {
-          id: `${id}`,
-        },
-      });
-
-      if (res.data.member[0]?.firstName?.length > 0) {
-        setMemberCode(res.data.member[0].memberId);
-        form.setFieldValue("memberId", `${res.data.member[0].id}`);
-        form.setFieldValue(
-          "member",
-          `${res.data.member[0].firstName} ${res.data.member[0].lastName}`
-        );
-      }
-      return;
-    } catch (error) {
-      console.log(error);
-    }
-  };
-
-  const fetchMembers = async () => {
-    try {
-      if (members.length > 0) return;
-      const res = await axios.request({
-        method: "GET",
-        url: "/api/members",
-      });
-
-      return setMembers(res.data.members);
-    } catch (error) {
-      console.log(error);
-    }
-  };
-
-  const fetchProducts = async () => {
-    try {
-      if (products.length > 0) return;
-      if (products.length < 1) setStatus(true);
-      const res = await axios.request({
-        method: "GET",
-        url: "/api/products",
-      });
-
-      setStatus(false);
-      setProducts(res.data.products);
-    } catch (error) {
-      console.log(error);
-    }
-  };
-
-  const fetchProduct = async () => {
-    try {
-      if (form.values.product !== proName) setReviewsible(true);
-      if (form.values.product === proName) return setReviewsible(false);
-      const res = await axios.request({
-        method: "POST",
-        url: `/api/products/${form.values.product}`,
-        data: {
-          productName: `${form.values.product}`,
-        },
-      });
-
-      res.data?.product
-        ? res.data?.product?.map((_: Products) => {
-            form.setFieldValue("productId", `${_.id}`);
-            setIntRate(_.interestRate);
-            setPenRate(_.penaltyRate);
-            setCycle(_.repaymentCycle);
-            setProRate(_.processingFee);
-            setProName(_.productName);
-            setGrace(_.gracePeriod);
-            setMaxTenure(+_.maximumTenure);
-            setMaxRange(+_.maximumRange);
-            setMinRange(+_.minimumRange);
-          })
-        : null;
-    } catch (error) {
-      console.log(error);
-    }
-  };
-
-  useEffect(() => {
-    const controller = new AbortController();
-    const signal = controller.signal;
-
-    fetchCollaterals(signal);
-    fetchGuarantor(signal);
-
-    return () => {
-      controller.abort();
-    };
-  }, [form.values.product]);
 
   const calcuDates = (grace: number, cycle: string) => {
     let counter = 0;
@@ -488,6 +344,7 @@ const Page: NextPage = () => {
   };
 
   const fillForm = () => {
+form.setFieldValue("productId", `${pro_data?.id}`);
     form.setFieldValue("guarantorId", uuidV4().toString());
     form.setFieldValue("payoff", `${payoffAmount}`);
     form.setFieldValue("sundays", `${sundays}`);
@@ -604,12 +461,6 @@ const Page: NextPage = () => {
     let subscribe = true;
 
     if (subscribe) {
-      fetchMembers();
-      fetchMember();
-      fetchProducts();
-      fetchProduct();
-      fetchLoans();
-      /* calculateSundays(); */
       fillForm();
       calcuDates(+grace, cycle.toLowerCase());
     }
@@ -618,7 +469,6 @@ const Page: NextPage = () => {
       subscribe = false;
     };
   }, [
-    products,
     checked,
     sundays,
     intRate,
@@ -631,36 +481,40 @@ const Page: NextPage = () => {
     collateral_form.values.value,
   ]);
 
-  const handleSubmit = async () => {
-    try {
-      setLoad(true);
+  const maintain_member = trpc.useMutation(["members.maintain-member"], {
+      onSuccess: async () => {
+        await utils.invalidateQueries(["members.collaterals"]);
+        },
+    })
+
+  const maintain_guarantor = trpc.useMutation(["members.maintain-guarantor"], {
+      onSuccess: async () => {
+        await utils.invalidateQueries(["members.collaterals"]);
+        },
+    })
+
+  const maintain_loan = trpc.useMutation(["members.maintain-loan"], {
+      onSuccess: async () => {
+        await utils.invalidateQueries(["members.collaterals"]);
+        },
+    })
+
+const createLoan = useCallback(() => {
+  try{
       setOpen(false);
-      await axios.request({
-        method: "POST",
-        url: "/api/members/update",
-        data: {
+    maintain_member.mutate({
           id: id,
           maintained: form.values.maintained,
-        },
-      });
-
-      const guarantor = await axios.request({
-        method: "POST",
-        url: "/api/members/guarantor/create-guarantor",
-        data: {
+      })
+    maintain_guarantor.mutate({
           id: form.values.guarantorId,
           guarantorName: guarantor_form.values.guarantorName,
           guarantorPhone: guarantor_form.values.guarantorPhone,
           guarantorRelationship: guarantor_form.values.guarantorRelationship,
           guarantorID: guarantor_form.values.guarantorID,
           memberId: form.values.memberId,
-        },
-      });
-
-      const loan = await axios.request({
-        method: "POST",
-        url: "/api/loans/create-loan",
-        data: {
+      })
+    maintain_loan.mutate({
           guarantorId: form.values.guarantorId,
           memberId: form.values.memberId,
           tenure: form.values.tenure,
@@ -681,15 +535,13 @@ const Page: NextPage = () => {
           cycle: cycle,
           startDate: startDate,
           loanRef: loanRef,
-        },
-      });
-
+      })
       setTimeout(() => {
         updateNotification({
           id: "submit-status",
           color: "teal",
-          title: `${loan.data.message.memberName}`,
-          message: `Loan Was Successfully Maintained and is Guaranteed by ${guarantor.data.message.guarantorName}.`,
+          title: `${maintain_loan.data?.memberName}`,
+          message: `Loan Was Successfully Maintained and is Guaranteed by ${maintain_guarantor.data?.guarantorName}.`,
           icon: <IconCheck size={16} />,
           autoClose: 8000,
         });
@@ -728,23 +580,9 @@ const Page: NextPage = () => {
       setCollateralId("");
       setStartDate("");
       setLoanRef("");
-      setLoanLen(0);
       setMemberCode("");
       setSundays(0);
-      setProducts([]);
-      setMembers([]);
-      setCollaterals([]);
-      setGuarantor([]);
       setChangeGuarantor(false);
-      setIntRate("");
-      setProRate("");
-      setPenRate("");
-      setCycle("");
-      setProName("");
-      setGrace("");
-      setMaxTenure(0);
-      setMaxRange(0);
-      setMinRange(0);
       setPayoffAmount(0);
 
       return router.push("/loans/approvals");
@@ -760,23 +598,25 @@ const Page: NextPage = () => {
         });
       });
     }
-  };
+  }, [])
 
-  const handleCollaterals = async () => {
+  const maintain_collateral = trpc.useMutation(["members.maintain-collateral"], {
+      onSuccess: async () => {
+        await utils.invalidateQueries(["members.collaterals"]);
+        },
+    })
+
+const createCollateral = useCallback(() => {
     try {
       if (
         form.values.memberId &&
         collateral_form.values.item &&
         collateral_form.values.value
       ) {
-        const add = await axios.request({
-          method: "POST",
-          url: "/api/members/collateral/create",
-          data: {
+        maintain_collateral.mutate({
             memberId: form.values.memberId,
             item: collateral_form.values.item.toUpperCase(),
             value: collateral_form.values.value,
-          },
         });
 
         collateral_form.setFieldValue("item", "");
@@ -786,7 +626,7 @@ const Page: NextPage = () => {
             id: "collateral-status",
             color: "teal",
             title: "Collaterals",
-            message: `${add.data.message.item} @ ${add.data.message.value} Added Successfully as Collateral!`,
+            message: `${maintain_collateral.data?.item} @ ${maintain_collateral.data?.value} Added Successfully as Collateral!`,
             icon: <IconCheck size={16} />,
             autoClose: 8000,
           });
@@ -815,7 +655,8 @@ const Page: NextPage = () => {
         });
       });
     }
-  };
+
+  }, [])
 
   const roundOff = (value: number) => {
     return (
@@ -911,16 +752,16 @@ const Page: NextPage = () => {
     return roundOff((penalty_rate / 100) * +installment);
   };
 
-  const product_data = products.map((_: Products) => [
+  const product_data = products_data?.map((_: Product) => [
     { key: _.id, value: `${_.id}`, label: `${_.productName}` },
   ]);
 
-  const guarantor_data = members.map((_: Members) => [
+  const guarantor_data = members_data?.map((_: Member) => [
     { key: _.id, value: `${_.id}`, label: `${_.firstName} ${_.lastName}` },
   ]);
 
   const findGuarantor = (name: string) => {
-    return members.find((e: Members) => {
+    return members_data?.find((e: Member) => {
       if (e.firstName + " " + e.lastName === name) {
         guarantor_form.setFieldValue("guarantorPhone", `${e.phoneNumber}`);
         guarantor_form.setFieldValue("guarantorID", `${e.idPass}`);
@@ -971,8 +812,8 @@ const Page: NextPage = () => {
       findGuarantor(guarantor_form.values.guarantorName);
     }
 
-    if (guarantor.length > 0 && !changeGuarantor) {
-      guarantor.map((_: Guarantors) => {
+    if (guarantor && !changeGuarantor) {
+      guarantor?.map((_: Guarantor) => {
         findGuarantor(_.guarantorName);
         guarantor_form.setFieldValue("guarantorPhone", `${_.guarantorPhone}`);
         guarantor_form.setFieldValue("guarantorID", `${_.guarantorID}`);
@@ -1022,7 +863,7 @@ const Page: NextPage = () => {
               </Text>
             </Group>
           </Card.Section>
-          <LoadingOverlay visible={reviewsible} overlayBlur={2} />
+          <LoadingOverlay visible={product.status === "loading"} overlayBlur={2} />
           <Group position="apart" mt="md" mb="xs">
             <Text weight={500}>
               Include Payments on Sunday. (
@@ -1328,8 +1169,8 @@ const Page: NextPage = () => {
                   <TitleText title={`Collaterals`} />
                 </Group>
               </Card.Section>
-              {collaterals.length > 0 &&
-                collaterals.map((collateral: Collaterals, index: number) => (
+              {collaterals &&
+                collaterals.data?.map((collateral: Collateral) => (
                   <Grid key={collateral.id} grow>
                     <Grid.Col mt="md" span={4}>
                       <Text>{collateral.item}</Text>
@@ -1361,7 +1202,7 @@ const Page: NextPage = () => {
                       loading: true,
                       autoClose: 50000,
                     });
-                    handleSubmit();
+                    createLoan();
                   }}
                 >
                   Submit
@@ -1387,7 +1228,7 @@ const Page: NextPage = () => {
             <Stepper.Step
               label="Loan Maintenance"
               description="Select a Member & a Product."
-              loading={status}
+              loading={products_status === "loading"}
               allowStepSelect={active > 0}
             >
               <Box>
@@ -1549,9 +1390,9 @@ const Page: NextPage = () => {
                       </Menu>
                     </Group>
                   </Card.Section>
-                  {collaterals.length > 0 &&
-                    collaterals.map(
-                      (collateral: Collaterals, index: number) => (
+                  {collaterals &&
+                    collaterals.data?.map(
+                      (collateral: Collateral, index: number) => (
                         <div key={collateral.id}>
                           <Card.Section withBorder inheritPadding py="xs">
                             <Grid grow columns={12}>
@@ -1650,7 +1491,10 @@ const Page: NextPage = () => {
                                     radius="md"
                                     onClick={() => {
                                       setDeleteModal(false);
-                                      deleteCollateral(`${collateralId}`);
+                                      /* deleteCollateral(`${collateralId}`); */
+                                      delete_collateral.mutate({
+                                        id: collateralId,
+                                      });
                                     }}
                                   >
                                     Proceed
@@ -1699,7 +1543,7 @@ const Page: NextPage = () => {
                                         loading: true,
                                         autoClose: 50000,
                                       });
-                                      handleCollaterals();
+                                      createCollateral();
                                     }}
                                   >
                                     <IconPlus color="teal" size={24} />

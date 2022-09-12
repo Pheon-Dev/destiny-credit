@@ -52,7 +52,7 @@ const defaultMembersSelect = Prisma.validator<Prisma.MemberSelect>()({
   numberKin: true,
   maintained: true,
   group: true,
-})
+});
 
 export const membersRouter = createRouter()
   .query("members", {
@@ -150,4 +150,136 @@ export const membersRouter = createRouter()
         },
       });
     },
-  });
+  })
+  .query("collaterals", {
+    resolve: async () => {
+      return await prisma.collateral.findMany();
+    },
+  })
+  .mutation("collateral-delete", {
+    input: z.object({
+      id: z.string(),
+    }),
+    resolve: async ({ input }) => {
+      return await prisma.collateral.deleteMany({
+        where: { id: input.id },
+      });
+    },
+  })
+  .query("guarantor", {
+    input: z.object({
+      id: z.string(),
+    }),
+    resolve: async ({ input }) => {
+      return await prisma.guarantor.findMany({
+        where: {
+          memberId: input.id,
+        },
+      });
+    },
+  })
+  .mutation("maintain-member", {
+    input: z.object({
+      id: z.string(),
+      maintained: z.boolean(),
+    }),
+    resolve: async ({ input }) => {
+      return await prisma.member.update({
+        where: {
+          id: input.id,
+        },
+        data: {
+          maintained: input.maintained
+        }
+      });
+    },
+  })
+  .mutation("maintain-collateral", {
+    input: z.object({
+      item: z.string(),
+      value: z.string(),
+      memberId: z.string(),
+    }),
+    resolve: async ({ input }) => {
+      return await prisma.collateral.create({
+        data: {
+          item: input.value,
+          value: input.value,
+          memberId: input.memberId,
+        }
+      });
+    },
+  })
+  .mutation("maintain-guarantor", {
+    input: z.object({
+      id: z.string(),
+      guarantorName: z.string(),
+      guarantorPhone: z.string(),
+      guarantorRelationship: z.string(),
+      guarantorID: z.string(),
+      memberId: z.string(),
+    }),
+    resolve: async ({ input }) => {
+      return await prisma.guarantor.create({
+        data: {
+          id: input.id,
+          guarantorName: input.guarantorName,
+          guarantorPhone: input.guarantorPhone,
+          guarantorRelationship: input.guarantorRelationship,
+          guarantorID: input.guarantorID,
+          memberId: input.memberId,
+        }
+      });
+    },
+  })
+  .mutation("maintain-loan", {
+    input: z.object({
+      memberId: z.string(),
+      tenure: z.string(),
+      principal: z.string(),
+      maintained: z.boolean(),
+      approved: z.boolean(),
+      disbursed: z.boolean(),
+      grace: z.string(),
+      installment: z.string(),
+      productId: z.string(),
+      payoff: z.string(),
+      penalty: z.string(),
+      processingFee: z.string(),
+      sundays: z.string(),
+      memberName: z.string(),
+      productName: z.string(),
+      interest: z.string(),
+      cycle: z.string(),
+      guarantorId: z.string(),
+      startDate: z.string(),
+      loanRef: z.string(),
+    }),
+    resolve: async ({ input }) => {
+      return await prisma.loan.create({
+        data: {
+          memberId: input.memberId,
+          tenure: input.tenure,
+          principal: input.principal,
+          maintained: input.maintained,
+          approved: input.approved,
+          disbursed: input.disbursed,
+          grace: input.grace,
+          installment: input.installment,
+          productId: input.productId,
+          payoff: input.payoff,
+          penalty: input.penalty,
+          processingFee: input.processingFee,
+          sundays: input.sundays,
+          memberName: input.memberName,
+          productName: input.productName,
+          interest: input.interest,
+          cycle: input.cycle,
+          guarantorId: input.guarantorId,
+          startDate: input.startDate,
+          loanRef: input.loanRef,
+        }
+      });
+    },
+  })
+
