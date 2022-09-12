@@ -71,6 +71,10 @@ export type Transactions = {
   lastName: string;
 };
 
+export interface Transaction extends Transactions {
+  transction: Transactions;
+}
+
 export interface Title {
   title: string;
 }

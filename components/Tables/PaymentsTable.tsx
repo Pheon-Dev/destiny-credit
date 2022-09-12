@@ -49,7 +49,7 @@ function LoanRow({ loan, call }: { loan: Loans; call: string }) {
           <td>
               <Badge
                 style={{ cursor: "pointer" }}
-                onClick={() => router.push(`/loans/disburse/${loan.id}`)}
+                onClick={() => router.push(`/loans/payments/${loan.id}`)}
                 variant="gradient"
                 gradient={{
                   from: "teal",
