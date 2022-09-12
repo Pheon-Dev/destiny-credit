@@ -1,7 +1,7 @@
 import React from "react";
 import { trpc } from "../../utils/trpc";
-import { ProductsTable } from "../../components";
 import { Product } from "@prisma/client";
+import { ProductsTable } from "../../components";
 import { Group, LoadingOverlay, Text } from "@mantine/core";
 
 const ProductsList = () => {

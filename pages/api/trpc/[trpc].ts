@@ -212,6 +212,44 @@ export const appRouter = trpc
     resolve: async () => {
       return await prisma.product.findMany();
     },
+  })
+  .mutation("createProduct", {
+    input: z.object({
+      productId: z.string(),
+      productName: z.string(),
+      minimumRange: z.string(),
+      maximumRange: z.string(),
+      interestRate: z.string(),
+      frequency: z.string(),
+      maximumTenure: z.string(),
+      repaymentCycle: z.string(),
+      processingFee: z.string(),
+      gracePeriod: z.string(),
+      penaltyRate: z.string(),
+      penaltyCharge: z.string(),
+      penaltyPayment: z.string(),
+      approved: z.boolean(),
+    }),
+    resolve: async ({ input }) => {
+      return await prisma.product.create({
+        data: {
+          productId: input.productId,
+          productName: input.productName,
+          minimumRange: input.minimumRange,
+          maximumRange: input.maximumRange,
+          interestRate: input.interestRate,
+          frequency: input.frequency,
+          maximumTenure: input.maximumTenure,
+          repaymentCycle: input.repaymentCycle,
+          processingFee: input.processingFee,
+          gracePeriod: input.gracePeriod,
+          penaltyRate: input.penaltyRate,
+          penaltyCharge: input.penaltyCharge,
+          penaltyPayment: input.penaltyPayment,
+          approved: input.approved,
+        },
+      });
+    },
   });
 
 export type AppRouter = typeof appRouter;
