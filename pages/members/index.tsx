@@ -3,22 +3,20 @@ import { MembersTable } from "../../components";
 import { Group, LoadingOverlay, Text } from "@mantine/core";
 import { NextPage } from "next";
 import { trpc } from "../../utils/trpc";
-import { Member } from "@prisma/client";
 
 const MembersList = () => {
-  const members = trpc.useQuery(["members"]) || [];
-  const data = members.data?.map((m: Member) => m);
+  const { data: members, status } = trpc.useQuery(["members.members"])
 
   return (
     <>
-      {data && <MembersTable members={data} call="all-members" />}
-      {members.status === "loading" && (
+      {members && <MembersTable members={members} call="all-members" />}
+      {status === "loading" && (
         <LoadingOverlay
           overlayBlur={2}
-          visible={members.status === "loading"}
+          visible={status === "loading"}
         />
       )}
-      {members.status === "success" && members.data.length === 0 && (
+      {status === "success" && members.length === 0 && (
         <Group position="center">
           <Text>No Registered Members</Text>
         </Group>

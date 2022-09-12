@@ -2,22 +2,20 @@ import React from "react";
 import { trpc } from "../../utils/trpc";
 import { PaymentsTable } from "../../components";
 import { Group, LoadingOverlay, Text } from "@mantine/core";
-import { Loan } from "@prisma/client";
 
 const PaymentsList = () => {
-  const loans = trpc.useQuery(["loans"]) || [];
-  const data = loans.data?.map((l: Loan) => l);
+  const { data: loans, status } = trpc.useQuery(["loans.loans"]);
 
   return (
     <>
-      {data && <PaymentsTable loans={data} call="payments" />}
-      {loans.status === "loading" &&
+      {loans && <PaymentsTable loans={loans} call="payments" />}
+      {status === "loading" &&
         <LoadingOverlay
           overlayBlur={2}
-          visible={loans.status === "loading"}
+          visible={status === "loading"}
         />
       }
-      {loans.status === "success" && loans.data.length === 0 && (
+      {status === "success" && loans.length === 0 && (
         <Group position="center">
           <Text>No Disbursed loans</Text>
         </Group>

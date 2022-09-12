@@ -1,5 +1,4 @@
-import React, { useCallback, useEffect, useState } from "react";
-import axios from "axios";
+import React, { useCallback, useState } from "react";
 import { trpc } from "../../utils/trpc";
 import { Product } from "@prisma/client";
 import { z } from "zod";
@@ -40,7 +39,8 @@ const CreateProduct = () => {
   const [load, setLoad] = useState(false);
   const router = useRouter();
 
-  const { data: products, refetch } = trpc.useQuery(["products"]) || [];
+  const { data: products, refetch } =
+    trpc.useQuery(["products.products"]) || [];
   const data = products?.map((p: Product) => p) || [];
 
   const lencode: number = data.length + 1;
@@ -73,26 +73,38 @@ const CreateProduct = () => {
     },
   });
 
-  const product = trpc.useMutation(["createProduct"], {
+  const product = trpc.useMutation(["products.create-product"], {
     onSuccess: () => refetch(),
   });
 
   const createProduct = useCallback(() => {
     try {
-      if (form.values.productId === "") return;
-      if (form.values.productName === "") return;
-      if (form.values.minimumRange === "") return;
-      if (form.values.maximumRange === "") return;
-      if (form.values.interestRate === "") return;
-      if (form.values.frequency === "") return;
-      if (form.values.maximumTenure === "") return;
-      if (form.values.repaymentCycle === "") return;
-      if (form.values.processingFee === "") return;
-      if (form.values.gracePeriod === "") return;
-      if (form.values.penaltyRate === "") return;
-      if (form.values.penaltyCharge === "") return;
-      if (form.values.penaltyPayment === "") return;
-      if (form.values.approved === true) return;
+      if (
+        form.values.productId === "" ||
+        form.values.productName === "" ||
+        form.values.minimumRange === "" ||
+        form.values.maximumRange === "" ||
+        form.values.interestRate === "" ||
+        form.values.frequency === "" ||
+        form.values.maximumTenure === "" ||
+        form.values.repaymentCycle === "" ||
+        form.values.processingFee === "" ||
+        form.values.gracePeriod === "" ||
+        form.values.penaltyRate === "" ||
+        form.values.penaltyCharge === "" ||
+        form.values.penaltyPayment === "" ||
+        form.values.approved === true
+      ) {
+        return updateNotification({
+          id: "submit",
+          title: "Missing Fields",
+          message: "Please Make Sure All Fields Are Filled!",
+          color: "red",
+          icon: <IconAlertCircle size={16} />,
+          autoClose: 5000,
+        });
+      }
+
       setLoad(true);
       product.mutate({
         productId: form.values.productId.toUpperCase(),

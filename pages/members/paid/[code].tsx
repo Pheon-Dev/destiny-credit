@@ -1,5 +1,4 @@
-import React, { useEffect, useState } from "react";
-import axios from "axios";
+import React, { useEffect } from "react";
 import { z } from "zod";
 import { useForm, zodResolver } from "@mantine/form";
 import { IconAlertCircle, IconCalendar, IconCheck, IconX } from "@tabler/icons";
@@ -13,9 +12,11 @@ import {
   Group,
   Select,
 } from "@mantine/core";
-import { TitleText } from "../../../components";
+import { Protected, TitleText } from "../../../components";
 import { useRouter } from "next/router";
 import { showNotification, updateNotification } from "@mantine/notifications";
+import { trpc } from "../../../utils/trpc";
+import { Member } from "@prisma/client";
 
 const schema = z.object({
   date: z.date({ required_error: "Select Todays' Date" }),
@@ -68,59 +69,44 @@ const schema = z.object({
   numberKin: z.string().min(2, { message: "Enter  Phone # (kin)" }),
 });
 
-const CreateMember = ({ memcode }: { memcode: string }) => {
-  const [transaction, setTransaction] = useState();
-  const [amount, setAmount] = useState(0);
-  const [fName, setFName] = useState("");
-  const [mName, setMName] = useState("");
-  const [lName, setLName] = useState("");
-  const [pNumber, setPNumber] = useState("");
-  const [mId, setMId] = useState("");
-
+const CreateMember = () => {
   const router = useRouter();
   const id = router.query.code as string;
 
-  const fetchTransaction = async () => {
-    let subscribe = true;
-    if (subscribe) {
-      const res = await axios.request({
-        method: "POST",
-        url: `/api/transactions/${id}`,
-        data: {
-          id: `${id}`,
-        },
-      });
-      setTransaction(res.data);
-      setAmount(res.data.transaction[0].transAmount);
-      setFName(res.data.transaction[0].firstName);
-      setLName(res.data.transaction[0].lastName);
-      setMName(res.data.transaction[0].middleName);
-      setPNumber(res.data.transaction[0].msisdn);
-      setMId(res.data.transaction[0].id);
-    }
+  const {
+    data: members,
+    status,
+    refetch,
+  } = trpc.useQuery(["members.members"]) || [];
+  const members_data = members?.map((m: Member) => m) || [];
 
-    return () => {
-      subscribe = false;
-    };
-  };
+  const transaction = trpc.useQuery(["transactions.transaction", { id: id }]);
+  const data = transaction?.data;
 
-  useEffect(() => {
-    fetchTransaction();
-  }, [transaction, amount]);
+  const lencode = members_data?.length + 1;
+
+  const memcode =
+    lencode > 9
+      ? lencode > 99
+        ? lencode > 999
+          ? lencode
+          : "DC-0" + `${lencode}`
+        : "DC-00" + `${lencode}`
+      : "DC-000" + `${lencode}`;
 
   const form = useForm({
     validate: zodResolver(schema),
     initialValues: {
-      id: `${mId}`,
+      id: data?.id,
       date: "",
       branchName: "Eldoret",
       memberId: `${memcode}`,
-      firstName: `${fName}`,
-      lastName: `${mName} ${lName}`,
+      firstName: `${data?.firstName}`,
+      lastName: `${data?.middleName} ${data?.lastName}`,
       dob: "",
       idPass: "",
       kraPin: "",
-      phoneNumber: `${pNumber}`,
+      phoneNumber: `${data?.msisdn}`,
       gender: "",
       age: "0",
       religion: "",
@@ -141,8 +127,8 @@ const CreateMember = ({ memcode }: { memcode: string }) => {
       refereeName: "",
       refereeNumber: "",
       communityPosition: "",
-      mpesaCode: `${id}`,
-      membershipAmount: `${amount}`,
+      mpesaCode: `${data?.transID}`,
+      membershipAmount: `${data?.transAmount}`,
       nameKin: "",
       relationship: "",
       residentialAddressKin: "",
@@ -157,12 +143,12 @@ const CreateMember = ({ memcode }: { memcode: string }) => {
 
   useEffect(() => {
     form.setFieldValue("memberId", `${memcode}`);
-    form.setFieldValue("firstName", `${fName}`);
-    form.setFieldValue("lastName", `${mName} ${lName}`);
-    form.setFieldValue("id", `${mId}`);
-    form.setFieldValue("phoneNumber", `${pNumber}`);
-    form.setFieldValue("membershipAmount", `${amount}`);
-  }, [memcode, transaction]);
+    form.setFieldValue("firstName", `${data?.firstName}`);
+    form.setFieldValue("lastName", `${data?.middleName} ${data?.lastName}`);
+    form.setFieldValue("id", `${data?.id}`);
+    form.setFieldValue("phoneNumber", `${data?.msisdn}`);
+    form.setFieldValue("membershipAmount", `${data?.transAmount}`);
+  }, [memcode, data]);
 
   let today_date = new Date(form.values.date);
   let birth_date = new Date(form.values.dob);
@@ -222,165 +208,161 @@ const CreateMember = ({ memcode }: { memcode: string }) => {
     return () => (subscribe = false);
   }, [age_result]);
 
+  const member = trpc.useMutation(["members.register"], {
+    onSuccess: () => refetch(),
+  });
+
   const handleSave = async () => {
     try {
-      if (
-        (form.values.date &&
-          form.values.branchName &&
-          form.values.memberId &&
-          form.values.firstName &&
-          form.values.lastName &&
-          form.values.dob &&
-          form.values.idPass &&
-          form.values.kraPin &&
-          form.values.phoneNumber &&
-          form.values.gender &&
-          form.values.age &&
-          form.values.religion &&
-          form.values.maritalStatus &&
-          form.values.spouseName &&
-          form.values.spouseNumber &&
-          form.values.postalAddress &&
-          form.values.postalCode &&
-          form.values.cityTown &&
-          form.values.residentialAddress &&
-          form.values.emailAddress &&
-          form.values.rentedOwned &&
-          form.values.landCareAgent &&
-          form.values.occupationEmployer &&
-          form.values.employerNumber &&
-          form.values.businessLocation &&
-          form.values.businessAge &&
-          form.values.refereeName &&
-          form.values.refereeNumber &&
-          form.values.communityPosition &&
-          form.values.mpesaCode &&
-          form.values.membershipAmount &&
-          form.values.nameKin &&
-          form.values.relationship &&
-          form.values.residentialAddressKin &&
-          form.values.postalAddressKin &&
-          form.values.postalCodeKin &&
-          form.values.cityTownKin &&
-          form.values.numberKin) ||
-        form.values.group ||
-        form.values.maintained
-      ) {
-        const res = await axios.request({
-          method: "POST",
-          url: "/api/register",
-          data: {
-            date: `${dash_today_date}`,
-            branchName: form.values.branchName.toUpperCase(),
-            memberId: form.values.memberId.toUpperCase(),
-            firstName: form.values.firstName.toUpperCase(),
-            lastName: form.values.lastName.toUpperCase(),
-            dob: `${dash_birth_date}`,
-            idPass: form.values.idPass.toUpperCase(),
-            kraPin: form.values.kraPin.toUpperCase(),
-            phoneNumber: form.values.phoneNumber.toUpperCase(),
-            gender: form.values.gender.toUpperCase(),
-            age: form.values.age.toUpperCase(),
-            religion: form.values.religion.toUpperCase(),
-            maritalStatus: form.values.maritalStatus.toUpperCase(),
-            spouseName: form.values.spouseName.toUpperCase(),
-            spouseNumber: form.values.spouseNumber.toUpperCase(),
-            postalAddress: form.values.postalAddress.toUpperCase(),
-            postalCode: form.values.postalCode.toUpperCase(),
-            cityTown: form.values.cityTown.toUpperCase(),
-            residentialAddress: form.values.residentialAddress.toUpperCase(),
-            emailAddress: form.values.emailAddress.toUpperCase(),
-            rentedOwned: form.values.rentedOwned.toUpperCase(),
-            landCareAgent: form.values.landCareAgent.toUpperCase(),
-            occupationEmployer: form.values.occupationEmployer.toUpperCase(),
-            employerNumber: form.values.employerNumber.toUpperCase(),
-            businessLocation: form.values.businessLocation.toUpperCase(),
-            businessAge: form.values.businessAge.toUpperCase(),
-            refereeName: form.values.refereeName.toUpperCase(),
-            refereeNumber: form.values.refereeNumber.toUpperCase(),
-            communityPosition: form.values.communityPosition.toUpperCase(),
-            mpesaCode: form.values.mpesaCode.toUpperCase(),
-            membershipAmount: form.values.membershipAmount.toUpperCase(),
-            nameKin: form.values.nameKin.toUpperCase(),
-            relationship: form.values.relationship.toUpperCase(),
-            residentialAddressKin:
-              form.values.residentialAddressKin.toUpperCase(),
-            postalAddressKin: form.values.postalAddressKin.toUpperCase(),
-            postalCodeKin: form.values.postalCodeKin.toUpperCase(),
-            cityTownKin: form.values.cityTownKin.toUpperCase(),
-            numberKin: form.values.numberKin.toUpperCase(),
-            group: false,
-            maintained: false,
-          },
-        });
+      /* if ( */
+      /*   form.values.date === "" || */
+      /*   form.values.branchName === "" || */
+      /*   form.values.memberId === "" || */
+      /*   form.values.firstName === "" || */
+      /*   form.values.lastName === "" || */
+      /*   form.values.dob === "" || */
+      /*   form.values.idPass === "" || */
+      /*   form.values.kraPin === "" || */
+      /*   form.values.phoneNumber === "" || */
+      /*   form.values.gender === "" || */
+      /*   form.values.age === "" || */
+      /*   form.values.religion === "" || */
+      /*   form.values.maritalStatus === "" || */
+      /*   form.values.spouseName === "" || */
+      /*   form.values.spouseNumber === "" || */
+      /*   form.values.postalAddress === "" || */
+      /*   form.values.postalCode === "" || */
+      /*   form.values.cityTown === "" || */
+      /*   form.values.residentialAddress === "" || */
+      /*   form.values.emailAddress === "" || */
+      /*   form.values.rentedOwned === "" || */
+      /*   form.values.landCareAgent === "" || */
+      /*   form.values.occupationEmployer === "" || */
+      /*   form.values.employerNumber === "" || */
+      /*   form.values.businessLocation === "" || */
+      /*   form.values.businessAge === "" || */
+      /*   form.values.refereeName === "" || */
+      /*   form.values.refereeNumber === "" || */
+      /*   form.values.communityPosition === "" || */
+      /*   form.values.mpesaCode === "" || */
+      /*   form.values.membershipAmount === "" || */
+      /*   form.values.nameKin === "" || */
+      /*   form.values.relationship === "" || */
+      /*   form.values.residentialAddressKin === "" || */
+      /*   form.values.postalAddressKin === "" || */
+      /*   form.values.postalCodeKin === "" || */
+      /*   form.values.cityTownKin === "" || */
+      /*   form.values.numberKin === "" || */
+      /*   form.values.group === true || */
+      /*   form.values.maintained === false */
+      /* ) { */
+      /*   return updateNotification({ */
+      /*     id: "submit", */
+      /*     title: "Missing Fields", */
+      /*     message: "Please Make Sure All Fields Are Filled!", */
+      /*     color: "red", */
+      /*     icon: <IconAlertCircle size={16} />, */
+      /*     autoClose: 5000, */
+      /*   }); */
+      /* } */
 
-        local_today_date = "";
-        local_birth_date = "";
-        form.setFieldValue("date", "");
-        form.setFieldValue("branchName", "");
-        form.setFieldValue("memberId", "");
-        form.setFieldValue("firstName", "");
-        form.setFieldValue("lastName", "");
-        form.setFieldValue("dob", "");
-        form.setFieldValue("idPass", "");
-        form.setFieldValue("kraPin", "");
-        form.setFieldValue("phoneNumber", "");
-        form.setFieldValue("gender", "");
-        form.setFieldValue("age", "");
-        form.setFieldValue("religion", "");
-        form.setFieldValue("maritalStatus", "");
-        form.setFieldValue("spouseName", "");
-        form.setFieldValue("spouseNumber", "");
-        form.setFieldValue("postalAddress", "");
-        form.setFieldValue("postalCode", "");
-        form.setFieldValue("cityTown", "");
-        form.setFieldValue("residentialAddress", "");
-        form.setFieldValue("emailAddress", "");
-        form.setFieldValue("rentedOwned", "");
-        form.setFieldValue("landCareAgent", "");
-        form.setFieldValue("occupationEmployer", "");
-        form.setFieldValue("employerNumber", "");
-        form.setFieldValue("businessLocation", "");
-        form.setFieldValue("businessAge", "");
-        form.setFieldValue("refereeName", "");
-        form.setFieldValue("refereeNumber", "");
-        form.setFieldValue("communityPosition", "");
-        form.setFieldValue("mpesaCode", "");
-        form.setFieldValue("membershipAmount", "");
-        form.setFieldValue("nameKin", "");
-        form.setFieldValue("relationship", "");
-        form.setFieldValue("residentialAddressKin", "");
-        form.setFieldValue("postalAddressKin", "");
-        form.setFieldValue("postalCodeKin", "");
-        form.setFieldValue("cityTownKin", "");
-        form.setFieldValue("numberKin", "");
-        form.setFieldValue("group", false);
-        form.setFieldValue("maintained", false);
+      member.mutate({
+          date: dash_today_date,
+          branchName: form.values.branchName.toUpperCase(),
+          memberId: form.values.memberId.toUpperCase(),
+          firstName: form.values.firstName.toUpperCase(),
+          lastName: form.values.lastName.toUpperCase(),
+          dob: dash_birth_date,
+          idPass: form.values.idPass.toUpperCase(),
+          kraPin: form.values.kraPin.toUpperCase(),
+          phoneNumber: form.values.phoneNumber.toUpperCase(),
+          gender: form.values.gender.toUpperCase(),
+          age: form.values.age.toUpperCase(),
+          religion: form.values.religion.toUpperCase(),
+          maritalStatus: form.values.maritalStatus.toUpperCase(),
+          spouseName: form.values.spouseName.toUpperCase(),
+          spouseNumber: form.values.spouseNumber.toUpperCase(),
+          postalAddress: form.values.postalAddress.toUpperCase(),
+          postalCode: form.values.postalCode.toUpperCase(),
+          cityTown: form.values.cityTown.toUpperCase(),
+          residentialAddress: form.values.residentialAddress.toUpperCase(),
+          emailAddress: form.values.emailAddress.toUpperCase(),
+          rentedOwned: form.values.rentedOwned.toUpperCase(),
+          landCareAgent: form.values.landCareAgent.toUpperCase(),
+          occupationEmployer: form.values.occupationEmployer.toUpperCase(),
+          employerNumber: form.values.employerNumber.toUpperCase(),
+          businessLocation: form.values.businessLocation.toUpperCase(),
+          businessAge: form.values.businessAge.toUpperCase(),
+          refereeName: form.values.refereeName.toUpperCase(),
+          refereeNumber: form.values.refereeNumber.toUpperCase(),
+          communityPosition: form.values.communityPosition.toUpperCase(),
+          mpesaCode: form.values.mpesaCode.toUpperCase(),
+          membershipAmount: form.values.membershipAmount.toUpperCase(),
+          nameKin: form.values.nameKin.toUpperCase(),
+          relationship: form.values.relationship.toUpperCase(),
+          residentialAddressKin:
+            form.values.residentialAddressKin.toUpperCase(),
+          postalAddressKin: form.values.postalAddressKin.toUpperCase(),
+          postalCodeKin: form.values.postalCodeKin.toUpperCase(),
+          cityTownKin: form.values.cityTownKin.toUpperCase(),
+          numberKin: form.values.numberKin.toUpperCase(),
+          group: false,
+          maintained: false,
+      });
 
-        setTimeout(() => {
-          updateNotification({
-            id: "submit",
-            color: "teal",
-            title: `${res.data.firstName} ${res.data.lastName}`,
-            message: "Member Registered Successfully!",
-            icon: <IconCheck size={16} />,
-            autoClose: 5000,
-          });
-        }, 2000);
-        return router.push("/members");
-      }
-      setTimeout(() => {
-        updateNotification({
-          id: "submit",
-          title: "Missing Fields",
-          message: "Please Make Sure All Fields Are Filled!",
-          color: "red",
-          icon: <IconAlertCircle size={16} />,
-          autoClose: 5000,
-        });
-      }, 2000);
+      local_today_date = "";
+      local_birth_date = "";
+      form.setFieldValue("date", "");
+      form.setFieldValue("branchName", "");
+      form.setFieldValue("memberId", "");
+      form.setFieldValue("firstName", "");
+      form.setFieldValue("lastName", "");
+      form.setFieldValue("dob", "");
+      form.setFieldValue("idPass", "");
+      form.setFieldValue("kraPin", "");
+      form.setFieldValue("phoneNumber", "");
+      form.setFieldValue("gender", "");
+      form.setFieldValue("age", "");
+      form.setFieldValue("religion", "");
+      form.setFieldValue("maritalStatus", "");
+      form.setFieldValue("spouseName", "");
+      form.setFieldValue("spouseNumber", "");
+      form.setFieldValue("postalAddress", "");
+      form.setFieldValue("postalCode", "");
+      form.setFieldValue("cityTown", "");
+      form.setFieldValue("residentialAddress", "");
+      form.setFieldValue("emailAddress", "");
+      form.setFieldValue("rentedOwned", "");
+      form.setFieldValue("landCareAgent", "");
+      form.setFieldValue("occupationEmployer", "");
+      form.setFieldValue("employerNumber", "");
+      form.setFieldValue("businessLocation", "");
+      form.setFieldValue("businessAge", "");
+      form.setFieldValue("refereeName", "");
+      form.setFieldValue("refereeNumber", "");
+      form.setFieldValue("communityPosition", "");
+      form.setFieldValue("mpesaCode", "");
+      form.setFieldValue("membershipAmount", "");
+      form.setFieldValue("nameKin", "");
+      form.setFieldValue("relationship", "");
+      form.setFieldValue("residentialAddressKin", "");
+      form.setFieldValue("postalAddressKin", "");
+      form.setFieldValue("postalCodeKin", "");
+      form.setFieldValue("cityTownKin", "");
+      form.setFieldValue("numberKin", "");
+      form.setFieldValue("group", false);
+      form.setFieldValue("maintained", false);
+
+      updateNotification({
+        id: "submit",
+        color: "teal",
+        title: `${member.data?.firstName} ${member.data?.lastName}`,
+        message: "Member Registered Successfully!",
+        icon: <IconCheck size={16} />,
+        autoClose: 5000,
+      });
+      return router.push("/members");
     } catch (error) {
-      setTimeout(() => {
         updateNotification({
           id: "submit",
           title: "Missing Fields",
@@ -389,328 +371,366 @@ const CreateMember = ({ memcode }: { memcode: string }) => {
           icon: <IconX size={16} />,
           autoClose: 5000,
         });
-      }, 2000);
     }
   };
 
   return (
-    <form
-    //     onSubmit={() => {
-    //       form.onSubmit((values) => {
-    //           console.log(values);
-    // handleSave();
-    //         });
-    //     }}
+    <div
+      style={{
+        position: "relative",
+      }}
     >
-      <Group position="center" m="md">
-        <TitleText title="Member Registration" />
-      </Group>
+      {status === "loading" && transaction.status === "loading" && (
+        <LoadingOverlay
+          overlayBlur={2}
+          visible={status === "loading" && transaction.status === "loading"}
+        />
+      )}
+      <LoadingOverlay
+        overlayBlur={2}
+        visible={status === "loading" && transaction.status === "loading"}
+      />
+      <form>
+        <Group position="center" m="md">
+          <TitleText title="Member Registration" />
+        </Group>
 
-      <Grid grow>
-        <Grid.Col span={4}>
-          <DatePicker
-            label="Date"
-            placeholder="Date"
-            icon={<IconCalendar size={16} />}
-            inputFormat="DD-MM-YYYY"
-            dropdownType="modal"
-            firstDayOfWeek="sunday"
-            // renderDay={(date) => {
-            //   const today = new Date();
-            //   const day = date.getDate();
-            //   return (
-            //     <Indicator
-            //       size={6}
-            //       color="blue"
-            //       offset={8}
-            //       disabled={day !== Number(today.getDate())}
-            //     >
-            //       <div>{day}</div>
-            //     </Indicator>
-            //   );
-            // }}
-            {...form.getInputProps("date")}
-            required
-          />
-        </Grid.Col>
-        <Grid.Col span={4}>
-          <TextInput
-            label="Branch Name"
-            placeholder="Branch Name"
-            {...form.getInputProps("branchName")}
-            required
-          />
-        </Grid.Col>
-        <Grid.Col span={4}>
-          <TextInput
-            label="Member ID"
-            placeholder="Member ID"
-            {...form.getInputProps("memberId")}
-            disabled
-          />
-        </Grid.Col>
-      </Grid>
+        <Grid grow>
+          <Grid.Col span={4}>
+            <DatePicker
+              label="Date"
+              placeholder="Date"
+              icon={<IconCalendar size={16} />}
+              inputFormat="DD-MM-YYYY"
+              dropdownType="modal"
+              firstDayOfWeek="sunday"
+              // renderDay={(date) => {
+              //   const today = new Date();
+              //   const day = date.getDate();
+              //   return (
+              //     <Indicator
+              //       size={6}
+              //       color="blue"
+              //       offset={8}
+              //       disabled={day !== Number(today.getDate())}
+              //     >
+              //       <div>{day}</div>
+              //     </Indicator>
+              //   );
+              // }}
+              {...form.getInputProps("date")}
+              required
+            />
+          </Grid.Col>
+          <Grid.Col span={4}>
+            <TextInput
+              label="Branch Name"
+              placeholder="Branch Name"
+              {...form.getInputProps("branchName")}
+              required
+            />
+          </Grid.Col>
+          <Grid.Col span={4}>
+            <TextInput
+              label="Member ID"
+              placeholder="Member ID"
+              {...form.getInputProps("memberId")}
+              disabled
+            />
+          </Grid.Col>
+        </Grid>
 
-      <Divider mt="lg" variant="dashed" my="sm" />
-      <Group position="center" m="md">
-        <TitleText title="Personal Details" />
-      </Group>
+        <Divider mt="lg" variant="dashed" my="sm" />
+        <Group position="center" m="md">
+          <TitleText title="Personal Details" />
+        </Group>
 
-      <Grid grow>
-        <Grid.Col span={4}>
-          <TextInput
-            mt="md"
-            label="First Name"
-            placeholder="First Name"
-            {...form.getInputProps("firstName")}
-            required
-          />
-        </Grid.Col>
-        <Grid.Col span={4}>
-          <TextInput
-            mt="md"
-            label="Last Name (other names)"
-            placeholder="Last Name (other names)"
-            {...form.getInputProps("lastName")}
-            required
-          />
-        </Grid.Col>
-        <Grid.Col span={4}>
-          <TextInput
-            mt="md"
-            label="Phone #"
-            placeholder="Phone #"
-            {...form.getInputProps("phoneNumber")}
-            required
-          />
-        </Grid.Col>
-      </Grid>
+        <Grid grow>
+          <Grid.Col span={4}>
+            <TextInput
+              mt="md"
+              label="First Name"
+              placeholder="First Name"
+              {...form.getInputProps("firstName")}
+              required
+            />
+          </Grid.Col>
+          <Grid.Col span={4}>
+            <TextInput
+              mt="md"
+              label="Last Name (other names)"
+              placeholder="Last Name (other names)"
+              {...form.getInputProps("lastName")}
+              required
+            />
+          </Grid.Col>
+          <Grid.Col span={4}>
+            <TextInput
+              mt="md"
+              label="Phone #"
+              placeholder="Phone #"
+              {...form.getInputProps("phoneNumber")}
+              required
+            />
+          </Grid.Col>
+        </Grid>
 
-      <Grid grow>
-        <Grid.Col span={4}>
-          <DatePicker
-            mt="md"
-            label="Date of Birth"
-            placeholder="Date of Birth"
-            icon={<IconCalendar size={16} />}
-            inputFormat="DD-MM-YYYY"
-            dropdownType="modal"
-            firstDayOfWeek="sunday"
-            {...form.getInputProps("dob")}
-            required
-          />
-        </Grid.Col>
-        <Grid.Col span={4}>
-          <TextInput
-            mt="md"
-            label="ID | Passport #"
-            placeholder="ID | Passport #"
-            {...form.getInputProps("idPass")}
-            required
-          />
-        </Grid.Col>
-        <Grid.Col span={4}>
-          <TextInput
-            mt="md"
-            label="KRA PIN"
-            placeholder="KRA PIN"
-            {...form.getInputProps("kraPin")}
-            required
-          />
-        </Grid.Col>
-      </Grid>
+        <Grid grow>
+          <Grid.Col span={4}>
+            <DatePicker
+              mt="md"
+              label="Date of Birth"
+              placeholder="Date of Birth"
+              icon={<IconCalendar size={16} />}
+              inputFormat="DD-MM-YYYY"
+              dropdownType="modal"
+              firstDayOfWeek="sunday"
+              {...form.getInputProps("dob")}
+              required
+            />
+          </Grid.Col>
+          <Grid.Col span={4}>
+            <TextInput
+              mt="md"
+              label="ID | Passport #"
+              placeholder="ID | Passport #"
+              {...form.getInputProps("idPass")}
+              required
+            />
+          </Grid.Col>
+          <Grid.Col span={4}>
+            <TextInput
+              mt="md"
+              label="KRA PIN"
+              placeholder="KRA PIN"
+              {...form.getInputProps("kraPin")}
+              required
+            />
+          </Grid.Col>
+        </Grid>
 
-      <Grid grow>
-        <Grid.Col span={4}>
-          <Select
-            mt="md"
-            label="Gender"
-            placeholder="Gender"
-            data={[
-              { value: "female", label: "Female" },
-              { value: "male", label: "Male" },
-            ]}
-            {...form.getInputProps("gender")}
-            required
-          />
-        </Grid.Col>
-        <Grid.Col span={4}>
-          <TextInput
-            mt="md"
-            label="Age"
-            value={age_result}
-            placeholder="Age"
-            {...form.getInputProps("age")}
-            disabled
-          />
-        </Grid.Col>
-        <Grid.Col span={4}>
-          <Select
-            mt="md"
-            label="Religion"
-            placeholder="Religion"
-            data={[
-              { value: "christian", label: "Christian" },
-              { value: "muslim", label: "Muslim" },
-              { value: "hindu", label: "Hindu" },
-              { value: "other", label: "Other" },
-            ]}
-            {...form.getInputProps("religion")}
-            required
-          />
-        </Grid.Col>
-      </Grid>
+        <Grid grow>
+          <Grid.Col span={4}>
+            <Select
+              mt="md"
+              label="Gender"
+              placeholder="Gender"
+              data={[
+                { value: "female", label: "Female" },
+                { value: "male", label: "Male" },
+              ]}
+              {...form.getInputProps("gender")}
+              required
+            />
+          </Grid.Col>
+          <Grid.Col span={4}>
+            <TextInput
+              mt="md"
+              label="Age"
+              value={age_result}
+              placeholder="Age"
+              {...form.getInputProps("age")}
+              disabled
+            />
+          </Grid.Col>
+          <Grid.Col span={4}>
+            <Select
+              mt="md"
+              label="Religion"
+              placeholder="Religion"
+              data={[
+                { value: "christian", label: "Christian" },
+                { value: "muslim", label: "Muslim" },
+                { value: "hindu", label: "Hindu" },
+                { value: "other", label: "Other" },
+              ]}
+              {...form.getInputProps("religion")}
+              required
+            />
+          </Grid.Col>
+        </Grid>
 
-      <Grid grow>
-        <Grid.Col span={4}>
-          <Select
-            mt="md"
-            label="Marital Status"
-            placeholder="Marital Status"
-            data={[
-              { value: "single", label: "Single" },
-              { value: "married", label: "Married" },
-              { value: "widowed", label: "Widowed" },
-            ]}
-            {...form.getInputProps("maritalStatus")}
-            required
-          />
-        </Grid.Col>
-        {form.values.maritalStatus === "married" ? (
-          <>
+        <Grid grow>
+          <Grid.Col span={4}>
+            <Select
+              mt="md"
+              label="Marital Status"
+              placeholder="Marital Status"
+              data={[
+                { value: "single", label: "Single" },
+                { value: "married", label: "Married" },
+                { value: "widowed", label: "Widowed" },
+              ]}
+              {...form.getInputProps("maritalStatus")}
+              required
+            />
+          </Grid.Col>
+          {form.values.maritalStatus === "married" ? (
+            <>
+              <Grid.Col span={4}>
+                <TextInput
+                  mt="md"
+                  label="Names (spouse)"
+                  placeholder="Names (spouse)"
+                  {...form.getInputProps("spouseName")}
+                  required
+                />
+              </Grid.Col>
+              <Grid.Col span={4}>
+                <TextInput
+                  mt="md"
+                  label="Phone # (spouse)"
+                  placeholder="Phone # (spouse)"
+                  {...form.getInputProps("spouseNumber")}
+                  required
+                />
+              </Grid.Col>
+            </>
+          ) : (
             <Grid.Col span={4}>
               <TextInput
                 mt="md"
-                label="Names (spouse)"
-                placeholder="Names (spouse)"
-                {...form.getInputProps("spouseName")}
+                label="Postal Address"
+                placeholder="Postal Address"
+                {...form.getInputProps("postalAddress")}
                 required
               />
             </Grid.Col>
+          )}
+        </Grid>
+
+        <Grid grow>
+          {form.values.maritalStatus === "married" ? (
             <Grid.Col span={4}>
               <TextInput
                 mt="md"
-                label="Phone # (spouse)"
-                placeholder="Phone # (spouse)"
-                {...form.getInputProps("spouseNumber")}
+                label="Postal Address"
+                placeholder="Postal Address"
+                {...form.getInputProps("postalAddress")}
                 required
               />
             </Grid.Col>
-          </>
-        ) : (
+          ) : null}
           <Grid.Col span={4}>
             <TextInput
               mt="md"
-              label="Postal Address"
-              placeholder="Postal Address"
-              {...form.getInputProps("postalAddress")}
+              label="Postal Code"
+              placeholder="Postal Code"
+              {...form.getInputProps("postalCode")}
               required
             />
           </Grid.Col>
-        )}
-      </Grid>
+          <Grid.Col span={4}>
+            <TextInput
+              mt="md"
+              label="City | Town"
+              placeholder="City | Town"
+              {...form.getInputProps("cityTown")}
+              required
+            />
+          </Grid.Col>
+        </Grid>
 
-      <Grid grow>
-        {form.values.maritalStatus === "married" ? (
+        <Grid grow>
           <Grid.Col span={4}>
             <TextInput
               mt="md"
-              label="Postal Address"
-              placeholder="Postal Address"
-              {...form.getInputProps("postalAddress")}
+              label="Email Address"
+              placeholder="Email Address"
+              {...form.getInputProps("emailAddress")}
               required
             />
           </Grid.Col>
-        ) : null}
-        <Grid.Col span={4}>
-          <TextInput
-            mt="md"
-            label="Postal Code"
-            placeholder="Postal Code"
-            {...form.getInputProps("postalCode")}
-            required
-          />
-        </Grid.Col>
-        <Grid.Col span={4}>
-          <TextInput
-            mt="md"
-            label="City | Town"
-            placeholder="City | Town"
-            {...form.getInputProps("cityTown")}
-            required
-          />
-        </Grid.Col>
-      </Grid>
+          <Grid.Col span={4}>
+            <TextInput
+              mt="md"
+              label="Residential Address"
+              placeholder="Residential Address"
+              {...form.getInputProps("residentialAddress")}
+              required
+            />
+          </Grid.Col>
+          <Grid.Col span={4}>
+            <Select
+              mt="md"
+              label="Rented | Owned"
+              placeholder="Rented | Owned"
+              data={[
+                { value: "rented", label: "Rented" },
+                { value: "owned", label: "Owned" },
+              ]}
+              {...form.getInputProps("rentedOwned")}
+              required
+            />
+          </Grid.Col>
+        </Grid>
 
-      <Grid grow>
-        <Grid.Col span={4}>
-          <TextInput
-            mt="md"
-            label="Email Address"
-            placeholder="Email Address"
-            {...form.getInputProps("emailAddress")}
-            required
-          />
-        </Grid.Col>
-        <Grid.Col span={4}>
-          <TextInput
-            mt="md"
-            label="Residential Address"
-            placeholder="Residential Address"
-            {...form.getInputProps("residentialAddress")}
-            required
-          />
-        </Grid.Col>
-        <Grid.Col span={4}>
-          <Select
-            mt="md"
-            label="Rented | Owned"
-            placeholder="Rented | Owned"
-            data={[
-              { value: "rented", label: "Rented" },
-              { value: "owned", label: "Owned" },
-            ]}
-            {...form.getInputProps("rentedOwned")}
-            required
-          />
-        </Grid.Col>
-      </Grid>
-
-      <Grid grow>
-        {form.values.rentedOwned === "rented" ? (
-          <Grid.Col span={4}>
-            <TextInput
-              mt="md"
-              label="Landlord | Care Taker | Agent (names)"
-              placeholder="Landlord | Care Taker | Agent (names)"
-              {...form.getInputProps("landCareAgent")}
-              required
-            />
-          </Grid.Col>
-        ) : (
-          <Grid.Col span={4}>
-            <TextInput
-              mt="md"
-              label="Occupation | Employer"
-              placeholder="Occupation | Employer"
-              {...form.getInputProps("occupationEmployer")}
-              required
-            />
-          </Grid.Col>
-        )}
-        {form.values.rentedOwned !== "rented" ? null : (
-          <Grid.Col span={4}>
-            <TextInput
-              mt="md"
-              label="Occupation | Employer"
-              placeholder="Occupation | Employer"
-              {...form.getInputProps("occupationEmployer")}
-              required
-            />
-          </Grid.Col>
-        )}
-        {form.values.occupationEmployer.toUpperCase() === "BUSINESS" ? (
-          <>
+        <Grid grow>
+          {form.values.rentedOwned === "rented" ? (
+            <Grid.Col span={4}>
+              <TextInput
+                mt="md"
+                label="Landlord | Care Taker | Agent (names)"
+                placeholder="Landlord | Care Taker | Agent (names)"
+                {...form.getInputProps("landCareAgent")}
+                required
+              />
+            </Grid.Col>
+          ) : (
+            <Grid.Col span={4}>
+              <TextInput
+                mt="md"
+                label="Occupation | Employer"
+                placeholder="Occupation | Employer"
+                {...form.getInputProps("occupationEmployer")}
+                required
+              />
+            </Grid.Col>
+          )}
+          {form.values.rentedOwned !== "rented" ? null : (
+            <Grid.Col span={4}>
+              <TextInput
+                mt="md"
+                label="Occupation | Employer"
+                placeholder="Occupation | Employer"
+                {...form.getInputProps("occupationEmployer")}
+                required
+              />
+            </Grid.Col>
+          )}
+          {form.values.occupationEmployer.toUpperCase() === "BUSINESS" ? (
+            <>
+              <Grid.Col span={4}>
+                <TextInput
+                  mt="md"
+                  label="Business Location"
+                  placeholder="Business Location"
+                  {...form.getInputProps("businessLocation")}
+                  required
+                />
+              </Grid.Col>
+              <Grid.Col span={4}>
+                <TextInput
+                  mt="md"
+                  label="Age of Business"
+                  placeholder="Age of Business"
+                  {...form.getInputProps("businessAge")}
+                  required
+                />
+              </Grid.Col>
+            </>
+          ) : (
+            <Grid.Col span={4}>
+              <TextInput
+                mt="md"
+                label="Employer Contacts"
+                placeholder="Employer Contacts"
+                {...form.getInputProps("employerNumber")}
+                required
+              />
+            </Grid.Col>
+          )}
+          {form.values.occupationEmployer.toUpperCase() !== "BUSINESS" ? (
             <Grid.Col span={4}>
               <TextInput
                 mt="md"
@@ -720,6 +740,11 @@ const CreateMember = ({ memcode }: { memcode: string }) => {
                 required
               />
             </Grid.Col>
+          ) : null}
+        </Grid>
+
+        <Grid grow>
+          {form.values.occupationEmployer.toUpperCase() !== "BUSINESS" ? (
             <Grid.Col span={4}>
               <TextInput
                 mt="md"
@@ -729,274 +754,203 @@ const CreateMember = ({ memcode }: { memcode: string }) => {
                 required
               />
             </Grid.Col>
-          </>
-        ) : (
+          ) : null}
           <Grid.Col span={4}>
             <TextInput
               mt="md"
-              label="Employer Contacts"
-              placeholder="Employer Contacts"
-              {...form.getInputProps("employerNumber")}
+              label="Referee (name)"
+              placeholder="Referee (name)"
+              {...form.getInputProps("refereeName")}
               required
             />
           </Grid.Col>
-        )}
-        {form.values.occupationEmployer.toUpperCase() !== "BUSINESS" ? (
           <Grid.Col span={4}>
             <TextInput
               mt="md"
-              label="Business Location"
-              placeholder="Business Location"
-              {...form.getInputProps("businessLocation")}
+              label="Phone # (referee)"
+              placeholder="Phone # (referee)"
+              {...form.getInputProps("refereeNumber")}
               required
             />
           </Grid.Col>
-        ) : null}
-      </Grid>
+          {form.values.occupationEmployer.toUpperCase() === "BUSINESS" ? (
+            <Grid.Col span={4}>
+              <TextInput
+                mt="md"
+                label="Position in Community"
+                placeholder="Position in Community"
+                {...form.getInputProps("communityPosition")}
+                required
+              />
+            </Grid.Col>
+          ) : null}
+        </Grid>
 
-      <Grid grow>
-        {form.values.occupationEmployer.toUpperCase() !== "BUSINESS" ? (
+        <Grid grow>
+          {form.values.occupationEmployer.toUpperCase() !== "BUSINESS" ? (
+            <Grid.Col span={4}>
+              <TextInput
+                mt="md"
+                label="Position in Community"
+                placeholder="Position in Community"
+                {...form.getInputProps("communityPosition")}
+                required
+              />
+            </Grid.Col>
+          ) : null}
           <Grid.Col span={4}>
             <TextInput
               mt="md"
-              label="Age of Business"
-              placeholder="Age of Business"
-              {...form.getInputProps("businessAge")}
+              label="Membership Fee (M-PESA Code)"
+              placeholder="Membership Fee (M-PESA Code)"
+              {...form.getInputProps("mpesaCode")}
               required
             />
           </Grid.Col>
-        ) : null}
-        <Grid.Col span={4}>
-          <TextInput
-            mt="md"
-            label="Referee (name)"
-            placeholder="Referee (name)"
-            {...form.getInputProps("refereeName")}
-            required
-          />
-        </Grid.Col>
-        <Grid.Col span={4}>
-          <TextInput
-            mt="md"
-            label="Phone # (referee)"
-            placeholder="Phone # (referee)"
-            {...form.getInputProps("refereeNumber")}
-            required
-          />
-        </Grid.Col>
-        {form.values.occupationEmployer.toUpperCase() === "BUSINESS" ? (
           <Grid.Col span={4}>
             <TextInput
               mt="md"
-              label="Position in Community"
-              placeholder="Position in Community"
-              {...form.getInputProps("communityPosition")}
+              label="Membership Fee Amount"
+              placeholder="Membership Fee Amount"
+              {...form.getInputProps("membershipAmount")}
               required
             />
           </Grid.Col>
-        ) : null}
-      </Grid>
+        </Grid>
 
-      <Grid grow>
-        {form.values.occupationEmployer.toUpperCase() !== "BUSINESS" ? (
+        <Divider mt="lg" variant="dashed" my="sm" />
+        <Group position="center" m="md">
+          <TitleText title="Next of Kin Details" />
+        </Group>
+
+        <Grid grow>
           <Grid.Col span={4}>
             <TextInput
               mt="md"
-              label="Position in Community"
-              placeholder="Position in Community"
-              {...form.getInputProps("communityPosition")}
+              label="Names (kin)"
+              placeholder="Names (kin)"
+              {...form.getInputProps("nameKin")}
               required
             />
           </Grid.Col>
-        ) : null}
-        <Grid.Col span={4}>
-          <TextInput
-            mt="md"
-            label="Membership Fee (M-PESA Code)"
-            placeholder="Membership Fee (M-PESA Code)"
-            {...form.getInputProps("mpesaCode")}
-            required
-          />
-        </Grid.Col>
-        <Grid.Col span={4}>
-          <TextInput
-            mt="md"
-            label="Membership Fee Amount"
-            placeholder="Membership Fee Amount"
-            {...form.getInputProps("membershipAmount")}
-            required
-          />
-        </Grid.Col>
-      </Grid>
+          <Grid.Col span={4}>
+            <TextInput
+              mt="md"
+              label="Relationship"
+              placeholder="Relationship"
+              {...form.getInputProps("relationship")}
+              required
+            />
+          </Grid.Col>
+          <Grid.Col span={4}>
+            <TextInput
+              mt="md"
+              label="Phone # (kin)"
+              placeholder="Phone # (kin)"
+              {...form.getInputProps("numberKin")}
+              required
+            />
+          </Grid.Col>
+        </Grid>
 
-      <Divider mt="lg" variant="dashed" my="sm" />
-      <Group position="center" m="md">
-        <TitleText title="Next of Kin Details" />
-      </Group>
+        <Grid grow>
+          <Grid.Col span={4}>
+            <TextInput
+              mt="md"
+              label="Residential Address"
+              placeholder="Residential Address"
+              {...form.getInputProps("residentialAddressKin")}
+              required
+            />
+          </Grid.Col>
+          <Grid.Col span={4}>
+            <TextInput
+              mt="md"
+              label="City | Town"
+              placeholder="City | Town"
+              {...form.getInputProps("cityTownKin")}
+              required
+            />
+          </Grid.Col>
+        </Grid>
 
-      <Grid grow>
-        <Grid.Col span={4}>
-          <TextInput
-            mt="md"
-            label="Names (kin)"
-            placeholder="Names (kin)"
-            {...form.getInputProps("nameKin")}
-            required
-          />
-        </Grid.Col>
-        <Grid.Col span={4}>
-          <TextInput
-            mt="md"
-            label="Relationship"
-            placeholder="Relationship"
-            {...form.getInputProps("relationship")}
-            required
-          />
-        </Grid.Col>
-        <Grid.Col span={4}>
-          <TextInput
-            mt="md"
-            label="Phone # (kin)"
-            placeholder="Phone # (kin)"
-            {...form.getInputProps("numberKin")}
-            required
-          />
-        </Grid.Col>
-      </Grid>
+        <Grid grow>
+          <Grid.Col span={4}>
+            <TextInput
+              mt="md"
+              label="Postal Address"
+              placeholder="Postal Address"
+              {...form.getInputProps("postalAddressKin")}
+              required
+            />
+          </Grid.Col>
+          <Grid.Col span={4}>
+            <TextInput
+              mt="md"
+              label="Postal Code"
+              placeholder="Postal Code"
+              {...form.getInputProps("postalCodeKin")}
+              required
+            />
+          </Grid.Col>
+        </Grid>
 
-      <Grid grow>
-        <Grid.Col span={4}>
-          <TextInput
-            mt="md"
-            label="Residential Address"
-            placeholder="Residential Address"
-            {...form.getInputProps("residentialAddressKin")}
-            required
-          />
-        </Grid.Col>
-        <Grid.Col span={4}>
-          <TextInput
-            mt="md"
-            label="City | Town"
-            placeholder="City | Town"
-            {...form.getInputProps("cityTownKin")}
-            required
-          />
-        </Grid.Col>
-      </Grid>
-
-      <Grid grow>
-        <Grid.Col span={4}>
-          <TextInput
-            mt="md"
-            label="Postal Address"
-            placeholder="Postal Address"
-            {...form.getInputProps("postalAddressKin")}
-            required
-          />
-        </Grid.Col>
-        <Grid.Col span={4}>
-          <TextInput
-            mt="md"
-            label="Postal Code"
-            placeholder="Postal Code"
-            {...form.getInputProps("postalCodeKin")}
-            required
-          />
-        </Grid.Col>
-      </Grid>
-
-      <Divider mt="lg" variant="dashed" my="sm" />
-      <Group position="center" mt="xl">
-        <Button
-          // type="submit"
-          variant="outline"
-          onClick={() => {
-            form.setFieldValue("memberId", `${memcode}`);
-            form.setFieldValue("date", `${new Date(local_today_date)}`);
-            form.setFieldValue("dob", `${new Date(local_birth_date)}`);
-            {
-              form.values.maritalStatus !== "married"
-                ? null
-                : form.setFieldValue("spouseName", "NA");
-            }
-            {
-              form.values.maritalStatus !== "married"
-                ? null
-                : form.setFieldValue("spouseNumber", "NA");
-            }
-            {
-              form.values.rentedOwned !== "owned"
-                ? null
-                : form.setFieldValue("landCareAgent", "NA");
-            }
-            {
-              form.values.rentedOwned.toUpperCase() !== "BUSINESS"
-                ? null
-                : form.setFieldValue("employerNumber", "NA");
-            }
-            form.setFieldValue("branchName", "Eldoret");
-            form.setFieldValue("group", false);
-            form.setFieldValue("maintained", false);
-            form.validate();
-            showNotification({
-              id: "submit",
-              title: "Member Registration",
-              message: "Registering New Member ...",
-              disallowClose: true,
-              loading: true,
-            });
-            handleSave();
-          }}
-        >
-          Submit
-        </Button>
-      </Group>
-    </form>
+        <Divider mt="lg" variant="dashed" my="sm" />
+        <Group position="center" mt="xl">
+          <Button
+            // type="submit"
+            variant="outline"
+            onClick={() => {
+              form.setFieldValue("memberId", `${memcode}`);
+              form.setFieldValue("date", `${new Date(local_today_date)}`);
+              form.setFieldValue("dob", `${new Date(local_birth_date)}`);
+              {
+                form.values.maritalStatus !== "married"
+                  ? null
+                  : form.setFieldValue("spouseName", "NA");
+              }
+              {
+                form.values.maritalStatus !== "married"
+                  ? null
+                  : form.setFieldValue("spouseNumber", "NA");
+              }
+              {
+                form.values.rentedOwned !== "owned"
+                  ? null
+                  : form.setFieldValue("landCareAgent", "NA");
+              }
+              {
+                form.values.rentedOwned.toUpperCase() !== "BUSINESS"
+                  ? null
+                  : form.setFieldValue("employerNumber", "NA");
+              }
+              form.setFieldValue("branchName", "Eldoret");
+              form.setFieldValue("group", false);
+              form.setFieldValue("maintained", false);
+              form.validate();
+              showNotification({
+                id: "submit",
+                title: "Member Registration",
+                message: "Registering New Member ...",
+                disallowClose: true,
+                loading: true,
+              });
+              handleSave();
+            }}
+          >
+            Submit
+          </Button>
+        </Group>
+      </form>
+    </div>
   );
 };
 
 const Page = () => {
-  const [members, setMembers] = useState([]);
-
-  async function fetchMembers() {
-    let subscription = true;
-
-    if (subscription) {
-      const res = await axios.request({
-        method: "GET",
-        url: "/api/members",
-      });
-
-      const data = res.data.members;
-      setMembers(data);
-    }
-
-    return () => {
-      subscription = false;
-    };
-  }
-
-  useEffect(() => {
-    fetchMembers();
-  }, [members]);
-
-  const lencode = members.length + 1;
-
-  const memcode =
-    lencode > 9
-      ? lencode > 99
-        ? lencode > 999
-          ? lencode
-          : "DC-0" + `${lencode}`
-        : "DC-00" + `${lencode}`
-      : "DC-000" + `${lencode}`;
   return (
-    <>
-      {(members && <CreateMember memcode={`${memcode}`} />) || (
-        <LoadingOverlay overlayBlur={2} visible />
-      )}
-    </>
+    <Protected>
+      <CreateMember />
+    </Protected>
   );
 };
 

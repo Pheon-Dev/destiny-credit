@@ -1,23 +1,21 @@
 import React from "react";
 import { trpc } from "../../utils/trpc";
-import { Product } from "@prisma/client";
 import { ProductsTable } from "../../components";
 import { Group, LoadingOverlay, Text } from "@mantine/core";
 
 const ProductsList = () => {
-  const products = trpc.useQuery(["products"]) || [];
-  const data = products.data?.map((p: Product) => p);
+  const { data: products, status } = trpc.useQuery(["products.products"]);
 
   return (
     <>
-      {data && <ProductsTable products={data} />}
-      {products.status === "loading" &&
+      {products && <ProductsTable products={products} />}
+      {status === "loading" &&
         <LoadingOverlay
           overlayBlur={2}
-          visible={products.status === "loading"}
+          visible={status === "loading"}
         />
       }
-      {products.status === "success" && products.data.length === 0 && (
+      {status === "success" && products.length === 0 && (
         <Group position="center">
           <Text>No Created Products</Text>
         </Group>

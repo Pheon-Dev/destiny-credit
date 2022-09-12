@@ -5,7 +5,7 @@ import { getCookie, setCookie } from "cookies-next";
 import Head from "next/head";
 import { NotificationsProvider } from "@mantine/notifications";
 import { withTRPC } from "@trpc/next";
-import type { AppRouter } from "./api/trpc/[trpc]";
+import type { AppRouter } from "../server/_app";
 import { SessionProvider } from "next-auth/react";
 import { signOut, useSession } from "next-auth/react";
 
