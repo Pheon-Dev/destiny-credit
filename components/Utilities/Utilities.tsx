@@ -1,4 +1,3 @@
-import axios from "axios";
 import { showNotification, updateNotification } from "@mantine/notifications";
 import {
   Tabs,
@@ -26,9 +25,9 @@ import {
 } from "@tabler/icons";
 import Router, { useRouter } from "next/router";
 import { signOut, useSession } from "next-auth/react";
-import { useEffect, useState } from "react";
-import { ActionIcon, Group, useMantineColorScheme } from "@mantine/core";
+import { useMantineColorScheme } from "@mantine/core";
 import { IconSun, IconMoonStars } from "@tabler/icons";
+import { trpc } from "../../utils/trpc";
 
 function StyledTabs(props: TabsProps) {
   return (
@@ -101,41 +100,39 @@ function StyledTabs(props: TabsProps) {
   );
 }
 
-export const forceReload = async () => {
-  try {
-    const res = await axios.get("/api/transactions");
-    const data = res.data;
-    Router.replace(Router.asPath);
-
-    setTimeout(() => {
-      updateNotification({
-        id: "transactions-status",
-        color: "teal",
-        title: data.message,
-        message: `${data.data.length} Recent Transactions as from ${data.from} to ${data.to}`,
-        icon: <IconCheck size={16} />,
-        autoClose: 8000,
-      });
-    });
-  } catch (error) {
-    setTimeout(() => {
-      updateNotification({
-        id: "transactions-status",
-        title: "Transaction Fetch Error!",
-        message: `${error}. Please Try Again Later`,
-        icon: <IconX size={16} />,
-        color: "red",
-        autoClose: 4000,
-      });
-    });
-  }
-};
-
 export function Utilities() {
   const [scroll, scrollTo] = useWindowScroll();
   const { status, data } = useSession();
   const router = useRouter();
   const { colorScheme, toggleColorScheme } = useMantineColorScheme();
+
+  const logs = trpc.useQuery(["transactions.logs"]);
+  const forceReload = async () => {
+    try {
+      setTimeout(() => {
+        updateNotification({
+          id: "transactions-status",
+          color: "teal",
+          title: logs.data?.message,
+          message: `${logs.data?.data.length} Recent Transactions as from ${logs.data?.from} to ${logs.data?.data.to}`,
+          icon: <IconCheck size={16} />,
+          autoClose: 8000,
+        });
+      });
+      Router.replace(Router.asPath);
+    } catch (error) {
+      setTimeout(() => {
+        updateNotification({
+          id: "transactions-status",
+          title: "Transaction Fetch Error!",
+          message: `${error}. Please Try Again Later`,
+          icon: <IconX size={16} />,
+          color: "red",
+          autoClose: 4000,
+        });
+      });
+    }
+  };
 
   const handleSignOut = () => {
     try {
@@ -180,35 +177,38 @@ export function Utilities() {
           <StyledTabs defaultValue="apps">
             <Tabs.List>
               <Menu.Target>
-              <Tooltip label="Utilities" color="blue" withArrow>
-                <Tabs.Tab
-                  value="apps"
-                  icon={<IconCategory2 style={{ padding: 2 }} />}
-                /></Tooltip>
+                <Tooltip label="Utilities" color="blue" withArrow>
+                  <Tabs.Tab
+                    value="apps"
+                    icon={<IconCategory2 style={{ padding: 2 }} />}
+                  />
+                </Tooltip>
               </Menu.Target>
               {status === "authenticated" && (
-              <>
-              <Tooltip color="blue" withArrow label="Refresh">
-                  <Tabs.Tab
-                    onClick={() => {
-                      showNotification({
-                        id: "transactions-status",
-                        color: "teal",
-                        title: "Loading Transactions",
-                        message: "Fetching Recent M-PESA Transactions ...",
-                        loading: true,
-                        autoClose: 50000,
-                      });
-                      forceReload();
-                    }}
-                    value="refresh"
-                    icon={<IconArrowsLeftRight style={{ padding: 2 }} />}
-                /></Tooltip>
-              <Tooltip color="blue" withArrow label="Account">
-                  <Tabs.Tab
-                    value="account"
-                    icon={<IconUser style={{ padding: 2 }} />}
-                /></Tooltip>
+                <>
+                  <Tooltip color="blue" withArrow label="Refresh">
+                    <Tabs.Tab
+                      onClick={() => {
+                        showNotification({
+                          id: "transactions-status",
+                          color: "teal",
+                          title: "Loading Transactions",
+                          message: "Fetching Recent M-PESA Transactions ...",
+                          loading: true,
+                          autoClose: 50000,
+                        });
+                        forceReload();
+                      }}
+                      value="refresh"
+                      icon={<IconArrowsLeftRight style={{ padding: 2 }} />}
+                    />
+                  </Tooltip>
+                  <Tooltip color="blue" withArrow label="Account">
+                    <Tabs.Tab
+                      value="account"
+                      icon={<IconUser style={{ padding: 2 }} />}
+                    />
+                  </Tooltip>
                 </>
               )}
             </Tabs.List>
@@ -227,15 +227,11 @@ export function Utilities() {
               )
             }
           >
-              {colorScheme === "dark" ? (
-                "Light Theme"
-              ) : (
-                "Dark Theme"
-              )}
+            {colorScheme === "dark" ? "Light Theme" : "Dark Theme"}
           </Menu.Item>
           {status === "authenticated" && (
             <>
-            <Menu.Divider />
+              <Menu.Divider />
               <Menu.Item icon={<IconSettings size={20} />}>Settings</Menu.Item>
               <Menu.Item icon={<IconMessageCircle size={20} />} disabled>
                 Messages

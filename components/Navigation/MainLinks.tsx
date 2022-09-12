@@ -1,4 +1,4 @@
-import React, { useEffect, useState } from "react";
+import React, { useState } from "react";
 import {
   IconHome,
   IconUsers,
@@ -6,15 +6,12 @@ import {
   IconCash,
   IconTag,
   IconBrandAsana,
-  IconX,
-  IconCheck,
 } from "@tabler/icons";
 import { Box, NavLink, Text } from "@mantine/core";
 import { Protected } from "../Protected/Protected";
 import Link from "next/link";
 import { useRouter } from "next/router";
-import axios from "axios";
-import { showNotification } from "@mantine/notifications";
+import { trpc } from "../../utils/trpc";
 
 export function MainLinks() {
   const [membersActive, setMembersActive] = useState(9);
@@ -25,23 +22,12 @@ export function MainLinks() {
   const [dashboardActive, setDashboardActive] = useState(true);
 
   const router = useRouter();
+  const logs = trpc.useQuery(["transactions.logs"]);
 
   const reload = async () => {
     try {
-      const res = await axios.get("/api/transactions");
-      const data = res.data;
       router.replace(router.asPath);
-      router.push("/");
-      return setTimeout(() => {
-        showNotification({
-          id: "transactions-status",
-          color: "teal",
-          title: data.message,
-          message: `${data.data.length} Recent Transactions as from ${data.from} to ${data.to}`,
-          icon: <IconCheck size={16} />,
-          autoClose: 8000,
-        });
-      });
+      if (logs.status === "loading" || logs.status === "success") return router.push("/");
     } catch (error) {
       return router.push("/");
     }
@@ -66,25 +52,25 @@ export function MainLinks() {
           childrenOffset={24}
         >
           <Link href="/">
-          <NavLink
-            styles={{
-              root: {
-                borderRadius: 6,
-                margin: 2,
-              },
-            }}
-            label={<Text weight={500}>Dashboard</Text>}
-            active={dashboardActive}
-            onClick={() => {
-              setMembersActive(8);
-              setLoansActive(8);
-              setProductsActive(8);
-              setGroupsActive(8);
-              setReportsActive(8);
-              setDashboardActive(true);
-              reload();
-            }}
-          />
+            <NavLink
+              styles={{
+                root: {
+                  borderRadius: 6,
+                  margin: 2,
+                },
+              }}
+              label={<Text weight={500}>Dashboard</Text>}
+              active={dashboardActive}
+              onClick={() => {
+                setMembersActive(8);
+                setLoansActive(8);
+                setProductsActive(8);
+                setGroupsActive(8);
+                setReportsActive(8);
+                setDashboardActive(true);
+                reload();
+              }}
+            />
           </Link>
         </NavLink>
         <NavLink
@@ -179,26 +165,26 @@ export function MainLinks() {
           childrenOffset={24}
         >
           {groups_data.map((item: any, index: number) => (
-              <NavLink
-                styles={{
-                  root: {
-                    borderRadius: 6,
-                    margin: 2,
-                  },
-                }}
-                label={<Text weight={500}>{item.name}</Text>}
-                active={groupsActive === index}
-                onClick={() => {
-                  setMembersActive(8);
-                  setLoansActive(8);
-                  setProductsActive(8);
-                  setGroupsActive(index);
-                  setReportsActive(8);
-                  setDashboardActive(false);
+            <NavLink
+              styles={{
+                root: {
+                  borderRadius: 6,
+                  margin: 2,
+                },
+              }}
+              label={<Text weight={500}>{item.name}</Text>}
+              active={groupsActive === index}
+              onClick={() => {
+                setMembersActive(8);
+                setLoansActive(8);
+                setProductsActive(8);
+                setGroupsActive(index);
+                setReportsActive(8);
+                setDashboardActive(false);
                 router.push(`${item.url}`);
               }}
               key={item.url}
-              />
+            />
           ))}
         </NavLink>
         <NavLink
@@ -217,26 +203,26 @@ export function MainLinks() {
           childrenOffset={24}
         >
           {products_data.map((item: any, index: number) => (
-              <NavLink
-                styles={{
-                  root: {
-                    borderRadius: 6,
-                    margin: 2,
-                  },
-                }}
-                label={<Text weight={500}>{item.name}</Text>}
-                active={productsActive === index}
-                onClick={() => {
-                  setMembersActive(8);
-                  setLoansActive(8);
-                  setProductsActive(index);
-                  setGroupsActive(8);
-                  setReportsActive(8);
-                  setDashboardActive(false);
+            <NavLink
+              styles={{
+                root: {
+                  borderRadius: 6,
+                  margin: 2,
+                },
+              }}
+              label={<Text weight={500}>{item.name}</Text>}
+              active={productsActive === index}
+              onClick={() => {
+                setMembersActive(8);
+                setLoansActive(8);
+                setProductsActive(index);
+                setGroupsActive(8);
+                setReportsActive(8);
+                setDashboardActive(false);
                 router.push(`${item.url}`);
               }}
               key={item.url}
-              />
+            />
           ))}
         </NavLink>
         {/* <NavLink */}
@@ -293,26 +279,26 @@ export function MainLinks() {
           childrenOffset={24}
         >
           {reports_data.map((item: any, index: number) => (
-              <NavLink
-                styles={{
-                  root: {
-                    borderRadius: 6,
-                    margin: 2,
-                  },
-                }}
-                label={<Text weight={500}>{item.name}</Text>}
-                active={reportsActive === index}
-                onClick={() => {
-                  setMembersActive(8);
-                  setLoansActive(8);
-                  setProductsActive(8);
-                  setGroupsActive(8);
-                  setReportsActive(index);
-                  setDashboardActive(false);
+            <NavLink
+              styles={{
+                root: {
+                  borderRadius: 6,
+                  margin: 2,
+                },
+              }}
+              label={<Text weight={500}>{item.name}</Text>}
+              active={reportsActive === index}
+              onClick={() => {
+                setMembersActive(8);
+                setLoansActive(8);
+                setProductsActive(8);
+                setGroupsActive(8);
+                setReportsActive(index);
+                setDashboardActive(false);
                 router.push(`${item.url}`);
               }}
               key={item.url}
-              />
+            />
           ))}
         </NavLink>
       </Box>

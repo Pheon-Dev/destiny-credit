@@ -8,25 +8,22 @@ const PaymentsList = () => {
   const router = useRouter();
   const id = router.query.payments;
 
-  const { data: loan, status } = trpc.useQuery(["loans.loan", { id: `${id}` }])
+  const { data: loan, status } = trpc.useQuery(["loans.loan", { id: `${id}` }]);
 
   return (
     <>
       {loan && <PaymentTable payments={loan} call="payments" />}
-      {status === "loading" &&
-        <LoadingOverlay
-          overlayBlur={2}
-          visible={status === "loading"}
-        />
-      }
+      {status === "loading" && (
+        <LoadingOverlay overlayBlur={2} visible={status === "loading"} />
+      )}
       {status === "success" && loan.length === 0 && (
-      <>
-        <Group position="center">
-          <Text>Active Loan</Text>
-        </Group>
-        <Group position="center">
-          <pre>{JSON.stringify(loan, null, 4)}</pre>
-        </Group>
+        <>
+          <Group position="center">
+            <Text>Active Loan</Text>
+          </Group>
+          <Group position="center">
+            <pre>{JSON.stringify(loan, null, 4)}</pre>
+          </Group>
         </>
       )}
     </>

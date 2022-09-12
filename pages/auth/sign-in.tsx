@@ -1,5 +1,4 @@
 import React from "react";
-import axios from "axios";
 import { signIn } from "next-auth/react";
 import { NextPage } from "next";
 import { z } from "zod";
@@ -14,9 +13,10 @@ import {
   Group,
   Text,
 } from "@mantine/core";
-import Router, { useRouter } from "next/router";
+import { useRouter } from "next/router";
 import { showNotification, updateNotification } from "@mantine/notifications";
 import { IconCheck, IconX } from "@tabler/icons";
+import { trpc } from "../../utils/trpc";
 
 const schema = z.object({
   username: z.string().min(2, { message: "User Name Missing" }),
@@ -33,6 +33,8 @@ const Page: NextPage = (props): JSX.Element => {
     },
   });
 
+  const logs = trpc.useQuery(["transactions.logs"]);
+
   const handleSubmit = async () => {
     try {
       const res = await signIn("credentials", {
@@ -40,8 +42,6 @@ const Page: NextPage = (props): JSX.Element => {
         password: form.values.password,
         redirect: false,
       });
-
-      console.log(res?.error);
 
       if (res?.ok) {
         setTimeout(() => {
@@ -54,10 +54,9 @@ const Page: NextPage = (props): JSX.Element => {
             autoClose: 8000,
           });
         });
-        router.push("/");
-        const res = await axios.get("/api/transactions");
-        const data = res.data;
-        return Router.replace(Router.asPath);
+        router.replace(router.asPath);
+        if (logs.status === "loading" || logs.status === "success")
+          return router.push("/");
       }
 
       if (res?.error) {
@@ -117,9 +116,11 @@ const Page: NextPage = (props): JSX.Element => {
 
             <Group mt="xl">
               <Button
-              variant="light"
-              color="blue"
-              fullWidth mt="md" radius="md"
+                variant="light"
+                color="blue"
+                fullWidth
+                mt="md"
+                radius="md"
                 onClick={() => {
                   form.validate();
                   showNotification({

@@ -80,74 +80,73 @@ const CreateProduct = () => {
   const createProduct = useCallback(() => {
     try {
       if (
-        form.values.productId === "" ||
-        form.values.productName === "" ||
-        form.values.minimumRange === "" ||
-        form.values.maximumRange === "" ||
-        form.values.interestRate === "" ||
-        form.values.frequency === "" ||
-        form.values.maximumTenure === "" ||
-        form.values.repaymentCycle === "" ||
-        form.values.processingFee === "" ||
-        form.values.gracePeriod === "" ||
-        form.values.penaltyRate === "" ||
-        form.values.penaltyCharge === "" ||
-        form.values.penaltyPayment === "" ||
+        (form.values.productId === "" &&
+          form.values.productName === "" &&
+          form.values.minimumRange === "" &&
+          form.values.maximumRange === "" &&
+          form.values.interestRate === "" &&
+          form.values.frequency === "" &&
+          form.values.maximumTenure === "" &&
+          form.values.repaymentCycle === "" &&
+          form.values.processingFee === "" &&
+          form.values.gracePeriod === "" &&
+          form.values.penaltyRate === "" &&
+          form.values.penaltyCharge === "" &&
+          form.values.penaltyPayment === "") ||
         form.values.approved === true
       ) {
-        return updateNotification({
+        setLoad(true);
+        product.mutate({
+          productId: form.values.productId.toUpperCase(),
+          productName: form.values.productName.toUpperCase(),
+          minimumRange: form.values.minimumRange.toUpperCase(),
+          maximumRange: form.values.maximumRange.toUpperCase(),
+          interestRate: form.values.interestRate.toUpperCase(),
+          frequency: form.values.frequency.toUpperCase(),
+          maximumTenure: form.values.maximumTenure.toUpperCase(),
+          repaymentCycle: form.values.repaymentCycle.toUpperCase(),
+          processingFee: form.values.processingFee.toUpperCase(),
+          gracePeriod: form.values.gracePeriod.toUpperCase(),
+          penaltyRate: form.values.penaltyRate.toUpperCase(),
+          penaltyCharge: form.values.penaltyCharge.toUpperCase(),
+          penaltyPayment: form.values.penaltyPayment.toUpperCase(),
+          approved: false,
+        });
+
+        form.setFieldValue("productId", "");
+        form.setFieldValue("productName", "");
+        form.setFieldValue("minimumRange", "");
+        form.setFieldValue("maximumRange", "");
+        form.setFieldValue("interestRate", "");
+        form.setFieldValue("frequency", "");
+        form.setFieldValue("maximumTenure", "");
+        form.setFieldValue("repaymentCycle", "");
+        form.setFieldValue("processingFee", "");
+        form.setFieldValue("gracePeriod", "");
+        form.setFieldValue("penaltyRate", "");
+        form.setFieldValue("penaltyCharge", "");
+        form.setFieldValue("penaltyPayment", "");
+        form.setFieldValue("approved", false);
+
+        updateNotification({
           id: "submit",
-          title: "Missing Fields",
-          message: "Please Make Sure All Fields Are Filled!",
-          color: "red",
-          icon: <IconAlertCircle size={16} />,
+          color: "teal",
+          title: `${product.data?.productName} @ ${product.data?.interestRate}%`,
+          message: "Product Created Successfully!",
+          icon: <IconCheck size={16} />,
           autoClose: 5000,
         });
+
+        return router.push("/products");
       }
-
-      setLoad(true);
-      product.mutate({
-        productId: form.values.productId.toUpperCase(),
-        productName: form.values.productName.toUpperCase(),
-        minimumRange: form.values.minimumRange.toUpperCase(),
-        maximumRange: form.values.maximumRange.toUpperCase(),
-        interestRate: form.values.interestRate.toUpperCase(),
-        frequency: form.values.frequency.toUpperCase(),
-        maximumTenure: form.values.maximumTenure.toUpperCase(),
-        repaymentCycle: form.values.repaymentCycle.toUpperCase(),
-        processingFee: form.values.processingFee.toUpperCase(),
-        gracePeriod: form.values.gracePeriod.toUpperCase(),
-        penaltyRate: form.values.penaltyRate.toUpperCase(),
-        penaltyCharge: form.values.penaltyCharge.toUpperCase(),
-        penaltyPayment: form.values.penaltyPayment.toUpperCase(),
-        approved: false,
-      });
-
-      form.setFieldValue("productId", "");
-      form.setFieldValue("productName", "");
-      form.setFieldValue("minimumRange", "");
-      form.setFieldValue("maximumRange", "");
-      form.setFieldValue("interestRate", "");
-      form.setFieldValue("frequency", "");
-      form.setFieldValue("maximumTenure", "");
-      form.setFieldValue("repaymentCycle", "");
-      form.setFieldValue("processingFee", "");
-      form.setFieldValue("gracePeriod", "");
-      form.setFieldValue("penaltyRate", "");
-      form.setFieldValue("penaltyCharge", "");
-      form.setFieldValue("penaltyPayment", "");
-      form.setFieldValue("approved", false);
-
-      updateNotification({
+      return updateNotification({
         id: "submit",
-        color: "teal",
-        title: `${product.data?.productName} @ ${product.data?.interestRate}%`,
-        message: "Product Created Successfully!",
-        icon: <IconCheck size={16} />,
+        title: "Missing Fields",
+        message: "Please Make Sure All Fields Are Filled!",
+        color: "red",
+        icon: <IconAlertCircle size={16} />,
         autoClose: 5000,
       });
-
-      return router.push("/products");
     } catch (error) {
       updateNotification({
         id: "submit",

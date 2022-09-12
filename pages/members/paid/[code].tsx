@@ -214,57 +214,48 @@ const CreateMember = () => {
 
   const handleSave = async () => {
     try {
-      /* if ( */
-      /*   form.values.date === "" || */
-      /*   form.values.branchName === "" || */
-      /*   form.values.memberId === "" || */
-      /*   form.values.firstName === "" || */
-      /*   form.values.lastName === "" || */
-      /*   form.values.dob === "" || */
-      /*   form.values.idPass === "" || */
-      /*   form.values.kraPin === "" || */
-      /*   form.values.phoneNumber === "" || */
-      /*   form.values.gender === "" || */
-      /*   form.values.age === "" || */
-      /*   form.values.religion === "" || */
-      /*   form.values.maritalStatus === "" || */
-      /*   form.values.spouseName === "" || */
-      /*   form.values.spouseNumber === "" || */
-      /*   form.values.postalAddress === "" || */
-      /*   form.values.postalCode === "" || */
-      /*   form.values.cityTown === "" || */
-      /*   form.values.residentialAddress === "" || */
-      /*   form.values.emailAddress === "" || */
-      /*   form.values.rentedOwned === "" || */
-      /*   form.values.landCareAgent === "" || */
-      /*   form.values.occupationEmployer === "" || */
-      /*   form.values.employerNumber === "" || */
-      /*   form.values.businessLocation === "" || */
-      /*   form.values.businessAge === "" || */
-      /*   form.values.refereeName === "" || */
-      /*   form.values.refereeNumber === "" || */
-      /*   form.values.communityPosition === "" || */
-      /*   form.values.mpesaCode === "" || */
-      /*   form.values.membershipAmount === "" || */
-      /*   form.values.nameKin === "" || */
-      /*   form.values.relationship === "" || */
-      /*   form.values.residentialAddressKin === "" || */
-      /*   form.values.postalAddressKin === "" || */
-      /*   form.values.postalCodeKin === "" || */
-      /*   form.values.cityTownKin === "" || */
-      /*   form.values.numberKin === "" || */
-      /*   form.values.group === true || */
-      /*   form.values.maintained === false */
-      /* ) { */
-      /*   return updateNotification({ */
-      /*     id: "submit", */
-      /*     title: "Missing Fields", */
-      /*     message: "Please Make Sure All Fields Are Filled!", */
-      /*     color: "red", */
-      /*     icon: <IconAlertCircle size={16} />, */
-      /*     autoClose: 5000, */
-      /*   }); */
-      /* } */
+      if (
+        form.values.date === "" &&
+        form.values.branchName === "" &&
+        form.values.memberId === "" &&
+        form.values.firstName === "" &&
+        form.values.lastName === "" &&
+        form.values.dob === "" &&
+        form.values.idPass === "" &&
+        form.values.kraPin === "" &&
+        form.values.phoneNumber === "" &&
+        form.values.gender === "" &&
+        form.values.age === "" &&
+        form.values.religion === "" &&
+        form.values.maritalStatus === "" &&
+        form.values.spouseName === "" &&
+        form.values.spouseNumber === "" &&
+        form.values.postalAddress === "" &&
+        form.values.postalCode === "" &&
+        form.values.cityTown === "" &&
+        form.values.residentialAddress === "" &&
+        form.values.emailAddress === "" &&
+        form.values.rentedOwned === "" &&
+        form.values.landCareAgent === "" &&
+        form.values.occupationEmployer === "" &&
+        form.values.employerNumber === "" &&
+        form.values.businessLocation === "" &&
+        form.values.businessAge === "" &&
+        form.values.refereeName === "" &&
+        form.values.refereeNumber === "" &&
+        form.values.communityPosition === "" &&
+        form.values.mpesaCode === "" &&
+        form.values.membershipAmount === "" &&
+        form.values.nameKin === "" &&
+        form.values.relationship === "" &&
+        form.values.residentialAddressKin === "" &&
+        form.values.postalAddressKin === "" &&
+        form.values.postalCodeKin === "" &&
+        form.values.cityTownKin === "" &&
+        form.values.numberKin === "" ||
+        form.values.group === true ||
+        form.values.maintained === false
+      ) {
 
       member.mutate({
           date: dash_today_date,
@@ -362,6 +353,15 @@ const CreateMember = () => {
         autoClose: 5000,
       });
       return router.push("/members");
+      }
+      return updateNotification({
+        id: "submit",
+        title: "Missing Fields",
+        message: "Please Make Sure All Fields Are Filled!",
+        color: "red",
+        icon: <IconAlertCircle size={16} />,
+        autoClose: 5000,
+      });
     } catch (error) {
         updateNotification({
           id: "submit",
