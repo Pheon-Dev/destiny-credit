@@ -39,7 +39,7 @@ function App(props: AppProps & { colorScheme: ColorScheme }) {
 
   const toggleColorScheme = (value?: ColorScheme) => {
     const nextColorScheme =
-      value || (colorScheme === "light" ? "dark" : "light");
+      value || (colorScheme === "dark" ? "light" : "dark");
     setColorScheme(nextColorScheme);
     setCookie("mantine-color-scheme", nextColorScheme, {
       maxAge: 60 * 60 * 24 * 30,

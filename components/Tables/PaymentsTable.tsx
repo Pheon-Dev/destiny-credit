@@ -1,10 +1,10 @@
 import React from "react";
 import { Table, Badge } from "@mantine/core";
-import { Loans } from "../../types";
+import { Loan } from "@prisma/client";
 import { useRouter } from "next/router";
 import { IconEdit } from "@tabler/icons";
 
-export function PaymentsTable({ loans, call }: { loans: Loans[]; call: string }) {
+export function PaymentsTable({ loans, call }: { loans: Loan[]; call: string }) {
   const Header = () => (
     <tr>
       <th>Names</th>
@@ -35,7 +35,7 @@ export function PaymentsTable({ loans, call }: { loans: Loans[]; call: string })
   );
 }
 
-function LoanRow({ loan, call }: { loan: Loans; call: string }) {
+function LoanRow({ loan, call }: { loan: Loan; call: string }) {
   const router = useRouter();
   return (
     <>

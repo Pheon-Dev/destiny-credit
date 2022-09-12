@@ -1,54 +1,23 @@
-import React, { useEffect, useState } from "react";
-import axios from "axios";
+import React from "react";
+import { trpc } from "../../utils/trpc";
 import { PaymentsTable } from "../../components";
 import { Group, LoadingOverlay, Text } from "@mantine/core";
+import { Loan } from "@prisma/client";
 
 const PaymentsList = () => {
-  const [loans, setLoans] = useState([]);
-  const [load, setLoad] = useState(true);
-  const [loaded, setLoaded] = useState(false);
-
-  const fetchLoans = async (signal: AbortSignal) => {
-    try {
-      const res = await axios.request({
-        method: "GET",
-        url: "/api/loans",
-      });
-
-      const data = res.data.loans;
-      setLoans(data);
-      loans.length === 0 && setLoaded(true);
-    } catch (error) {
-      console.log(error);
-    }
-  };
-
-  useEffect(() => {
-    const controller = new AbortController();
-    const signal = controller.signal;
-
-    fetchLoans(signal);
-
-    setTimeout(() => {
-      loans.length === 0 && setLoad(false);
-    }, 8000);
-    return () => {
-      controller.abort();
-    };
-  }, []);
+  const loans = trpc.useQuery(["loans"]) || [];
+  const data = loans.data?.map((l: Loan) => l);
 
   return (
     <>
-      {(loans.length > 0 && (
-        <PaymentsTable loans={loans} call="payments" />
-      )) || (
+      {data && <PaymentsTable loans={data} call="payments" />}
+      {loans.status === "loading" &&
         <LoadingOverlay
           overlayBlur={2}
-          onClick={() => setLoad((prev) => !prev)}
-          visible={load}
+          visible={loans.status === "loading"}
         />
-      )}
-      {loaded && loans.length === 0 && (
+      }
+      {loans.status === "success" && loans.data.length === 0 && (
         <Group position="center">
           <Text>No Disbursed loans</Text>
         </Group>

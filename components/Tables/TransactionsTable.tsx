@@ -1,13 +1,13 @@
 import React from "react";
 import { Group, Table } from "@mantine/core";
-import { Transactions } from "../../types";
+import { Transaction } from "@prisma/client";
 import { TitleText } from "../../components";
-import Router, { useRouter } from "next/router";
+import { useRouter } from "next/router";
 
 export function TransactionsTable({
   transactions,
 }: {
-  transactions: Transactions[];
+  transactions: Transaction[];
 }) {
   const Header = () => (
     <tr>
@@ -43,7 +43,7 @@ export function TransactionsTable({
   );
 }
 
-function TransactionRow({ transaction }: { transaction: Transactions }) {
+function TransactionRow({ transaction }: { transaction: Transaction }) {
   const router = useRouter();
   const today = new Date()
   const date = today.toLocaleDateString()

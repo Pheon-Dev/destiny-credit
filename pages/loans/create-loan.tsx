@@ -1,46 +1,23 @@
-import React, { useEffect, useState } from "react";
-import axios from "axios";
+import React from "react";
 import { MembersTable } from "../../components";
 import { Group, LoadingOverlay, Text } from "@mantine/core";
+import { Member } from "@prisma/client";
+import { trpc } from "../../utils/trpc";
 
 const MembersList = () => {
-  const [members, setMembers] = useState([]);
-  const [load, setLoad] = useState(true);
-  const [loaded, setLoaded] = useState(false);
-
-  async function fetchMembers() {
-    let subscription = true;
-
-    if (subscription) {
-      const res = await axios.request({
-        method: "GET",
-        url: "/api/members",
-      });
-
-      const data = res.data.members;
-      setMembers(data);
-      members.length === 0 && setLoaded(true);
-    }
-
-    return () => {
-      subscription = false;
-    };
-  }
-
-  useEffect(() => {
-    fetchMembers();
-  }, [members]);
+  const members = trpc.useQuery(["members"]) || [];
+  const data = members.data?.map((m: Member) => m);
 
   return (
     <>
-      {(members.length > 0 && <MembersTable members={members} call="create-loan" />) || (
+      {data && <MembersTable members={data} call="create-loan" />}
+      {members.status === "loading" && (
         <LoadingOverlay
           overlayBlur={2}
-          onClick={() => setLoad((prev) => !prev)}
-          visible={load}
+          visible={members.status === "loading"}
         />
       )}
-      {loaded && members.length === 0 && (
+      {members.status === "success" && members.data.length === 0 && (
         <Group position="center">
           <Text>No Maintained Loans</Text>
         </Group>
@@ -50,7 +27,7 @@ const MembersList = () => {
 };
 
 const Page = () => {
-    return <MembersList />
-  }
+  return <MembersList />;
+};
 
 export default Page;

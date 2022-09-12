@@ -21,6 +21,18 @@ export const appRouter = trpc
         }
       })
     }
+  }).query("members", {
+    resolve: async () => {
+      return await prisma.member.findMany()
+    }
+  }).query("loans", {
+    resolve: async () => {
+      return await prisma.loan.findMany()
+    }
+  }).query("products", {
+    resolve: async () => {
+      return await prisma.product.findMany()
+    }
   });
 
 export type AppRouter = typeof appRouter;
