@@ -509,30 +509,30 @@ const Page: NextPage = () => {
     try {
       setOpen(false);
       if (
-        form.values.memberId &&
-        form.values.tenure &&
-        form.values.principal &&
-        form.values.grace &&
-        form.values.member &&
-        form.values.installment &&
-        form.values.productId &&
-        form.values.payoff &&
-        form.values.penalty &&
-        form.values.processingFee &&
-        form.values.sundays &&
-        form.values.interest &&
-        form.values.guarantorId &&
-        form.values.productName &&
-        form.values.cycle &&
-        form.values.startDate &&
-        form.values.loanRef &&
-        guarantor_form.values.guarantorPhone &&
-        guarantor_form.values.guarantorRelationship &&
-        guarantor_form.values.guarantorName &&
-        guarantor_form.values.guarantorID &&
-        form.values.maintained ||
+        (form.values.memberId &&
+          form.values.tenure &&
+          form.values.principal &&
+          form.values.grace &&
+          form.values.member &&
+          form.values.installment &&
+          form.values.productId &&
+          form.values.payoff &&
+          form.values.penalty &&
+          form.values.processingFee &&
+          form.values.sundays &&
+          form.values.interest &&
+          form.values.guarantorId &&
+          form.values.productName &&
+          form.values.cycle &&
+          form.values.startDate &&
+          form.values.loanRef &&
+          guarantor_form.values.guarantorPhone &&
+          guarantor_form.values.guarantorRelationship &&
+          guarantor_form.values.guarantorName &&
+          guarantor_form.values.guarantorID &&
+          form.values.maintained) ||
         form.values.approved ||
-        form.values.disbursed 
+        form.values.disbursed
       ) {
         maintain_member.mutate({
           id: id,
@@ -571,50 +571,80 @@ const Page: NextPage = () => {
           loanRef: form.values.loanRef,
         });
 
+        form.setFieldValue("item", "");
+        form.setFieldValue("value", "");
+        form.setFieldValue("guarantorId", "");
+        form.setFieldValue("memberId", "");
+        form.setFieldValue("tenure", "");
+        form.setFieldValue("principal", "");
+        form.setFieldValue("maintained", false);
+        form.setFieldValue("approved", false);
+        form.setFieldValue("disbursed", false);
+        form.setFieldValue("grace", "");
+        form.setFieldValue("installment", "");
+        form.setFieldValue("productId", "");
+        form.setFieldValue("payoff", "");
+        form.setFieldValue("penalty", "");
+        form.setFieldValue("processingFee", "");
+        form.setFieldValue("sundays", "");
+        form.setFieldValue("member", "");
+        form.setFieldValue("productName", "");
+        form.setFieldValue("interest", "");
+        form.setFieldValue("loanRef", "");
+        form.setFieldValue("startDate", "");
+        form.setFieldValue("cycle", "");
+
+        guarantor_form.setFieldValue("guarantorName", "");
+        guarantor_form.setFieldValue("guarantorPhone", "");
+        guarantor_form.setFieldValue("guarantorRelationship", "");
+        guarantor_form.setFieldValue("guarantorID", "");
+
+        setLoad(false);
+        setActive(0);
+        setOpen(false);
+        setDeleteModal(false);
+        setCollateralId("");
+        setStartDate("");
+        setLoanRef("");
+        setSundays(0);
+        setChangeGuarantor(false);
+        setPayoffAmount(0);
+
+        if (maintain_loan.status === "error") {
+          return updateNotification({
+            id: "submit-status",
+            color: "orange",
+            title: `Error Maintaining Loan`,
+            message: `Loan Maintenance Error : ${maintain_loan.error}.`,
+            icon: <IconX size={16} />,
+            autoClose: 8000,
+          });
+        }
+        if (maintain_member.status === "error") {
+          return updateNotification({
+            id: "submit-status",
+            color: "orange",
+            title: `Error Updating Member`,
+            message: `Member Updating Error : ${maintain_member.error}.`,
+            icon: <IconX size={16} />,
+            autoClose: 8000,
+          });
+        }
+        if (maintain_guarantor.status === "error") {
+          return updateNotification({
+            id: "submit-status",
+            color: "orange",
+            title: `Error Maintaining Guarantor`,
+            message: `Guarantor Maintenance Error : ${maintain_guarantor.error}.`,
+            icon: <IconX size={16} />,
+            autoClose: 8000,
+          });
+        }
         if (
           maintain_loan.status === "success" &&
           maintain_member.status === "success" &&
           maintain_guarantor.status === "success"
         ) {
-          form.setFieldValue("item", "");
-          form.setFieldValue("value", "");
-          form.setFieldValue("guarantorId", "");
-          form.setFieldValue("memberId", "");
-          form.setFieldValue("tenure", "");
-          form.setFieldValue("principal", "");
-          form.setFieldValue("maintained", false);
-          form.setFieldValue("approved", false);
-          form.setFieldValue("disbursed", false);
-          form.setFieldValue("grace", "");
-          form.setFieldValue("installment", "");
-          form.setFieldValue("productId", "");
-          form.setFieldValue("payoff", "");
-          form.setFieldValue("penalty", "");
-          form.setFieldValue("processingFee", "");
-          form.setFieldValue("sundays", "");
-          form.setFieldValue("member", "");
-          form.setFieldValue("productName", "");
-          form.setFieldValue("interest", "");
-          form.setFieldValue("loanRef", "");
-          form.setFieldValue("startDate", "");
-          form.setFieldValue("cycle", "");
-
-          guarantor_form.setFieldValue("guarantorName", "");
-          guarantor_form.setFieldValue("guarantorPhone", "");
-          guarantor_form.setFieldValue("guarantorRelationship", "");
-          guarantor_form.setFieldValue("guarantorID", "");
-
-          setLoad(false);
-          setActive(0);
-          setOpen(false);
-          setDeleteModal(false);
-          setCollateralId("");
-          setStartDate("");
-          setLoanRef("");
-          setSundays(0);
-          setChangeGuarantor(false);
-          setPayoffAmount(0);
-
           updateNotification({
             id: "submit-status",
             color: "teal",
