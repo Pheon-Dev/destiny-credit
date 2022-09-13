@@ -46,17 +46,19 @@ const defaultLoansSelect = Prisma.validator<Prisma.LoanSelect>()({
   disburserId: true,
   updater: true,
   updaterId: true,
-})
+});
 
 export const loansRouter = createRouter()
   .query("create-loan", {
     resolve: async () => {
-      return await prisma.member.findMany();
+      return await prisma.member
+        .findMany()
     },
   })
   .query("loans", {
     resolve: async () => {
-      return await prisma.loan.findMany();
+      return await prisma.loan
+        .findMany()
     },
   })
   .query("loan", {
@@ -64,11 +66,12 @@ export const loansRouter = createRouter()
       id: z.string(),
     }),
     resolve: async ({ input }) => {
-      return await prisma.payment.findMany({
-        where: {
-          loanId: input.id,
-        },
-      });
+      return await prisma.payment
+        .findMany({
+          where: {
+            loanId: input.id,
+          },
+        })
     },
   })
   .query("member", {
@@ -76,12 +79,17 @@ export const loansRouter = createRouter()
       id: z.string(),
     }),
     resolve: async ({ input }) => {
-      return await prisma.loan.findMany({
-        where: {
-          memberId: input.id,
-        },
-      });
+      return await prisma.loan
+        .findMany({
+          where: {
+            memberId: input.id,
+          },
+        })
     },
   })
-
-
+  .query("delete-loans", {
+    resolve: async () => {
+      return await prisma.loan
+        .deleteMany()
+    },
+  });

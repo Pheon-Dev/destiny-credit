@@ -22,8 +22,8 @@ const defaultTransactionsSelect = Prisma.validator<Prisma.TransactionSelect>()({
   msisdn: true,
   firstName: true,
   middleName: true,
-  lastName: true
-})
+  lastName: true,
+});
 
 export const transactionsRouter = createRouter()
   .query("logs", {
@@ -145,13 +145,13 @@ export const transactionsRouter = createRouter()
           });
 
           try {
-            const data = await prisma.transaction.findMany({
+            const data = await prisma.transaction.findFirst({
               where: {
                 transID: `${transID}`,
               },
             });
 
-            if (data.length === 0) {
+            if (!data) {
               if (
                 transactionType === "Pay Bill" ||
                 transactionType === "Customer Merchant Payment"
@@ -178,7 +178,7 @@ export const transactionsRouter = createRouter()
               counter++;
             }
 
-            if (data.length !== 0) {
+            if (data) {
               counter++;
             }
           } catch (error) {
@@ -203,8 +203,8 @@ export const transactionsRouter = createRouter()
     resolve: async ({ input }) => {
       return await prisma.transaction.findFirst({
         where: {
-          transID: input.id
-        }
+          transID: input.id,
+        },
       });
     },
   })
@@ -212,4 +212,4 @@ export const transactionsRouter = createRouter()
     resolve: async () => {
       return await prisma.transaction.findMany();
     },
-  })
+  });

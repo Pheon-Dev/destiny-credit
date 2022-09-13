@@ -97,7 +97,6 @@ const CreateMember = () => {
   const form = useForm({
     validate: zodResolver(schema),
     initialValues: {
-      id: data?.id,
       date: "",
       branchName: "Eldoret",
       memberId: `${memcode}`,
@@ -145,10 +144,10 @@ const CreateMember = () => {
     form.setFieldValue("memberId", `${memcode}`);
     form.setFieldValue("firstName", `${data?.firstName}`);
     form.setFieldValue("lastName", `${data?.middleName} ${data?.lastName}`);
-    form.setFieldValue("id", `${data?.id}`);
+    form.setFieldValue("mpesaCode", `${data?.transID}`);
     form.setFieldValue("phoneNumber", `${data?.msisdn}`);
     form.setFieldValue("membershipAmount", `${data?.transAmount}`);
-  }, [memcode, data]);
+  }, [memcode]);
 
   let today_date = new Date(form.values.date);
   let birth_date = new Date(form.values.dob);

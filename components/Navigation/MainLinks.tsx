@@ -9,9 +9,7 @@ import {
 } from "@tabler/icons";
 import { Box, NavLink, Text } from "@mantine/core";
 import { Protected } from "../Protected/Protected";
-import Link from "next/link";
 import { useRouter } from "next/router";
-import { trpc } from "../../utils/trpc";
 
 export function MainLinks() {
   const [membersActive, setMembersActive] = useState(9);
@@ -22,16 +20,6 @@ export function MainLinks() {
   const [dashboardActive, setDashboardActive] = useState(true);
 
   const router = useRouter();
-  const logs = trpc.useQuery(["transactions.logs"]);
-
-  const reload = async () => {
-    try {
-      router.replace(router.asPath);
-      if (logs.status === "loading" || logs.status === "success") return router.push("/");
-    } catch (error) {
-      return router.push("/");
-    }
-  };
 
   return (
     <Protected>
@@ -51,7 +39,6 @@ export function MainLinks() {
           icon={<IconHome size={16} stroke={1.5} />}
           childrenOffset={24}
         >
-          <Link href="/">
             <NavLink
               styles={{
                 root: {
@@ -68,10 +55,9 @@ export function MainLinks() {
                 setGroupsActive(8);
                 setReportsActive(8);
                 setDashboardActive(true);
-                reload();
+                router.push("/")
               }}
             />
-          </Link>
         </NavLink>
         <NavLink
           styles={{

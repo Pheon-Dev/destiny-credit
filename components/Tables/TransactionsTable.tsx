@@ -28,9 +28,9 @@ export function TransactionsTable({
           <Header />
         </thead>
         <tbody>
-          {transactions?.map((transaction) => (
+          {transactions?.map((transaction, index) => (
             <TransactionRow
-              key={transaction.transID}
+              key={index}
               transaction={transaction}
             />
           ))}

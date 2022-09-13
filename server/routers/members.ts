@@ -1,11 +1,7 @@
 import { Prisma, PrismaClient } from "@prisma/client";
 import { TRPCError } from "@trpc/server";
 import { z } from "zod";
-import axios from "axios";
 import { createRouter } from "../create-router";
-import { Fields } from "../../types";
-
-const LOGTAIL_API_TOKEN = process.env.NEXT_PUBLIC_LOGTAIL_API_TOKEN;
 
 const prisma = new PrismaClient();
 const defaultMembersSelect = Prisma.validator<Prisma.MemberSelect>()({
@@ -58,6 +54,18 @@ export const membersRouter = createRouter()
   .query("members", {
     resolve: async () => {
       return await prisma.member.findMany();
+    },
+  })
+  .query("member", {
+    input: z.object({
+      id: z.string(),
+    }),
+    resolve: async ({ input }) => {
+      return await prisma.member.findFirst({
+        where: {
+          id: input.id,
+        },
+      });
     },
   })
   .mutation("register", {
@@ -171,9 +179,21 @@ export const membersRouter = createRouter()
       id: z.string(),
     }),
     resolve: async ({ input }) => {
-      return await prisma.guarantor.findMany({
+      return await prisma.guarantor.findFirst({
         where: {
           memberId: input.id,
+        },
+      });
+    },
+  })
+  .mutation("update-member", {
+    resolve: async () => {
+      return await prisma.member.updateMany({
+        where: {
+          maintained: true,
+        },
+        data: {
+          maintained: false
         },
       });
     },
@@ -189,8 +209,8 @@ export const membersRouter = createRouter()
           id: input.id,
         },
         data: {
-          maintained: input.maintained
-        }
+          maintained: input.maintained,
+        },
       });
     },
   })
@@ -203,10 +223,10 @@ export const membersRouter = createRouter()
     resolve: async ({ input }) => {
       return await prisma.collateral.create({
         data: {
-          item: input.value,
+          item: input.item,
           value: input.value,
           memberId: input.memberId,
-        }
+        },
       });
     },
   })
@@ -220,6 +240,11 @@ export const membersRouter = createRouter()
       memberId: z.string(),
     }),
     resolve: async ({ input }) => {
+        await prisma.guarantor.deleteMany({
+          where: {
+          memberId: input.memberId,
+          }
+        });
       return await prisma.guarantor.create({
         data: {
           id: input.id,
@@ -228,7 +253,7 @@ export const membersRouter = createRouter()
           guarantorRelationship: input.guarantorRelationship,
           guarantorID: input.guarantorID,
           memberId: input.memberId,
-        }
+        },
       });
     },
   })
@@ -278,8 +303,7 @@ export const membersRouter = createRouter()
           guarantorId: input.guarantorId,
           startDate: input.startDate,
           loanRef: input.loanRef,
-        }
+        },
       });
     },
-  })
-
+  });

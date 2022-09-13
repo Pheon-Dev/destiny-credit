@@ -13,7 +13,6 @@ async function products(req: NextApiRequest, res: NextApiResponse) {
       return {
         props: { products },
       };
-
     } catch (error) {
       console.log(error);
 
@@ -32,4 +31,3 @@ async function products(req: NextApiRequest, res: NextApiResponse) {
 }
 
 export default products;
-
