@@ -1,4 +1,5 @@
 import { createRouter } from "./create-router";
+import superjson from "superjson";
 import {
   transactionsRouter,
   membersRouter,
@@ -7,7 +8,7 @@ import {
 } from "./routers";
 
 export const appRouter = createRouter()
-  /* .transformer(superjson) */
+  .transformer(superjson)
   .merge("transactions.", transactionsRouter)
   .merge("loans.", loansRouter)
   .merge("members.", membersRouter)

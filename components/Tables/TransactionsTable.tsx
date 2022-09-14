@@ -71,7 +71,9 @@ function TransactionRow({ transaction }: { transaction: Transaction }) {
               " " +
               transaction.lastName}
           </td>
-          <td>{transaction.transAmount}</td>
+          <td>
+            {`${transaction.transAmount}`.replace(/\B(?=(\d{3})+(?!\d))/g, ",")}
+          </td>
           <td>{transaction.msisdn}</td>
           {transaction.billRefNumber === "" ? (
             <td>{transaction.transTime}</td>

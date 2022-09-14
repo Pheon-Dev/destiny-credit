@@ -1,13 +1,16 @@
 import { GetServerSidePropsContext } from "next";
-import React, { useState, useEffect } from "react";
+import React, { useState } from "react";
 import type { AppProps } from "next/app";
 import { getCookie, setCookie } from "cookies-next";
 import Head from "next/head";
 import { NotificationsProvider } from "@mantine/notifications";
 import { withTRPC } from "@trpc/next";
+import { loggerLink } from '@trpc/client/links/loggerLink';
+import { httpBatchLink } from '@trpc/client/links/httpBatchLink';
 import type { AppRouter } from "../server/_app";
 import { SessionProvider } from "next-auth/react";
-import { signOut, useSession } from "next-auth/react";
+import { useSession } from "next-auth/react";
+import superjson from "superjson";
 
 import {
   MantineProvider,
@@ -20,7 +23,6 @@ import {
   Footer,
   Aside,
   ScrollArea,
-  Text,
   MediaQuery,
   Burger,
   useMantineTheme,
@@ -158,10 +160,18 @@ App.getInitialProps = ({ ctx }: { ctx: GetServerSidePropsContext }) => ({
 });
 
 export default withTRPC<AppRouter>({
-  config({ ctx }) {
-    const url = `${process.env.NEXT_PUBLIC_VERCEL_URL}/api/trpc`
+  config() {
     return {
-      url,
+      links: [
+       loggerLink({
+           enabled: (opts) => process.env.NODE_ENV === "development" ||
+           (opts.direction === "down" && opts.result instanceof Error),
+         }),
+       httpBatchLink({
+           url: `${process.env.NEXT_PUBLIC_VERCEL_URL}/api/trpc`
+         }),
+      ],
+      transformer: superjson,
     };
   },
   ssr: true,
