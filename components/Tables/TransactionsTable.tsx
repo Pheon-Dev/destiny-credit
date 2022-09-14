@@ -66,7 +66,7 @@ const  TransactionRow = ({
           }}
           onClick={() => {
             transaction.billRefNumber !== ""
-              ? router.push(`/members/paid/${transaction.transID}`)
+              ? router.push(`/members/register/${transaction.transID}`)
               : null;
           }}
         >
@@ -97,7 +97,7 @@ const  TransactionRow = ({
               cursor: "pointer",
             }}
             onClick={() => {
-              router.push(`/members/paid/${transaction.transID}`);
+              router.push(`/members/register/${transaction.transID}`);
             }}
           >
             <td>{transaction.transID}</td>

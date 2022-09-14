@@ -2,7 +2,7 @@ import React from "react";
 import { LoadingOverlay, Text } from "@mantine/core";
 import { useRouter } from "next/router";
 import { NextPage } from "next";
-import { trpc } from "../../utils/trpc";
+import { trpc } from "../../../utils/trpc";
 
 const Page: NextPage = () => {
   const router = useRouter();
@@ -24,3 +24,4 @@ const Page: NextPage = () => {
 };
 
 export default Page;
+

@@ -64,7 +64,7 @@ const MemberRow = ({ member, call }: { member: Member; call: string }) => {
             {member.maintained ? (
               <Badge
                 style={{ cursor: "pointer" }}
-                onClick={() => router.push(`/members/${member.id}`)}
+                onClick={() => router.push(`/members/details/${member.id}`)}
                 variant="gradient"
                 gradient={{
                   from: "teal",
@@ -89,7 +89,7 @@ const MemberRow = ({ member, call }: { member: Member; call: string }) => {
           </td>
           <td
             style={{ cursor: "pointer" }}
-            onClick={() => router.push(`/members/${member.id}`)}
+            onClick={() => router.push(`/members/details/${member.id}`)}
           >
             <IconEdit size={24} />
           </td>
@@ -117,7 +117,7 @@ const MemberRow = ({ member, call }: { member: Member; call: string }) => {
           </td>
           <td
             style={{ cursor: "pointer" }}
-            onClick={() => router.push(`/members/${member.id}`)}
+            onClick={() => router.push(`/members/details/${member.id}`)}
           >
             <IconEdit size={24} />
           </td>
@@ -145,7 +145,7 @@ const MemberRow = ({ member, call }: { member: Member; call: string }) => {
           </td>
           <td
             style={{ cursor: "pointer" }}
-            onClick={() => router.push(`/members/${member.id}`)}
+            onClick={() => router.push(`/members/details/${member.id}`)}
           >
             <IconEdit size={24} />
           </td>
