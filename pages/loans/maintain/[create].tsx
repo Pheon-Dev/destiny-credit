@@ -311,7 +311,13 @@ const Page: NextPage = () => {
     );
 
     const date = new Date();
-    date.setDate(cycle === "monthly" ? date.getDate() + 30 : cycle === "weekly" ? date.getDate() + 7 : date.getDate() + 1);
+    date.setDate(
+      cycle === "monthly"
+        ? date.getDate() + 30
+        : cycle === "weekly"
+        ? date.getDate() + 7
+        : date.getDate() + 1
+    );
     date.setDate(date.getDay() === 0 ? date.getDate() + 1 : date.getDate() + 0);
 
     const startsOn =
@@ -454,17 +460,24 @@ const Page: NextPage = () => {
       subscribe = false;
     };
   }, [
+    member,
+    pro_data,
+    proName,
     checked,
+    loanLen,
+    memberCode,
     sundays,
     intRate,
-    proName,
-    member,
-    form.values.principal,
-    form.values.tenure,
-    form.values.product,
-    form.values.productId,
-    collateral_form.values.item,
-    collateral_form.values.value,
+    payoffAmount,
+    grace,
+    loanRef,
+    startDate,
+    cycle,
+    penRate,
+    proRate,
+    maxTenure,
+    minRange,
+    maxRange,
   ]);
 
   const maintain_member = trpc.useMutation(["members.maintain-member"], {
@@ -476,14 +489,6 @@ const Page: NextPage = () => {
   const maintain_guarantor = trpc.useMutation(["members.maintain-guarantor"], {
     onSuccess: async () => {
       await utils.invalidateQueries(["members.guarantor"]);
-      showNotification({
-        id: "maintained-status",
-        color: "teal",
-        title: `Guarantor Saved`,
-        message: `This Loan is Guaranteed by ${maintain_guarantor.data?.guarantorName}.`,
-        icon: <IconCheck size={16} />,
-        autoClose: 8000,
-      });
     },
   });
 
@@ -494,7 +499,7 @@ const Page: NextPage = () => {
         id: "maintained-status",
         color: "teal",
         title: `Maintained Successfully`,
-        message: `Loan for ${maintain_loan.data?.memberName} was Successfully Maintained.`,
+        message: `Loan was Successfully Maintained.`,
         icon: <IconCheck size={16} />,
         autoClose: 8000,
       });
@@ -635,60 +640,60 @@ const Page: NextPage = () => {
             autoClose: 8000,
           });
         }
-          updateNotification({
-            id: "submit-status",
-            color: "teal",
-            title: `${maintain_loan.data?.memberName}`,
-            message: `Loan Was Successfully Maintained and is Guaranteed by ${maintain_guarantor.data?.guarantorName}.`,
-            icon: <IconCheck size={16} />,
-            autoClose: 8000,
-          });
+        updateNotification({
+          id: "submit-status",
+          color: "teal",
+          title: `${maintain_loan.data?.memberName}`,
+          message: `Loan Was Successfully Maintained and is Guaranteed by ${maintain_guarantor.data?.guarantorName}.`,
+          icon: <IconCheck size={16} />,
+          autoClose: 8000,
+        });
 
-          return router.push("/loans/approvals");
+        return router.push("/loans/approvals");
       }
-          console.table({
-            id: id,
-            maintained: form.values.maintained,
-          });
-          console.table({
-            id: form.values.guarantorId,
-            guarantorName: guarantor_form.values.guarantorName,
-            guarantorPhone: guarantor_form.values.guarantorPhone,
-            guarantorRelationship: guarantor_form.values.guarantorRelationship,
-            guarantorID: guarantor_form.values.guarantorID,
-            memberId: form.values.memberId,
-          });
+      console.table({
+        id: id,
+        maintained: form.values.maintained,
+      });
+      console.table({
+        id: form.values.guarantorId,
+        guarantorName: guarantor_form.values.guarantorName,
+        guarantorPhone: guarantor_form.values.guarantorPhone,
+        guarantorRelationship: guarantor_form.values.guarantorRelationship,
+        guarantorID: guarantor_form.values.guarantorID,
+        memberId: form.values.memberId,
+      });
 
-          console.table({
-            guarantorId: form.values.guarantorId,
-            memberId: form.values.memberId,
-            tenure: form.values.tenure,
-            principal: form.values.principal,
-            maintained: form.values.maintained,
-            approved: form.values.approved,
-            disbursed: form.values.disbursed,
-            grace: form.values.grace,
-            installment: form.values.installment,
-            productId: form.values.productId,
-            payoff: form.values.payoff,
-            penalty: form.values.penalty,
-            processingFee: form.values.processingFee,
-            sundays: form.values.sundays,
-            memberName: form.values.member,
-            productName: form.values.product,
-            interest: form.values.interest,
-            cycle: form.values.cycle,
-            startDate: form.values.startDate,
-            loanRef: form.values.loanRef,
-          });
-          return updateNotification({
-            id: "submit-status",
-            title: "Something Went Wrong",
-            message: `Please Make Sure all Fields are Filled Before Submission Then Try Adding Again!`,
-            icon: <IconX size={16} />,
-            color: "red",
-            autoClose: 4000,
-          });
+      console.table({
+        guarantorId: form.values.guarantorId,
+        memberId: form.values.memberId,
+        tenure: form.values.tenure,
+        principal: form.values.principal,
+        maintained: form.values.maintained,
+        approved: form.values.approved,
+        disbursed: form.values.disbursed,
+        grace: form.values.grace,
+        installment: form.values.installment,
+        productId: form.values.productId,
+        payoff: form.values.payoff,
+        penalty: form.values.penalty,
+        processingFee: form.values.processingFee,
+        sundays: form.values.sundays,
+        memberName: form.values.member,
+        productName: form.values.product,
+        interest: form.values.interest,
+        cycle: form.values.cycle,
+        startDate: form.values.startDate,
+        loanRef: form.values.loanRef,
+      });
+      return updateNotification({
+        id: "submit-status",
+        title: "Something Went Wrong",
+        message: `Please Make Sure all Fields are Filled Before Submission Then Try Adding Again!`,
+        icon: <IconX size={16} />,
+        color: "red",
+        autoClose: 4000,
+      });
     } catch (error) {
       return updateNotification({
         id: "submit-status",
@@ -700,48 +705,31 @@ const Page: NextPage = () => {
       });
     }
   }, [
-    form.values.memberId,
-    form.values.tenure,
-    form.values.principal,
-    form.values.maintained,
-    form.values.approved,
-    form.values.disbursed,
-    form.values.grace,
-    form.values.member,
-    form.values.installment,
-    form.values.productId,
-    form.values.payoff,
-    form.values.penalty,
-    form.values.processingFee,
-    form.values.sundays,
-    form.values.interest,
-    form.values.guarantorId,
-    form.values.productName,
-    form.values.cycle,
-    form.values.startDate,
-    form.values.loanRef,
-    guarantor_form.values.guarantorPhone,
-    guarantor_form.values.guarantorRelationship,
-    guarantor_form.values.guarantorName,
-    guarantor_form.values.guarantorID,
+    form,
+    guarantor_form,
+    id,
+    maintain_guarantor,
+    maintain_loan,
+    maintain_member,
+    router,
   ]);
 
   const maintain_collateral = trpc.useMutation(
     ["members.maintain-collateral"],
     {
       onSuccess: async () => {
-        await utils.invalidateQueries(["members.collateral", {id: id}]);
+        await utils.invalidateQueries(["members.collateral", { id: id }]);
       },
     }
   );
 
-  const collaterals = trpc.useQuery(["members.collateral", {id: id}]) || [];
+  const collaterals = trpc.useQuery(["members.collateral", { id: id }]) || [];
   const { data: guarantor } =
     trpc.useQuery(["members.guarantor", { id: id }]) || [];
 
   const delete_collateral = trpc.useMutation(["members.collateral-delete"], {
     onSuccess: async () => {
-      await utils.invalidateQueries(["members.collateral", {id: id}]);
+      await utils.invalidateQueries(["members.collateral", { id: id }]);
       updateNotification({
         id: "collateral-delete-status",
         color: "red",
@@ -769,7 +757,6 @@ const Page: NextPage = () => {
         collateral_form.setFieldValue("item", "");
         collateral_form.setFieldValue("value", "");
         if (maintain_collateral.status === "success") {
-
           return updateNotification({
             id: "collateral-status",
             color: "teal",
@@ -819,7 +806,11 @@ const Page: NextPage = () => {
         autoClose: 4000,
       });
     }
-  }, [collateral_form.values.item, collateral_form.values.value]);
+  }, [
+    collateral_form,
+    form.values.memberId,
+    maintain_collateral,
+  ]);
 
   const deleteCollateral = useCallback(() => {
     try {
@@ -846,7 +837,7 @@ const Page: NextPage = () => {
         autoClose: 5000,
       });
     }
-  }, [collateral_form.values.item, collateral_form.values.value, collateralId]);
+  }, [collateralId, delete_collateral]);
 
   const roundOff = (value: number) => {
     return (
@@ -1036,6 +1027,9 @@ const Page: NextPage = () => {
     guarantor_form.values.guarantorPhone,
     form.values.principal,
     form.values.tenure,
+    form.values.member,
+    changeGuarantor,
+    guarantor,
   ]);
 
   const Review = () => {
@@ -1420,10 +1414,7 @@ const Page: NextPage = () => {
         position: "relative",
       }}
     >
-      <LoadingOverlay
-        overlayBlur={2}
-        visible={member_status === "loading"}
-      />
+      <LoadingOverlay overlayBlur={2} visible={member_status === "loading"} />
       <Protected>
         <Stepper
           mt="lg"

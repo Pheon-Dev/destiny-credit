@@ -34,6 +34,15 @@ const Disburse = () => {
   const disburse = trpc.useMutation(["loans.disburse"], {
     onSuccess: async () => {
       await utils.invalidateQueries(["loans.loan", { id: id }]);
+      updateNotification({
+        id: "submit-status",
+        color: "teal",
+        title: `Loan Disbursement`,
+        message: `Loan Was Successfully Disbursed`,
+        icon: <IconCheck size={16} />,
+        autoClose: 8000,
+      });
+      return router.push("/loans/payments");
     },
   });
 
@@ -52,15 +61,6 @@ const Disburse = () => {
         disbursedOn: disbursedOn,
         disbursed: true,
       });
-      updateNotification({
-        id: "submit-status",
-        color: "teal",
-        title: `Loan Disbursement`,
-        message: `Loan Was Successfully Disbursed`,
-        icon: <IconCheck size={16} />,
-        autoClose: 8000,
-      });
-      return router.push("/loans/payments");
     } catch (error) {
       return updateNotification({
         id: "submit-status",
@@ -71,7 +71,7 @@ const Disburse = () => {
         autoClose: 8000,
       });
     }
-  }, []);
+  }, [disburse, id, disbursedOn]);
 
   return (
     <>

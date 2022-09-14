@@ -33,15 +33,6 @@ const Approve = () => {
   const approve = trpc.useMutation(["loans.approve"], {
     onSuccess: async () => {
       await utils.invalidateQueries(["loans.loan", { id: id }]);
-    },
-  });
-
-  const handleSubmit = useCallback(() => {
-    try {
-      approve.mutate({
-        id: id,
-        approved: true,
-      });
       updateNotification({
         id: "submit-status",
         color: "teal",
@@ -51,6 +42,15 @@ const Approve = () => {
         autoClose: 8000,
       });
       return router.push("/loans/disbursements");
+    },
+  });
+
+  const handleSubmit = useCallback(() => {
+    try {
+      approve.mutate({
+        id: id,
+        approved: true,
+      });
     } catch (error) {
       return updateNotification({
         id: "submit-status",
@@ -61,7 +61,7 @@ const Approve = () => {
         autoClose: 8000,
       });
     }
-  }, []);
+  }, [approve, id]);
 
   return (
     <>
