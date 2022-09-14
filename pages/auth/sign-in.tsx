@@ -34,8 +34,6 @@ const Page: NextPage = (props): JSX.Element => {
     },
   });
 
-  const logs = trpc.useQuery(["transactions.logs"]);
-
   const handleSubmit = async () => {
     try {
       const res = await signIn("credentials", {
@@ -46,7 +44,6 @@ const Page: NextPage = (props): JSX.Element => {
 
       if (res?.ok) {
         router.replace(router.asPath);
-        if (logs.error) return;
          setTimeout(() => {
           updateNotification({
             id: "sing-in-status",

@@ -161,7 +161,7 @@ export const transactionsRouter = createRouter()
               transaction[0]?.transactionType === "PAY BILL" ||
               transaction[0]?.transactionType === "CUSTOMER MERCHANT PAYMENT"
             )
-              await prisma.transaction.create({
+              return await prisma.transaction.create({
                 data: {
                   transactionType: transaction[0]?.transactionType,
                   transID: transaction[0]?.transID,
@@ -184,13 +184,24 @@ export const transactionsRouter = createRouter()
             };
           }
         }
+        return {
+          message: "Transaction not Found",
+        };
       });
 
+      if (transactions.length > 0)
+        return {
+          data: transactions,
+          from: new_date + " " + str_tdate,
+          to: now_date + " " + str_tdate,
+          message: "Transactions Upto Date",
+        };
+
       return {
-        data: transactions,
+        data: transactions.length,
         from: new_date + " " + str_tdate,
         to: now_date + " " + str_tdate,
-        message: "Transactions Upto Date",
+        message: "No New Transactions",
       };
     },
   })

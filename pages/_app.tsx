@@ -159,6 +159,17 @@ App.getInitialProps = ({ ctx }: { ctx: GetServerSidePropsContext }) => ({
   colorscheme: getCookie("mantine-color-scheme", ctx) || "dark",
 });
 
+function getBaseUrl() {
+  if (typeof window !== 'undefined') {
+    return '';
+  }
+  if (process.env.NEXT_PUBLIC_VERCEL_URL) {
+    return `https://${process.env.NEXT_PUBLIC_VERCEL_URL}`;
+  }
+
+  return `http://localhost:${process.env.PORT ?? 3000}`;
+}
+
 export default withTRPC<AppRouter>({
   config() {
     return {
@@ -168,7 +179,7 @@ export default withTRPC<AppRouter>({
            (opts.direction === "down" && opts.result instanceof Error),
          }),
        httpBatchLink({
-           url: `${process.env.NEXT_PUBLIC_VERCEL_URL}/api/trpc`
+           url: `${getBaseUrl()}/api/trpc`
          }),
       ],
       transformer: superjson,

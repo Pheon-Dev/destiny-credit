@@ -8,7 +8,7 @@ const PaymentsList = () => {
   const router = useRouter();
   const id = router.query.payments as string;
 
-  const { data: loan, status } = trpc.useQuery(["loans.loan", { id: id }])
+  const { data: loan, status } = trpc.useQuery(["loans.payment", { id: id }])
 
   return (
     <>

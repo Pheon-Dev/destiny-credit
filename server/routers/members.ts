@@ -159,9 +159,16 @@ export const membersRouter = createRouter()
       });
     },
   })
-  .query("collaterals", {
-    resolve: async () => {
-      return await prisma.collateral.findMany();
+  .query("collateral", {
+    input: z.object({
+      id: z.string(),
+    }),
+    resolve: async ({input}) => {
+      return await prisma.collateral.findMany({
+        where: {
+          memberId: input.id
+        }
+      });
     },
   })
   .mutation("collateral-delete", {

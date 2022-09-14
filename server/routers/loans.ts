@@ -61,7 +61,7 @@ export const loansRouter = createRouter()
         .findMany()
     },
   })
-  .query("loan", {
+  .query("payment", {
     input: z.object({
       id: z.string(),
     }),
@@ -71,6 +71,55 @@ export const loansRouter = createRouter()
           where: {
             loanId: input.id,
           },
+        })
+    },
+  })
+  .query("loan", {
+    input: z.object({
+      id: z.string(),
+    }),
+    resolve: async ({ input }) => {
+      return await prisma.loan
+        .findMany({
+          where: {
+            id: input.id,
+          },
+        })
+    },
+  })
+  .mutation("approve", {
+    input: z.object({
+      id: z.string(),
+      approved: z.boolean(),
+    }),
+    resolve: async ({ input }) => {
+      return await prisma.loan
+        .updateMany({
+          where: {
+            id: input.id,
+          },
+          data: {
+            approved: input.approved
+          }
+        })
+    },
+  })
+  .mutation("disburse", {
+    input: z.object({
+      id: z.string(),
+      disbursed: z.boolean(),
+      disbursedOn: z.string(),
+    }),
+    resolve: async ({ input }) => {
+      return await prisma.loan
+        .updateMany({
+          where: {
+            id: input.id,
+          },
+          data: {
+            disbursed: input.disbursed,
+            disbursedOn: input.disbursedOn
+          }
         })
     },
   })

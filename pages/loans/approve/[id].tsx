@@ -1,5 +1,4 @@
-import React, { useEffect, useState } from "react";
-import axios from "axios";
+import React, { useCallback } from "react";
 import { NextPage } from "next";
 import { Protected } from "../../../components";
 import {
@@ -22,55 +21,29 @@ import {
   IconTrash,
   IconX,
 } from "@tabler/icons";
-import { Loans } from "../../../types";
+import { trpc } from "../../../utils/trpc";
+import type { Loan } from "@prisma/client";
 
 const Approve = () => {
-  const [loan, setLoan] = useState([]);
-  const [load, setLoad] = useState(true);
-
   const router = useRouter();
   const id = router.query.id as string;
+  const utils = trpc.useContext();
 
-  const fetchLoan = async (signal: AbortSignal) => {
+  const { data: loan, status } = trpc.useQuery(["loans.loan", { id: id }]);
+  const approve = trpc.useMutation(["loans.approve"], {
+    onSuccess: async () => {
+      await utils.invalidateQueries(["loans.loan", { id: id }]);
+    },
+  });
+
+  const handleSubmit = useCallback(() => {
     try {
-      const res = await axios.request({
-        method: "POST",
-        url: `/api/loans/approve`,
-        signal,
-        data: {
-          id: `${id}`,
-        },
-      });
-      setLoan(res.data.loan);
-      loan.length === 0 && setLoad(false);
-    } catch (error) {
-      console.log(error);
-    }
-  };
-
-  useEffect(() => {
-    const controller = new AbortController();
-    const signal = controller.signal;
-
-      fetchLoan(signal);
-    return () => {
-      controller.abort();
-    };
-  }, []);
-
-  const handleSubmit = async () => {
-    try {
-      setLoad(true)
-      const req = await axios.request({
-        method: "POST",
-        url: "/api/loans/approve",
-        data: {
+      if (id) {
+        approve.mutate({
           id: id,
           approved: true,
-        },
-      });
-      if (req.status === 200) {
-        setTimeout(() => {
+        });
+        if (status === "success") {
           updateNotification({
             id: "submit-status",
             color: "teal",
@@ -79,30 +52,27 @@ const Approve = () => {
             icon: <IconCheck size={16} />,
             autoClose: 8000,
           });
-        });
-        return router.push("/loans/disbursements");
+          return router.push("/loans/disbursements");
+        }
       }
-      if (req.status !== 200)
-        setTimeout(() => {
-          updateNotification({
-            id: "submit-status",
-            color: "red",
-            title: `Loan Approval`,
-            message: `Loan Was not Successfully Approved. Please Try Again.`,
-            icon: <IconX size={16} />,
-            autoClose: 8000,
-          });
-        });
+      return updateNotification({
+        id: "submit-status",
+        color: "red",
+        title: `Loan Approval`,
+        message: `Loan Was not Successfully Approved. Please Try Again.`,
+        icon: <IconX size={16} />,
+        autoClose: 8000,
+      });
     } catch (error) {
       console.log(error);
     }
-  };
+  }, []);
 
   return (
     <>
-      {!load && (loan.length > 0 && (
+      {loan && (
         <>
-          {loan.map((_: Loans) => (
+          {loan.map((_: Loan) => (
             <Card key={_.id} shadow="sm" p="lg" radius="md" m="xl" withBorder>
               <Card.Section withBorder inheritPadding py="xs">
                 <Group position="apart">
@@ -277,13 +247,9 @@ const Approve = () => {
             </Card>
           ))}
         </>
-      ))}
-      {load && (
-        <LoadingOverlay
-          overlayBlur={2}
-          onClick={() => setLoad((prev) => !prev)}
-          visible={load}
-        />
+      )}
+      {!loan && (
+        <LoadingOverlay overlayBlur={2} visible={status === "loading"} />
       )}
     </>
   );

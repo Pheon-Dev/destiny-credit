@@ -1,5 +1,4 @@
-import React, { useEffect, useState } from "react";
-import axios from "axios";
+import React, { useCallback } from "react";
 import { NextPage } from "next";
 import { Protected, TitleText } from "../../../components";
 import {
@@ -23,11 +22,21 @@ import {
   IconTrash,
   IconX,
 } from "@tabler/icons";
-import { Loans } from "../../../types";
+import { trpc } from "../../../utils/trpc";
+import type { Loan } from "@prisma/client";
 
 const Disburse = () => {
-  const [loan, setLoan] = useState([]);
-  const [load, setLoad] = useState(true);
+  const router = useRouter();
+  const id = router.query.id as string;
+  const utils = trpc.useContext();
+
+  const { data: loan, status } = trpc.useQuery(["loans.loan", { id: id }]);
+  const disburse = trpc.useMutation(["loans.disburse"], {
+    onSuccess: async () => {
+      await utils.invalidateQueries(["loans.loan", { id: id }]);
+    },
+  });
+
   const date = new Date();
   const disbursedOn =
     date.toLocaleDateString().split("/")[0] +
@@ -36,51 +45,15 @@ const Disburse = () => {
     "-" +
     date.toLocaleDateString().split("/")[2];
 
-  const router = useRouter();
-  const id = router.query.id as string;
-
-  const fetchLoan = async (signal: AbortSignal) => {
+  const handleSubmit = useCallback(() => {
     try {
-      const res = await axios.request({
-        method: "POST",
-        url: `/api/loans/disburse`,
-        signal,
-        data: {
-          id: `${id}`,
-        },
-      });
-      setLoan(res.data.loan);
-      loan.length === 0 && setLoad(false);
-    } catch (error) {
-      console.log(error);
-    }
-  };
-
-  useEffect(() => {
-    const controller = new AbortController();
-    const signal = controller.signal;
-
-    fetchLoan(signal);
-
-    return () => {
-      controller.abort();
-    };
-  }, []);
-
-  const handleSubmit = async () => {
-    try {
-      setLoad(true);
-      const req = await axios.request({
-        method: "POST",
-        url: "/api/loans/disburse",
-        data: {
+      if (id) {
+       disburse.mutate({
           id: id,
           disbursedOn: disbursedOn,
           disbursed: true,
-        },
       });
-      if (req.status === 200) {
-        setTimeout(() => {
+        if (status === "success") {
           updateNotification({
             id: "submit-status",
             color: "teal",
@@ -89,30 +62,27 @@ const Disburse = () => {
             icon: <IconCheck size={16} />,
             autoClose: 8000,
           });
-        });
-        return router.push("/loans/payments");
+          return router.push("/loans/payments");
+        }
       }
-      if (req.status !== 200)
-        setTimeout(() => {
-          updateNotification({
+      return updateNotification({
             id: "submit-status",
             color: "red",
             title: `Loan Disbursement`,
             message: `Loan Was not Successfully Disbursed. Please Try Again.`,
             icon: <IconX size={16} />,
             autoClose: 8000,
-          });
-        });
+      });
     } catch (error) {
       console.log(error);
     }
-  };
+  }, []);
 
   return (
     <>
-      {!load && loan.length > 0 && (
+      {loan && (
         <>
-          {loan.map((_: Loans) => (
+          {loan.map((_: Loan) => (
             <Card key={_.id} shadow="sm" p="lg" radius="md" m="xl" withBorder>
               <Card.Section withBorder inheritPadding py="xs">
                 <Group position="apart">
@@ -307,15 +277,10 @@ const Disburse = () => {
               </Card.Section>
             </Card>
           ))}
-          <pre>{JSON.stringify(loan, undefined, 2)}</pre>
         </>
       )}
-      {load && (
-        <LoadingOverlay
-          overlayBlur={2}
-          onClick={() => setLoad((prev) => !prev)}
-          visible={load}
-        />
+      {!loan && (
+        <LoadingOverlay overlayBlur={2} visible={status === "loading"} />
       )}
     </>
   );
