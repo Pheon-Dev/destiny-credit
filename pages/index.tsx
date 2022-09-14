@@ -1,7 +1,7 @@
 import React from "react";
 import { TransactionsTable, Protected } from "../components";
 import { trpc } from "../utils/trpc";
-import { Group } from "@mantine/core";
+import { Group, LoadingOverlay } from "@mantine/core";
 
 export default function Home() {
   const { data: transactions, status } = trpc.useQuery([
@@ -10,6 +10,7 @@ export default function Home() {
 
   return (
     <Protected>
+      <LoadingOverlay overlayBlur={2} visible={status === "loading"} />
       {transactions && (
         <TransactionsTable transactions={transactions} call="transactions" />
       )}

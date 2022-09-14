@@ -1,13 +1,14 @@
 import React from "react";
 import { trpc } from "../../utils/trpc";
 import { ProductsTable, Protected } from "../../components";
-import { Group, Text } from "@mantine/core";
+import { Group, LoadingOverlay, Text } from "@mantine/core";
 
 const ProductsList = () => {
   const { data: products, status } = trpc.useQuery(["products.products"]);
 
   return (
     <Protected>
+      <LoadingOverlay overlayBlur={2} visible={status === "loading"} />
       {products && <ProductsTable products={products} />}
       {status === "success" && products.length === 0 && (
         <Group position="center">
@@ -19,7 +20,7 @@ const ProductsList = () => {
 };
 
 const Page = () => {
-    return <ProductsList />
-  }
+  return <ProductsList />;
+};
 
 export default Page;
