@@ -1,10 +1,8 @@
 import React from "react";
 import { TitleText } from "../../components";
 import { Table, Group, Badge } from "@mantine/core";
-import { Loan, Transaction, Member, Product, Payment } from "@prisma/client";
+import { Product } from "@prisma/client";
 import { useRouter } from "next/router";
-import { IconEdit } from "@tabler/icons";
-import { trpc } from "../../utils/trpc";
 
 export function ProductsTable({ products }: { products: Product[] }) {
   const Header = () => (
@@ -19,6 +17,9 @@ export function ProductsTable({ products }: { products: Product[] }) {
 
   return (
     <>
+      <Group position="center" m="lg">
+       <TitleText title="Products List" />
+      </Group>
       <Table striped highlightOnHover horizontalSpacing="md">
         <thead>
           <Header />

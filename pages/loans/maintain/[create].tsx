@@ -22,7 +22,7 @@ import {
   Modal,
   LoadingOverlay,
 } from "@mantine/core";
-import Router, { useRouter } from "next/router";
+import { useRouter } from "next/router";
 import { showNotification, updateNotification } from "@mantine/notifications";
 import {
   IconCheck,
@@ -36,8 +36,7 @@ import {
   IconX,
 } from "@tabler/icons";
 import { trpc } from "../../../utils/trpc";
-import { Collateral, Guarantor, Loan, Member, Product } from "@prisma/client";
-/* import { DatePicker } from "@mantine/dates"; */
+import { Collateral, Loan, Member, Product } from "@prisma/client";
 
 const loan_schema = z.object({
   member: z.string().min(2, { message: "User Name Missing" }),
@@ -63,7 +62,6 @@ const collateral_schema = z.object({
 });
 
 const Page: NextPage = () => {
-  const [load, setLoad] = useState(false);
   const [active, setActive] = useState(0);
   const [open, setOpen] = useState(false);
   const [deleteModal, setDeleteModal] = useState(false);
@@ -71,8 +69,6 @@ const Page: NextPage = () => {
   const [startDate, setStartDate] = useState("");
   const [loanRef, setLoanRef] = useState("");
   const [sundays, setSundays] = useState(0);
-  /* const [collaterals, setCollaterals] = useState([]); */
-  /* const [guarantor, setGuarantor] = useState([]); */
   const [changeGuarantor, setChangeGuarantor] = useState(false);
 
   const [payoffAmount, setPayoffAmount] = useState(0);
@@ -599,7 +595,6 @@ const Page: NextPage = () => {
         guarantor_form.setFieldValue("guarantorRelationship", "");
         guarantor_form.setFieldValue("guarantorID", "");
 
-        setLoad(false);
         setActive(0);
         setOpen(false);
         setDeleteModal(false);
@@ -1427,7 +1422,6 @@ const Page: NextPage = () => {
     >
       <LoadingOverlay
         overlayBlur={2}
-        onClick={() => setLoad((prev) => !prev)}
         visible={member_status === "loading"}
       />
       <Protected>

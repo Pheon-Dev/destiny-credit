@@ -1,8 +1,9 @@
 import React from "react";
-import { Table, Badge } from "@mantine/core";
 import { Loan } from "@prisma/client";
 import { useRouter } from "next/router";
 import { IconEdit } from "@tabler/icons";
+import { Table, Badge, Group } from "@mantine/core";
+import { TitleText } from "../Text/TitleText";
 
 export function LoansTable({ loans, call }: { loans: Loan[]; call: string }) {
   const Header = () => (
@@ -18,6 +19,10 @@ export function LoansTable({ loans, call }: { loans: Loan[]; call: string }) {
   );
   return (
     <>
+      <Group position="center" m="lg">
+        {call === "approvals" && <TitleText title="Approvals List" />}
+        {call === "disbursements" && <TitleText title="Disbursements List" />}
+      </Group>
       <Table striped highlightOnHover horizontalSpacing="md">
         <thead>
           <Header />

@@ -16,7 +16,6 @@ import { Protected, TitleText } from "../../../components";
 import { useRouter } from "next/router";
 import { showNotification, updateNotification } from "@mantine/notifications";
 import { trpc } from "../../../utils/trpc";
-import { Member } from "@prisma/client";
 
 const schema = z.object({
   date: z.date({ required_error: "Select Todays' Date" }),
@@ -75,15 +74,13 @@ const CreateMember = () => {
 
   const {
     data: members,
-    status,
+    status: members_status,
     refetch,
-  } = trpc.useQuery(["members.members"]) || [];
-  const members_data = members?.map((m: Member) => m) || [];
+  } = trpc.useQuery(["members.members"]);
 
-  const transaction = trpc.useQuery(["transactions.transaction", { id: id }]);
-  const data = transaction?.data;
+  const { data: transaction, status: transaction_status } = trpc.useQuery(["transactions.transaction", { id: id }]);
 
-  const lencode = members_data?.length + 1;
+  const lencode = members ? members?.length + 1 : 0;
 
   const memcode =
     lencode > 9
@@ -100,12 +97,12 @@ const CreateMember = () => {
       date: "",
       branchName: "Eldoret",
       memberId: `${memcode}`,
-      firstName: `${data?.firstName}`,
-      lastName: `${data?.middleName} ${data?.lastName}`,
+      firstName: `${transaction?.firstName}`,
+      lastName: `${transaction?.middleName} ${transaction?.lastName}`,
       dob: "",
       idPass: "",
       kraPin: "",
-      phoneNumber: `${data?.msisdn}`,
+      phoneNumber: `${transaction?.msisdn}`,
       gender: "",
       age: "0",
       religion: "",
@@ -126,8 +123,8 @@ const CreateMember = () => {
       refereeName: "",
       refereeNumber: "",
       communityPosition: "",
-      mpesaCode: `${data?.transID}`,
-      membershipAmount: `${data?.transAmount}`,
+      mpesaCode: `${transaction?.transID}`,
+      membershipAmount: `${transaction?.transAmount}`,
       nameKin: "",
       relationship: "",
       residentialAddressKin: "",
@@ -141,12 +138,18 @@ const CreateMember = () => {
   });
 
   useEffect(() => {
+    let subscribe = true;
+    if (subscribe) {
     form.setFieldValue("memberId", `${memcode}`);
-    form.setFieldValue("firstName", `${data?.firstName}`);
-    form.setFieldValue("lastName", `${data?.middleName} ${data?.lastName}`);
-    form.setFieldValue("mpesaCode", `${data?.transID}`);
-    form.setFieldValue("phoneNumber", `${data?.msisdn}`);
-    form.setFieldValue("membershipAmount", `${data?.transAmount}`);
+    form.setFieldValue("firstName", `${transaction?.firstName}`);
+    form.setFieldValue("lastName", `${transaction?.middleName} ${transaction?.lastName}`);
+    form.setFieldValue("mpesaCode", `${transaction?.transID}`);
+    form.setFieldValue("phoneNumber", `${transaction?.msisdn}`);
+    form.setFieldValue("membershipAmount", `${transaction?.transAmount}`);
+      }
+      return () => {
+          subscribe = false;
+        }
   }, [memcode]);
 
   let today_date = new Date(form.values.date);
@@ -379,15 +382,15 @@ const CreateMember = () => {
         position: "relative",
       }}
     >
-      {status === "loading" && transaction.status === "loading" && (
+      {members_status === "loading" && transaction_status === "loading" && (
         <LoadingOverlay
           overlayBlur={2}
-          visible={status === "loading" && transaction.status === "loading"}
+          visible={members_status === "loading" && transaction_status === "loading"}
         />
       )}
       <LoadingOverlay
         overlayBlur={2}
-        visible={status === "loading" && transaction.status === "loading"}
+        visible={members_status === "loading" && transaction_status === "loading"}
       />
       <form>
         <Group position="center" m="md">

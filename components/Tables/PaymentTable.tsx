@@ -1,5 +1,6 @@
 import React from "react";
-import { Table } from "@mantine/core";
+import { Table, Group } from "@mantine/core";
+import { TitleText } from "../Text/TitleText";
 import { Payment } from "@prisma/client";
 
 export function PaymentTable({
@@ -25,6 +26,9 @@ export function PaymentTable({
   );
   return (
     <>
+      <Group position="center" m="lg">
+        {call === "payments" && <TitleText title="Recent Payments List" />}
+      </Group>
       <Table striped highlightOnHover horizontalSpacing="md">
         <thead>
           <Header />

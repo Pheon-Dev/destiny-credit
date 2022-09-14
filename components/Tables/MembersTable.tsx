@@ -1,8 +1,9 @@
 import React from "react";
-import { Table, Badge } from "@mantine/core";
 import { Member } from "@prisma/client";
 import { useRouter } from "next/router";
 import { IconEdit } from "@tabler/icons";
+import { Table, Badge, Group } from "@mantine/core";
+import { TitleText } from "../Text/TitleText";
 
 export function MembersTable({
   members,
@@ -25,6 +26,11 @@ export function MembersTable({
 
   return (
     <>
+      <Group position="center" m="lg">
+        {call === "approvals" && <TitleText title="Approvals List" />}
+        {call === "create-loan" && <TitleText title="Maintain a New Loan" />}
+        {call === "all-members" && <TitleText title="All Members List" />}
+      </Group>
       <Table striped highlightOnHover horizontalSpacing="md">
         <thead>
           <Header />

@@ -6,8 +6,10 @@ import { useRouter } from "next/router";
 
 export function TransactionsTable({
   transactions,
+  call,
 }: {
   transactions: Transaction[];
+  call: string;
 }) {
   const Header = () => (
     <tr>
@@ -21,7 +23,8 @@ export function TransactionsTable({
   return (
     <>
       <Group position="center" m="lg">
-        <TitleText title="Todays Transactions" />
+        {call === "transactions" && <TitleText title="Todays Transactions" />}
+        {call === "register" && <TitleText title="Registration List" />}
       </Group>
       <Table striped highlightOnHover horizontalSpacing="md">
         <thead>
@@ -29,21 +32,25 @@ export function TransactionsTable({
         </thead>
         <tbody>
           {transactions?.map((transaction, index) => (
-            <TransactionRow
-              key={index}
-              transaction={transaction}
-            />
+            <TransactionRow key={index} transaction={transaction} call={call} />
           ))}
         </tbody>
         <tfoot>
           <Header />
         </tfoot>
       </Table>
+      <Group position="center" m="lg"></Group>
     </>
   );
 }
 
-function TransactionRow({ transaction }: { transaction: Transaction }) {
+function TransactionRow({
+  transaction,
+  call,
+}: {
+  transaction: Transaction;
+  call: string;
+}) {
   const router = useRouter();
   const today = new Date();
   const date = today.toLocaleDateString();
@@ -52,7 +59,7 @@ function TransactionRow({ transaction }: { transaction: Transaction }) {
 
   return (
     <>
-      {transaction.transTime.startsWith(time_str) && (
+      {call === "transactions" && transaction.transTime.startsWith(time_str) && (
         <tr
           style={{
             cursor: transaction.billRefNumber !== "" ? "pointer" : "text",
@@ -82,6 +89,39 @@ function TransactionRow({ transaction }: { transaction: Transaction }) {
           )}
         </tr>
       )}
+      {call === "register" &&
+        transaction.transTime.startsWith(time_str) &&
+        transaction.billRefNumber !== "" && (
+          <tr
+            style={{
+              cursor: "pointer",
+            }}
+            onClick={() => {
+              router.push(`/members/paid/${transaction.transID}`);
+            }}
+          >
+            <td>{transaction.transID}</td>
+            <td>
+              {transaction.firstName +
+                " " +
+                transaction.middleName +
+                " " +
+                transaction.lastName}
+            </td>
+            <td>
+              {`${transaction.transAmount}`.replace(
+                /\B(?=(\d{3})+(?!\d))/g,
+                ","
+              )}
+            </td>
+            <td>{transaction.msisdn}</td>
+            {transaction.billRefNumber === "" ? (
+              <td>{transaction.transTime}</td>
+            ) : (
+              <td>{transaction.billRefNumber}</td>
+            )}
+          </tr>
+        )}
     </>
   );
 }

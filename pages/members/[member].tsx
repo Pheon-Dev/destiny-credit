@@ -1,40 +1,24 @@
-import React, { useEffect, useState } from "react";
-import { Text } from "@mantine/core";
-import axios from "axios";
+import React from "react";
+import { LoadingOverlay, Text } from "@mantine/core";
 import { useRouter } from "next/router";
 import { NextPage } from "next";
+import { trpc } from "../../utils/trpc";
 
 const Page: NextPage = () => {
-  const [member, setMember] = useState();
   const router = useRouter();
   const id = router.query.member as string;
 
-  const fetchMember = async () => {
-    let subscribe = true;
-    if (subscribe) {
-      const res = await axios.request({
-        method: "POST",
-        url: `/api/members/${id}`,
-        data: {
-          id: `${id}`,
-        },
-      });
-      setMember(res.data);
-    }
+  const { data: member, status } = trpc.useQuery(["members.member", {id: id}])
 
-    return () => {
-      subscribe = false;
-    };
-  };
-
-  useEffect(() => {
-    fetchMember();
-  }, []);
 
   return (
     <>
-    <Text>Member Page :</Text>
+      {member && (
       <pre>{JSON.stringify(member, undefined, 2)}</pre>
+      )}
+      {!member && (
+      <LoadingOverlay overlayBlur={2} visible={status === "loading"} />
+      )}
     </>
   );
 };

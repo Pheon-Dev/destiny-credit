@@ -1,10 +1,9 @@
 import React from "react";
-import { TitleText } from "../../components";
-import { Table, Group, Badge } from "@mantine/core";
-import { Loan, Transaction, Member, Product, Payment } from "@prisma/client";
+import { Loan } from "@prisma/client";
 import { useRouter } from "next/router";
 import { IconEdit } from "@tabler/icons";
-import { trpc } from "../../utils/trpc";
+import { Table, Badge, Group } from "@mantine/core";
+import { TitleText } from "../Text/TitleText";
 
 export function PaymentsTable({
   loans,
@@ -26,6 +25,9 @@ export function PaymentsTable({
   );
   return (
     <>
+      <Group position="center" m="lg">
+        {call === "payments" && <TitleText title="Payments List" />}
+      </Group>
       <Table striped highlightOnHover horizontalSpacing="md">
         <thead>
           <Header />

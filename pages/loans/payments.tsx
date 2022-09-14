@@ -1,26 +1,20 @@
 import React from "react";
 import { trpc } from "../../utils/trpc";
-import { PaymentsTable } from "../../components";
-import { Group, LoadingOverlay, Text } from "@mantine/core";
+import { PaymentsTable, Protected } from "../../components";
+import { Group, Text } from "@mantine/core";
 
 const PaymentsList = () => {
   const { data: loans, status } = trpc.useQuery(["loans.loans"]);
 
   return (
-    <>
-      {loans && <PaymentsTable loans={loans} call="payments" />}
-      {status === "loading" &&
-        <LoadingOverlay
-          overlayBlur={2}
-          visible={status === "loading"}
-        />
-      }
-      {status === "success" && loans.length === 0 && (
-        <Group position="center">
-          <Text>No Disbursed loans</Text>
-        </Group>
-      )}
-    </>
+    <Protected>
+        {loans && <PaymentsTable loans={loans} call="payments" />}
+        {status === "success" && loans.length === 0 && (
+          <Group position="center">
+            <Text>No Disbursed loans</Text>
+          </Group>
+        )}
+    </Protected>
   );
 };
 
