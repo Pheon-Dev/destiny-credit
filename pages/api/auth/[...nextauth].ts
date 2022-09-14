@@ -11,7 +11,8 @@ type Props = {
   password: string;
   hashedPassword: string;
 };
-
+/* Checkout */
+/* https://blog.devso.io/implementing-credentials-provider-on-nextjs-and-nextauth */
 const SECRET = process.env.NEXT_PUBLIC_JWT_SECRET;
 
 const prisma = new PrismaClient();

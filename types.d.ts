@@ -38,6 +38,15 @@ export interface IUser {
   image: string;
 }
 
+export interface Logs {
+  app: string;
+  source_id: string;
+  dt: string;
+  _insert_index: number;
+  _dt: string;
+  message: string;
+}
+
 export interface Fields {
   transactionType: string;
   transID: string;

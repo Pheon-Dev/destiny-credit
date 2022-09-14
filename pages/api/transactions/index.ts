@@ -5,7 +5,6 @@ import { Fields } from "../../../types";
 
 const LOGTAIL_API_TOKEN = process.env.NEXT_PUBLIC_LOGTAIL_API_TOKEN;
 
-
 async function transactions(req: NextApiRequest, res: NextApiResponse) {
   const prisma = new PrismaClient();
 
@@ -33,7 +32,8 @@ async function transactions(req: NextApiRequest, res: NextApiResponse) {
         "-" +
         str_ndate.split("/")[0];
 
-      const url = "https://logtail.com/api/v1/query?source_ids=158744&query=transID";
+      const url =
+        "https://logtail.com/api/v1/query?source_ids=158744&query=transID";
 
       const token = LOGTAIL_API_TOKEN;
       const headers = {
@@ -126,50 +126,48 @@ async function transactions(req: NextApiRequest, res: NextApiResponse) {
             lastName: lastName.toUpperCase(),
           });
 
-            try {
-              const data = await prisma.transaction.findMany({
-                where: {
-                  transID: `${transID}`
-                }
-              })
-              
-          if (data.length === 0) {
-            if (
-              transactionType === "Pay Bill" ||
-              transactionType === "Customer Merchant Payment"
-            ) {
-              await prisma.transaction.create({
-                data: {
-                  transactionType: transactionType,
-                  transID: transID,
-                  transTime: transTime,
-                  transAmount: transAmount,
-                  businessShortCode: businessShortCode,
-                  billRefNumber: billRefNumber,
-                  invoiceNumber: invoiceNumber,
-                  orgAccountBalance: orgAccountBalance,
-                  thirdPartyTransID: thirdPartyTransID,
-                  msisdn: msisdn,
-                  firstName: firstName,
-                  middleName: middleName,
-                  lastName: lastName,
-                }
-              })
+          try {
+            const data = await prisma.transaction.findMany({
+              where: {
+                transID: `${transID}`,
+              },
+            });
+
+            if (data.length === 0) {
+              if (
+                transactionType === "Pay Bill" ||
+                transactionType === "Customer Merchant Payment"
+              ) {
+                await prisma.transaction.create({
+                  data: {
+                    transactionType: transactionType,
+                    transID: transID,
+                    transTime: transTime,
+                    transAmount: transAmount,
+                    businessShortCode: businessShortCode,
+                    billRefNumber: billRefNumber,
+                    invoiceNumber: invoiceNumber,
+                    orgAccountBalance: orgAccountBalance,
+                    thirdPartyTransID: thirdPartyTransID,
+                    msisdn: msisdn,
+                    firstName: firstName,
+                    middleName: middleName,
+                    lastName: lastName,
+                  },
+                });
+              }
+
+              counter++;
             }
 
-            counter++;
-          }
-
-          if (data.length !== 0) {
-            counter++;
-          }
-            } catch (error) {
+            if (data.length !== 0) {
+              counter++;
+            }
+          } catch (error) {
             return res
               .status(500)
               .json({ message: "Error Fetching Data From Database" });
-            }
-
-
+          }
         }
       }
 
@@ -180,7 +178,9 @@ async function transactions(req: NextApiRequest, res: NextApiResponse) {
         message: "Transactions Upto Date",
       });
     } catch (error) {
-      res.status(500).json({ message: "Something Went Wrong With The Internal Server!" });
+      res
+        .status(500)
+        .json({ message: "Something Went Wrong With The Internal Server!" });
       // res.status(500).json({ message: error });
     }
   }
@@ -196,5 +196,3 @@ async function transactions(req: NextApiRequest, res: NextApiResponse) {
 }
 
 export default transactions;
-
-

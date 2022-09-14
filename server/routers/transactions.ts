@@ -1,9 +1,9 @@
-import { Prisma, PrismaClient } from "@prisma/client";
+import { Prisma, PrismaClient, Transaction } from "@prisma/client";
 import { TRPCError } from "@trpc/server";
 import { z } from "zod";
 import axios from "axios";
 import { createRouter } from "../create-router";
-import { Fields } from "../../types";
+import { Fields, Logs, Transactions } from "../../types";
 
 const LOGTAIL_API_TOKEN = process.env.NEXT_PUBLIC_LOGTAIL_API_TOKEN;
 
@@ -66,75 +66,76 @@ export const transactionsRouter = createRouter()
 
       const log = response.data;
 
-      if (log.data.length > 0) {
-        let counter: number = 0;
-        while (counter < log.data.length) {
-          const data_res: string = log.data[counter]?.message
-            .split("{")[1]
-            .split("}")[0];
-          // counter++;
-          let transactionType: string = data_res
+      let transactions = [{}];
+
+      log.data?.map(async (t: Logs) => {
+        if (t?.message.startsWith("START")) {
+          const data = t?.message.split("{")[1].split("}")[0];
+          /* transactions.push({ */
+          /*   transaction: data.split(",").map((e) => */
+          /*     e.trim() */
+          /*   ), */
+          /* }); */
+          let transactionType = data
             .split(",")[0]
             .split(":")[1]
+            .trim()
             .split("'")[1];
-          let transID: string = data_res
-            .split(",")[1]
-            .split(":")[1]
-            .split("'")[1];
-          let transTime: string = data_res
-            .split(",")[2]
-            .split(":")[1]
-            .split("'")[1];
-          let transAmount: string = data_res
+          let transID = data.split(",")[1].split(":")[1].trim().split("'")[1];
+          let transTime = data.split(",")[2].split(":")[1].trim().split("'")[1];
+          let transAmount = data
             .split(",")[3]
             .split(":")[1]
-            .split("'")[1];
-          let businessShortCode: string = data_res
+            .trim()
+            .split("'")[1]
+            .split(".")[0];
+          let businessShortCode = data
             .split(",")[4]
             .split(":")[1]
+            .trim()
             .split("'")[1];
-          let billRefNumber: string = data_res
+          let billRefNumber = data
             .split(",")[5]
             .split(":")[1]
+            .trim()
             .split("'")[1];
-          let invoiceNumber: string = data_res
+          let invoiceNumber = data
             .split(",")[6]
             .split(":")[1]
+            .trim()
             .split("'")[1];
-          let orgAccountBalance: string = data_res
+          let orgAccountBalance = data
             .split(",")[7]
             .split(":")[1]
-            .split("'")[1];
-          let thirdPartyTransID: string = data_res
+            .trim()
+            .split("'")[1]
+            .split(".")[0];
+          let thirdPartyTransID = data
             .split(",")[8]
             .split(":")[1]
+            .trim()
             .split("'")[1];
-          let msisdn: string = data_res
-            .split(",")[9]
-            .split(":")[1]
-            .split("'")[1];
-          let firstName: string = data_res
+          let msisdn = data.split(",")[9].split(":")[1].trim().split("'")[1];
+          let firstName = data
             .split(",")[10]
             .split(":")[1]
+            .trim()
             .split("'")[1];
-          let middleName: string = data_res
+          let middleName = data
             .split(",")[11]
             .split(":")[1]
+            .trim()
             .split("'")[1];
-          let lastName: string = data_res
-            .split(",")[12]
-            .split(":")[1]
-            .split("'")[1];
+          let lastName = data.split(",")[12].split(":")[1].trim().split("'")[1];
 
-          let result: Array<Fields> = [];
-
-          result.push({
-            transactionType: transactionType,
+          let transaction: Array<Fields> = [];
+          transaction.push({
+            transactionType: transactionType.toUpperCase(),
+            transID: transID,
+            transTime: transTime,
             transAmount: transAmount,
             businessShortCode: businessShortCode,
             billRefNumber: billRefNumber.toUpperCase(),
-            transID: transID,
-            transTime: transTime,
             invoiceNumber: invoiceNumber,
             orgAccountBalance: orgAccountBalance,
             thirdPartyTransID: thirdPartyTransID,
@@ -143,53 +144,50 @@ export const transactionsRouter = createRouter()
             middleName: middleName.toUpperCase(),
             lastName: lastName.toUpperCase(),
           });
+          /* console.log(transaction[0].transactionType); */
 
+          transactions.push({
+            transaction,
+          });
+
+          const search = await prisma.transaction.findFirst({
+            where: {
+              transID: transaction[0].transID,
+            },
+          });
           try {
-            const data = await prisma.transaction.findFirst({
-              where: {
-                transID: `${transID}`,
-              },
-            });
-
-            if (!data) {
-              if (
-                transactionType === "Pay Bill" ||
-                transactionType === "Customer Merchant Payment"
-              ) {
-                await prisma.transaction.create({
-                  data: {
-                    transactionType: transactionType,
-                    transID: transID,
-                    transTime: transTime,
-                    transAmount: transAmount,
-                    businessShortCode: businessShortCode,
-                    billRefNumber: billRefNumber,
-                    invoiceNumber: invoiceNumber,
-                    orgAccountBalance: orgAccountBalance,
-                    thirdPartyTransID: thirdPartyTransID,
-                    msisdn: msisdn,
-                    firstName: firstName,
-                    middleName: middleName,
-                    lastName: lastName,
-                  },
-                });
-              }
-
-              counter++;
-            }
-
-            if (data) {
-              counter++;
-            }
+            if (search) return;
+            if (
+              transaction[0]?.transactionType === "PAY BILL" ||
+              transaction[0]?.transactionType === "CUSTOMER MERCHANT PAYMENT"
+            )
+              await prisma.transaction.create({
+                data: {
+                  transactionType: transaction[0]?.transactionType,
+                  transID: transaction[0]?.transID,
+                  transTime: transaction[0]?.transTime,
+                  transAmount: transaction[0]?.transAmount,
+                  businessShortCode: transaction[0]?.businessShortCode,
+                  billRefNumber: transaction[0]?.billRefNumber,
+                  invoiceNumber: transaction[0]?.invoiceNumber,
+                  orgAccountBalance: transaction[0]?.orgAccountBalance,
+                  thirdPartyTransID: transaction[0]?.thirdPartyTransID,
+                  msisdn: transaction[0]?.msisdn,
+                  firstName: transaction[0]?.firstName,
+                  middleName: transaction[0]?.middleName,
+                  lastName: transaction[0]?.lastName,
+                },
+              });
           } catch (error) {
-            return console.log({
-              message: "Error Fetching Data From Database",
-            });
+            return {
+              message: "Something Went Wrong",
+            };
           }
         }
-      }
+      });
+
       return {
-        data: log.data,
+        data: transactions,
         from: new_date + " " + str_tdate,
         to: now_date + " " + str_tdate,
         message: "Transactions Upto Date",
