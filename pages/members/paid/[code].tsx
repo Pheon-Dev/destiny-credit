@@ -150,7 +150,21 @@ const CreateMember = () => {
       return () => {
           subscribe = false;
         }
-  }, [memcode]);
+  }, [
+  memcode,
+  transaction?.firstName,
+  transaction?.middleName,
+  transaction?.lastName,
+  transaction?.transID,
+  transaction?.msisdn,
+  transaction?.transAmount,
+  form.values.memberId,
+  form.values.firstName,
+  form.values.lastName,
+  form.values.mpesaCode,
+  form.values.phoneNumber,
+  form.values.membershipAmount,
+  ]);
 
   let today_date = new Date(form.values.date);
   let birth_date = new Date(form.values.dob);

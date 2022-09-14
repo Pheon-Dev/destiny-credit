@@ -23,7 +23,7 @@ import {
   IconLogout,
   IconX,
 } from "@tabler/icons";
-import Router, { useRouter } from "next/router";
+import Router from "next/router";
 import { signOut, useSession } from "next-auth/react";
 import { useMantineColorScheme } from "@mantine/core";
 import { IconSun, IconMoonStars } from "@tabler/icons";
