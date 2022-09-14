@@ -1,5 +1,5 @@
 import React from "react";
-import { signIn } from "next-auth/react";
+import { signIn, useSession } from "next-auth/react";
 import { NextPage } from "next";
 import { z } from "zod";
 import { useForm, zodResolver } from "@mantine/form";
@@ -24,6 +24,7 @@ const schema = z.object({
 });
 
 const Page: NextPage = (props): JSX.Element => {
+    const { status, data } = useSession();
   const router = useRouter();
   const form = useForm({
     validate: zodResolver(schema),
@@ -44,7 +45,9 @@ const Page: NextPage = (props): JSX.Element => {
       });
 
       if (res?.ok) {
-        setTimeout(() => {
+        router.replace(router.asPath);
+        if (logs.error) return;
+         setTimeout(() => {
           updateNotification({
             id: "sing-in-status",
             color: "teal",
@@ -54,9 +57,7 @@ const Page: NextPage = (props): JSX.Element => {
             autoClose: 8000,
           });
         });
-        router.replace(router.asPath);
-        if (logs.status === "loading" || logs.status === "success")
-          return router.push("/");
+         return router.push("/");
       }
 
       if (res?.error) {
@@ -86,6 +87,7 @@ const Page: NextPage = (props): JSX.Element => {
   };
 
   return (
+  <>
     <Card
       sx={{ maxWidth: 360 }}
       mx="auto"
@@ -141,6 +143,7 @@ const Page: NextPage = (props): JSX.Element => {
         </Box>
       </Card.Section>
     </Card>
+    </>
   );
 };
 

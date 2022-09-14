@@ -103,7 +103,6 @@ function StyledTabs(props: TabsProps) {
 export function Utilities() {
   const [scroll, scrollTo] = useWindowScroll();
   const { status, data } = useSession();
-  const router = useRouter();
   const { colorScheme, toggleColorScheme } = useMantineColorScheme();
 
   const logs = trpc.useQuery(["transactions.logs"]);
@@ -136,16 +135,7 @@ export function Utilities() {
 
   const handleSignOut = () => {
     try {
-      setTimeout(() => {
-        updateNotification({
-          id: "sign-out-status",
-          color: "teal",
-          title: "Successful Sign Out!",
-          message: `Welcome Back Again Next Time, Goodbye!`,
-          icon: <IconCheck size={16} />,
-          autoClose: 8000,
-        });
-      });
+    signOut()
     } catch (error) {
       setTimeout(() => {
         updateNotification({
@@ -158,8 +148,6 @@ export function Utilities() {
         });
       });
     }
-    signOut();
-    return router.push("/auth/sign-in");
   };
 
   return (
@@ -258,9 +246,9 @@ export function Utilities() {
                     id: "sign-out-status",
                     color: "teal",
                     title: "Sign Out",
-                    message: "Signing Out Destiny Credit LTD ...",
+                    message: "Signing Out of Destiny Credit LTD ...",
                     loading: true,
-                    autoClose: 50000,
+                    autoClose: 10000
                   });
                   handleSignOut();
                 }}
