@@ -287,6 +287,7 @@ const CreateMember = () => {
             form.setFieldValue("group", false);
             form.setFieldValue("maintained", false);
         }
+
   const handleSave = useCallback(() => {
     try {
       try {
@@ -397,7 +398,7 @@ const CreateMember = () => {
         autoClose: 5000,
       });
     }
-  }, [form.values, dash_today_date, dash_birth_date]);
+  }, [form.values, dash_today_date, dash_birth_date, member]);
 
   return (
     <>

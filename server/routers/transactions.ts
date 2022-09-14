@@ -191,7 +191,7 @@ export const transactionsRouter = createRouter()
 
       if (transactions.length > 0)
         return {
-          data: transactions,
+          data: Object.assign({}, transactions),
           from: new_date + " " + str_tdate,
           to: now_date + " " + str_tdate,
           message: "Transactions Upto Date",
