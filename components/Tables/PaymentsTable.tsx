@@ -5,13 +5,13 @@ import { IconEdit } from "@tabler/icons";
 import { Table, Badge, Group } from "@mantine/core";
 import { TitleText } from "../Text/TitleText";
 
-export function PaymentsTable({
+export const PaymentsTable = ({
   loans,
   call,
 }: {
   loans: Loan[];
   call: string;
-}) {
+}) => {
   const Header = () => (
     <tr>
       <th>Names</th>
@@ -45,7 +45,7 @@ export function PaymentsTable({
   );
 }
 
-function PaymentsRow({ loan, call }: { loan: Loan; call: string }) {
+const PaymentsRow = ({ loan, call }: { loan: Loan; call: string }) => {
   const router = useRouter();
   return (
     <>

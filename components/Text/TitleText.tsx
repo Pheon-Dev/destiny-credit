@@ -1,7 +1,7 @@
 import { Text } from "@mantine/core";
 import { Title } from "../../types";
 
-export function TitleText({ title }: Title) {
+export const TitleText = ({ title }: Title) => {
   return (
     <Text
       component="span"

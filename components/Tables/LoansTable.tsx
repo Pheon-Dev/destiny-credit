@@ -5,7 +5,13 @@ import { IconEdit } from "@tabler/icons";
 import { Table, Badge, Group } from "@mantine/core";
 import { TitleText } from "../Text/TitleText";
 
-export function LoansTable({ loans, call }: { loans: Loan[]; call: string }) {
+export const LoansTable = ({
+  loans,
+  call,
+}: {
+  loans: Loan[];
+  call: string;
+}) => {
   const Header = () => (
     <tr>
       <th>Names</th>
@@ -23,6 +29,7 @@ export function LoansTable({ loans, call }: { loans: Loan[]; call: string }) {
         {call === "approvals" && <TitleText title="Approvals List" />}
         {call === "disbursements" && <TitleText title="Disbursements List" />}
       </Group>
+      
       <Table striped highlightOnHover horizontalSpacing="md">
         <thead>
           <Header />
@@ -38,9 +45,9 @@ export function LoansTable({ loans, call }: { loans: Loan[]; call: string }) {
       </Table>
     </>
   );
-}
+};
 
-function LoansRow({ loan, call }: { loan: Loan; call: string }) {
+const LoansRow = ({ loan, call }: { loan: Loan; call: string }) => {
   const router = useRouter();
   return (
     <>
@@ -144,4 +151,4 @@ function LoansRow({ loan, call }: { loan: Loan; call: string }) {
       )}
     </>
   );
-}
+};

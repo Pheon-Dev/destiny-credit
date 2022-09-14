@@ -5,13 +5,13 @@ import { IconEdit } from "@tabler/icons";
 import { Table, Badge, Group } from "@mantine/core";
 import { TitleText } from "../Text/TitleText";
 
-export function MembersTable({
+export const MembersTable = ({
   members,
   call,
 }: {
   members: Member[];
   call: string;
-}) {
+}) => {
   const Header = () => (
     <tr>
       <th>Code</th>
@@ -48,7 +48,7 @@ export function MembersTable({
   );
 }
 
-function MemberRow({ member, call }: { member: Member; call: string }) {
+const MemberRow = ({ member, call }: { member: Member; call: string }) => {
   const router = useRouter();
 
   return (

@@ -11,7 +11,7 @@ import { Box, NavLink, Text } from "@mantine/core";
 import { Protected } from "../Protected/Protected";
 import { useRouter } from "next/router";
 
-export function MainLinks() {
+export const MainLinks = () => {
   const [membersActive, setMembersActive] = useState(9);
   const [groupsActive, setGroupsActive] = useState(9);
   const [productsActive, setProductsActive] = useState(9);

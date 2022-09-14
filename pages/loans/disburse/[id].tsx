@@ -47,34 +47,29 @@ const Disburse = () => {
 
   const handleSubmit = useCallback(() => {
     try {
-      if (id) {
-       disburse.mutate({
-          id: id,
-          disbursedOn: disbursedOn,
-          disbursed: true,
+      disburse.mutate({
+        id: id,
+        disbursedOn: disbursedOn,
+        disbursed: true,
       });
-        if (status === "success") {
-          updateNotification({
-            id: "submit-status",
-            color: "teal",
-            title: `Loan Disbursement`,
-            message: `Loan Was Successfully Disbursed`,
-            icon: <IconCheck size={16} />,
-            autoClose: 8000,
-          });
-          return router.push("/loans/payments");
-        }
-      }
-      return updateNotification({
-            id: "submit-status",
-            color: "red",
-            title: `Loan Disbursement`,
-            message: `Loan Was not Successfully Disbursed. Please Try Again.`,
-            icon: <IconX size={16} />,
-            autoClose: 8000,
+      updateNotification({
+        id: "submit-status",
+        color: "teal",
+        title: `Loan Disbursement`,
+        message: `Loan Was Successfully Disbursed`,
+        icon: <IconCheck size={16} />,
+        autoClose: 8000,
       });
+      return router.push("/loans/payments");
     } catch (error) {
-      console.log(error);
+      return updateNotification({
+        id: "submit-status",
+        color: "red",
+        title: `Loan Disbursement`,
+        message: `Loan Was not Successfully Disbursed. Please Try Again.`,
+        icon: <IconX size={16} />,
+        autoClose: 8000,
+      });
     }
   }, []);
 
@@ -238,9 +233,7 @@ const Disburse = () => {
                     <Text weight={500}>First Installment Date</Text>
                   </Grid.Col>
                   <Grid.Col mt="xs" span={4}>
-                    <Text>
-                      {_.startDate}
-                    </Text>
+                    <Text>{_.startDate}</Text>
                   </Grid.Col>
                 </Grid>
                 <Grid grow>
@@ -248,9 +241,7 @@ const Disburse = () => {
                     <Text weight={500}>Disbursement Date</Text>
                   </Grid.Col>
                   <Grid.Col mt="xs" span={4}>
-                    <Text>
-                      {disbursedOn}
-                    </Text>
+                    <Text>{disbursedOn}</Text>
                   </Grid.Col>
                 </Grid>
                 <Group mt="xl" position="center">

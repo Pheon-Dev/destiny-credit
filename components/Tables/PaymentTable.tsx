@@ -3,13 +3,13 @@ import { Table, Group } from "@mantine/core";
 import { TitleText } from "../Text/TitleText";
 import { Payment } from "@prisma/client";
 
-export function PaymentTable({
+export const PaymentTable = ({
   payments,
   call,
 }: {
   payments: Payment[];
   call: string;
-}) {
+}) => {
   const Header = () => (
     <tr>
       <th>Paid Amount</th>
@@ -46,7 +46,7 @@ export function PaymentTable({
   );
 }
 
-function PaymentRow({ payment, call }: { payment: Payment; call: string }) {
+const PaymentRow = ({ payment, call }: { payment: Payment; call: string }) => {
   /* const router = useRouter(); */
   return (
     <>

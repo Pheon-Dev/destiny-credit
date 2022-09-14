@@ -29,7 +29,7 @@ import {
 } from "@mantine/core";
 import { TitleText, MainLinks, Utilities } from "../components";
 
-function App(props: AppProps & { colorScheme: ColorScheme }) {
+const App = (props: AppProps & { colorScheme: ColorScheme }) => {
   const theme = useMantineTheme();
   const [opened, setOpened] = useState(false);
   const { Component, pageProps } = props;
@@ -159,7 +159,7 @@ App.getInitialProps = ({ ctx }: { ctx: GetServerSidePropsContext }) => ({
   colorscheme: getCookie("mantine-color-scheme", ctx) || "dark",
 });
 
-function getBaseUrl() {
+const getBaseUrl = () => {
   if (typeof window !== 'undefined') {
     return '';
   }

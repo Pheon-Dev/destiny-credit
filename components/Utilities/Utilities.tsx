@@ -29,7 +29,7 @@ import { useMantineColorScheme } from "@mantine/core";
 import { IconSun, IconMoonStars } from "@tabler/icons";
 import { trpc } from "../../utils/trpc";
 
-function StyledTabs(props: TabsProps) {
+const StyledTabs = (props: TabsProps) => {
   return (
     <Tabs
       unstyled
@@ -100,7 +100,7 @@ function StyledTabs(props: TabsProps) {
   );
 }
 
-export function Utilities() {
+export const Utilities = () => {
   const [scroll, scrollTo] = useWindowScroll();
   const { status, data } = useSession();
   const { colorScheme, toggleColorScheme } = useMantineColorScheme();
@@ -113,7 +113,7 @@ export function Utilities() {
           id: "transactions-status",
           color: "teal",
           title: logs.data?.message,
-          message: `${logs.data?.data?.length} Recent Transactions as from ${logs.data?.from} to ${logs.data?.to}`,
+          message: `Updated Recent Transactions as from ${logs.data?.from} to ${logs.data?.to}`,
           icon: <IconCheck size={16} />,
           autoClose: 8000,
         });

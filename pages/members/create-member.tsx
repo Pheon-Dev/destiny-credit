@@ -1,9 +1,10 @@
 import { LoadingOverlay } from "@mantine/core";
+import { NextPage } from "next";
 import React from "react";
 import { TransactionsTable, Protected } from "../../components";
 import { trpc } from "../../utils/trpc";
 
-export default function Home() {
+const Page: NextPage = () => {
   const { data: transactions, status } = trpc.useQuery([
     "transactions.transactions",
   ]);
@@ -17,3 +18,4 @@ export default function Home() {
     </Protected>
   );
 }
+export default Page;

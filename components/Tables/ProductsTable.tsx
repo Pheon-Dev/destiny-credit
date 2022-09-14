@@ -4,7 +4,7 @@ import { Table, Group, Badge } from "@mantine/core";
 import { Product } from "@prisma/client";
 import { useRouter } from "next/router";
 
-export function ProductsTable({ products }: { products: Product[] }) {
+export const ProductsTable = ({ products }: { products: Product[] }) => {
   const Header = () => (
     <tr>
       <th>Code</th>
@@ -37,7 +37,7 @@ export function ProductsTable({ products }: { products: Product[] }) {
   );
 }
 
-function ProductRow({ product }: { product: Product }) {
+const ProductRow = ({ product }: { product: Product }) => {
   const router = useRouter();
   return (
     <tr

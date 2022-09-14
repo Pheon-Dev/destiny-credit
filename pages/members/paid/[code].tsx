@@ -176,7 +176,7 @@ const CreateMember = () => {
     Number(dash_today_date.split("-")[2]) -
     Number(dash_birth_date.split("-")[2]);
   //
-  function renderAge(today_month: number, birth_month: number) {
+  const renderAge = (today_month: number, birth_month: number) => {
     let result: number = 0;
     if (today_month === birth_month) result = 1;
     if (today_month > birth_month) result = 1;

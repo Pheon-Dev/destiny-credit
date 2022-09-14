@@ -38,23 +38,20 @@ const Approve = () => {
 
   const handleSubmit = useCallback(() => {
     try {
-      if (id) {
-        approve.mutate({
-          id: id,
-          approved: true,
-        });
-        if (status === "success") {
-          updateNotification({
-            id: "submit-status",
-            color: "teal",
-            title: `Loan Approval`,
-            message: `Loan Was Successfully Approved`,
-            icon: <IconCheck size={16} />,
-            autoClose: 8000,
-          });
-          return router.push("/loans/disbursements");
-        }
-      }
+      approve.mutate({
+        id: id,
+        approved: true,
+      });
+      updateNotification({
+        id: "submit-status",
+        color: "teal",
+        title: `Loan Approval`,
+        message: `Loan Was Successfully Approved`,
+        icon: <IconCheck size={16} />,
+        autoClose: 8000,
+      });
+      return router.push("/loans/disbursements");
+    } catch (error) {
       return updateNotification({
         id: "submit-status",
         color: "red",
@@ -63,8 +60,6 @@ const Approve = () => {
         icon: <IconX size={16} />,
         autoClose: 8000,
       });
-    } catch (error) {
-      console.log(error);
     }
   }, []);
 

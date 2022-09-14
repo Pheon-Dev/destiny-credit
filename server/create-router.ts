@@ -1,6 +1,6 @@
 import { context } from "./context";
 import * as trpc from "@trpc/server";
 
-export function createRouter() {
+export const createRouter = () => {
   return trpc.router<context>();
 }

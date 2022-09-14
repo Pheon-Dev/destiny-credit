@@ -4,13 +4,13 @@ import { Table, Group } from "@mantine/core";
 import { Transaction } from "@prisma/client";
 import { useRouter } from "next/router";
 
-export function TransactionsTable({
+export const TransactionsTable = ({
   transactions,
   call,
 }: {
   transactions: Transaction[];
   call: string;
-}) {
+}) => {
   const Header = () => (
     <tr>
       <th>ID</th>
@@ -44,13 +44,13 @@ export function TransactionsTable({
   );
 }
 
-function TransactionRow({
+const  TransactionRow = ({
   transaction,
   call,
 }: {
   transaction: Transaction;
   call: string;
-}) {
+}) => {
   const router = useRouter();
   const today = new Date();
   const date = today.toLocaleDateString();
