@@ -114,7 +114,7 @@ export function Utilities() {
           id: "transactions-status",
           color: "teal",
           title: logs.data?.message,
-          message: `${logs.data?.data.length} Recent Transactions as from ${logs.data?.from} to ${logs.data?.data.to}`,
+          message: `${logs.data?.data.length} Recent Transactions as from ${logs.data?.from} to ${logs.data?.to}`,
           icon: <IconCheck size={16} />,
           autoClose: 8000,
         });
