@@ -14,7 +14,7 @@ const PaymentsList = () => {
     <>
       {loan && <PaymentTable payments={loan} call="payments" />}
       <LoadingOverlay overlayBlur={2} visible={status === "loading"} />
-      {status === "success" && loan.length === 0 && (
+      {status === "success" && !loan && (
         <>
           <Group position="center">
             <Text>Active Loan</Text>

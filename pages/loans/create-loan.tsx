@@ -10,7 +10,7 @@ const MembersList = () => {
     <Protected>
       <LoadingOverlay overlayBlur={2} visible={status === "loading"} />
       {members && <MembersTable members={members} call="create-loan" />}
-      {status === "success" && members.length === 0 && (
+      {status === "success" && !members && (
         <Group position="center">
           <Text>No Maintained Loans</Text>
         </Group>

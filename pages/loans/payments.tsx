@@ -10,7 +10,7 @@ const PaymentsList = () => {
     <Protected>
       <LoadingOverlay overlayBlur={2} visible={status === "loading"} />
       {loans && <PaymentsTable loans={loans} call="payments" />}
-      {status === "success" && loans.length === 0 && (
+      {status === "success" && !loans && (
         <Group position="center">
           <Text>No Disbursed loans</Text>
         </Group>

@@ -11,7 +11,7 @@ const MembersList = () => {
     <Protected>
     <LoadingOverlay overlayBlur={2} visible={status === "loading"} />
       {members && <MembersTable members={members} call="all-members" />}
-      {status === "success" && members.length === 0 && (
+      {status === "success" && !members && (
         <Group position="center">
           <Text>No Registered Members</Text>
         </Group>

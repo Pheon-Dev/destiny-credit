@@ -10,7 +10,7 @@ const ProductsList = () => {
     <Protected>
       <LoadingOverlay overlayBlur={2} visible={status === "loading"} />
       {products && <ProductsTable products={products} />}
-      {status === "success" && products.length === 0 && (
+      {status === "success" && !products && (
         <Group position="center">
           <Text>No Created Products</Text>
         </Group>
