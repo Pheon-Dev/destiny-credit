@@ -112,8 +112,10 @@ export const Utilities = () => {
         updateNotification({
           id: "transactions-status",
           color: "teal",
-          title: logs.data?.message,
-          message: `Updated Recent Transactions as from ${logs.data?.from} to ${logs.data?.to}`,
+          /* title: logs.data?.message, */
+          /* message: `Updated Recent Transactions as from ${logs.data?.from} to ${logs.data?.to}`, */
+          title: "M-PESA Transactions",
+          message: `Updated Recent M-PESA Transactions`,
           icon: <IconCheck size={16} />,
           autoClose: 8000,
         });

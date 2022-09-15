@@ -197,12 +197,13 @@ export const transactionsRouter = createRouter()
           message: "Transactions Upto Date",
         };
 
-      return {
-        data: transactions.length,
-        from: new_date + " " + str_tdate,
-        to: now_date + " " + str_tdate,
-        message: "No New Transactions",
-      };
+      return await prisma.transaction.findMany();
+      /* return { */
+      /*   data: transactions.length, */
+      /*   from: new_date + " " + str_tdate, */
+      /*   to: now_date + " " + str_tdate, */
+      /*   message: "No New Transactions", */
+      /* }; */
     },
   })
   .query("transaction", {
