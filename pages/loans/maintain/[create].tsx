@@ -36,7 +36,7 @@ import {
   IconX,
 } from "@tabler/icons";
 import { trpc } from "../../../utils/trpc";
-import { Collateral, Loan, Member, Product } from "@prisma/client";
+import type { Collateral, Loan, Member, Product } from "@prisma/client";
 
 const loan_schema = z.object({
   member: z.string().min(2, { message: "User Name Missing" }),

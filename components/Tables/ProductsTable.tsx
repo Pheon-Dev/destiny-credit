@@ -1,7 +1,7 @@
 import React from "react";
 import { TitleText } from "../../components";
 import { Table, Group, Badge } from "@mantine/core";
-import { Product } from "@prisma/client";
+import type { Product } from "@prisma/client";
 import { useRouter } from "next/router";
 
 export const ProductsTable = ({ products }: { products: Product[] }) => {

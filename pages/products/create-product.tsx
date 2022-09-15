@@ -1,6 +1,6 @@
 import React, { useCallback, useState } from "react";
 import { trpc } from "../../utils/trpc";
-import { Product } from "@prisma/client";
+import type { Product } from "@prisma/client";
 import { z } from "zod";
 import { useForm, zodResolver } from "@mantine/form";
 import { IconAlertCircle, IconCheck, IconX } from "@tabler/icons";

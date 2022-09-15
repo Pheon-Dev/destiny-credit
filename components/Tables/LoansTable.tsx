@@ -1,5 +1,5 @@
 import React from "react";
-import { Loan } from "@prisma/client";
+import type { Loan } from "@prisma/client";
 import { useRouter } from "next/router";
 import { IconEdit } from "@tabler/icons";
 import { Table, Badge, Group } from "@mantine/core";

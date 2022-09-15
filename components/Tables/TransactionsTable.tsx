@@ -1,7 +1,7 @@
 import React from "react";
 import { TitleText } from "../../components";
 import { Table, Group } from "@mantine/core";
-import { Transaction } from "@prisma/client";
+import type { Transaction } from "@prisma/client";
 import { useRouter } from "next/router";
 
 export const TransactionsTable = ({

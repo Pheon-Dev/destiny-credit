@@ -1,7 +1,7 @@
 import React from "react";
 import { Table, Group } from "@mantine/core";
 import { TitleText } from "../Text/TitleText";
-import { Payment } from "@prisma/client";
+import type { Payment } from "@prisma/client";
 
 export const PaymentTable = ({
   payments,
