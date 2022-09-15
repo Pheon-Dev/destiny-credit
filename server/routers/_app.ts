@@ -1,11 +1,9 @@
-import { createRouter } from "./create-router";
+import { createRouter } from "../create-router";
 import superjson from "superjson";
-import {
-  transactionsRouter,
-  membersRouter,
-  productsRouter,
-  loansRouter,
-} from "./routers";
+import { transactionsRouter } from "./transactions";
+import { membersRouter } from "./members";
+import { productsRouter } from "./products";
+import { loansRouter } from "./loans";
 
 export const appRouter = createRouter()
   .transformer(superjson)
