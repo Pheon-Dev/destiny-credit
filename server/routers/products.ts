@@ -27,7 +27,11 @@ const defaultProductsSelect = Prisma.validator<Prisma.ProductSelect>()({
 export const productsRouter = createRouter()
   .query("products", {
     resolve: async () => {
-      return await prisma.product.findMany();
+      try {
+        return await prisma.product.findMany();
+      } catch (error) {
+        console.log("products.products");
+      }
     },
   })
   .query("product", {
@@ -35,11 +39,15 @@ export const productsRouter = createRouter()
       productName: z.string(),
     }),
     resolve: async ({ input }) => {
-      return await prisma.product.findFirst({
-        where: {
-          productName: input.productName,
-        },
-      });
+      try {
+        return await prisma.product.findFirst({
+          where: {
+            productName: input.productName,
+          },
+        });
+      } catch (error) {
+        console.log("products.product");
+      }
     },
   })
   .mutation("create-product", {
@@ -60,23 +68,27 @@ export const productsRouter = createRouter()
       approved: z.boolean(),
     }),
     resolve: async ({ input }) => {
-      return await prisma.product.create({
-        data: {
-          productId: input.productId,
-          productName: input.productName,
-          minimumRange: input.minimumRange,
-          maximumRange: input.maximumRange,
-          interestRate: input.interestRate,
-          frequency: input.frequency,
-          maximumTenure: input.maximumTenure,
-          repaymentCycle: input.repaymentCycle,
-          processingFee: input.processingFee,
-          gracePeriod: input.gracePeriod,
-          penaltyRate: input.penaltyRate,
-          penaltyCharge: input.penaltyCharge,
-          penaltyPayment: input.penaltyPayment,
-          approved: input.approved,
-        },
-      });
+      try {
+        return await prisma.product.create({
+          data: {
+            productId: input.productId,
+            productName: input.productName,
+            minimumRange: input.minimumRange,
+            maximumRange: input.maximumRange,
+            interestRate: input.interestRate,
+            frequency: input.frequency,
+            maximumTenure: input.maximumTenure,
+            repaymentCycle: input.repaymentCycle,
+            processingFee: input.processingFee,
+            gracePeriod: input.gracePeriod,
+            penaltyRate: input.penaltyRate,
+            penaltyCharge: input.penaltyCharge,
+            penaltyPayment: input.penaltyPayment,
+            approved: input.approved,
+          },
+        });
+      } catch (error) {
+        console.log("products.create-product");
+      }
     },
   });

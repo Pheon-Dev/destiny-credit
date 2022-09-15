@@ -51,14 +51,20 @@ const defaultLoansSelect = Prisma.validator<Prisma.LoanSelect>()({
 export const loansRouter = createRouter()
   .query("create-loan", {
     resolve: async () => {
-      return await prisma.member
-        .findMany()
+      try {
+        return await prisma.member.findMany();
+      } catch (error) {
+        console.log("loans.create-loan");
+      }
     },
   })
   .query("loans", {
     resolve: async () => {
-      return await prisma.loan
-        .findMany()
+      try {
+        return await prisma.loan.findMany();
+      } catch (error) {
+        console.log("loans.loans");
+      }
     },
   })
   .query("payment", {
@@ -66,12 +72,15 @@ export const loansRouter = createRouter()
       id: z.string(),
     }),
     resolve: async ({ input }) => {
-      return await prisma.payment
-        .findMany({
+      try {
+        return await prisma.payment.findMany({
           where: {
             loanId: input.id,
           },
-        })
+        });
+      } catch (error) {
+        console.log("loans.payment");
+      }
     },
   })
   .query("loan", {
@@ -79,12 +88,15 @@ export const loansRouter = createRouter()
       id: z.string(),
     }),
     resolve: async ({ input }) => {
-      return await prisma.loan
-        .findMany({
+      try {
+        return await prisma.loan.findMany({
           where: {
             id: input.id,
           },
-        })
+        });
+      } catch (error) {
+        console.log("loans.loan");
+      }
     },
   })
   .mutation("approve", {
@@ -93,15 +105,18 @@ export const loansRouter = createRouter()
       approved: z.boolean(),
     }),
     resolve: async ({ input }) => {
-      return await prisma.loan
-        .updateMany({
+      try {
+        return await prisma.loan.updateMany({
           where: {
             id: input.id,
           },
           data: {
-            approved: input.approved
-          }
-        })
+            approved: input.approved,
+          },
+        });
+      } catch (error) {
+        console.log("loans.approve");
+      }
     },
   })
   .mutation("disburse", {
@@ -111,16 +126,19 @@ export const loansRouter = createRouter()
       disbursedOn: z.string(),
     }),
     resolve: async ({ input }) => {
-      return await prisma.loan
-        .updateMany({
+      try {
+        return await prisma.loan.updateMany({
           where: {
             id: input.id,
           },
           data: {
             disbursed: input.disbursed,
-            disbursedOn: input.disbursedOn
-          }
-        })
+            disbursedOn: input.disbursedOn,
+          },
+        });
+      } catch (error) {
+        console.log("loans.disburse");
+      }
     },
   })
   .query("member", {
@@ -128,17 +146,23 @@ export const loansRouter = createRouter()
       id: z.string(),
     }),
     resolve: async ({ input }) => {
-      return await prisma.loan
-        .findMany({
+      try {
+        return await prisma.loan.findMany({
           where: {
             memberId: input.id,
           },
-        })
+        });
+      } catch (error) {
+        console.log("loans.member");
+      }
     },
   })
   .query("delete-loans", {
     resolve: async () => {
-      return await prisma.loan
-        .deleteMany()
+      try {
+        return await prisma.loan.deleteMany();
+      } catch (error) {
+        console.log("loans.delete-loans");
+      }
     },
   });

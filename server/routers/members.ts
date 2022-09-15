@@ -53,7 +53,11 @@ const defaultMembersSelect = Prisma.validator<Prisma.MemberSelect>()({
 export const membersRouter = createRouter()
   .query("members", {
     resolve: async () => {
-      return await prisma.member.findMany();
+      try {
+        return await prisma.member.findMany();
+      } catch (error) {
+        console.log("members.members");
+      }
     },
   })
   .query("member", {
@@ -61,11 +65,15 @@ export const membersRouter = createRouter()
       id: z.string(),
     }),
     resolve: async ({ input }) => {
-      return await prisma.member.findFirst({
-        where: {
-          id: input.id,
-        },
-      });
+      try {
+        return await prisma.member.findFirst({
+          where: {
+            id: input.id,
+          },
+        });
+      } catch (error) {
+        console.log("members.member");
+      }
     },
   })
   .mutation("register", {
@@ -112,63 +120,71 @@ export const membersRouter = createRouter()
       maintained: z.boolean(),
     }),
     resolve: async ({ input }) => {
-      return await prisma.member.create({
-        data: {
-          date: input.date,
-          branchName: input.branchName,
-          memberId: input.memberId,
-          firstName: input.firstName,
-          lastName: input.lastName,
-          dob: input.dob,
-          idPass: input.idPass,
-          kraPin: input.kraPin,
-          phoneNumber: input.phoneNumber,
-          gender: input.gender,
-          age: input.age,
-          religion: input.religion,
-          maritalStatus: input.maritalStatus,
-          spouseName: input.spouseName,
-          spouseNumber: input.spouseNumber,
-          postalAddress: input.postalAddress,
-          postalCode: input.postalCode,
-          cityTown: input.cityTown,
-          residentialAddress: input.residentialAddress,
-          emailAddress: input.emailAddress,
-          rentedOwned: input.rentedOwned,
-          landCareAgent: input.landCareAgent,
-          occupationEmployer: input.occupationEmployer,
-          employerNumber: input.employerNumber,
-          businessLocation: input.businessLocation,
-          businessAge: input.businessAge,
-          refereeName: input.refereeName,
-          refereeNumber: input.refereeNumber,
-          communityPosition: input.communityPosition,
-          mpesaCode: input.mpesaCode,
-          membershipAmount: input.membershipAmount,
-          nameKin: input.nameKin,
-          relationship: input.relationship,
-          residentialAddressKin: input.residentialAddressKin,
-          postalAddressKin: input.postalAddressKin,
-          postalCodeKin: input.postalCodeKin,
-          cityTownKin: input.cityTownKin,
-          numberKin: input.numberKin,
-          group: input.group,
-          maintained: input.maintained,
-          ratings: 0,
-        },
-      });
+      try {
+        return await prisma.member.create({
+          data: {
+            date: input.date,
+            branchName: input.branchName,
+            memberId: input.memberId,
+            firstName: input.firstName,
+            lastName: input.lastName,
+            dob: input.dob,
+            idPass: input.idPass,
+            kraPin: input.kraPin,
+            phoneNumber: input.phoneNumber,
+            gender: input.gender,
+            age: input.age,
+            religion: input.religion,
+            maritalStatus: input.maritalStatus,
+            spouseName: input.spouseName,
+            spouseNumber: input.spouseNumber,
+            postalAddress: input.postalAddress,
+            postalCode: input.postalCode,
+            cityTown: input.cityTown,
+            residentialAddress: input.residentialAddress,
+            emailAddress: input.emailAddress,
+            rentedOwned: input.rentedOwned,
+            landCareAgent: input.landCareAgent,
+            occupationEmployer: input.occupationEmployer,
+            employerNumber: input.employerNumber,
+            businessLocation: input.businessLocation,
+            businessAge: input.businessAge,
+            refereeName: input.refereeName,
+            refereeNumber: input.refereeNumber,
+            communityPosition: input.communityPosition,
+            mpesaCode: input.mpesaCode,
+            membershipAmount: input.membershipAmount,
+            nameKin: input.nameKin,
+            relationship: input.relationship,
+            residentialAddressKin: input.residentialAddressKin,
+            postalAddressKin: input.postalAddressKin,
+            postalCodeKin: input.postalCodeKin,
+            cityTownKin: input.cityTownKin,
+            numberKin: input.numberKin,
+            group: input.group,
+            maintained: input.maintained,
+            ratings: 0,
+          },
+        });
+      } catch (error) {
+        console.log("members.register");
+      }
     },
   })
   .query("collateral", {
     input: z.object({
       id: z.string(),
     }),
-    resolve: async ({input}) => {
-      return await prisma.collateral.findMany({
-        where: {
-          memberId: input.id
-        }
-      });
+    resolve: async ({ input }) => {
+      try {
+        return await prisma.collateral.findMany({
+          where: {
+            memberId: input.id,
+          },
+        });
+      } catch (error) {
+        console.log("members.collateral");
+      }
     },
   })
   .mutation("collateral-delete", {
@@ -176,9 +192,13 @@ export const membersRouter = createRouter()
       id: z.string(),
     }),
     resolve: async ({ input }) => {
-      return await prisma.collateral.deleteMany({
-        where: { id: input.id },
-      });
+      try {
+        return await prisma.collateral.deleteMany({
+          where: { id: input.id },
+        });
+      } catch (error) {
+        console.log("members.collateral-delete");
+      }
     },
   })
   .query("guarantor", {
@@ -186,23 +206,31 @@ export const membersRouter = createRouter()
       id: z.string(),
     }),
     resolve: async ({ input }) => {
-      return await prisma.guarantor.findFirst({
-        where: {
-          memberId: input.id,
-        },
-      });
+      try {
+        return await prisma.guarantor.findFirst({
+          where: {
+            memberId: input.id,
+          },
+        });
+      } catch (error) {
+        console.log("members.guarantor");
+      }
     },
   })
   .mutation("update-member", {
     resolve: async () => {
-      return await prisma.member.updateMany({
-        where: {
-          maintained: true,
-        },
-        data: {
-          maintained: false
-        },
-      });
+      try {
+        return await prisma.member.updateMany({
+          where: {
+            maintained: true,
+          },
+          data: {
+            maintained: false,
+          },
+        });
+      } catch (error) {
+        console.log("members.update-member");
+      }
     },
   })
   .mutation("maintain-member", {
@@ -211,14 +239,18 @@ export const membersRouter = createRouter()
       maintained: z.boolean(),
     }),
     resolve: async ({ input }) => {
-      return await prisma.member.update({
-        where: {
-          id: input.id,
-        },
-        data: {
-          maintained: input.maintained,
-        },
-      });
+      try {
+        return await prisma.member.update({
+          where: {
+            id: input.id,
+          },
+          data: {
+            maintained: input.maintained,
+          },
+        });
+      } catch (error) {
+        console.log("members.maintain-member");
+      }
     },
   })
   .mutation("maintain-collateral", {
@@ -228,13 +260,17 @@ export const membersRouter = createRouter()
       memberId: z.string(),
     }),
     resolve: async ({ input }) => {
-      return await prisma.collateral.create({
-        data: {
-          item: input.item,
-          value: input.value,
-          memberId: input.memberId,
-        },
-      });
+      try {
+        return await prisma.collateral.create({
+          data: {
+            item: input.item,
+            value: input.value,
+            memberId: input.memberId,
+          },
+        });
+      } catch (error) {
+        console.log("members.maintain-collateral");
+      }
     },
   })
   .mutation("maintain-guarantor", {
@@ -247,21 +283,25 @@ export const membersRouter = createRouter()
       memberId: z.string(),
     }),
     resolve: async ({ input }) => {
+      try {
         await prisma.guarantor.deleteMany({
           where: {
-          memberId: input.memberId,
-          }
+            memberId: input.memberId,
+          },
         });
-      return await prisma.guarantor.create({
-        data: {
-          id: input.id,
-          guarantorName: input.guarantorName,
-          guarantorPhone: input.guarantorPhone,
-          guarantorRelationship: input.guarantorRelationship,
-          guarantorID: input.guarantorID,
-          memberId: input.memberId,
-        },
-      });
+        return await prisma.guarantor.create({
+          data: {
+            id: input.id,
+            guarantorName: input.guarantorName,
+            guarantorPhone: input.guarantorPhone,
+            guarantorRelationship: input.guarantorRelationship,
+            guarantorID: input.guarantorID,
+            memberId: input.memberId,
+          },
+        });
+      } catch (error) {
+        console.log("members.maintain-guarantor");
+      }
     },
   })
   .mutation("maintain-loan", {
@@ -288,29 +328,33 @@ export const membersRouter = createRouter()
       loanRef: z.string(),
     }),
     resolve: async ({ input }) => {
-      return await prisma.loan.create({
-        data: {
-          memberId: input.memberId,
-          tenure: input.tenure,
-          principal: input.principal,
-          maintained: input.maintained,
-          approved: input.approved,
-          disbursed: input.disbursed,
-          grace: input.grace,
-          installment: input.installment,
-          productId: input.productId,
-          payoff: input.payoff,
-          penalty: input.penalty,
-          processingFee: input.processingFee,
-          sundays: input.sundays,
-          memberName: input.memberName,
-          productName: input.productName,
-          interest: input.interest,
-          cycle: input.cycle,
-          guarantorId: input.guarantorId,
-          startDate: input.startDate,
-          loanRef: input.loanRef,
-        },
-      });
+      try {
+        return await prisma.loan.create({
+          data: {
+            memberId: input.memberId,
+            tenure: input.tenure,
+            principal: input.principal,
+            maintained: input.maintained,
+            approved: input.approved,
+            disbursed: input.disbursed,
+            grace: input.grace,
+            installment: input.installment,
+            productId: input.productId,
+            payoff: input.payoff,
+            penalty: input.penalty,
+            processingFee: input.processingFee,
+            sundays: input.sundays,
+            memberName: input.memberName,
+            productName: input.productName,
+            interest: input.interest,
+            cycle: input.cycle,
+            guarantorId: input.guarantorId,
+            startDate: input.startDate,
+            loanRef: input.loanRef,
+          },
+        });
+      } catch (error) {
+        console.log("members.maintain-loan");
+      }
     },
   });
