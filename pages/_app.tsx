@@ -7,7 +7,7 @@ import { NotificationsProvider } from "@mantine/notifications";
 import { withTRPC } from "@trpc/next";
 import { loggerLink } from '@trpc/client/links/loggerLink';
 import { httpBatchLink } from '@trpc/client/links/httpBatchLink';
-import type { AppRouter } from "../server/routers/_app";
+import type { AppRouter } from "../server/_app";
 import { SessionProvider } from "next-auth/react";
 import { useSession } from "next-auth/react";
 import superjson from "superjson";

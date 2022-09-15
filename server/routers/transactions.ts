@@ -220,6 +220,11 @@ export const transactionsRouter = createRouter()
   })
   .query("transactions", {
     resolve: async () => {
-      return await prisma.transaction.findMany();
+      try {
+        const transactions = await prisma.transaction.findMany();
+        return transactions
+      } catch (error) {
+        console.log("Something went wrong")
+      }
     },
   });
