@@ -6,6 +6,7 @@ import { PrismaClient } from "@prisma/client";
 import { PrismaAdapter } from "@next-auth/prisma-adapter";
 import { Session } from "../../../lib/session";
 import { hash, compare } from "bcryptjs";
+import axios from "axios";
 
 type Props = {
   password: string;
@@ -22,31 +23,60 @@ export async function verify({ password, hashedPassword }: Props) {
   return isValid;
 }
 const authOptions: NextAuthOptions = {
+  debug: true,
   adapter: PrismaAdapter(prisma),
   session: {
     strategy: "jwt",
   },
   providers: [
     CredentialsProvider({
-      name: "SignIn",
+      id: "credentials",
+      name: "credentials",
       type: "credentials",
       credentials: {
-        /* username: { label: "DCL000", type: "text", placeholder: "User Name" }, */
-        /* password: { label: "Password", type: "password", placeholder: "*******" }, */
+        username: { label: "DCL000", type: "text", placeholder: "User Name" },
+        password: {
+          label: "Password",
+          type: "password",
+          placeholder: "*******",
+        },
       },
-      async authorize(credentials, req) {
+      authorize: async (credentials, req) => {
+        /* const user = await axios */
+        /*   .request({ */
+        /*     url: `${process.env.NEXTAUTH_URL}/api/user/check-credentials`, */
+        /*     method: "POST", */
+        /*     headers: { */
+        /*       "Content-Type": "application/x-www-form-urlencoded", */
+        /*       accept: "application/json", */
+        /*     }, */
+        /*     data: Object.entries(credentials) */
+        /*       .map((e) => e.join("=")) */
+        /*       .join("&"), */
+        /*   }) */
+        /*   .then((res) => res.data) */
+        /*   .catch((e) => { */
+        /*     return null; */
+        /*   }); */
+        /**/
+        /* if (user) { */
+        /*   return user; */
+        /* } */
+        /* return null; */
+
         const { username, password } = credentials as {
           username: string;
           password: string;
         };
         if (!username || !password) {
           throw new Error(
-            `${!username ? "User Name" : "Password"} is Missing!`
+            `User Name | Password is Missing!`
           );
         }
 
         if (username === "DCL000" && password === "ADMIN")
           return { username: "Admin", id: "0" };
+
         /* try { */
         /*   let maybe_user = await prisma.user.findFirst({ */
         /*     where: { */
@@ -91,6 +121,7 @@ const authOptions: NextAuthOptions = {
         /* } catch (error) { */
         /*   console.log(error); */
         /* } */
+
         throw new Error(`Wrong User Name | Password!`);
       },
     }),
