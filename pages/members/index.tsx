@@ -1,11 +1,13 @@
 import React from "react";
 import { EmptyTable, MembersTable, Protected } from "../../components";
-import { Group, LoadingOverlay, Text } from "@mantine/core";
+import { LoadingOverlay } from "@mantine/core";
 import { NextPage } from "next";
 import { trpc } from "../../utils/trpc";
 
 const MembersList = () => {
   const { data: members, status } = trpc.useQuery(["members.members"]);
+  const m = trpc.useQuery(["members.members"]);
+  console.log(m)
 
   return (
     <Protected>
