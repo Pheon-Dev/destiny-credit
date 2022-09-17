@@ -172,20 +172,27 @@ const getBaseUrl = () => {
 }
 
 export default withTRPC<AppRouter>({
-  config() {
+  config({ ctx }) {
+    const url = `https://${process.env.NEXT_PUBLIC_VERCEL_URL}/api/trpc`
     return {
-      links: [
-       loggerLink({
-           enabled: (opts) => process.env.NODE_ENV === "development" ||
-           (opts.direction === "down" && opts.result instanceof Error),
-         }),
-       httpBatchLink({
-           url: `${getBaseUrl()}/api/trpc`
-         }),
-      ],
+      url,
       /* transformer: superjson, */
     };
   },
+  /* config() { */
+  /*   return { */
+  /*     links: [ */
+  /*      loggerLink({ */
+  /*          enabled: (opts) => process.env.NODE_ENV === "development" || */
+  /*          (opts.direction === "down" && opts.result instanceof Error), */
+  /*        }), */
+  /*      httpBatchLink({ */
+  /*          url: `${getBaseUrl()}/api/trpc` */
+  /*        }), */
+  /*     ], */
+  /*     transformer: superjson, */
+  /*   }; */
+  /* }, */
   ssr: true,
   responseMeta({ clientErrors, ctx }) {
     if (clientErrors.length) {

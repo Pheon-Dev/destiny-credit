@@ -6,8 +6,8 @@ import { trpc } from "../../utils/trpc";
 
 const MembersList = () => {
   const { data: members, status } = trpc.useQuery(["members.members"]);
-  const m = trpc.useQuery(["members.members"]);
-  console.log(m)
+  /* const m = trpc.useQuery(["members.members"]); */
+  /* console.log(m) */
 
   return (
     <Protected>
