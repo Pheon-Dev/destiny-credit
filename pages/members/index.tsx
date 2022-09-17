@@ -5,15 +5,15 @@ import { NextPage } from "next";
 import { trpc } from "../../utils/trpc";
 
 const MembersList = () => {
-  const { data: members, status } = trpc.useQuery(["members.members"])
+  const { data: members, status } = trpc.useQuery(["members.members"]);
 
   return (
     <Protected>
-    <LoadingOverlay overlayBlur={2} visible={status === "loading"} />
-      {!members && status === "success" && (
+      <LoadingOverlay overlayBlur={2} visible={status === "loading"} />
+      {(members?.length === 0 && status === "success" && (
         <EmptyTable call="all-members" />
-      )}
-      {members && <MembersTable members={members} call="all-members" />}
+      )) ||
+        (members && <MembersTable members={members} call="all-members" />)}
     </Protected>
   );
 };

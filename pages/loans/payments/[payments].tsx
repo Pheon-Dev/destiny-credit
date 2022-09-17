@@ -12,9 +12,11 @@ const PaymentsList = () => {
 
   return (
     <>
-      {loan && <PaymentTable payments={loan} call="payments" />}
       <LoadingOverlay overlayBlur={2} visible={status === "loading"} />
-      {!loan && status === "success" && <EmptyTable call="payments" />}
+      {(loan?.length === 0 && status === "success" && (
+        <EmptyTable call="payment" />
+      )) ||
+        (loan && <PaymentTable payments={loan} call="payment" />)}
       {status === "success" && loan?.length === 0 && (
         <>
           <Group position="center">

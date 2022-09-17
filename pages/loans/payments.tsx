@@ -9,8 +9,10 @@ const PaymentsList = () => {
   return (
     <Protected>
       <LoadingOverlay overlayBlur={2} visible={status === "loading"} />
-      {loans && <PaymentsTable loans={loans} call="payments" />}
-      {!loans && status === "success" && <EmptyTable call="payments" />}
+      {(loans?.length === 0 && status === "success" && (
+        <EmptyTable call="payments" />
+      )) ||
+        (loans && <PaymentsTable loans={loans} call="payments" />)}
     </Protected>
   );
 };

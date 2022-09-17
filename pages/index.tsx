@@ -12,12 +12,10 @@ const Page: NextPage = () => {
   return (
     <Protected>
       <LoadingOverlay overlayBlur={2} visible={status === "loading"} />
-      {!transactions && status === "success" && (
+      {(transactions?.length === 0 && status === "success" && (
         <EmptyTable call="transactions" />
-      )}
-      {transactions && (
-        <TransactionsTable transactions={transactions} call="transactions" />
-      )}
+      )) ||
+        (transactions && <TransactionsTable transactions={transactions} call="transactions" />)}
     </Protected>
   );
 };
