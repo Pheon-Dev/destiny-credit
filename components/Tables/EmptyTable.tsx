@@ -5,62 +5,31 @@ import { Table, Group } from "@mantine/core";
 export const EmptyTable = ({ call }: { call: string }) => {
   const TransactionsHeader = () => (
     <tr>
-      <th>ID</th>
-      <th>Names</th>
-      <th>Amount</th>
-      <th>Phone</th>
-      <th>Type</th>
+      <th>Transactions Table</th>
     </tr>
   );
 
   const MembersHeader = () => (
     <tr>
-      <th>Code</th>
-      <th>Names</th>
-      <th>Phone</th>
-      <th>ID</th>
-      <th>Date</th>
-      <th>Status</th>
-      <th>Action</th>
+      <th>Members Table</th>
     </tr>
   );
 
   const LoansHeader = () => (
     <tr>
-      <th>Names</th>
-      <th>Principal</th>
-      <th>Interest</th>
-      <th>Installment</th>
-      <th>Tenure</th>
-      <th>Status</th>
-      <th>Action</th>
+      <th>Loans Table</th>
     </tr>
   );
 
   const PaymentsHeader = () => (
     <tr>
-      <th>Names</th>
-      <th>Principal</th>
-      <th>Interest</th>
-      <th>Installment</th>
-      <th>Tenure</th>
-      <th>Status</th>
-      <th>Action</th>
+      <th>Payments Table</th>
     </tr>
   );
 
   const PaymentHeader = () => (
     <tr>
-      <th>Paid Amount</th>
-      <th>O|S Arrears</th>
-      <th>Paid Arrears</th>
-      <th>O|S Penalty</th>
-      <th>Paid Penalty</th>
-      <th>O|S Interest</th>
-      <th>Paid Interest</th>
-      <th>O|S Principal</th>
-      <th>Paid Principal</th>
-      <th>O|S Balance</th>
+      <th>Loan Payments Table</th>
     </tr>
   );
   return (
@@ -79,19 +48,16 @@ export const EmptyTable = ({ call }: { call: string }) => {
       </Group>
       <Table striped highlightOnHover horizontalSpacing="md">
         <thead>
-        <tr>
-        <th></th>
-        </tr>
-          {/* {call === "transactions" || */}
-          {/*   (call === "register" && <TransactionsHeader />)} */}
-          {/* {call === "all-members" || */}
-          {/*   call === "create-loan" || */}
-          {/*   (call === "approvals" && <MembersHeader />)} */}
-          {/* {call === "all-loans" || */}
-          {/*   call === "approvals" || */}
-          {/*   (call === "disbursements" && <LoansHeader />)} */}
-          {/* {call === "payments" && <PaymentsHeader />} */}
-          {/* {call === "payment" && <PaymentHeader />} */}
+          {call === "transactions" ||
+            (call === "register" && <TransactionsHeader />)}
+          {call === "all-members" ||
+            call === "create-loan" ||
+            (call === "approvals" && <MembersHeader />)}
+          {call === "all-loans" ||
+            call === "approvals" ||
+            (call === "disbursements" && <LoansHeader />)}
+          {call === "payments" && <PaymentsHeader />}
+          {call === "payment" && <PaymentHeader />}
         </thead>
         <tbody>
           <tr>
@@ -117,9 +83,7 @@ export const EmptyTable = ({ call }: { call: string }) => {
               {call === "all-loans" && (
                 <TitleText title="No Newly Disbursed Loans" />
               )}
-              {call === "payments" && (
-                <TitleText title="No New Active Loans" />
-              )}
+              {call === "payments" && <TitleText title="No New Active Loans" />}
               {call === "payment" && (
                 <TitleText title="No Payments Made To This Loan Yet" />
               )}
