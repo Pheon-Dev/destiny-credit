@@ -159,13 +159,13 @@ export const transactionsRouter = createRouter()
               transaction,
             });
 
-            const search = await prisma.transaction.findFirst({
+            const search = await prisma.transaction.findMany({
               where: {
                 transID: transaction[0].transID,
               },
             });
             try {
-              if (search) return;
+              if (search.length > 0) return;
               if (
                 transaction[0]?.transactionType === "PAY BILL" ||
                 transaction[0]?.transactionType === "CUSTOMER MERCHANT PAYMENT"

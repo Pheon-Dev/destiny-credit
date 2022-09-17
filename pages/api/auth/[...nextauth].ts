@@ -34,12 +34,12 @@ const authOptions: NextAuthOptions = {
       name: "credentials",
       type: "credentials",
       credentials: {
-        username: { label: "DCL000", type: "text", placeholder: "User Name" },
-        password: {
-          label: "Password",
-          type: "password",
-          placeholder: "*******",
-        },
+        /* username: { label: "DCL000", type: "text", placeholder: "User Name" }, */
+        /* password: { */
+        /*   label: "Password", */
+        /*   type: "password", */
+        /*   placeholder: "*******", */
+        /* }, */
       },
       authorize: async (credentials, req) => {
         /* const user = await axios */
@@ -75,7 +75,11 @@ const authOptions: NextAuthOptions = {
         }
 
         if (username === "DCL000" && password === "ADMIN")
-          return { username: "Admin", id: "0" };
+          return {
+          id: 1,
+          name: "Admin",
+          email: "admin@email.com"
+          };
 
         /* try { */
         /*   let maybe_user = await prisma.user.findFirst({ */
@@ -126,18 +130,18 @@ const authOptions: NextAuthOptions = {
       },
     }),
   ],
-  callbacks: {
-    async signIn({ user, account, profile, email, credentials }) {
-      const isAllowedToSignIn = true;
-      if (isAllowedToSignIn) return true;
-      return false;
-    },
-    async redirect({ url, baseUrl }) {
-      if (url.startsWith("/")) return `${baseUrl}${url}`;
-      if (new URL(url).origin === baseUrl) return url;
-      return baseUrl;
-    },
-    async session({ session, user, token }) {
+  /* callbacks: { */
+  /*   async signIn({ user, account, profile, email, credentials }) { */
+  /*     const isAllowedToSignIn = true; */
+  /*     if (isAllowedToSignIn) return true; */
+  /*     return false; */
+  /*   }, */
+  /*   async redirect({ url, baseUrl }) { */
+  /*     if (url.startsWith("/")) return `${baseUrl}${url}`; */
+  /*     if (new URL(url).origin === baseUrl) return url; */
+  /*     return baseUrl; */
+  /*   }, */
+  /*   async session({ session, user, token }) { */
       /* const sesh: Session = { */
       /*   ...session, */
       /*   user: { */
@@ -145,10 +149,10 @@ const authOptions: NextAuthOptions = {
       /*     username: token.username, */
       /*   } */
       /* } */
-      /* session.accessToken = token.accessToken; */
-      return session;
-    },
-    async jwt({ token, user, account, profile, isNewUser }) {
+  /*     session.accessToken = token.accessToken; */
+  /*     return session; */
+  /*   }, */
+  /*   async jwt({ token, user, account, profile, isNewUser }) { */
       /* if (user) { */
       /*   token.sub === account.access_token; */
       /* } */
@@ -156,9 +160,9 @@ const authOptions: NextAuthOptions = {
       /* if (account) { */
       /*   token.accessToken === account.access_token; */
       /* } */
-      return token;
-    },
-  },
+  /*     return token; */
+  /*   }, */
+  /* }, */
   secret: `${SECRET}`,
   jwt: {
     secret: `${SECRET}`,
