@@ -183,7 +183,7 @@ export default withTRPC<AppRouter>({
            url: `${getBaseUrl()}/api/trpc`
          }),
       ],
-      transformer: superjson,
+      /* transformer: superjson, */
     };
   },
   ssr: true,

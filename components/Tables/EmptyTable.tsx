@@ -79,16 +79,19 @@ export const EmptyTable = ({ call }: { call: string }) => {
       </Group>
       <Table striped highlightOnHover horizontalSpacing="md">
         <thead>
-          {call === "transactions" ||
-            (call === "register" && <TransactionsHeader />)}
-          {call === "all-members" ||
-            call === "create-loan" ||
-            (call === "approvals" && <MembersHeader />)}
-          {call === "all-loans" ||
-            call === "approvals" ||
-            (call === "disbursements" && <LoansHeader />)}
-          {call === "payments" && <PaymentsHeader />}
-          {call === "payment" && <PaymentHeader />}
+        <tr>
+        <th></th>
+        </tr>
+          {/* {call === "transactions" || */}
+          {/*   (call === "register" && <TransactionsHeader />)} */}
+          {/* {call === "all-members" || */}
+          {/*   call === "create-loan" || */}
+          {/*   (call === "approvals" && <MembersHeader />)} */}
+          {/* {call === "all-loans" || */}
+          {/*   call === "approvals" || */}
+          {/*   (call === "disbursements" && <LoansHeader />)} */}
+          {/* {call === "payments" && <PaymentsHeader />} */}
+          {/* {call === "payment" && <PaymentHeader />} */}
         </thead>
         <tbody>
           <tr>
