@@ -8,8 +8,8 @@ import { withTRPC } from "@trpc/next";
 import { loggerLink } from '@trpc/client/links/loggerLink';
 import { httpBatchLink } from '@trpc/client/links/httpBatchLink';
 import type { AppRouter } from "../server/_app";
-import { SessionProvider } from "next-auth/react";
-import { useSession } from "next-auth/react";
+/* import { SessionProvider } from "next-auth/react"; */
+/* import { useSession } from "next-auth/react"; */
 import superjson from "superjson";
 
 import {
@@ -56,7 +56,7 @@ const App = (props: AppProps & { colorScheme: ColorScheme }) => {
 
   const AppContent = () => {
   /* console.log(pageProps.session); */
-    const { status, data } = useSession();
+    /* const { status, data } = useSession(); */
     /* console.log(data) */
 
     return (
@@ -75,7 +75,7 @@ const App = (props: AppProps & { colorScheme: ColorScheme }) => {
               asideOffsetBreakpoint="sm"
               navbar={
                 <>
-                  {status === "authenticated" && (
+                  {/* {status === "authenticated" && ( */}
                     <Navbar
                       p="xs"
                       hiddenBreakpoint="sm"
@@ -94,7 +94,7 @@ const App = (props: AppProps & { colorScheme: ColorScheme }) => {
                         <MainLinks />
                       </Navbar.Section>
                     </Navbar>
-                  )}
+                  {/* )} */}
                 </>
               }
               // aside={
@@ -149,9 +149,10 @@ const App = (props: AppProps & { colorScheme: ColorScheme }) => {
         />
       </Head>
 
-      <SessionProvider session={pageProps.session}>
+      {/* <SessionProvider session={pageProps.session}> */}
+      {/*   <AppContent /> */}
+      {/* </SessionProvider> */}
         <AppContent />
-      </SessionProvider>
     </>
   );
 }
@@ -173,7 +174,7 @@ const getBaseUrl = () => {
 
 export default withTRPC<AppRouter>({
   config({ ctx }) {
-    const url = `https://${process.env.NEXT_PUBLIC_VERCEL_URL}/api/trpc`
+    const url = `http://${process.env.NEXT_PUBLIC_VERCEL_URL}/api/trpc`
     return {
       url,
       /* transformer: superjson, */

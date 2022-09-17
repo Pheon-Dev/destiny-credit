@@ -24,7 +24,7 @@ import {
   IconX,
 } from "@tabler/icons";
 import Router from "next/router";
-import { signOut, useSession } from "next-auth/react";
+/* import { signOut, useSession } from "next-auth/react"; */
 import { useMantineColorScheme } from "@mantine/core";
 import { IconSun, IconMoonStars } from "@tabler/icons";
 import { trpc } from "../../utils/trpc";
@@ -102,7 +102,7 @@ const StyledTabs = (props: TabsProps) => {
 
 export const Utilities = () => {
   const [scroll, scrollTo] = useWindowScroll();
-  const { status, data } = useSession();
+  /* const { status, data } = useSession(); */
   const { colorScheme, toggleColorScheme } = useMantineColorScheme();
 
   const logs = trpc.useQuery(["transactions.logs"]);
@@ -136,7 +136,7 @@ export const Utilities = () => {
 
   const handleSignOut = () => {
     try {
-    signOut()
+    /* signOut() */
     } catch (error) {
       setTimeout(() => {
         updateNotification({
@@ -173,7 +173,7 @@ export const Utilities = () => {
                   />
                 </Tooltip>
               </Menu.Target>
-              {status === "authenticated" && (
+              {/* {status === "authenticated" && ( */}
                 <>
                   <Tooltip color="blue" withArrow label="Refresh">
                     <Tabs.Tab
@@ -199,7 +199,7 @@ export const Utilities = () => {
                     />
                   </Tooltip>
                 </>
-              )}
+              {/* )} */}
             </Tabs.List>
           </StyledTabs>
         </Affix>
@@ -218,7 +218,7 @@ export const Utilities = () => {
           >
             {colorScheme === "dark" ? "Light Theme" : "Dark Theme"}
           </Menu.Item>
-          {status === "authenticated" && (
+          {/* {status === "authenticated" && ( */}
             <>
               <Menu.Divider />
               <Menu.Item icon={<IconSettings size={20} />}>Settings</Menu.Item>
@@ -259,7 +259,7 @@ export const Utilities = () => {
                 Sign Out
               </Menu.Item>
             </>
-          )}
+          {/* )} */}
         </Menu.Dropdown>
       </Menu>
       <Affix position={{ bottom: 20, right: 20 }}>
