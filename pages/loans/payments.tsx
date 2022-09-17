@@ -1,7 +1,7 @@
 import React from "react";
 import { trpc } from "../../utils/trpc";
-import { PaymentsTable, Protected } from "../../components";
-import { Group, LoadingOverlay, Text } from "@mantine/core";
+import { EmptyTable, PaymentsTable, Protected } from "../../components";
+import { LoadingOverlay } from "@mantine/core";
 
 const PaymentsList = () => {
   const { data: loans, status } = trpc.useQuery(["loans.loans"]);
@@ -10,11 +10,7 @@ const PaymentsList = () => {
     <Protected>
       <LoadingOverlay overlayBlur={2} visible={status === "loading"} />
       {loans && <PaymentsTable loans={loans} call="payments" />}
-      {status === "success" && !loans && (
-        <Group position="center">
-          <Text>No Disbursed loans</Text>
-        </Group>
-      )}
+      {!loans && status === "success" && <EmptyTable call="payments" />}
     </Protected>
   );
 };

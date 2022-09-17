@@ -27,7 +27,6 @@ export const MembersTable = ({
   return (
     <>
       <Group position="center" m="lg">
-        {call === "approvals" && <TitleText title="Approvals List" />}
         {call === "create-loan" && <TitleText title="Maintain a New Loan" />}
         {call === "all-members" && <TitleText title="All Members List" />}
       </Group>
@@ -113,34 +112,6 @@ const MemberRow = ({ member, call }: { member: Member; call: string }) => {
               }}
             >
               Maintain
-            </Badge>
-          </td>
-          <td
-            style={{ cursor: "pointer" }}
-            onClick={() => router.push(`/members/details/${member.id}`)}
-          >
-            <IconEdit size={24} />
-          </td>
-        </tr>
-      )}
-      {call === "approvals" && member.maintained && (
-        <tr style={{ cursor: "auto" }}>
-          <td>{member.memberId}</td>
-          <td>{member.firstName + " " + member.lastName}</td>
-          <td>{member.phoneNumber}</td>
-          <td>{member.idPass}</td>
-          <td>{member.date}</td>
-          <td>
-            <Badge
-              style={{ cursor: "pointer" }}
-              onClick={() => router.push(`/approve/${member.id}`)}
-              variant="gradient"
-              gradient={{
-                from: "teal",
-                to: "lime",
-              }}
-            >
-              Approve
             </Badge>
           </td>
           <td

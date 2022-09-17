@@ -18,24 +18,37 @@ export const ProductsTable = ({ products }: { products: Product[] }) => {
   return (
     <>
       <Group position="center" m="lg">
-       <TitleText title="Products List" />
+        <TitleText title="Products List" />
       </Group>
       <Table striped highlightOnHover horizontalSpacing="md">
         <thead>
           <Header />
         </thead>
-        <tbody>
-          {products?.map((product) => (
-            <ProductRow key={product.productId} product={product} />
-          ))}
-        </tbody>
-        <tfoot>
-          <Header />
-        </tfoot>
+        {!products && (
+          <tbody>
+            <tr>
+              <Group position="center" m="lg">
+                <TitleText title="Products List is Empty, Create a New One" />
+              </Group>
+            </tr>
+          </tbody>
+        )}
+        {products && (
+          <>
+            <tbody>
+              {products?.map((product) => (
+                <ProductRow key={product.productId} product={product} />
+              ))}
+            </tbody>
+            <tfoot>
+              <Header />
+            </tfoot>
+          </>
+        )}
       </Table>
     </>
   );
-}
+};
 
 const ProductRow = ({ product }: { product: Product }) => {
   const router = useRouter();
@@ -77,5 +90,4 @@ const ProductRow = ({ product }: { product: Product }) => {
       </td>
     </tr>
   );
-}
-
+};

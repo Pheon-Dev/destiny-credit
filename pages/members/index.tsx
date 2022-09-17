@@ -1,5 +1,5 @@
 import React from "react";
-import { MembersTable, Protected } from "../../components";
+import { EmptyTable, MembersTable, Protected } from "../../components";
 import { Group, LoadingOverlay, Text } from "@mantine/core";
 import { NextPage } from "next";
 import { trpc } from "../../utils/trpc";
@@ -10,12 +10,10 @@ const MembersList = () => {
   return (
     <Protected>
     <LoadingOverlay overlayBlur={2} visible={status === "loading"} />
-      {members && <MembersTable members={members} call="all-members" />}
-      {status === "success" && !members && (
-        <Group position="center">
-          <Text>No Registered Members</Text>
-        </Group>
+      {!members && status === "success" && (
+        <EmptyTable call="all-members" />
       )}
+      {members && <MembersTable members={members} call="all-members" />}
     </Protected>
   );
 };

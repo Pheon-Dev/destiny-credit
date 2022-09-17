@@ -1,7 +1,7 @@
 import React from "react";
-import { TransactionsTable, Protected } from "../components";
+import { TransactionsTable, Protected, EmptyTable } from "../components";
 import { trpc } from "../utils/trpc";
-import { Group, LoadingOverlay } from "@mantine/core";
+import { LoadingOverlay } from "@mantine/core";
 import { NextPage } from "next";
 
 const Page: NextPage = () => {
@@ -12,13 +12,13 @@ const Page: NextPage = () => {
   return (
     <Protected>
       <LoadingOverlay overlayBlur={2} visible={status === "loading"} />
+      {!transactions && status === "success" && (
+        <EmptyTable call="transactions" />
+      )}
       {transactions && (
         <TransactionsTable transactions={transactions} call="transactions" />
       )}
-      {status === "success" && transactions?.length === 0 && (
-        <Group position="center">No New Transactions</Group>
-      )}
     </Protected>
   );
-}
+};
 export default Page;

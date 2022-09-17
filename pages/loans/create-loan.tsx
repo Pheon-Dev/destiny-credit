@@ -1,6 +1,6 @@
 import React from "react";
-import { MembersTable, Protected } from "../../components";
-import { Group, LoadingOverlay, Text } from "@mantine/core";
+import { EmptyTable, MembersTable, Protected } from "../../components";
+import { LoadingOverlay } from "@mantine/core";
 import { trpc } from "../../utils/trpc";
 
 const MembersList = () => {
@@ -10,11 +10,7 @@ const MembersList = () => {
     <Protected>
       <LoadingOverlay overlayBlur={2} visible={status === "loading"} />
       {members && <MembersTable members={members} call="create-loan" />}
-      {status === "success" && !members && (
-        <Group position="center">
-          <Text>No Maintained Loans</Text>
-        </Group>
-      )}
+      {!members && status === "success" && <EmptyTable call="create-loan" />}
     </Protected>
   );
 };
