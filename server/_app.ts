@@ -5,12 +5,14 @@ import {
   membersRouter,
   productsRouter,
   loansRouter,
+  usersRouter,
 } from "./routers";
 
 export const appRouter = createRouter()
   .transformer(superjson)
   .merge("transactions.", transactionsRouter)
   .merge("loans.", loansRouter)
+  .merge("users.", usersRouter)
   .merge("members.", membersRouter)
   .merge("products.", productsRouter)
 

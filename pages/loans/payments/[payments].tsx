@@ -13,7 +13,7 @@ const PaymentsList = () => {
   return (
     <>
       <LoadingOverlay overlayBlur={2} visible={status === "loading"} />
-      {(loan?.length === 0 && status === "success" && (
+      {(!loan && status === "success" && (
         <EmptyTable call="payment" />
       )) ||
         (loan && <PaymentTable payments={loan} call="payment" />)}

@@ -232,6 +232,7 @@ export const transactionsRouter = createRouter()
         return transaction;
       } catch (error) {
         console.log("transactions.transaction");
+          throw new Error(`${error}`);
       }
     },
   })
@@ -242,6 +243,7 @@ export const transactionsRouter = createRouter()
         return transactions;
       } catch (error) {
         console.log("transactions.transactions");
+          throw new Error(`${error}`);
       }
     },
   });

@@ -12,7 +12,7 @@ const Page: NextPage = () => {
   return (
     <Protected>
       <LoadingOverlay overlayBlur={2} visible={status === "loading"} />
-      {(transactions?.length === 0 && status === "success" && (
+      {(!transactions && (
         <EmptyTable call="transactions" />
       )) ||
         (transactions && <TransactionsTable transactions={transactions} call="transactions" />)}

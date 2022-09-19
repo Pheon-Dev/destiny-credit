@@ -36,14 +36,16 @@ const schema = z.object({
 });
 
 const CreateProduct = () => {
-  const [load, setLoad] = useState(false);
   const router = useRouter();
 
-  const { data: products, refetch } =
-    trpc.useQuery(["products.products"]) || [];
-  const data = products?.map((p: Product) => p) || [];
+  const {
+    data: products,
+    refetch,
+    status: products_status,
+  } = trpc.useQuery(["products.products"]);
 
-  const lencode: number = data.length + 1;
+  const lencode = products ? products?.length + 1 : 0;
+
   const procode =
     lencode > 9
       ? lencode > 99
@@ -75,6 +77,7 @@ const CreateProduct = () => {
 
   const product = trpc.useMutation(["products.create-product"], {
     onSuccess: () => {
+      clear();
       refetch();
       updateNotification({
         id: "submit",
@@ -89,26 +92,42 @@ const CreateProduct = () => {
     },
   });
 
+  const clear = () => {
+    form.setFieldValue("productId", "");
+    form.setFieldValue("productName", "");
+    form.setFieldValue("minimumRange", "");
+    form.setFieldValue("maximumRange", "");
+    form.setFieldValue("interestRate", "");
+    form.setFieldValue("frequency", "");
+    form.setFieldValue("maximumTenure", "");
+    form.setFieldValue("repaymentCycle", "");
+    form.setFieldValue("processingFee", "");
+    form.setFieldValue("gracePeriod", "");
+    form.setFieldValue("penaltyRate", "");
+    form.setFieldValue("penaltyCharge", "");
+    form.setFieldValue("penaltyPayment", "");
+    form.setFieldValue("approved", false);
+  };
+
   const createProduct = useCallback(() => {
     try {
       try {
         if (
-          (form.values.productId === "" &&
-            form.values.productName === "" &&
-            form.values.minimumRange === "" &&
-            form.values.maximumRange === "" &&
-            form.values.interestRate === "" &&
-            form.values.frequency === "" &&
-            form.values.maximumTenure === "" &&
-            form.values.repaymentCycle === "" &&
-            form.values.processingFee === "" &&
-            form.values.gracePeriod === "" &&
-            form.values.penaltyRate === "" &&
-            form.values.penaltyCharge === "" &&
-            form.values.penaltyPayment === "") ||
-          form.values.approved === true
+          (form.values.productId &&
+            form.values.productName &&
+            form.values.minimumRange &&
+            form.values.maximumRange &&
+            form.values.interestRate &&
+            form.values.frequency &&
+            form.values.maximumTenure &&
+            form.values.repaymentCycle &&
+            form.values.processingFee &&
+            form.values.gracePeriod &&
+            form.values.penaltyRate &&
+            form.values.penaltyCharge &&
+            form.values.penaltyPayment) ||
+          form.values.approved
         ) {
-          setLoad(true);
           product.mutate({
             productId: form.values.productId.toUpperCase(),
             productName: form.values.productName.toUpperCase(),
@@ -125,21 +144,6 @@ const CreateProduct = () => {
             penaltyPayment: form.values.penaltyPayment.toUpperCase(),
             approved: false,
           });
-
-          form.setFieldValue("productId", "");
-          form.setFieldValue("productName", "");
-          form.setFieldValue("minimumRange", "");
-          form.setFieldValue("maximumRange", "");
-          form.setFieldValue("interestRate", "");
-          form.setFieldValue("frequency", "");
-          form.setFieldValue("maximumTenure", "");
-          form.setFieldValue("repaymentCycle", "");
-          form.setFieldValue("processingFee", "");
-          form.setFieldValue("gracePeriod", "");
-          form.setFieldValue("penaltyRate", "");
-          form.setFieldValue("penaltyCharge", "");
-          form.setFieldValue("penaltyPayment", "");
-          form.setFieldValue("approved", false);
         }
       } catch (error) {
         return updateNotification({
@@ -161,218 +165,213 @@ const CreateProduct = () => {
         autoClose: 5000,
       });
     }
-  }, [product, form]);
+  }, [product, form.values]);
 
   return (
     <>
-      {!load && (
-        <form>
-          <Group position="center" m="md">
-            <TitleText title="New Product" />
-          </Group>
+      <form style={{ position: "relative" }}>
+        <Group position="center" m="md">
+          <TitleText title="New Product" />
+        </Group>
 
-          <Grid grow>
-            <Grid.Col span={4}>
-              <TextInput
-                mt="md"
-                label="Product Name"
-                placeholder="Product Name"
-                {...form.getInputProps("productName")}
-                required
-              />
-            </Grid.Col>
-            <Grid.Col span={4}>
-              <TextInput
-                mt="md"
-                label="Product ID"
-                placeholder="Product ID"
-                {...form.getInputProps("productId")}
-                disabled
-                required
-              />
-            </Grid.Col>
-          </Grid>
-
-          <Grid grow>
-            <Grid.Col span={4}>
-              <TextInput
-                mt="md"
-                label="Interest Rate"
-                placeholder="Interest Rate"
-                {...form.getInputProps("interestRate")}
-                required
-              />
-            </Grid.Col>
-            <Grid.Col span={4}>
-              <Select
-                mt="md"
-                label="Frequency (PA | PM)"
-                placeholder="Frequency (PA | PM)"
-                data={[
-                  { value: "pm", label: "Per Month" },
-                  { value: "pa", label: "Per Annum" },
-                ]}
-                {...form.getInputProps("frequency")}
-                required
-              />
-            </Grid.Col>
-          </Grid>
-
-          <Grid grow>
-            <Grid.Col span={4}>
-              <TextInput
-                mt="md"
-                label="Minimum Range"
-                placeholder="Minimum Range"
-                {...form.getInputProps("minimumRange")}
-                required
-              />
-            </Grid.Col>
-            <Grid.Col span={4}>
-              <TextInput
-                mt="md"
-                label="Maximum Range"
-                placeholder="Maximum Range"
-                {...form.getInputProps("maximumRange")}
-                required
-              />
-            </Grid.Col>
-          </Grid>
-
-          <Grid grow>
-            <Grid.Col span={4}>
-              <Select
-                mt="md"
-                label="Repayment Cycle"
-                placeholder="Repayment Cycle"
-                data={[
-                  { value: "daily", label: "Daily" },
-                  { value: "weekly", label: "Weeekly" },
-                  { value: "monthly", label: "Monthly" },
-                ]}
-                {...form.getInputProps("repaymentCycle")}
-                required
-              />
-            </Grid.Col>
-            <Grid.Col span={4}>
-              <TextInput
-                mt="md"
-                label="Processing Fee (%)"
-                placeholder="Processing Fee (%)"
-                {...form.getInputProps("processingFee")}
-                required
-              />
-            </Grid.Col>
-            <Grid.Col span={4}>
-              <Select
-                mt="md"
-                label="Grace Period"
-                placeholder="Grace Period"
-                data={[
-                  { value: "0", label: "0 Days" },
-                  { value: "1", label: "1 Day" },
-                ]}
-                {...form.getInputProps("gracePeriod")}
-                required
-              />
-            </Grid.Col>
-          </Grid>
-
-          <Grid grow>
-            <Grid.Col span={4}>
-              <TextInput
-                mt="md"
-                label="Penalty Rate (%)"
-                placeholder="Penalty Rate (%)"
-                {...form.getInputProps("penaltyRate")}
-                required
-              />
-            </Grid.Col>
-            <Grid.Col span={4}>
-              <Select
-                mt="md"
-                label="Penalty Charged as"
-                placeholder="Penalty Charged as"
-                data={[
-                  { value: "installment", label: "% of Principal" },
-                  { value: "principal", label: "% of Installment" },
-                ]}
-                {...form.getInputProps("penaltyCharge")}
-                required
-              />
-            </Grid.Col>
-            <Grid.Col span={4}>
-              <Select
-                mt="md"
-                label="Penalty Payment"
-                placeholder="Penalty Payment"
-                data={[
-                  { value: "each", label: "Each Installment" },
-                  { value: "last", label: "Last Installment" },
-                ]}
-                {...form.getInputProps("penaltyPayment")}
-                required
-              />
-            </Grid.Col>
-          </Grid>
-
-          <Grid grow>
-            <Grid.Col span={5}>
-              <TextInput
-                mt="md"
-                label="Maximum Tenure"
-                placeholder="Maximum Tenure"
-                {...form.getInputProps("maximumTenure")}
-                required
-              />
-            </Grid.Col>
-            <Grid.Col span={1}>
-              <Group position="center" mt="xl" pt="md">
-                <TitleText
-                  title={
-                    form.values.repaymentCycle === "daily"
-                      ? "Days"
-                      : form.values.repaymentCycle === "weekly"
-                      ? "Weeks"
-                      : "Months"
-                  }
-                />
-              </Group>
-            </Grid.Col>
-          </Grid>
-
-          <Divider mt="lg" variant="dashed" my="sm" />
-
-          <Group position="center" mt="xl">
-            <Button
-              // type="submit"
-              variant="outline"
-              onClick={() => {
-                form.setFieldValue("productId", `${procode}`);
-                form.setFieldValue("approved", false);
-                form.validate();
-                showNotification({
-                  id: "submit",
-                  title: "New Product",
-                  message: "Creating New Product ...",
-                  disallowClose: true,
-                  loading: true,
-                });
-                createProduct();
-              }}
-            >
-              Submit
-            </Button>
-          </Group>
-        </form>
-      )}
-      {load && (
         <LoadingOverlay
           overlayBlur={2}
-          onClick={() => setLoad((prev) => !prev)}
-          visible={load}
+          visible={products_status === "loading"}
         />
-      )}
+        <Grid grow>
+          <Grid.Col span={4}>
+            <TextInput
+              mt="md"
+              label="Product Name"
+              placeholder="Product Name"
+              {...form.getInputProps("productName")}
+              required
+            />
+          </Grid.Col>
+          <Grid.Col span={4}>
+            <TextInput
+              mt="md"
+              label="Product ID"
+              placeholder="Product ID"
+              {...form.getInputProps("productId")}
+              disabled
+              required
+            />
+          </Grid.Col>
+        </Grid>
+
+        <Grid grow>
+          <Grid.Col span={4}>
+            <TextInput
+              mt="md"
+              label="Interest Rate"
+              placeholder="Interest Rate"
+              {...form.getInputProps("interestRate")}
+              required
+            />
+          </Grid.Col>
+          <Grid.Col span={4}>
+            <Select
+              mt="md"
+              label="Frequency (PA | PM)"
+              placeholder="Frequency (PA | PM)"
+              data={[
+                { value: "pm", label: "Per Month" },
+                { value: "pa", label: "Per Annum" },
+              ]}
+              {...form.getInputProps("frequency")}
+              required
+            />
+          </Grid.Col>
+        </Grid>
+
+        <Grid grow>
+          <Grid.Col span={4}>
+            <TextInput
+              mt="md"
+              label="Minimum Range"
+              placeholder="Minimum Range"
+              {...form.getInputProps("minimumRange")}
+              required
+            />
+          </Grid.Col>
+          <Grid.Col span={4}>
+            <TextInput
+              mt="md"
+              label="Maximum Range"
+              placeholder="Maximum Range"
+              {...form.getInputProps("maximumRange")}
+              required
+            />
+          </Grid.Col>
+        </Grid>
+
+        <Grid grow>
+          <Grid.Col span={4}>
+            <Select
+              mt="md"
+              label="Repayment Cycle"
+              placeholder="Repayment Cycle"
+              data={[
+                { value: "daily", label: "Daily" },
+                { value: "weekly", label: "Weeekly" },
+                { value: "monthly", label: "Monthly" },
+              ]}
+              {...form.getInputProps("repaymentCycle")}
+              required
+            />
+          </Grid.Col>
+          <Grid.Col span={4}>
+            <TextInput
+              mt="md"
+              label="Processing Fee (%)"
+              placeholder="Processing Fee (%)"
+              {...form.getInputProps("processingFee")}
+              required
+            />
+          </Grid.Col>
+          <Grid.Col span={4}>
+            <Select
+              mt="md"
+              label="Grace Period"
+              placeholder="Grace Period"
+              data={[
+                { value: "0", label: "0 Days" },
+                { value: "1", label: "1 Day" },
+              ]}
+              {...form.getInputProps("gracePeriod")}
+              required
+            />
+          </Grid.Col>
+        </Grid>
+
+        <Grid grow>
+          <Grid.Col span={4}>
+            <TextInput
+              mt="md"
+              label="Penalty Rate (%)"
+              placeholder="Penalty Rate (%)"
+              {...form.getInputProps("penaltyRate")}
+              required
+            />
+          </Grid.Col>
+          <Grid.Col span={4}>
+            <Select
+              mt="md"
+              label="Penalty Charged as"
+              placeholder="Penalty Charged as"
+              data={[
+                { value: "installment", label: "% of Principal" },
+                { value: "principal", label: "% of Installment" },
+              ]}
+              {...form.getInputProps("penaltyCharge")}
+              required
+            />
+          </Grid.Col>
+          <Grid.Col span={4}>
+            <Select
+              mt="md"
+              label="Penalty Payment"
+              placeholder="Penalty Payment"
+              data={[
+                { value: "each", label: "Each Installment" },
+                { value: "last", label: "Last Installment" },
+              ]}
+              {...form.getInputProps("penaltyPayment")}
+              required
+            />
+          </Grid.Col>
+        </Grid>
+
+        <Grid grow>
+          <Grid.Col span={5}>
+            <TextInput
+              mt="md"
+              label="Maximum Tenure"
+              placeholder="Maximum Tenure"
+              {...form.getInputProps("maximumTenure")}
+              required
+            />
+          </Grid.Col>
+          <Grid.Col span={1}>
+            <Group position="center" mt="xl" pt="md">
+              <TitleText
+                title={
+                  form.values.repaymentCycle === "daily"
+                    ? "Days"
+                    : form.values.repaymentCycle === "weekly"
+                    ? "Weeks"
+                    : "Months"
+                }
+              />
+            </Group>
+          </Grid.Col>
+        </Grid>
+
+        <Divider mt="lg" variant="dashed" my="sm" />
+
+        <Group position="center" mt="xl">
+          <Button
+            // type="submit"
+            variant="outline"
+            onClick={() => {
+              form.setFieldValue("productId", `${procode}`);
+              form.setFieldValue("approved", false);
+              form.validate();
+              showNotification({
+                id: "submit",
+                title: "New Product",
+                message: "Creating New Product ...",
+                disallowClose: true,
+                loading: true,
+              });
+              createProduct();
+            }}
+          >
+            Submit
+          </Button>
+        </Group>
+      </form>
     </>
   );
 };

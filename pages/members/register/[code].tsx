@@ -245,48 +245,48 @@ const CreateMember = () => {
     },
   });
 
-      const clear = () => {
-            form.setFieldValue("date", "");
-            form.setFieldValue("branchName", "");
-            form.setFieldValue("memberId", "");
-            form.setFieldValue("firstName", "");
-            form.setFieldValue("lastName", "");
-            form.setFieldValue("dob", "");
-            form.setFieldValue("idPass", "");
-            form.setFieldValue("kraPin", "");
-            form.setFieldValue("phoneNumber", "");
-            form.setFieldValue("gender", "");
-            form.setFieldValue("age", "");
-            form.setFieldValue("religion", "");
-            form.setFieldValue("maritalStatus", "");
-            form.setFieldValue("spouseName", "");
-            form.setFieldValue("spouseNumber", "");
-            form.setFieldValue("postalAddress", "");
-            form.setFieldValue("postalCode", "");
-            form.setFieldValue("cityTown", "");
-            form.setFieldValue("residentialAddress", "");
-            form.setFieldValue("emailAddress", "");
-            form.setFieldValue("rentedOwned", "");
-            form.setFieldValue("landCareAgent", "");
-            form.setFieldValue("occupationEmployer", "");
-            form.setFieldValue("employerNumber", "");
-            form.setFieldValue("businessLocation", "");
-            form.setFieldValue("businessAge", "");
-            form.setFieldValue("refereeName", "");
-            form.setFieldValue("refereeNumber", "");
-            form.setFieldValue("communityPosition", "");
-            form.setFieldValue("mpesaCode", "");
-            form.setFieldValue("membershipAmount", "");
-            form.setFieldValue("nameKin", "");
-            form.setFieldValue("relationship", "");
-            form.setFieldValue("residentialAddressKin", "");
-            form.setFieldValue("postalAddressKin", "");
-            form.setFieldValue("postalCodeKin", "");
-            form.setFieldValue("cityTownKin", "");
-            form.setFieldValue("numberKin", "");
-            form.setFieldValue("group", false);
-            form.setFieldValue("maintained", false);
-        }
+  const clear = () => {
+    form.setFieldValue("date", "");
+    form.setFieldValue("branchName", "");
+    form.setFieldValue("memberId", "");
+    form.setFieldValue("firstName", "");
+    form.setFieldValue("lastName", "");
+    form.setFieldValue("dob", "");
+    form.setFieldValue("idPass", "");
+    form.setFieldValue("kraPin", "");
+    form.setFieldValue("phoneNumber", "");
+    form.setFieldValue("gender", "");
+    form.setFieldValue("age", "");
+    form.setFieldValue("religion", "");
+    form.setFieldValue("maritalStatus", "");
+    form.setFieldValue("spouseName", "");
+    form.setFieldValue("spouseNumber", "");
+    form.setFieldValue("postalAddress", "");
+    form.setFieldValue("postalCode", "");
+    form.setFieldValue("cityTown", "");
+    form.setFieldValue("residentialAddress", "");
+    form.setFieldValue("emailAddress", "");
+    form.setFieldValue("rentedOwned", "");
+    form.setFieldValue("landCareAgent", "");
+    form.setFieldValue("occupationEmployer", "");
+    form.setFieldValue("employerNumber", "");
+    form.setFieldValue("businessLocation", "");
+    form.setFieldValue("businessAge", "");
+    form.setFieldValue("refereeName", "");
+    form.setFieldValue("refereeNumber", "");
+    form.setFieldValue("communityPosition", "");
+    form.setFieldValue("mpesaCode", "");
+    form.setFieldValue("membershipAmount", "");
+    form.setFieldValue("nameKin", "");
+    form.setFieldValue("relationship", "");
+    form.setFieldValue("residentialAddressKin", "");
+    form.setFieldValue("postalAddressKin", "");
+    form.setFieldValue("postalCodeKin", "");
+    form.setFieldValue("cityTownKin", "");
+    form.setFieldValue("numberKin", "");
+    form.setFieldValue("group", false);
+    form.setFieldValue("maintained", false);
+  };
 
   const handleSave = useCallback(() => {
     try {
@@ -330,7 +330,7 @@ const CreateMember = () => {
             form.values.postalCodeKin &&
             form.values.cityTownKin &&
             form.values.numberKin) ||
-            form.values.group ||
+          form.values.group ||
           form.values.maintained
         ) {
           member.mutate({
@@ -376,7 +376,6 @@ const CreateMember = () => {
             group: false,
             maintained: false,
           });
-
         }
       } catch (error) {
         return updateNotification({
@@ -402,7 +401,7 @@ const CreateMember = () => {
 
   return (
     <>
-      <form style={{position: "relative"}}>
+      <form style={{ position: "relative" }}>
         <Group position="center" m="md">
           <TitleText title="Member Registration" />
         </Group>
@@ -410,7 +409,9 @@ const CreateMember = () => {
         <LoadingOverlay
           overlayBlur={2}
           visible={
-            members_status === "loading" || transaction_status === "loading" || member.status === "loading"
+            members_status === "loading" ||
+            transaction_status === "loading" ||
+            member.status === "loading"
           }
         />
         <Grid grow>

@@ -52,6 +52,7 @@ model User {
   password           String?
   emailVerified      DateTime?
   image              String?
+  role               String?      @default("CO")
   accounts           Account[]
   sessions           Session[]
   registeredMembers  Member[]     @relation("RegisteredBy")
@@ -69,7 +70,7 @@ model User {
   updatedProducts    Product[]    @relation("UpdatedBy")
   updatedCollaterals Collateral[] @relation("UpdatedBy")
   updatedGuarantors  Guarantor[]  @relation("UpdatedBy")
-  role               Role         @default(USER)
+  // role               Role         @default(CO)
 }
 
 model VerificationToken {
@@ -296,7 +297,8 @@ model Transaction {
 }
 
 enum Role {
-  USER
-  ADMIN
-  SUPAERADMIN
+  CO
+  CA
+  MD
+  AU
 }

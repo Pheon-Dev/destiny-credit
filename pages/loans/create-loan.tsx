@@ -9,7 +9,7 @@ const MembersList = () => {
   return (
     <Protected>
       <LoadingOverlay overlayBlur={2} visible={status === "loading"} />
-      {(members?.length === 0 && status === "success" && (
+      {(!members && status === "success" && (
         <EmptyTable call="create-loan" />
       )) ||
         (members && <MembersTable members={members} call="create-loan" />)}

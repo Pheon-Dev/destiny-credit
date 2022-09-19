@@ -8,8 +8,8 @@ import { withTRPC } from "@trpc/next";
 import { loggerLink } from '@trpc/client/links/loggerLink';
 import { httpBatchLink } from '@trpc/client/links/httpBatchLink';
 import type { AppRouter } from "../server/_app";
-/* import { SessionProvider } from "next-auth/react"; */
-/* import { useSession } from "next-auth/react"; */
+import { SessionProvider } from "next-auth/react";
+import { useSession } from "next-auth/react";
 import superjson from "superjson";
 
 import {
@@ -55,9 +55,8 @@ const App = (props: AppProps & { colorScheme: ColorScheme }) => {
   /* if (isSSR) return null; */
 
   const AppContent = () => {
-  /* console.log(pageProps.session); */
-    /* const { status, data } = useSession(); */
-    /* console.log(data) */
+    const { status, data } = useSession();
+    console.log(data)
 
     return (
       <MantineProvider
@@ -75,7 +74,7 @@ const App = (props: AppProps & { colorScheme: ColorScheme }) => {
               asideOffsetBreakpoint="sm"
               navbar={
                 <>
-                  {/* {status === "authenticated" && ( */}
+                  {status === "authenticated" && (
                     <Navbar
                       p="xs"
                       hiddenBreakpoint="sm"
@@ -94,7 +93,7 @@ const App = (props: AppProps & { colorScheme: ColorScheme }) => {
                         <MainLinks />
                       </Navbar.Section>
                     </Navbar>
-                  {/* )} */}
+                  )}
                 </>
               }
               // aside={
@@ -149,10 +148,9 @@ const App = (props: AppProps & { colorScheme: ColorScheme }) => {
         />
       </Head>
 
-      {/* <SessionProvider session={pageProps.session}> */}
-      {/*   <AppContent /> */}
-      {/* </SessionProvider> */}
+      <SessionProvider session={pageProps.session}>
         <AppContent />
+      </SessionProvider>
     </>
   );
 }
