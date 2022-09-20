@@ -1,4 +1,4 @@
-import React from "react";
+import React, { useEffect } from "react";
 import { signIn, useSession } from "next-auth/react";
 import { NextPage } from "next";
 import { z } from "zod";
@@ -81,6 +81,16 @@ const Page: NextPage = (props): JSX.Element => {
       });
     }
   };
+
+  useEffect(() => {
+    let sub = true;
+    if (sub) {
+      if (status === "authenticated") router.push("/");
+    }
+    return () => {
+      sub = false;
+    };
+  }, [status, router]);
 
   return (
     <>

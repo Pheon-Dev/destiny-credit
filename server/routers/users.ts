@@ -1,14 +1,25 @@
-import { PrismaClient } from "@prisma/client";
+import { Prisma, PrismaClient } from "@prisma/client";
 import { TRPCError } from "@trpc/server";
 import { z } from "zod";
 import { createRouter } from "../create-router";
 
 const prisma = new PrismaClient();
 
+const defaultUserSelect = Prisma.validator<Prisma.UserSelect>()({
+  id: true,
+  username: true,
+  firstName: true,
+  lastName: true,
+  email: true,
+  role: true,
+});
+
 export const usersRouter = createRouter()
   .query("users", {
     resolve: async () => {
-      const users = await prisma.user.findMany();
+      const users = await prisma.user.findMany({
+        select: defaultUserSelect,
+      });
       if (!users) {
         throw new TRPCError({
           code: "NOT_FOUND",
@@ -18,24 +29,35 @@ export const usersRouter = createRouter()
       return users;
     },
   })
+  .query("officers", {
+    resolve: async () => {
+      const user = await prisma.user.findMany({
+        where: {
+          role: "CO",
+        },
+        select: defaultUserSelect,
+      });
+
+      if (!user) {
+        throw new TRPCError({
+          code: "NOT_FOUND",
+          message: `users.officers not found`,
+        });
+      }
+      return user;
+    },
+  })
   .query("user", {
     input: z.object({
       email: z.string().email(),
     }),
     resolve: async ({ input }) => {
       const user = await prisma.user.findFirst({
-          where: {
-            email: input.email,
-          },
-          select: {
-            id: true,
-            username: true,
-            firstName: true,
-            lastName: true,
-            email: true,
-            role: true
-          }
-        });
+        where: {
+          email: input.email,
+        },
+        select: defaultUserSelect,
+      });
 
       if (!user) {
         throw new TRPCError({
@@ -57,15 +79,15 @@ export const usersRouter = createRouter()
     }),
     resolve: async ({ input }) => {
       const user = await prisma.user.create({
-          data: {
-            username: input.username,
-            firstName: input.firstName,
-            lastName: input.lastName,
-            password: input.password,
-            email: input.email,
-            role: input.role,
-          },
-        });
+        data: {
+          username: input.username,
+          firstName: input.firstName,
+          lastName: input.lastName,
+          password: input.password,
+          email: input.email,
+          role: input.role,
+        },
+      });
 
       if (!user) {
         throw new TRPCError({
@@ -76,4 +98,3 @@ export const usersRouter = createRouter()
       return user;
     },
   });
-

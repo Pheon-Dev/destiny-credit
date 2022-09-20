@@ -71,6 +71,7 @@ export const loansRouter = createRouter()
   .mutation("approve", {
     input: z.object({
       id: z.string(),
+      approverId: z.string(),
       approved: z.boolean(),
     }),
     resolve: async ({ input }) => {
@@ -80,6 +81,7 @@ export const loansRouter = createRouter()
         },
         data: {
           approved: input.approved,
+          approverId: input.approverId,
         },
       });
       if (loan?.count === 0) {
@@ -96,6 +98,9 @@ export const loansRouter = createRouter()
       id: z.string(),
       disbursed: z.boolean(),
       disbursedOn: z.string(),
+      disburserId: z.string(),
+      updaterId: z.string(),
+      creditOfficerId: z.string(),
     }),
     resolve: async ({ input }) => {
       const loan = await prisma.loan.updateMany({
@@ -105,6 +110,9 @@ export const loansRouter = createRouter()
         data: {
           disbursed: input.disbursed,
           disbursedOn: input.disbursedOn,
+          disburserId: input.disburserId,
+          updaterId: input.updaterId,
+          creditOfficerId: input.creditOfficerId,
         },
       });
       if (loan?.count === 0) {

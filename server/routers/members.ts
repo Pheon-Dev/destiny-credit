@@ -209,6 +209,7 @@ export const membersRouter = createRouter()
     input: z.object({
       id: z.string(),
       maintained: z.boolean(),
+      updaterId: z.string(),
     }),
     resolve: async ({ input }) => {
       const member = await prisma.member.update({
@@ -217,6 +218,7 @@ export const membersRouter = createRouter()
         },
         data: {
           maintained: input.maintained,
+          updaterId: input.updaterId,
         },
       });
       if (!member) {
@@ -233,6 +235,7 @@ export const membersRouter = createRouter()
       item: z.string(),
       value: z.string(),
       memberId: z.string(),
+      updaterId: z.string(),
     }),
     resolve: async ({ input }) => {
       const collateral = await prisma.collateral.create({
@@ -240,6 +243,7 @@ export const membersRouter = createRouter()
           item: input.item,
           value: input.value,
           memberId: input.memberId,
+          updaterId: input.updaterId,
         },
       });
       if (!collateral) {
@@ -259,6 +263,7 @@ export const membersRouter = createRouter()
       guarantorRelationship: z.string(),
       guarantorID: z.string(),
       memberId: z.string(),
+      updaterId: z.string(),
     }),
     resolve: async ({ input }) => {
       await prisma.guarantor.deleteMany({
@@ -274,6 +279,7 @@ export const membersRouter = createRouter()
           guarantorRelationship: input.guarantorRelationship,
           guarantorID: input.guarantorID,
           memberId: input.memberId,
+          updaterId: input.updaterId,
         },
       });
       if (!guarantor) {
@@ -307,6 +313,7 @@ export const membersRouter = createRouter()
       guarantorId: z.string(),
       startDate: z.string(),
       loanRef: z.string(),
+      maintainerId: z.string(),
     }),
     resolve: async ({ input }) => {
       const loan = await prisma.loan.create({
@@ -331,6 +338,7 @@ export const membersRouter = createRouter()
           guarantorId: input.guarantorId,
           startDate: input.startDate,
           loanRef: input.loanRef,
+          maintainerId: input.maintainerId,
         },
       });
       if (!loan) {

@@ -241,15 +241,15 @@ const CreateMember = () => {
 
   const member = trpc.useMutation(["members.register"], {
     onSuccess: () => {
-      clear();
       updateNotification({
         id: "submit",
         color: "teal",
-        title: `${member.data?.firstName} ${member.data?.lastName}`,
+        title: `${form.values.firstName} ${form.values.lastName}`,
         message: "Member Registered Successfully!",
         icon: <IconCheck size={16} />,
         autoClose: 5000,
       });
+      clear();
       return router.push("/members");
     },
   });
@@ -302,7 +302,7 @@ const CreateMember = () => {
       try {
         if (
           (user &&
-          form.values.date &&
+            form.values.date &&
             form.values.branchName &&
             form.values.memberId &&
             form.values.firstName &&
@@ -385,7 +385,7 @@ const CreateMember = () => {
             numberKin: form.values.numberKin.toUpperCase(),
             group: false,
             maintained: false,
-            registrarId: `${user?.id}`
+            registrarId: `${user?.id}`,
           });
         }
       } catch (error) {

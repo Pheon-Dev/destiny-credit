@@ -1,4 +1,6 @@
-import React, { useCallback } from "react";
+import React, { useCallback, useEffect } from "react";
+import { z } from "zod";
+import { useForm, zodResolver } from "@mantine/form";
 import { NextPage } from "next";
 import { Protected, TitleText } from "../../../components";
 import {
@@ -11,6 +13,7 @@ import {
   ActionIcon,
   LoadingOverlay,
   Divider,
+  Select,
 } from "@mantine/core";
 import { useRouter } from "next/router";
 import { showNotification, updateNotification } from "@mantine/notifications";
@@ -23,14 +26,48 @@ import {
   IconX,
 } from "@tabler/icons";
 import { trpc } from "../../../utils/trpc";
-import type { Loan } from "@prisma/client";
+import type { Loan, User } from "@prisma/client";
+import { useSession } from "next-auth/react";
+
+const schema = z.object({
+  creditOfficerId: z.string().min(2, { message: "Officer not Selected" }),
+  creditOfficerName: z.string().min(2, { message: "Officer not Selected" }),
+});
 
 const Disburse = () => {
   const router = useRouter();
   const id = router.query.id as string;
   const utils = trpc.useContext();
 
-  const { data: loan, status } = trpc.useQuery(["loans.loan", { id: id }]);
+  const { status, data } = useSession();
+
+  const { data: user, status: user_status } = trpc.useQuery([
+    "users.user",
+    {
+      email: `${data?.user?.email}`,
+    },
+  ]);
+
+  const { data: users, status: users_status } = trpc.useQuery([
+    "users.officers",
+  ]);
+  const users_data = users?.map((p) => p) || [];
+  const user_data = users_data?.map((_) => [
+    { key: _?.id, value: `${_?.id}`, label: `${_?.username}` },
+  ]);
+  const { data: loan, status: loan_status } = trpc.useQuery([
+    "loans.loan",
+    { id: id },
+  ]);
+
+  const form = useForm({
+    validate: zodResolver(schema),
+    initialValues: {
+      creditOfficerId: "",
+      creditOfficerName: "",
+    },
+  });
+
   const disburse = trpc.useMutation(["loans.disburse"], {
     onSuccess: async () => {
       await utils.invalidateQueries(["loans.loan", { id: id }]);
@@ -46,6 +83,24 @@ const Disburse = () => {
     },
   });
 
+  const findOfficer = (officer: string) => {
+    return users_data?.find((e) => {
+      if (officer === e?.username) {
+        form.setFieldValue("creditOfficerId", `${e.id}`);
+      }
+    });
+  };
+
+  useEffect(() => {
+    let sub = true;
+    if (sub) {
+      findOfficer(form.values.creditOfficerName);
+    }
+    return () => {
+      sub = false;
+    };
+  }, [form.values.creditOfficerName]);
+
   const date = new Date();
   const disbursedOn =
     date.toLocaleDateString().split("/")[0] +
@@ -56,11 +111,32 @@ const Disburse = () => {
 
   const handleSubmit = useCallback(() => {
     try {
-      disburse.mutate({
-        id: id,
-        disbursedOn: disbursedOn,
-        disbursed: true,
+      try {
+      if (
+        form.values.creditOfficerName &&
+        form.values.creditOfficerId &&
+        user &&
+        disbursedOn
+      ) {
+        disburse.mutate({
+          id: id,
+          disbursedOn: disbursedOn,
+          disbursed: true,
+          disburserId: `${user?.id}`,
+          updaterId: `${user?.id}`,
+          creditOfficerId: form.values.creditOfficerId,
+        });
+      }
+      } catch (error) {
+      return updateNotification({
+        id: "submit-status",
+        color: "red",
+        title: `Missing Fields`,
+        message: `Please Fill All The Missing Fields Then Try Again.`,
+        icon: <IconX size={16} />,
+        autoClose: 8000,
       });
+      }
     } catch (error) {
       return updateNotification({
         id: "submit-status",
@@ -71,7 +147,7 @@ const Disburse = () => {
         autoClose: 8000,
       });
     }
-  }, [disburse, id, disbursedOn]);
+  }, [disburse, id, disbursedOn, form.values]);
 
   return (
     <>
@@ -232,7 +308,7 @@ const Disburse = () => {
                   <Grid.Col mt="xs" span={4}>
                     <Text weight={500}>First Installment Date</Text>
                   </Grid.Col>
-                  <Grid.Col mt="xs" span={4}>
+                  <Grid.Col mt="xs" span={4} offset={4}>
                     <Text>{_.startDate}</Text>
                   </Grid.Col>
                 </Grid>
@@ -240,8 +316,23 @@ const Disburse = () => {
                   <Grid.Col mt="xs" span={4}>
                     <Text weight={500}>Disbursement Date</Text>
                   </Grid.Col>
-                  <Grid.Col mt="xs" span={4}>
+                  <Grid.Col mt="xs" span={4} offset={4}>
                     <Text>{disbursedOn}</Text>
+                  </Grid.Col>
+                </Grid>
+                <Divider variant="dotted" my="xl" />
+                <Grid grow>
+                  <Grid.Col mt="xs" span={4}>
+                    <Text weight={500}>Credit Officer</Text>
+                  </Grid.Col>
+                  <Grid.Col mt="xs" span={4}>
+                    <Select
+                      placeholder="Select Officer ..."
+                      data={user_data?.map((p) => p[0].label)}
+                      {...form.getInputProps("creditOfficerName")}
+                      disabled={!users}
+                      required
+                    />
                   </Grid.Col>
                 </Grid>
                 <Group mt="xl" position="center">
@@ -271,7 +362,7 @@ const Disburse = () => {
         </>
       )}
       {!loan && (
-        <LoadingOverlay overlayBlur={2} visible={status === "loading"} />
+        <LoadingOverlay overlayBlur={2} visible={loan_status === "loading"} />
       )}
     </>
   );

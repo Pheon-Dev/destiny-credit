@@ -37,6 +37,7 @@ import {
 } from "@tabler/icons";
 import { trpc } from "../../../utils/trpc";
 import type { Collateral, Loan, Member, Product } from "@prisma/client";
+import { useSession } from "next-auth/react";
 
 const loan_schema = z.object({
   member: z.string().min(2, { message: "User Name Missing" }),
@@ -78,6 +79,15 @@ const CreateLoan = () => {
 
   const router = useRouter();
   const id = router.query.create as string;
+
+  const { status, data } = useSession();
+
+  const { data: user, status: user_status } = trpc.useQuery([
+    "users.user",
+    {
+      email: `${data?.user?.email}`,
+    },
+  ]);
 
   const form = useForm({
     validate: zodResolver(loan_schema),
@@ -511,7 +521,8 @@ const CreateLoan = () => {
     try {
       setOpen(false);
       if (
-        (form.values.memberId &&
+        (user &&
+          form.values.memberId &&
           form.values.tenure &&
           form.values.principal &&
           form.values.grace &&
@@ -539,6 +550,7 @@ const CreateLoan = () => {
         maintain_member.mutate({
           id: id,
           maintained: form.values.maintained,
+          updaterId: `${user?.id}`,
         });
 
         maintain_guarantor.mutate({
@@ -548,6 +560,7 @@ const CreateLoan = () => {
           guarantorRelationship: guarantor_form.values.guarantorRelationship,
           guarantorID: guarantor_form.values.guarantorID,
           memberId: form.values.memberId,
+          updaterId: `${user?.id}`,
         });
 
         maintain_loan.mutate({
@@ -571,6 +584,7 @@ const CreateLoan = () => {
           cycle: form.values.cycle,
           startDate: form.values.startDate,
           loanRef: form.values.loanRef,
+          maintainerId: `${user?.id}`,
         });
 
         form.setFieldValue("item", "");
@@ -745,6 +759,7 @@ const CreateLoan = () => {
   const createCollateral = useCallback(() => {
     try {
       if (
+        user &&
         form.values.memberId &&
         collateral_form.values.item &&
         collateral_form.values.value
@@ -753,6 +768,7 @@ const CreateLoan = () => {
           memberId: form.values.memberId,
           item: collateral_form.values.item.toUpperCase(),
           value: collateral_form.values.value,
+          updaterId: `${user?.id}`,
         });
 
         collateral_form.setFieldValue("item", "");

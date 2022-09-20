@@ -23,13 +23,26 @@ import {
 } from "@tabler/icons";
 import { trpc } from "../../../utils/trpc";
 import type { Loan } from "@prisma/client";
+import { useSession } from "next-auth/react";
 
 const Approve = () => {
   const router = useRouter();
   const id = router.query.id as string;
   const utils = trpc.useContext();
 
-  const { data: loan, status } = trpc.useQuery(["loans.loan", { id: id }]);
+  const { status, data } = useSession();
+
+  const { data: user, status: user_status } = trpc.useQuery([
+    "users.user",
+    {
+      email: `${data?.user?.email}`,
+    },
+  ]);
+
+  const { data: loan, status: loan_status } = trpc.useQuery([
+    "loans.loan",
+    { id: id },
+  ]);
   const approve = trpc.useMutation(["loans.approve"], {
     onSuccess: async () => {
       await utils.invalidateQueries(["loans.loan", { id: id }]);
@@ -50,6 +63,7 @@ const Approve = () => {
       approve.mutate({
         id: id,
         approved: true,
+        approverId: `${user?.id}`,
       });
     } catch (error) {
       return updateNotification({
@@ -244,7 +258,7 @@ const Approve = () => {
         </>
       )}
       {!loan && (
-        <LoadingOverlay overlayBlur={2} visible={status === "loading"} />
+        <LoadingOverlay overlayBlur={2} visible={loan_status === "loading"} />
       )}
     </>
   );
