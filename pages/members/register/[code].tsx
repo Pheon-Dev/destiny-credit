@@ -1,5 +1,6 @@
 import React, { useCallback, useEffect } from "react";
 import { z } from "zod";
+import { useSession } from "next-auth/react";
 import { useForm, zodResolver } from "@mantine/form";
 import { IconAlertCircle, IconCalendar, IconCheck, IconX } from "@tabler/icons";
 import { DatePicker } from "@mantine/dates";
@@ -71,6 +72,14 @@ const schema = z.object({
 const CreateMember = () => {
   const router = useRouter();
   const id = router.query.code as string;
+  const { status, data } = useSession();
+
+  const { data: user, status: user_status } = trpc.useQuery([
+    "users.user",
+    {
+      email: `${data?.user?.email}`,
+    },
+  ]);
 
   const {
     data: members,
@@ -292,7 +301,8 @@ const CreateMember = () => {
     try {
       try {
         if (
-          (form.values.date &&
+          (user &&
+          form.values.date &&
             form.values.branchName &&
             form.values.memberId &&
             form.values.firstName &&
@@ -375,6 +385,7 @@ const CreateMember = () => {
             numberKin: form.values.numberKin.toUpperCase(),
             group: false,
             maintained: false,
+            registrarId: `${user?.id}`
           });
         }
       } catch (error) {

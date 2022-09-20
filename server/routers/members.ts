@@ -79,6 +79,7 @@ export const membersRouter = createRouter()
       numberKin: z.string(),
       group: z.boolean(),
       maintained: z.boolean(),
+      registrarId: z.string(),
     }),
     resolve: async ({ input }) => {
       const member = await prisma.member.create({
@@ -124,6 +125,7 @@ export const membersRouter = createRouter()
           group: input.group,
           maintained: input.maintained,
           ratings: 0,
+          registrarId: input.registrarId,
         },
       });
       if (!member) {

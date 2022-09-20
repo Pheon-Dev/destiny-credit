@@ -4,12 +4,6 @@ import { z } from "zod";
 import { createRouter } from "../create-router";
 
 const prisma = new PrismaClient();
-/* const defaultUsersSelect = Prisma.validator<Prisma.UserSelect>()({ */
-/*   id: true, */
-/*   createdAt: true, */
-/*   updatedAt: true, */
-/*   username: true, */
-/* }); */
 
 export const usersRouter = createRouter()
   .query("users", {
@@ -36,6 +30,8 @@ export const usersRouter = createRouter()
           select: {
             id: true,
             username: true,
+            firstName: true,
+            lastName: true,
             email: true,
             role: true
           }
@@ -53,6 +49,8 @@ export const usersRouter = createRouter()
   .mutation("create-user", {
     input: z.object({
       username: z.string(),
+      firstName: z.string(),
+      lastName: z.string(),
       password: z.string(),
       email: z.string(),
       role: z.string(),
@@ -61,6 +59,8 @@ export const usersRouter = createRouter()
       const user = await prisma.user.create({
           data: {
             username: input.username,
+            firstName: input.firstName,
+            lastName: input.lastName,
             password: input.password,
             email: input.email,
             role: input.role,

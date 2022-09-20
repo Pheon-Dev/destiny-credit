@@ -1,17 +1,15 @@
-import React, { useCallback, useEffect, useState } from "react";
-import { signIn, useSession } from "next-auth/react";
+import React, { useCallback, useEffect } from "react";
 import { NextPage } from "next";
 import { z } from "zod";
 import { useForm, zodResolver } from "@mantine/form";
 import {
   TextInput,
+  Text,
   Card,
-  Badge,
   PasswordInput,
   Button,
   Box,
   Group,
-  Text,
   Select,
   LoadingOverlay,
 } from "@mantine/core";
@@ -24,6 +22,8 @@ import { trpc } from "../../utils/trpc";
 
 const schema = z.object({
   username: z.string().min(2, { message: "User Name Missing" }),
+  firstName: z.string().min(2, { message: "First Name Missing" }),
+  lastName: z.string().min(2, { message: "Last Name Missing" }),
   role: z.string().min(2, { message: "Please Assign a Role" }),
   email: z.string().email(),
   password: z.string().min(8, { message: "Password Missing" }),
@@ -31,7 +31,6 @@ const schema = z.object({
 });
 
 const Page: NextPage = (props): JSX.Element => {
-  /* const { status, data } = useSession(); */
   const router = useRouter();
 
   const {
@@ -56,6 +55,8 @@ const Page: NextPage = (props): JSX.Element => {
     initialValues: {
       username: `${usercode}`,
       password: "",
+      firstName: "",
+      lastName: "",
       confirm: "",
       email: "",
       role: "",
@@ -86,6 +87,8 @@ const Page: NextPage = (props): JSX.Element => {
     form.setFieldValue("password", "");
     form.setFieldValue("confirm", "");
     form.setFieldValue("role", "");
+    form.setFieldValue("firstName", "");
+    form.setFieldValue("lastName", "");
   };
   const createUser = useCallback(() => {
     try {
@@ -103,10 +106,14 @@ const Page: NextPage = (props): JSX.Element => {
           form.values.email &&
           form.values.username &&
           form.values.password &&
+          form.values.firstName &&
+          form.values.lastName &&
           form.values.role
         ) {
           newUser.mutate({
             username: form.values.username,
+            firstName: form.values.firstName,
+            lastName: form.values.lastName,
             password: form.values.password,
             email: form.values.email.toLowerCase(),
             role: form.values.role.toUpperCase(),
@@ -132,7 +139,7 @@ const Page: NextPage = (props): JSX.Element => {
         autoClose: 5000,
       });
     }
-  }, [newUser, form]);
+  }, [newUser, form.values]);
 
   useEffect(() => {
     let subscribe = true;
@@ -171,103 +178,123 @@ const Page: NextPage = (props): JSX.Element => {
     return () => {
       subscribe = false;
     };
-  }, [form.values.password, form.values.confirm, users, usercode]);
+  }, [
+    form.values.password,
+    form.values.confirm,
+    users,
+    usercode,
+  ]);
 
-  return (
-    <>
-      <Card
-        sx={{ maxWidth: 360 }}
-        mx="auto"
-        shadow="sm"
-        p="lg"
-        radius="md"
-        withBorder
-        style={{ marginTop: "100px", position: "relative" }}
-      >
-        <LoadingOverlay overlayBlur={2} visible={users_status === "loading"} />
-        <Card.Section>
-          <Box p="lg">
-            <form>
-              <TextInput
-                label="User Name"
-                placeholder="User Name ..."
-                {...form.getInputProps("username")}
-                required
-              />
-              <TextInput
-                label="Email Address"
-                type="email"
-                placeholder="Email Address ..."
-                {...form.getInputProps("email")}
-                required
-              />
-              <PasswordInput
-                label="New Password"
-                placeholder="********"
-                mt="sm"
-                {...form.getInputProps("password")}
-                required
-              />
-              <PasswordInput
-                label="Confirm Password"
-                placeholder="********"
-                mt="sm"
-                {...form.getInputProps("confirm")}
-                required
-              />
-              <Select
-                mt="md"
-                label="Assign Role"
-                placeholder="Select Role"
-                data={[
-                  { value: "CO", label: "Credit Officer" },
-                  { value: "CA", label: "Credit Admin" },
-                  { value: "MD", label: "Managing Director" },
-                  { value: "AU", label: "Auditor" },
-                ]}
-                {...form.getInputProps("role")}
-                required
-              />
-
-              <Group mt="md">
-                <Text color="gray">Already have an account?</Text>
-                <Text
-                  style={{ cursor: "pointer" }}
-                  onClick={() => router.push("/auth/sign-in")}
-                  color="blue"
-                >
-                  Sign In
-                </Text>
-              </Group>
-              <Group mt="xl">
-                <Button
-                  variant="light"
-                  color="blue"
-                  fullWidth
+    return (
+      <>
+        <Card
+          sx={{ maxWidth: 360 }}
+          mx="auto"
+          shadow="sm"
+          p="lg"
+          radius="md"
+          withBorder
+          style={{ marginTop: "50px", position: "relative" }}
+        >
+          <LoadingOverlay
+            overlayBlur={2}
+            visible={users_status === "loading"}
+          />
+          <Card.Section>
+            <Box p="lg">
+              <form>
+                <TextInput
+                  label="User Name"
+                  placeholder="User Name ..."
+                  {...form.getInputProps("username")}
+                  required
+                />
+                <TextInput
+                  label="First Name"
+                  placeholder="First Name ..."
+                  {...form.getInputProps("firstName")}
+                  required
+                />
+                <TextInput
+                  label="Last Name"
+                  placeholder="Last Name ..."
+                  {...form.getInputProps("lastName")}
+                  required
+                />
+                <TextInput
+                  label="Email Address"
+                  type="email"
+                  placeholder="Email Address ..."
+                  {...form.getInputProps("email")}
+                  required
+                />
+                <PasswordInput
+                  label="New Password"
+                  placeholder="********"
+                  mt="sm"
+                  {...form.getInputProps("password")}
+                  required
+                />
+                <PasswordInput
+                  label="Confirm Password"
+                  placeholder="********"
+                  mt="sm"
+                  {...form.getInputProps("confirm")}
+                  required
+                />
+                <Select
                   mt="md"
-                  radius="md"
-                  onClick={() => {
-                    form.validate();
-                    showNotification({
-                      id: "submit",
-                      color: "teal",
-                      title: "Signing Up",
-                      message: `Registering New User ${form.values.username} ...`,
-                      loading: true,
-                      autoClose: 50000,
-                    });
-                    createUser();
-                  }}
-                >
-                  Sign Up
-                </Button>
-              </Group>
-            </form>
-          </Box>
-        </Card.Section>
-      </Card>
-    </>
-  );
+                  label="Assign Role"
+                  placeholder="Select Role"
+                  data={[
+                    { value: "CO", label: "Credit Officer" },
+                    { value: "CA", label: "Credit Admin" },
+                    { value: "MD", label: "Managing Director" },
+                    { value: "AU", label: "Auditor" },
+                  ]}
+                  {...form.getInputProps("role")}
+                  required
+                />
+
+                <Group mt="md">
+                  <Text color="gray">Already have an account?</Text>
+                  <Text
+                    style={{ cursor: "pointer" }}
+                    onClick={() => router.push("/auth/sign-in")}
+                    color="blue"
+                  >
+                    Sign In
+                  </Text>
+                </Group>
+                <Group mt="xl">
+                  <Button
+                    variant="light"
+                    color="blue"
+                    fullWidth
+                    mt="md"
+                    radius="md"
+                    onClick={() => {
+                      form.validate();
+                      showNotification({
+                        id: "submit",
+                        color: "teal",
+                        title: "Signing Up",
+                        message: `Registering New User ${form.values.username} ...`,
+                        loading: true,
+                        autoClose: 50000,
+                      });
+                      createUser();
+                    }}
+                  >
+                    Sign Up
+                  </Button>
+                </Group>
+              </form>
+            </Box>
+          </Card.Section>
+        </Card>
+      </>
+    );
 };
 
 export default Page;

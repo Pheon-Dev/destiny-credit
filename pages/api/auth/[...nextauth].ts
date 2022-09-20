@@ -3,8 +3,6 @@ import { PrismaClient } from "@prisma/client";
 import NextAuth from "next-auth";
 import type { NextAuthOptions } from "next-auth";
 import CredentialsProvider from "next-auth/providers/credentials";
-import { trpc } from "../../../utils/trpc";
-import { Session } from "../../../lib/session";
 import { NextApiHandler } from "next";
 
 const prisma = new PrismaClient();

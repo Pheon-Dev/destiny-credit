@@ -6,7 +6,6 @@ import { useForm, zodResolver } from "@mantine/form";
 import {
   TextInput,
   Card,
-  Badge,
   PasswordInput,
   Button,
   Box,
@@ -16,7 +15,6 @@ import {
 import { useRouter } from "next/router";
 import { showNotification, updateNotification } from "@mantine/notifications";
 import { IconCheck, IconX } from "@tabler/icons";
-import { trpc } from "../../utils/trpc";
 
 const schema = z.object({
   username: z.string().min(2, { message: "User Name Missing" }),
@@ -24,7 +22,9 @@ const schema = z.object({
 });
 
 const Page: NextPage = (props): JSX.Element => {
+  const { status, data } = useSession();
   const router = useRouter();
+
   const form = useForm({
     validate: zodResolver(schema),
     initialValues: {
@@ -55,7 +55,6 @@ const Page: NextPage = (props): JSX.Element => {
         });
         return router.push("/");
       }
-      console.log(res)
 
       if (res?.error) {
         return setTimeout(() => {
@@ -63,7 +62,7 @@ const Page: NextPage = (props): JSX.Element => {
             id: "sing-in-status",
             color: "red",
             title: "Unsuccessful Sign In!",
-            message: `${res?.error}`,
+            message: `Please Make Sure You Are Connected to the Internet or Input Valid Credentials`,
             icon: <IconX size={16} />,
             autoClose: 8000,
           });

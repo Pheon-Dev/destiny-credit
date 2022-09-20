@@ -56,7 +56,6 @@ const App = (props: AppProps & { colorScheme: ColorScheme }) => {
 
   const AppContent = () => {
     const { status, data } = useSession();
-    console.log(data)
 
     return (
       <MantineProvider
