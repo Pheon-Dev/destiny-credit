@@ -14,11 +14,14 @@ const prisma = new PrismaClient();
 export const usersRouter = createRouter()
   .query("users", {
     resolve: async () => {
-      try {
-        return await prisma.user.findMany();
-      } catch (error) {
-        console.log("users.users");
+      const users = await prisma.user.findMany();
+      if (!users) {
+        throw new TRPCError({
+          code: "NOT_FOUND",
+          message: `users.users not found`,
+        });
       }
+      return users;
     },
   })
   .query("user", {
@@ -26,8 +29,7 @@ export const usersRouter = createRouter()
       email: z.string().email(),
     }),
     resolve: async ({ input }) => {
-      try {
-        return await prisma.user.findFirst({
+      const user = await prisma.user.findFirst({
           where: {
             email: input.email,
           },
@@ -38,9 +40,14 @@ export const usersRouter = createRouter()
             role: true
           }
         });
-      } catch (error) {
-        console.log("users.user");
+
+      if (!user) {
+        throw new TRPCError({
+          code: "NOT_FOUND",
+          message: `users.user not found`,
+        });
       }
+      return user;
     },
   })
   .mutation("create-user", {
@@ -51,8 +58,7 @@ export const usersRouter = createRouter()
       role: z.string(),
     }),
     resolve: async ({ input }) => {
-      try {
-        return await prisma.user.create({
+      const user = await prisma.user.create({
           data: {
             username: input.username,
             password: input.password,
@@ -60,9 +66,14 @@ export const usersRouter = createRouter()
             role: input.role,
           },
         });
-      } catch (error) {
-        console.log("users.create-user");
+
+      if (!user) {
+        throw new TRPCError({
+          code: "NOT_FOUND",
+          message: `users.create-user not found`,
+        });
       }
+      return user;
     },
   });
 

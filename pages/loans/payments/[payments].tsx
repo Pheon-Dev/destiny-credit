@@ -14,17 +14,10 @@ const PaymentsList = () => {
   return (
     <>
       <LoadingOverlay overlayBlur={2} visible={status === "loading"} />
-      {(!loan && status === "success" && (
+      {(!loan && (
         <EmptyTable call="payment" />
       )) ||
         (loan && <PaymentTable payments={loan} call="payment" />)}
-      {status === "success" && loan?.length === 0 && (
-        <>
-          <Group position="center">
-            <pre>{JSON.stringify(loan, null, 4)}</pre>
-          </Group>
-        </>
-      )}
     </>
   );
   } catch (error) {

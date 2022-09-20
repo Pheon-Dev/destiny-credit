@@ -284,9 +284,9 @@ const CreateLoan = () => {
   const prevStep = () =>
     setActive((current) => (current > 0 ? current - 1 : current));
 
-  const calcuDates = (cycle: string) => {
+  const calcuDates = (cycle: string, tenure: number) => {
     let counter = 0;
-    let term = +form.values.tenure;
+    let term = tenure;
     const sundate = new Date();
     let total_sundays = 0;
 
@@ -453,7 +453,7 @@ const CreateLoan = () => {
 
     if (subscribe) {
       fillForm();
-      calcuDates(cycle.toLowerCase());
+      calcuDates(cycle.toLowerCase(), +form.values.tenure);
     }
 
     return () => {
@@ -478,6 +478,7 @@ const CreateLoan = () => {
     maxTenure,
     minRange,
     maxRange,
+    form.values.tenure,
   ]);
 
   const maintain_member = trpc.useMutation(["members.maintain-member"], {
@@ -1055,7 +1056,7 @@ const CreateLoan = () => {
           />
           <Group position="apart" mt="md" mb="xs">
             <Text weight={500}>
-              Include Payments on Sunday. (
+              Skipped Sundays. (
               {`${sundays} ${sundays === 1 ? "Sunday" : "Sundays"}`})
             </Text>
             <Switch
@@ -1353,6 +1354,43 @@ const CreateLoan = () => {
                   </Grid.Col>
                 </Grid>
               )}
+              <Card.Section withBorder inheritPadding mt="md" py="xs">
+                <Group position="apart">
+                  <TitleText title={`Guarantor`} />
+                </Group>
+              </Card.Section>
+              <Grid grow>
+                <Grid.Col mt="xs" span={4}>
+                  <Text weight={500}>Name</Text>
+                </Grid.Col>
+                <Grid.Col mt="xs" span={4}>
+                  <Text>{guarantor_form.values.guarantorName}</Text>
+                </Grid.Col>
+              </Grid>
+              <Grid grow>
+                <Grid.Col mt="xs" span={4}>
+                  <Text weight={500}>Phone</Text>
+                </Grid.Col>
+                <Grid.Col mt="xs" span={4}>
+                  <Text>{guarantor_form.values.guarantorPhone}</Text>
+                </Grid.Col>
+              </Grid>
+              <Grid grow>
+                <Grid.Col mt="xs" span={4}>
+                  <Text weight={500}>ID Number</Text>
+                </Grid.Col>
+                <Grid.Col mt="xs" span={4}>
+                  <Text>{guarantor_form.values.guarantorID}</Text>
+                </Grid.Col>
+              </Grid>
+              <Grid grow>
+                <Grid.Col mt="xs" span={4}>
+                  <Text weight={500}>Relationship</Text>
+                </Grid.Col>
+                <Grid.Col mt="xs" span={4}>
+                  <Text>{guarantor_form.values.guarantorRelationship}</Text>
+                </Grid.Col>
+              </Grid>
               <Card.Section withBorder inheritPadding mt="md" py="xs">
                 <Group position="apart">
                   <TitleText title={`Collaterals`} />
@@ -1804,8 +1842,8 @@ const Page: NextPage = () => {
   try {
     return <CreateLoan />;
   } catch (error) {
-    console.log(error)
-    return <></>
+    console.log(error);
+    return <></>;
   }
 };
 

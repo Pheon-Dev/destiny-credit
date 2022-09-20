@@ -10,7 +10,7 @@ const LoansList = () => {
     return (
       <Protected>
         <LoadingOverlay overlayBlur={2} visible={status === "loading"} />
-        {(!loans && status === "success" && <EmptyTable call="all-loans" />) ||
+        {(loans?.length === 0 && <EmptyTable call="all-loans" />) ||
           (loans && <LoansTable loans={loans} call="all-loans" />)}
       </Protected>
     );

@@ -7,11 +7,11 @@ import { trpc } from "../../utils/trpc";
 const MembersList = () => {
   try {
     const { data: members, status } = trpc.useQuery(["members.members"]);
-    console.log(members)
+
     return (
       <Protected>
         <LoadingOverlay overlayBlur={2} visible={status === "loading"} />
-        {(members?.length === 0 && status === "success" && (
+        {(members?.length === 0 && (
           <EmptyTable call="all-members" />
         )) ||
           (members && <MembersTable members={members} call="all-members" />)}

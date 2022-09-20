@@ -8,22 +8,6 @@ import { Fields, Logs, Transactions } from "../../types";
 const LOGTAIL_API_TOKEN = process.env.NEXT_PUBLIC_LOGTAIL_API_TOKEN;
 
 const prisma = new PrismaClient();
-const defaultTransactionsSelect = Prisma.validator<Prisma.TransactionSelect>()({
-  id: true,
-  transactionType: true,
-  transID: true,
-  transTime: true,
-  transAmount: true,
-  businessShortCode: true,
-  billRefNumber: true,
-  invoiceNumber: true,
-  orgAccountBalance: true,
-  thirdPartyTransID: true,
-  msisdn: true,
-  firstName: true,
-  middleName: true,
-  lastName: true,
-});
 
 export const transactionsRouter = createRouter()
   .query("logs", {
@@ -187,27 +171,28 @@ export const transactionsRouter = createRouter()
                 transaction[0]?.transactionType === "CUSTOMER MERCHANT PAYMENT"
               )
                 /* console.log("New :", transaction[0]?.firstName); */
-              return await prisma.transaction.create({
-                data: {
-                  transactionType: transaction[0]?.transactionType,
-                  transID: transaction[0]?.transID,
-                  transTime: transaction[0]?.transTime,
-                  transAmount: transaction[0]?.transAmount,
-                  businessShortCode: transaction[0]?.businessShortCode,
-                  billRefNumber: transaction[0]?.billRefNumber,
-                  invoiceNumber: transaction[0]?.invoiceNumber,
-                  orgAccountBalance: transaction[0]?.orgAccountBalance,
-                  thirdPartyTransID: transaction[0]?.thirdPartyTransID,
-                  msisdn: transaction[0]?.msisdn,
-                  firstName: transaction[0]?.firstName,
-                  middleName: transaction[0]?.middleName,
-                  lastName: transaction[0]?.lastName,
-                },
-              });
+                return await prisma.transaction.create({
+                  data: {
+                    transactionType: transaction[0]?.transactionType,
+                    transID: transaction[0]?.transID,
+                    transTime: transaction[0]?.transTime,
+                    transAmount: transaction[0]?.transAmount,
+                    businessShortCode: transaction[0]?.businessShortCode,
+                    billRefNumber: transaction[0]?.billRefNumber,
+                    invoiceNumber: transaction[0]?.invoiceNumber,
+                    orgAccountBalance: transaction[0]?.orgAccountBalance,
+                    thirdPartyTransID: transaction[0]?.thirdPartyTransID,
+                    msisdn: transaction[0]?.msisdn,
+                    firstName: transaction[0]?.firstName,
+                    middleName: transaction[0]?.middleName,
+                    lastName: transaction[0]?.lastName,
+                  },
+                });
             } catch (error) {
-              return {
-                message: "Something Went Wrong",
-              };
+              throw new TRPCError({
+                code: "NOT_FOUND",
+                message: `transactions.logs ${error}`,
+              });
             }
           }
           return {
@@ -224,12 +209,12 @@ export const transactionsRouter = createRouter()
         /*   }; */
 
         /* return await prisma.transaction.findMany(); */
-        const logs = await prisma.transaction.findMany()
+        const logs = await prisma.transaction.findMany();
         if (!logs) {
           throw new TRPCError({
             code: "NOT_FOUND",
-            message: `transaction.logs not found`
-          })
+            message: `transaction.logs not found`,
+          });
         }
         return logs;
         /* return { */
@@ -248,23 +233,29 @@ export const transactionsRouter = createRouter()
       id: z.string(),
     }),
     resolve: async ({ input }) => {
-        const transaction = await prisma.transaction.findFirst({
-          where: {
-            transID: input.id,
-          },
+      const transaction = await prisma.transaction.findFirst({
+        where: {
+          transID: input.id,
+        },
+      });
+      if (!transaction) {
+        throw new TRPCError({
+          code: "NOT_FOUND",
+          message: `transactions.transaction not found`,
         });
-        return transaction;
+      }
+      return transaction;
     },
   })
   .query("transactions", {
     resolve: async () => {
-        const transactions = await prisma.transaction.findMany();
-        if (!transactions) {
-          throw new TRPCError({
-            code: "NOT_FOUND",
-            message: `transactions.transactions not found`
-          })
-        }
-        return transactions;
+      const transactions = await prisma.transaction.findMany();
+      if (!transactions) {
+        throw new TRPCError({
+          code: "NOT_FOUND",
+          message: `transactions.transactions not found`,
+        });
+      }
+      return transactions;
     },
   });

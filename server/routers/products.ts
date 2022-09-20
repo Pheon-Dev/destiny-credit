@@ -4,34 +4,18 @@ import { z } from "zod";
 import { createRouter } from "../create-router";
 
 const prisma = new PrismaClient();
-const defaultProductsSelect = Prisma.validator<Prisma.ProductSelect>()({
-  id: true,
-  createdAt: true,
-  updatedAt: true,
-  productId: true,
-  productName: true,
-  minimumRange: true,
-  maximumRange: true,
-  interestRate: true,
-  frequency: true,
-  maximumTenure: true,
-  repaymentCycle: true,
-  processingFee: true,
-  gracePeriod: true,
-  penaltyRate: true,
-  penaltyCharge: true,
-  penaltyPayment: true,
-  approved: true,
-});
 
 export const productsRouter = createRouter()
   .query("products", {
     resolve: async () => {
-      try {
-        return await prisma.product.findMany();
-      } catch (error) {
-        console.log("products.products");
+      const products = await prisma.product.findMany();
+      if (!products) {
+        throw new TRPCError({
+          code: "NOT_FOUND",
+          message: `products.products not found`,
+        });
       }
+      return products;
     },
   })
   .query("product", {
@@ -39,15 +23,18 @@ export const productsRouter = createRouter()
       productName: z.string(),
     }),
     resolve: async ({ input }) => {
-      try {
-        return await prisma.product.findFirst({
+      const product = await prisma.product.findFirst({
           where: {
             productName: input.productName,
           },
         });
-      } catch (error) {
-        console.log("products.product");
+      if (!product) {
+        throw new TRPCError({
+          code: "NOT_FOUND",
+          message: `products.product not found`,
+        });
       }
+      return product;
     },
   })
   .mutation("create-product", {
@@ -68,8 +55,7 @@ export const productsRouter = createRouter()
       approved: z.boolean(),
     }),
     resolve: async ({ input }) => {
-      try {
-        return await prisma.product.create({
+      const product = await prisma.product.create({
           data: {
             productId: input.productId,
             productName: input.productName,
@@ -87,8 +73,12 @@ export const productsRouter = createRouter()
             approved: input.approved,
           },
         });
-      } catch (error) {
-        console.log("products.create-product");
+      if (!product) {
+        throw new TRPCError({
+          code: "NOT_FOUND",
+          message: `products.create-product not found`,
+        });
       }
+      return product;
     },
   });

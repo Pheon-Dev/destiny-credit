@@ -1,70 +1,33 @@
-import { Prisma, PrismaClient } from "@prisma/client";
+import { PrismaClient } from "@prisma/client";
 import { TRPCError } from "@trpc/server";
 import { z } from "zod";
 import { createRouter } from "../create-router";
 
 const prisma = new PrismaClient();
-const defaultLoansSelect = Prisma.validator<Prisma.LoanSelect>()({
-  id: true,
-  createdAt: true,
-  updatedAt: true,
-  maintained: true,
-  approved: true,
-  disbursed: true,
-  principal: true,
-  interest: true,
-  installment: true,
-  penalty: true,
-  sundays: true,
-  payoff: true,
-  tenure: true,
-  grace: true,
-  cycle: true,
-  productName: true,
-  memberName: true,
-  processingFee: true,
-  loanRef: true,
-  disbursedOn: true,
-  startDate: true,
-  paymentCounter: true,
-  paymentCount: true,
-  paymentDay: true,
-  paymentStatus: true,
-  paymentPenalties: true,
-  guarantor: true,
-  guarantorId: true,
-  product: true,
-  productId: true,
-  member: true,
-  memberId: true,
-  payment: true,
-  maintainer: true,
-  maintainerId: true,
-  approver: true,
-  approverId: true,
-  disburser: true,
-  disburserId: true,
-  updater: true,
-  updaterId: true,
-});
 
 export const loansRouter = createRouter()
   .query("create-loan", {
     resolve: async () => {
-      try {
-        return await prisma.member.findMany();
-      } catch (error) {
-        console.log("loans.create-loan");
+      const members = await prisma.member.findMany();
+      if (!members) {
+        throw new TRPCError({
+          code: "NOT_FOUND",
+          message: `loans.create-loan not found`,
+        });
       }
+      return members;
     },
   })
   .query("loans", {
     resolve: async () => {
-      try {
-        return await prisma.loan.findMany();
-      } catch (error) {
-        console.log("loans.loans");
+      const loans = await prisma.loan.findMany();
+      if (!loans) {
+        throw new TRPCError({
+          code: "NOT_FOUND",
+          message: `loans.loans not found`,
+        });
       }
+      return loans;
     },
   })
   .query("payment", {
@@ -72,15 +35,18 @@ export const loansRouter = createRouter()
       id: z.string(),
     }),
     resolve: async ({ input }) => {
-      try {
-        return await prisma.payment.findMany({
-          where: {
-            loanId: input.id,
-          },
+      const payment = await prisma.payment.findMany({
+        where: {
+          loanId: input.id,
+        },
+      });
+      if (!payment) {
+        throw new TRPCError({
+          code: "NOT_FOUND",
+          message: `loans.payment not found`,
         });
-      } catch (error) {
-        console.log("loans.payment");
       }
+      return payment;
     },
   })
   .query("loan", {
@@ -88,15 +54,18 @@ export const loansRouter = createRouter()
       id: z.string(),
     }),
     resolve: async ({ input }) => {
-      try {
-        return await prisma.loan.findMany({
-          where: {
-            id: input.id,
-          },
+      const loan = await prisma.loan.findMany({
+        where: {
+          id: input.id,
+        },
+      });
+      if (!loan) {
+        throw new TRPCError({
+          code: "NOT_FOUND",
+          message: `loans.loan not found`,
         });
-      } catch (error) {
-        console.log("loans.loan");
       }
+      return loan;
     },
   })
   .mutation("approve", {
@@ -105,18 +74,21 @@ export const loansRouter = createRouter()
       approved: z.boolean(),
     }),
     resolve: async ({ input }) => {
-      try {
-        return await prisma.loan.updateMany({
-          where: {
-            id: input.id,
-          },
-          data: {
-            approved: input.approved,
-          },
+      const loan = await prisma.loan.updateMany({
+        where: {
+          id: input.id,
+        },
+        data: {
+          approved: input.approved,
+        },
+      });
+      if (loan?.count === 0) {
+        throw new TRPCError({
+          code: "NOT_FOUND",
+          message: `loans.approve not found`,
         });
-      } catch (error) {
-        console.log("loans.approve");
       }
+      return loan;
     },
   })
   .mutation("disburse", {
@@ -126,19 +98,22 @@ export const loansRouter = createRouter()
       disbursedOn: z.string(),
     }),
     resolve: async ({ input }) => {
-      try {
-        return await prisma.loan.updateMany({
-          where: {
-            id: input.id,
-          },
-          data: {
-            disbursed: input.disbursed,
-            disbursedOn: input.disbursedOn,
-          },
+      const loan = await prisma.loan.updateMany({
+        where: {
+          id: input.id,
+        },
+        data: {
+          disbursed: input.disbursed,
+          disbursedOn: input.disbursedOn,
+        },
+      });
+      if (loan?.count === 0) {
+        throw new TRPCError({
+          code: "NOT_FOUND",
+          message: `loans.disburse not found`,
         });
-      } catch (error) {
-        console.log("loans.disburse");
       }
+      return loan;
     },
   })
   .query("member", {
@@ -146,23 +121,29 @@ export const loansRouter = createRouter()
       id: z.string(),
     }),
     resolve: async ({ input }) => {
-      try {
-        return await prisma.loan.findMany({
-          where: {
-            memberId: input.id,
-          },
+      const loan = await prisma.loan.findMany({
+        where: {
+          memberId: input.id,
+        },
+      });
+      if (!loan) {
+        throw new TRPCError({
+          code: "NOT_FOUND",
+          message: `loans.member not found`,
         });
-      } catch (error) {
-        console.log("loans.member");
       }
+      return loan;
     },
   })
   .query("delete-loans", {
     resolve: async () => {
-      try {
-        return await prisma.loan.deleteMany();
-      } catch (error) {
-        console.log("loans.delete-loans");
+      const loan = await prisma.loan.deleteMany();
+      if (loan?.count === 0) {
+        throw new TRPCError({
+          code: "NOT_FOUND",
+          message: `loans.delete-loans not found`,
+        });
       }
+      return loan;
     },
   });
