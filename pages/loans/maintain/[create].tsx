@@ -311,7 +311,7 @@ const CreateLoan = () => {
 
     if (!checked) setSundays(total_sundays);
     if (checked) setSundays(0);
-    /* if (sundays === 5) setSundays(4); */
+
     setLoanRef(
       loanLen > 9
         ? loanLen > 99
@@ -326,7 +326,7 @@ const CreateLoan = () => {
         ? date.getDate() + 30
         : cycle === "weekly"
         ? date.getDate() + 7
-        : date.getDate() + 1
+        : date.getDate() + 2
     );
     date.setDate(date.getDay() === 0 ? date.getDate() + 1 : date.getDate() + 0);
 
@@ -443,7 +443,7 @@ const CreateLoan = () => {
       +form.values.principal > minRange &&
       +form.values.principal > maxRange
     ) {
-      /* form.setFieldValue("principal", ""); */
+
       form.setFieldError(
         "principal",
         `Principal Exceeds Maximum Range of KSHs. ${maxRange} ...`
