@@ -165,28 +165,45 @@ export const transactionsRouter = createRouter()
               },
             });
             try {
-              if (search.length > 0) return;
+              if (search.length > 1) {
+                const duplicate = await prisma.transaction.findFirst({
+                  where: {
+                    transID: transaction[0].transID,
+                  },
+                });
+                /* console.log("Duplicate :", duplicate?.firstName); */
+                return await prisma.transaction.deleteMany({
+                  where: {
+                    transID: duplicate?.transID,
+                  },
+                });
+              }
+              if (search.length === 1) {
+                /* console.log("Logged :", transaction[0]?.firstName + ":" + transaction[0]?.transID + ":" + transaction[0]?.transAmount); */
+                return;
+              }
               if (
                 transaction[0]?.transactionType === "PAY BILL" ||
                 transaction[0]?.transactionType === "CUSTOMER MERCHANT PAYMENT"
               )
-                return await prisma.transaction.create({
-                  data: {
-                    transactionType: transaction[0]?.transactionType,
-                    transID: transaction[0]?.transID,
-                    transTime: transaction[0]?.transTime,
-                    transAmount: transaction[0]?.transAmount,
-                    businessShortCode: transaction[0]?.businessShortCode,
-                    billRefNumber: transaction[0]?.billRefNumber,
-                    invoiceNumber: transaction[0]?.invoiceNumber,
-                    orgAccountBalance: transaction[0]?.orgAccountBalance,
-                    thirdPartyTransID: transaction[0]?.thirdPartyTransID,
-                    msisdn: transaction[0]?.msisdn,
-                    firstName: transaction[0]?.firstName,
-                    middleName: transaction[0]?.middleName,
-                    lastName: transaction[0]?.lastName,
-                  },
-                });
+                /* console.log("New :", transaction[0]?.firstName); */
+              return await prisma.transaction.create({
+                data: {
+                  transactionType: transaction[0]?.transactionType,
+                  transID: transaction[0]?.transID,
+                  transTime: transaction[0]?.transTime,
+                  transAmount: transaction[0]?.transAmount,
+                  businessShortCode: transaction[0]?.businessShortCode,
+                  billRefNumber: transaction[0]?.billRefNumber,
+                  invoiceNumber: transaction[0]?.invoiceNumber,
+                  orgAccountBalance: transaction[0]?.orgAccountBalance,
+                  thirdPartyTransID: transaction[0]?.thirdPartyTransID,
+                  msisdn: transaction[0]?.msisdn,
+                  firstName: transaction[0]?.firstName,
+                  middleName: transaction[0]?.middleName,
+                  lastName: transaction[0]?.lastName,
+                },
+              });
             } catch (error) {
               return {
                 message: "Something Went Wrong",
@@ -232,7 +249,7 @@ export const transactionsRouter = createRouter()
         return transaction;
       } catch (error) {
         console.log("transactions.transaction");
-          throw new Error(`${error}`);
+        throw new Error(`${error}`);
       }
     },
   })
@@ -243,7 +260,7 @@ export const transactionsRouter = createRouter()
         return transactions;
       } catch (error) {
         console.log("transactions.transactions");
-          throw new Error(`${error}`);
+        throw new Error(`${error}`);
       }
     },
   });

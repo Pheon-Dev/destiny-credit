@@ -67,6 +67,15 @@ const Page: NextPage = (props): JSX.Element => {
       clear();
       refetch();
 
+      updateNotification({
+        id: "submit",
+        color: "teal",
+        title: `${form.values.username} @ [${form.values.email}]`,
+        message: "User Registered Successfully!",
+        icon: <IconCheck size={16} />,
+        autoClose: 5000,
+      });
+
       return router.push("/auth/sign-in");
     },
   });
@@ -102,16 +111,6 @@ const Page: NextPage = (props): JSX.Element => {
             email: form.values.email.toLowerCase(),
             role: form.values.role.toUpperCase(),
           });
-
-          updateNotification({
-            id: "submit",
-            color: "teal",
-            title: `${form.values.username} @ [${form.values.email}]%`,
-            message: "User Registered Successfully!",
-            icon: <IconCheck size={16} />,
-            autoClose: 5000,
-          });
-
         }
       } catch (error) {
         return updateNotification({

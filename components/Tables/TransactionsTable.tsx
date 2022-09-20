@@ -52,7 +52,7 @@ const  TransactionRow = ({
   call: string;
 }) => {
   const router = useRouter();
-  const today = new Date();
+  const today = new Date("2022-09-19");
   const date = today.toLocaleDateString();
 
   const time_str = date.split("/")[2] + date.split("/")[1] + date.split("/")[0];
