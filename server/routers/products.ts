@@ -28,12 +28,6 @@ export const productsRouter = createRouter()
             productName: input.productName,
           },
         });
-      if (!product) {
-        throw new TRPCError({
-          code: "NOT_FOUND",
-          message: `products.product not found`,
-        });
-      }
       return product;
     },
   })

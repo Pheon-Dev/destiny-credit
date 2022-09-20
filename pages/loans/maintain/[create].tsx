@@ -1051,7 +1051,7 @@ const CreateLoan = () => {
             </Group>
           </Card.Section>
           <LoadingOverlay
-            visible={product.status === "loading"}
+            visible={product?.status === "loading"}
             overlayBlur={2}
           />
           <Group position="apart" mt="md" mb="xs">
@@ -1482,7 +1482,7 @@ const CreateLoan = () => {
                       placeholder="Select Product ..."
                       data={product_data?.map((p) => p[0].label)}
                       {...form.getInputProps("product")}
-                      disabled={product.status === "success" ? false : true}
+                      disabled={product?.status === "success" ? false : true}
                       required
                     />
                   </Grid.Col>
@@ -1497,7 +1497,7 @@ const CreateLoan = () => {
                       label="Enter Principal Amount"
                       placeholder="Enter Principal Amount ..."
                       {...form.getInputProps("principal")}
-                      disabled={product.status === "success" ? false : true}
+                      disabled={product?.status === "success" ? false : true}
                       required
                     />
                   </Grid.Col>
@@ -1520,7 +1520,7 @@ const CreateLoan = () => {
                       }`}
                       placeholder="Enter Tenure ..."
                       {...form.getInputProps("tenure")}
-                      disabled={product.status === "success" ? false : true}
+                      disabled={product?.status === "success" ? false : true}
                       required
                     />
                   </Grid.Col>

@@ -181,12 +181,6 @@ export const membersRouter = createRouter()
           memberId: input.id,
         },
       });
-      if (!guarantor) {
-        throw new TRPCError({
-          code: "NOT_FOUND",
-          message: `members.guarantor not found`,
-        });
-      }
       return guarantor;
     },
   })
