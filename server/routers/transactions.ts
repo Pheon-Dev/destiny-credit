@@ -223,7 +223,15 @@ export const transactionsRouter = createRouter()
         /*     message: "Transactions Upto Date", */
         /*   }; */
 
-        return await prisma.transaction.findMany();
+        /* return await prisma.transaction.findMany(); */
+        const logs = await prisma.transaction.findMany()
+        if (!logs) {
+          throw new TRPCError({
+            code: "NOT_FOUND",
+            message: `transaction.logs not found`
+          })
+        }
+        return logs;
         /* return { */
         /*   data: transactions.length, */
         /*   from: new_date + " " + str_tdate, */
@@ -240,27 +248,29 @@ export const transactionsRouter = createRouter()
       id: z.string(),
     }),
     resolve: async ({ input }) => {
-      try {
         const transaction = await prisma.transaction.findFirst({
           where: {
             transID: input.id,
           },
         });
+        if (!transaction) {
+          throw new TRPCError({
+            code: "NOT_FOUND",
+            message: `transactions.transaction not found`
+          })
+        }
         return transaction;
-      } catch (error) {
-        console.log("transactions.transaction");
-        throw new Error(`${error}`);
-      }
     },
   })
   .query("transactions", {
     resolve: async () => {
-      try {
         const transactions = await prisma.transaction.findMany();
+        if (!transactions) {
+          throw new TRPCError({
+            code: "NOT_FOUND",
+            message: `transactions.transactions not found`
+          })
+        }
         return transactions;
-      } catch (error) {
-        console.log("transactions.transactions");
-        throw new Error(`${error}`);
-      }
     },
   });

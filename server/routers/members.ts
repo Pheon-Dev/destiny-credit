@@ -53,11 +53,14 @@ const defaultMembersSelect = Prisma.validator<Prisma.MemberSelect>()({
 export const membersRouter = createRouter()
   .query("members", {
     resolve: async () => {
-      try {
-        return await prisma.member.findMany();
-      } catch (error) {
-        console.log("members.members");
-      }
+        const members = await prisma.member.findMany();
+        if (!members) {
+          throw new TRPCError({
+            code: "NOT_FOUND",
+            message: `members.members not found`
+          })
+        }
+        return members;
     },
   })
   .query("member", {
@@ -65,15 +68,18 @@ export const membersRouter = createRouter()
       id: z.string(),
     }),
     resolve: async ({ input }) => {
-      try {
-        return await prisma.member.findFirst({
+        const member = await prisma.member.findFirst({
           where: {
             id: input.id,
           },
         });
-      } catch (error) {
-        console.log("members.member");
-      }
+        if (!member) {
+          throw new TRPCError({
+            code: "NOT_FOUND",
+            message: `members.member not found`
+          })
+        }
+        return member;
     },
   })
   .mutation("register", {
@@ -176,15 +182,18 @@ export const membersRouter = createRouter()
       id: z.string(),
     }),
     resolve: async ({ input }) => {
-      try {
-        return await prisma.collateral.findMany({
+        const collateral = await prisma.collateral.findMany({
           where: {
             memberId: input.id,
           },
         });
-      } catch (error) {
-        console.log("members.collateral");
-      }
+        if (!collateral) {
+          throw new TRPCError({
+            code: "NOT_FOUND",
+            message: `members.collateral not found`
+          })
+        }
+        return collateral;
     },
   })
   .mutation("collateral-delete", {
@@ -206,15 +215,18 @@ export const membersRouter = createRouter()
       id: z.string(),
     }),
     resolve: async ({ input }) => {
-      try {
-        return await prisma.guarantor.findFirst({
+        const guarantor = await prisma.guarantor.findFirst({
           where: {
             memberId: input.id,
           },
         });
-      } catch (error) {
-        console.log("members.guarantor");
-      }
+        if (!guarantor) {
+          throw new TRPCError({
+            code: "NOT_FOUND",
+            message: `members.guarantor not found`
+          })
+        }
+        return guarantor;
     },
   })
   .mutation("update-member", {
