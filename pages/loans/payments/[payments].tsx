@@ -1,10 +1,11 @@
 import React from "react";
 import { useRouter } from "next/router";
 import { trpc } from "../../../utils/trpc";
-import { EmptyTable, PaymentTable } from "../../../components";
+import { EmptyTable, PaymentTable, Protected } from "../../../components";
 import { Group, LoadingOverlay } from "@mantine/core";
 
 const PaymentsList = () => {
+  try {
   const router = useRouter();
   const id = router.query.payments as string;
 
@@ -26,6 +27,15 @@ const PaymentsList = () => {
       )}
     </>
   );
+  } catch (error) {
+    console.log(error);
+    return (
+      <Protected>
+        <EmptyTable call="payment" />
+      </Protected>
+    );
+  }
+
 };
 
 const Page = () => {

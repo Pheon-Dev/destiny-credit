@@ -1,9 +1,10 @@
 import React from "react";
 import { trpc } from "../../utils/trpc";
-import { ProductsTable, Protected } from "../../components";
-import { Group, LoadingOverlay, Text } from "@mantine/core";
+import { ProductsTable, Protected, TitleText } from "../../components";
+import { Group, LoadingOverlay } from "@mantine/core";
 
 const ProductsList = () => {
+  try {
   const { data: products, status } = trpc.useQuery(["products.products"]);
 
   return (
@@ -12,11 +13,19 @@ const ProductsList = () => {
       {products && <ProductsTable products={products} />}
       {status === "success" && !products && (
         <Group position="center">
-          <Text>No Created Products</Text>
+        <TitleText title="No Created Products" />
         </Group>
       )}
     </Protected>
   );
+  } catch (error) {
+    console.log(error);
+    return (
+      <Protected>
+        <TitleText title="No Created Products" />
+      </Protected>
+    );
+  }
 };
 
 const Page = () => {

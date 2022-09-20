@@ -4,17 +4,24 @@ import { EmptyTable, LoansTable, Protected } from "../../components";
 import { LoadingOverlay } from "@mantine/core";
 
 const LoansList = () => {
-  const { data: loans, status } = trpc.useQuery(["loans.loans"]);
+  try {
+    const { data: loans, status } = trpc.useQuery(["loans.loans"]);
 
-  return (
-    <Protected>
-      <LoadingOverlay overlayBlur={2} visible={status === "loading"} />
-      {(!loans && status === "success" && (
+    return (
+      <Protected>
+        <LoadingOverlay overlayBlur={2} visible={status === "loading"} />
+        {(!loans && status === "success" && <EmptyTable call="all-loans" />) ||
+          (loans && <LoansTable loans={loans} call="all-loans" />)}
+      </Protected>
+    );
+  } catch (error) {
+    console.log(error);
+    return (
+      <Protected>
         <EmptyTable call="all-loans" />
-      )) ||
-        (loans && <LoansTable loans={loans} call="all-loans" />)}
-    </Protected>
-  );
+      </Protected>
+    );
+  }
 };
 
 const Page = () => {

@@ -4,6 +4,7 @@ import { EmptyTable, LoansTable, Protected } from "../../components";
 import { LoadingOverlay } from "@mantine/core";
 
 const LoansList = () => {
+  try {
   const { data: loans, status } = trpc.useQuery(["loans.loans"]);
 
   return (
@@ -15,6 +16,14 @@ const LoansList = () => {
         (loans && <LoansTable loans={loans} call="approvals" />)}
     </Protected>
   );
+  } catch (error) {
+    console.log(error);
+    return (
+      <Protected>
+        <EmptyTable call="approvals" />
+      </Protected>
+    );
+  }
 };
 
 const Page = () => {

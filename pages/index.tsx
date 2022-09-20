@@ -11,7 +11,7 @@ const Page: NextPage = () => {
     ]);
     return (
       <Protected>
-        <LoadingOverlay overlayBlur={1} visible={status === "loading"} />
+        <LoadingOverlay overlayBlur={2} visible={status === "loading"} />
         {(!transactions && <EmptyTable call="transactions" />) ||
           (transactions && (
             <TransactionsTable
@@ -23,7 +23,11 @@ const Page: NextPage = () => {
     );
   } catch (error) {
     console.log(error);
-    return <EmptyTable call="transactions" />;
+    return (
+      <Protected>
+        <EmptyTable call="transactions" />
+      </Protected>
+    );
   }
 };
 export default Page;
