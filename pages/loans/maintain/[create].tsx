@@ -61,7 +61,7 @@ const collateral_schema = z.object({
   value: z.string().min(2, { message: "Item Value is Missing" }),
 });
 
-const Page: NextPage = () => {
+const CreateLoan = () => {
   const [active, setActive] = useState(0);
   const [open, setOpen] = useState(false);
   const [deleteModal, setDeleteModal] = useState(false);
@@ -806,11 +806,7 @@ const Page: NextPage = () => {
         autoClose: 4000,
       });
     }
-  }, [
-    collateral_form,
-    form.values.memberId,
-    maintain_collateral,
-  ]);
+  }, [collateral_form, form.values.memberId, maintain_collateral]);
 
   const deleteCollateral = useCallback(() => {
     try {
@@ -1802,6 +1798,15 @@ const Page: NextPage = () => {
       </Protected>
     </div>
   );
+};
+
+const Page: NextPage = () => {
+  try {
+    return <CreateLoan />;
+  } catch (error) {
+    console.log(error)
+    return <></>
+  }
 };
 
 export default Page;
