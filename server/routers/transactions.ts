@@ -253,12 +253,6 @@ export const transactionsRouter = createRouter()
             transID: input.id,
           },
         });
-        if (!transaction) {
-          throw new TRPCError({
-            code: "NOT_FOUND",
-            message: `transactions.transaction not found`
-          })
-        }
         return transaction;
     },
   })

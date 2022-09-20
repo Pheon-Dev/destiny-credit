@@ -53,14 +53,14 @@ const defaultMembersSelect = Prisma.validator<Prisma.MemberSelect>()({
 export const membersRouter = createRouter()
   .query("members", {
     resolve: async () => {
-        const members = await prisma.member.findMany();
-        if (!members) {
-          throw new TRPCError({
-            code: "NOT_FOUND",
-            message: `members.members not found`
-          })
-        }
-        return members;
+      const members = await prisma.member.findMany();
+      if (!members) {
+        throw new TRPCError({
+          code: "NOT_FOUND",
+          message: `members.members not found`,
+        });
+      }
+      return members;
     },
   })
   .query("member", {
@@ -68,18 +68,12 @@ export const membersRouter = createRouter()
       id: z.string(),
     }),
     resolve: async ({ input }) => {
-        const member = await prisma.member.findFirst({
-          where: {
-            id: input.id,
-          },
-        });
-        if (!member) {
-          throw new TRPCError({
-            code: "NOT_FOUND",
-            message: `members.member not found`
-          })
-        }
-        return member;
+      const member = await prisma.member.findFirst({
+        where: {
+          id: input.id,
+        },
+      });
+      return member;
     },
   })
   .mutation("register", {
@@ -182,18 +176,12 @@ export const membersRouter = createRouter()
       id: z.string(),
     }),
     resolve: async ({ input }) => {
-        const collateral = await prisma.collateral.findMany({
-          where: {
-            memberId: input.id,
-          },
-        });
-        if (!collateral) {
-          throw new TRPCError({
-            code: "NOT_FOUND",
-            message: `members.collateral not found`
-          })
-        }
-        return collateral;
+      const collateral = await prisma.collateral.findMany({
+        where: {
+          memberId: input.id,
+        },
+      });
+      return collateral;
     },
   })
   .mutation("collateral-delete", {
@@ -215,18 +203,12 @@ export const membersRouter = createRouter()
       id: z.string(),
     }),
     resolve: async ({ input }) => {
-        const guarantor = await prisma.guarantor.findFirst({
-          where: {
-            memberId: input.id,
-          },
-        });
-        if (!guarantor) {
-          throw new TRPCError({
-            code: "NOT_FOUND",
-            message: `members.guarantor not found`
-          })
-        }
-        return guarantor;
+      const guarantor = await prisma.guarantor.findFirst({
+        where: {
+          memberId: input.id,
+        },
+      });
+      return guarantor;
     },
   })
   .mutation("update-member", {
