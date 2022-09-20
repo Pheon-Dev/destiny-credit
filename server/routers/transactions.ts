@@ -215,21 +215,21 @@ export const transactionsRouter = createRouter()
           };
         });
 
-        if (transactions.length > 0)
-          return {
-            data: transactions.length,
-            from: new_date + " " + str_tdate,
-            to: now_date + " " + str_tdate,
-            message: "Transactions Upto Date",
-          };
+        /* if (transactions.length > 0) */
+        /*   return { */
+        /*     data: transactions.length, */
+        /*     from: new_date + " " + str_tdate, */
+        /*     to: now_date + " " + str_tdate, */
+        /*     message: "Transactions Upto Date", */
+        /*   }; */
 
-        /* return await prisma.transaction.findMany(); */
-        return {
-          data: transactions.length,
-          from: new_date + " " + str_tdate,
-          to: now_date + " " + str_tdate,
-          message: "No New Transactions",
-        };
+        return await prisma.transaction.findMany();
+        /* return { */
+        /*   data: transactions.length, */
+        /*   from: new_date + " " + str_tdate, */
+        /*   to: now_date + " " + str_tdate, */
+        /*   message: "No New Transactions", */
+        /* }; */
       } catch (error) {
         console.log("transactions.logs");
       }

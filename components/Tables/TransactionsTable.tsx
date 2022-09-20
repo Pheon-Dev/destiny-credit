@@ -20,6 +20,7 @@ export const TransactionsTable = ({
       <th>Type</th>
     </tr>
   );
+
   return (
     <>
       <Group position="center" m="lg">
@@ -39,7 +40,6 @@ export const TransactionsTable = ({
           <Header />
         </tfoot>
       </Table>
-      <Group position="center" m="lg"></Group>
     </>
   );
 }
