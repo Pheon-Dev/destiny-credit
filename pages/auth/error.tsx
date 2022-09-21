@@ -11,7 +11,8 @@ const ErrorPage = () => {
   useEffect(() => {
     let sub = true;
     if (sub) {
-      if (status === "unauthenticated") router.push("/");
+      /* if (status === "unauthenticated") router.push("/auth/sign-in"); */
+      if (status === "authenticated") router.push("/");
     }
     return () => {
       sub = false;
@@ -32,7 +33,9 @@ const ErrorPage = () => {
         <Card.Section>
           <Box p="lg">
             <form>
+              <Group m="md" position="center">
               <TitleText title="Sign In Error" />
+              </Group>
               <Group mt="xl">
                 <Button
                   variant="light"
@@ -41,10 +44,10 @@ const ErrorPage = () => {
                   mt="md"
                   radius="md"
                   onClick={() => {
-                    router.push("/");
+                    router.push("/auth/sign-in");
                   }}
                 >
-                  Back Home
+                Sign In
                 </Button>
               </Group>
             </form>

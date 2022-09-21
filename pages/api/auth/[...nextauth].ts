@@ -41,7 +41,7 @@ const authOptions: NextAuthOptions = {
   secret: `${SECRET}`,
   jwt: { secret: `${SECRET}` },
   session: { strategy: "jwt" },
-  pages: { signIn: "/auth/sign-in" },
+  pages: { signIn: "/auth/sign-in", error: "/auth/error" },
   callbacks: {
     async session({ session, user, token }) {
       session.accessToken = token.accessToken
