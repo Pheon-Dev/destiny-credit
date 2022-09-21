@@ -90,7 +90,7 @@ const PaymentsList = () => {
           </thead>
           <tbody>
             {payments?.map((payment) => (
-              <tr style={{ cursor: "auto" }}>
+              <tr key={payment?.id} style={{ cursor: "auto" }}>
                 <td>
                   {`${payment.amount}`.replace(/\B(?=(\d{3})+(?!\d))/g, ",")}
                 </td>
@@ -166,8 +166,9 @@ const PaymentsList = () => {
           <TransactionsHeader />
         </thead>
         <tbody>
-          {transactions?.map((transaction, index) => (
+          {transactions?.map((transaction) => (
         <tr
+        key={transaction.id}
           /* style={{ */
           /*   cursor: transaction.billRefNumber !== "" ? "pointer" : "text", */
           /* }} */
