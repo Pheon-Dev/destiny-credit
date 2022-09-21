@@ -85,7 +85,9 @@ const Page: NextPage = (props): JSX.Element => {
   useEffect(() => {
     let sub = true;
     if (sub) {
-      if (status === "authenticated") router.push("/");
+      setTimeout(() => {
+          if (status === "authenticated") router.push("/");
+        }, 5000)
     }
     return () => {
       sub = false;
