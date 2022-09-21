@@ -26,9 +26,9 @@ export const TransactionsTable = ({
       <Group position="center" m="lg">
         {call === "transactions" && <TitleText title="Todays Transactions" />}
         {call === "register" && <TitleText title="Registration List" />}
-        {call === "maintain" && <TitleText title="Maintenance List" />}
+        {call === "maintain" && <TitleText title="Maintain a New Loan" />}
       </Group>
-      <Table striped highlightOnHover horizontalSpacing="md">
+      <Table striped highlightOnHover horizontalSpacing="md" mb="xl">
         <thead>
           <Header />
         </thead>

@@ -1,9 +1,9 @@
-import { Prisma, PrismaClient, Transaction } from "@prisma/client";
+import { PrismaClient } from "@prisma/client";
 import { TRPCError } from "@trpc/server";
 import { z } from "zod";
 import axios from "axios";
 import { createRouter } from "../create-router";
-import { Fields, Logs, Transactions } from "../../types";
+import { Fields, Logs } from "../../types";
 
 const LOGTAIL_API_TOKEN = process.env.NEXT_PUBLIC_LOGTAIL_API_TOKEN;
 

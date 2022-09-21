@@ -81,26 +81,25 @@ const CreateLoan = () => {
   const router = useRouter();
   const mid = router.query.create as string;
 
-    const member_search = trpc.useQuery([
-            "transactions.transaction",
-            {
-              id: `${mid}`,
-            },
-          ])
-    const firstname = member_search?.data?.firstName;
-    const middlename = member_search?.data?.middleName;
-    const lastname = member_search?.data?.lastName;
-    const phonenumber = member_search?.data?.msisdn;
-    const member_info =
-        trpc.useQuery([
-            "members.maintain",
-            {
-              firstName: `${firstname}`,
-              lastName: `${middlename} ${lastname}`,
-              phoneNumber: `${phonenumber}`,
-            },
-          ])
-        /* () => setId(`${member_info?.data?.id}`) */
+  const member_search = trpc.useQuery([
+    "transactions.transaction",
+    {
+      id: `${mid}`,
+    },
+  ]);
+  const firstname = member_search?.data?.firstName;
+  const middlename = member_search?.data?.middleName;
+  const lastname = member_search?.data?.lastName;
+  const phonenumber = member_search?.data?.msisdn;
+  const member_info = trpc.useQuery([
+    "members.maintain",
+    {
+      firstName: `${firstname}`,
+      lastName: `${middlename} ${lastname}`,
+      phoneNumber: `${phonenumber}`,
+    },
+  ]);
+  /* () => setId(`${member_info?.data?.id}`) */
   const { status, data } = useSession();
 
   const { data: user, status: user_status } = trpc.useQuery([
@@ -464,7 +463,6 @@ const CreateLoan = () => {
       +form.values.principal > minRange &&
       +form.values.principal > maxRange
     ) {
-
       form.setFieldError(
         "principal",
         `Principal Exceeds Maximum Range of KSHs. ${maxRange} ...`
@@ -483,9 +481,8 @@ const CreateLoan = () => {
     let subscribe = true;
 
     if (subscribe) {
-
-      if (mid.length > 10) setId(mid)
-      if (mid.length < 11) setId(`${member_info?.data?.id}`)
+      if (mid.length > 10) setId(mid);
+      if (mid.length < 11) setId(`${member_info?.data?.id}`);
       fillForm();
       calcuDates(cycle.toLowerCase(), +form.values.tenure);
     }
@@ -494,7 +491,7 @@ const CreateLoan = () => {
       subscribe = false;
     };
   }, [
-member_info?.data?.id,
+    member_info?.data?.id,
     router,
     mid,
     id,
@@ -518,6 +515,7 @@ member_info?.data?.id,
     form.values.tenure,
   ]);
 
+console.log(id)
   const maintain_member = trpc.useMutation(["members.maintain-member"], {
     onSuccess: async () => {
       await utils.invalidateQueries(["members.member"]);

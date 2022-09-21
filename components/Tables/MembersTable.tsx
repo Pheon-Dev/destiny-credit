@@ -27,7 +27,7 @@ export const MembersTable = ({
   return (
     <>
       <Group position="center" m="lg">
-        {call === "create-loan" && <TitleText title="Maintain a New Loan" />}
+        {call === "create-loan" && <TitleText title="Newly Registered Members" />}
         {call === "all-members" && <TitleText title="All Members List" />}
       </Group>
       <Table striped highlightOnHover horizontalSpacing="md">
