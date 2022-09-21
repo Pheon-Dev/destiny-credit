@@ -37,6 +37,29 @@ export const membersRouter = createRouter()
       return member;
     },
   })
+  .query("maintain", {
+    input: z.object({
+      firstName: z.string(),
+      lastName: z.string(),
+      phoneNumber: z.string(),
+    }),
+    resolve: async ({ input }) => {
+      const member = await prisma.member.findFirst({
+        where: {
+          firstName: input.firstName,
+          lastName: input.lastName,
+          phoneNumber: input.phoneNumber,
+        },
+      });
+      if (!member) {
+        throw new TRPCError({
+          code: "NOT_FOUND",
+          message: `members.member not found`,
+        });
+      }
+      return member;
+    },
+  })
   .mutation("register", {
     input: z.object({
       date: z.string(),

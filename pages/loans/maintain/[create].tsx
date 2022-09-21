@@ -68,6 +68,7 @@ const CreateLoan = () => {
   const [deleteModal, setDeleteModal] = useState(false);
   const [collateralId, setCollateralId] = useState("");
   const [startDate, setStartDate] = useState("");
+  const [id, setId] = useState("");
   const [loanRef, setLoanRef] = useState("");
   const [sundays, setSundays] = useState(0);
   const [changeGuarantor, setChangeGuarantor] = useState(false);
@@ -78,8 +79,28 @@ const CreateLoan = () => {
   const [payoff, setPayoff] = useState(false);
 
   const router = useRouter();
-  const id = router.query.create as string;
+  const mid = router.query.create as string;
 
+    const member_search = trpc.useQuery([
+            "transactions.transaction",
+            {
+              id: `${mid}`,
+            },
+          ])
+    const firstname = member_search?.data?.firstName;
+    const middlename = member_search?.data?.middleName;
+    const lastname = member_search?.data?.lastName;
+    const phonenumber = member_search?.data?.msisdn;
+    const member_info =
+        trpc.useQuery([
+            "members.maintain",
+            {
+              firstName: `${firstname}`,
+              lastName: `${middlename} ${lastname}`,
+              phoneNumber: `${phonenumber}`,
+            },
+          ])
+        /* () => setId(`${member_info?.data?.id}`) */
   const { status, data } = useSession();
 
   const { data: user, status: user_status } = trpc.useQuery([
@@ -462,6 +483,9 @@ const CreateLoan = () => {
     let subscribe = true;
 
     if (subscribe) {
+
+      if (mid.length > 10) setId(mid)
+      if (mid.length < 11) setId(`${member_info?.data?.id}`)
       fillForm();
       calcuDates(cycle.toLowerCase(), +form.values.tenure);
     }
@@ -470,7 +494,10 @@ const CreateLoan = () => {
       subscribe = false;
     };
   }, [
-    member,
+member_info?.data?.id,
+    router,
+    mid,
+    id,
     pro_data,
     proName,
     checked,

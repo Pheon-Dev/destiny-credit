@@ -43,9 +43,9 @@ export const TransactionsTable = ({
       </Table>
     </>
   );
-}
+};
 
-const  TransactionRow = ({
+const TransactionRow = ({
   transaction,
   call,
 }: {
@@ -131,7 +131,7 @@ const  TransactionRow = ({
               cursor: "pointer",
             }}
             onClick={() => {
-              router.push(`/members/register/${transaction.transID}`);
+              router.push(`/loans/maintain/${transaction.transID}`);
             }}
           >
             <td>{transaction.transID}</td>
@@ -158,4 +158,4 @@ const  TransactionRow = ({
         )}
     </>
   );
-}
+};
