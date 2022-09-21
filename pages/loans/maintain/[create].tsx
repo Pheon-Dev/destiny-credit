@@ -99,7 +99,7 @@ const CreateLoan = () => {
       phoneNumber: `${phonenumber}`,
     },
   ]);
-  /* () => setId(`${member_info?.data?.id}`) */
+
   const { status, data } = useSession();
 
   const { data: user, status: user_status } = trpc.useQuery([
@@ -188,7 +188,7 @@ const CreateLoan = () => {
   const maxTenure = pro_data?.maximumTenure || 0;
   const maxRange = pro_data?.maximumRange || 0;
   const minRange = pro_data?.minimumRange || 0;
-  /* console.log(loanRef); */
+
   const nextStep = () => {
     if (form.values.principal.length > 0 && +form.values.principal < minRange) {
       showNotification({
@@ -515,7 +515,6 @@ const CreateLoan = () => {
     form.values.tenure,
   ]);
 
-console.log(id)
   const maintain_member = trpc.useMutation(["members.maintain-member"], {
     onSuccess: async () => {
       await utils.invalidateQueries(["members.member"]);

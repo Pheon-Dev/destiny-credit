@@ -8,9 +8,11 @@ import { TitleText } from "../Text/TitleText";
 export const MembersTable = ({
   members,
   call,
+  role,
 }: {
   members: Member[];
   call: string;
+  role: string;
 }) => {
   const Header = () => (
     <tr>
@@ -20,14 +22,16 @@ export const MembersTable = ({
       <th>ID</th>
       <th>Date</th>
       <th>Status</th>
-      <th>Action</th>
+      {role !== "CO" && <th>Action</th>}
     </tr>
   );
 
   return (
     <>
       <Group position="center" m="lg">
-        {call === "create-loan" && <TitleText title="Newly Registered Members" />}
+        {call === "create-loan" && (
+          <TitleText title="Newly Registered Members" />
+        )}
         {call === "all-members" && <TitleText title="All Members List" />}
       </Group>
       <Table striped highlightOnHover horizontalSpacing="md">
@@ -36,7 +40,12 @@ export const MembersTable = ({
         </thead>
         <tbody>
           {members?.map((member) => (
-            <MemberRow key={member.memberId} member={member} call={call} />
+            <MemberRow
+              key={member.memberId}
+              member={member}
+              call={call}
+              role={role}
+            />
           ))}
         </tbody>
         <tfoot>
@@ -45,9 +54,17 @@ export const MembersTable = ({
       </Table>
     </>
   );
-}
+};
 
-const MemberRow = ({ member, call }: { member: Member; call: string }) => {
+const MemberRow = ({
+  member,
+  call,
+  role,
+}: {
+  member: Member;
+  call: string;
+  role: string;
+}) => {
   const router = useRouter();
 
   return (
@@ -86,12 +103,14 @@ const MemberRow = ({ member, call }: { member: Member; call: string }) => {
               </Badge>
             )}
           </td>
-          <td
-            style={{ cursor: "pointer" }}
-            onClick={() => router.push(`/members/details/${member.id}`)}
-          >
-            <IconEdit size={24} />
-          </td>
+          {role !== "CO" && (
+            <td
+              style={{ cursor: "pointer" }}
+              onClick={() => router.push(`/members/details/${member.id}`)}
+            >
+              <IconEdit size={24} />
+            </td>
+          )}
         </tr>
       )}
       {call === "create-loan" && !member.maintained && (
@@ -114,14 +133,16 @@ const MemberRow = ({ member, call }: { member: Member; call: string }) => {
               Maintain
             </Badge>
           </td>
-          <td
-            style={{ cursor: "pointer" }}
-            onClick={() => router.push(`/members/details/${member.id}`)}
-          >
-            <IconEdit size={24} />
-          </td>
+          {role !== "CO" && (
+            <td
+              style={{ cursor: "pointer" }}
+              onClick={() => router.push(`/members/details/${member.id}`)}
+            >
+              <IconEdit size={24} />
+            </td>
+          )}
         </tr>
       )}
     </>
   );
-}
+};

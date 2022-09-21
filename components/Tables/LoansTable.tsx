@@ -8,9 +8,11 @@ import { TitleText } from "../Text/TitleText";
 export const LoansTable = ({
   loans,
   call,
+  role,
 }: {
   loans: Loan[];
   call: string;
+  role: string;
 }) => {
   const Header = () => (
     <tr>
@@ -20,7 +22,7 @@ export const LoansTable = ({
       <th>Installment</th>
       <th>Tenure</th>
       <th>Status</th>
-      <th>Action</th>
+      {role !== "CO" && <th>Action</th>}
     </tr>
   );
   return (
@@ -30,14 +32,14 @@ export const LoansTable = ({
         {call === "disbursements" && <TitleText title="Disbursements List" />}
         {call === "all-loans" && <TitleText title="All Loans List" />}
       </Group>
-      
+
       <Table striped highlightOnHover horizontalSpacing="md">
         <thead>
           <Header />
         </thead>
         <tbody>
           {loans?.map((loan) => (
-            <LoansRow key={loan.id} loan={loan} call={call} />
+            <LoansRow key={loan.id} loan={loan} call={call} role={role} />
           ))}
         </tbody>
         <tfoot>
@@ -48,7 +50,15 @@ export const LoansTable = ({
   );
 };
 
-const LoansRow = ({ loan, call }: { loan: Loan; call: string }) => {
+const LoansRow = ({
+  loan,
+  call,
+  role,
+}: {
+  loan: Loan;
+  call: string;
+  role: string;
+}) => {
   const router = useRouter();
   return (
     <>
@@ -93,12 +103,14 @@ const LoansRow = ({ loan, call }: { loan: Loan; call: string }) => {
               </Badge>
             )}
           </td>
-          <td
-            style={{ cursor: "pointer" }}
-            onClick={() => router.push(`/loans/${loan.id}`)}
-          >
-            <IconEdit size={24} />
-          </td>
+          {role !== "CO" && (
+            <td
+              style={{ cursor: "pointer" }}
+              onClick={() => router.push(`/loans/${loan.id}`)}
+            >
+              <IconEdit size={24} />
+            </td>
+          )}
         </tr>
       )}
       {call === "disbursements" && loan.approved && (
@@ -142,12 +154,14 @@ const LoansRow = ({ loan, call }: { loan: Loan; call: string }) => {
               </Badge>
             )}
           </td>
-          <td
-            style={{ cursor: "pointer" }}
-            onClick={() => router.push(`/loans/${loan.id}`)}
-          >
-            <IconEdit size={24} />
-          </td>
+          {role !== "CO" && (
+            <td
+              style={{ cursor: "pointer" }}
+              onClick={() => router.push(`/loans/${loan.id}`)}
+            >
+              <IconEdit size={24} />
+            </td>
+          )}
         </tr>
       )}
       {call === "all-loans" && (
@@ -231,12 +245,14 @@ const LoansRow = ({ loan, call }: { loan: Loan; call: string }) => {
               </Badge>
             )}
           </td>
-          <td
-            style={{ cursor: "pointer" }}
-            onClick={() => router.push(`/loans/${loan.id}`)}
-          >
-            <IconEdit size={24} />
-          </td>
+          {role !== "CO" && (
+            <td
+              style={{ cursor: "pointer" }}
+              onClick={() => router.push(`/loans/${loan.id}`)}
+            >
+              <IconEdit size={24} />
+            </td>
+          )}
         </tr>
       )}
     </>

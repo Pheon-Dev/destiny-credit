@@ -9,15 +9,24 @@ import { Divider, LoadingOverlay } from "@mantine/core";
 import { trpc } from "../../utils/trpc";
 
 import { NextPage } from "next";
+import { useSession } from "next-auth/react";
 
 const MembersList = () => {
   try {
-    const { data: members, status } = trpc.useQuery(["loans.create-loan"]);
+    const { status, data } = useSession();
+    const { data: user, status: user_status } = trpc.useQuery([
+      "users.user",
+      {
+        email: `${data?.user?.email}`,
+      },
+    ]);
+
+    const { data: members, status: members_status } = trpc.useQuery(["loans.create-loan"]);
     return (
       <Protected>
-        <LoadingOverlay overlayBlur={2} visible={status === "loading"} />
+        <LoadingOverlay overlayBlur={2} visible={members_status === "loading"} />
         {(!members && <EmptyTable call="create-loan" />) ||
-          (members && <MembersTable members={members} call="create-loan" />)}
+          (members && <MembersTable members={members} role={`${user?.role}`} call="create-loan" />)}
       </Protected>
     );
   } catch (error) {
