@@ -30,6 +30,31 @@ export const loansRouter = createRouter()
       return loans;
     },
   })
+  .query("transactions", {
+    input: z.object({
+      firstName: z.string(),
+      middleName: z.string(),
+      lastName: z.string(),
+      phoneNumber: z.string(),
+    }),
+    resolve: async ({ input }) => {
+      const transactions = await prisma.transaction.findMany({
+        where: {
+          firstName: input.firstName,
+          lastName: input.lastName,
+          middleName: input.middleName,
+          msisdn: input.phoneNumber,
+        },
+      });
+      if (!transactions) {
+        throw new TRPCError({
+          code: "NOT_FOUND",
+          message: `loans.transactions not found`,
+        });
+      }
+      return transactions;
+    },
+  })
   .query("payment", {
     input: z.object({
       id: z.string(),
@@ -47,6 +72,25 @@ export const loansRouter = createRouter()
         });
       }
       return payment;
+    },
+  })
+  .query("loan-payment", {
+    input: z.object({
+      id: z.string(),
+    }),
+    resolve: async ({ input }) => {
+      const loan = await prisma.loan.findFirst({
+        where: {
+          id: input.id,
+        },
+      });
+      if (!loan) {
+        throw new TRPCError({
+          code: "NOT_FOUND",
+          message: `loans.loan-payment not found`,
+        });
+      }
+      return loan;
     },
   })
   .query("loan", {

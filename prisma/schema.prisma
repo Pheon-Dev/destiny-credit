@@ -236,6 +236,7 @@ model Payment {
   outsBalance   String
   currInstDate  String
   nextInstDate  String
+  // mpesa         String
   loan          Loan     @relation(fields: [loanId], references: [id])
   loanId        String
   handler       User?    @relation("HandledBy", fields: [handlerId], references: [id])
