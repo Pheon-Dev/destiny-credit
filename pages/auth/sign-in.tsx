@@ -95,7 +95,7 @@ const Page: NextPage = (props): JSX.Element => {
   }, [status, router]);
 
   return (
-    <>
+    <div style={{position: "relative"}}>
       <Card
         sx={{ maxWidth: 360 }}
         mx="auto"
@@ -159,7 +159,7 @@ const Page: NextPage = (props): JSX.Element => {
           </Box>
         </Card.Section>
       </Card>
-    </>
+    </div>
   );
 };
 

@@ -1,32 +1,31 @@
-import React from "react";
-import { EmptyTable, MembersTable, Protected } from "../../components";
 import { LoadingOverlay } from "@mantine/core";
+import { NextPage } from "next";
+import React from "react";
+import { TransactionsTable, Protected, EmptyTable } from "../../components";
 import { trpc } from "../../utils/trpc";
 
-const MembersList = () => {
+const Page: NextPage = () => {
   try {
-    const { data: members, status } = trpc.useQuery(["loans.create-loan"]);
+    const { data: transactions, status } = trpc.useQuery([
+      "transactions.transactions",
+    ]);
+
     return (
       <Protected>
         <LoadingOverlay overlayBlur={2} visible={status === "loading"} />
-        {(!members && (
-          <EmptyTable call="create-loan" />
-        )) ||
-          (members && <MembersTable members={members} call="create-loan" />)}
+        {(transactions?.length === 0 && <EmptyTable call="maintain" />) ||
+          (transactions && (
+            <TransactionsTable transactions={transactions} call="maintain" />
+          ))}
       </Protected>
     );
   } catch (error) {
     console.log(error);
     return (
       <Protected>
-        <EmptyTable call="create-loan" />
+        <EmptyTable call="register" />
       </Protected>
     );
   }
 };
-
-const Page = () => {
-  return <MembersList />;
-};
-
 export default Page;

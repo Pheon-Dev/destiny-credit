@@ -26,6 +26,7 @@ export const TransactionsTable = ({
       <Group position="center" m="lg">
         {call === "transactions" && <TitleText title="Todays Transactions" />}
         {call === "register" && <TitleText title="Registration List" />}
+        {call === "maintain" && <TitleText title="Maintenance List" />}
       </Group>
       <Table striped highlightOnHover horizontalSpacing="md">
         <thead>
@@ -91,7 +92,40 @@ const  TransactionRow = ({
       )}
       {call === "register" &&
         transaction.transTime.startsWith(time_str) &&
-        transaction.billRefNumber !== "" && (
+        transaction.billRefNumber.startsWith("M") && (
+          <tr
+            style={{
+              cursor: "pointer",
+            }}
+            onClick={() => {
+              router.push(`/members/register/${transaction.transID}`);
+            }}
+          >
+            <td>{transaction.transID}</td>
+            <td>
+              {transaction.firstName +
+                " " +
+                transaction.middleName +
+                " " +
+                transaction.lastName}
+            </td>
+            <td>
+              {`${transaction.transAmount}`.replace(
+                /\B(?=(\d{3})+(?!\d))/g,
+                ","
+              )}
+            </td>
+            <td>{transaction.msisdn}</td>
+            {transaction.billRefNumber === "" ? (
+              <td>{transaction.transTime}</td>
+            ) : (
+              <td>{transaction.billRefNumber}</td>
+            )}
+          </tr>
+        )}
+      {call === "maintain" &&
+        transaction.transTime.startsWith(time_str) &&
+        transaction.billRefNumber.startsWith("P") && (
           <tr
             style={{
               cursor: "pointer",
