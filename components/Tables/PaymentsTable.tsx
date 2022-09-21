@@ -8,9 +8,11 @@ import { TitleText } from "../Text/TitleText";
 export const PaymentsTable = ({
   loans,
   call,
+  role,
 }: {
   loans: Loan[];
   call: string;
+  role: string;
 }) => {
   const Header = () => (
     <tr>
@@ -20,7 +22,7 @@ export const PaymentsTable = ({
       <th>Installment</th>
       <th>Tenure</th>
       <th>Status</th>
-      <th>Action</th>
+      {role !== "CO" && <th>Action</th>}
     </tr>
   );
   return (
@@ -34,7 +36,7 @@ export const PaymentsTable = ({
         </thead>
         <tbody>
           {loans?.map((loan) => (
-            <PaymentsRow key={loan.id} loan={loan} call={call} />
+            <PaymentsRow key={loan.id} loan={loan} call={call} role={role} />
           ))}
         </tbody>
         <tfoot>
@@ -43,9 +45,17 @@ export const PaymentsTable = ({
       </Table>
     </>
   );
-}
+};
 
-const PaymentsRow = ({ loan, call }: { loan: Loan; call: string }) => {
+const PaymentsRow = ({
+  loan,
+  call,
+  role,
+}: {
+  loan: Loan;
+  call: string;
+  role: string;
+}) => {
   const router = useRouter();
   return (
     <>
@@ -76,14 +86,16 @@ const PaymentsRow = ({ loan, call }: { loan: Loan; call: string }) => {
               Payments
             </Badge>
           </td>
-          <td
-            style={{ cursor: "pointer" }}
-            onClick={() => router.push(`/loans/${loan.id}`)}
-          >
-            <IconEdit size={24} />
-          </td>
+          {role !== "CO" && (
+            <td
+              style={{ cursor: "pointer" }}
+              onClick={() => router.push(`/loans/${loan.id}`)}
+            >
+              <IconEdit size={24} />
+            </td>
+          )}
         </tr>
       )}
     </>
   );
-}
+};

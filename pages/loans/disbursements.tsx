@@ -5,8 +5,8 @@ import { LoadingOverlay } from "@mantine/core";
 import { useSession } from "next-auth/react";
 
 const LoansList = () => {
+  const { status, data } = useSession();
   try {
-    const { status, data } = useSession();
     const { data: user, status: user_status } = trpc.useQuery([
       "users.user",
       {

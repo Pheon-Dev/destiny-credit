@@ -5,8 +5,8 @@ import { LoadingOverlay } from "@mantine/core";
 import { useSession } from "next-auth/react";
 
 const LoansList = () => {
+  const { status, data } = useSession();
   try {
-    const { status, data } = useSession();
     const { data: user, status: user_status } = trpc.useQuery([
       "users.user",
       {
@@ -22,7 +22,9 @@ const LoansList = () => {
       <Protected>
         <LoadingOverlay overlayBlur={2} visible={loans_status === "loading"} />
         {(loans?.length === 0 && <EmptyTable call="all-loans" />) ||
-          (loans && <LoansTable loans={loans} call="all-loans" role={`${user?.role}`} />)}
+          (loans && (
+            <LoansTable loans={loans} call="all-loans" role={`${user?.role}`} />
+          ))}
       </Protected>
     );
   } catch (error) {

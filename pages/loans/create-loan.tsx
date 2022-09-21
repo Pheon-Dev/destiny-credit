@@ -12,8 +12,8 @@ import { NextPage } from "next";
 import { useSession } from "next-auth/react";
 
 const MembersList = () => {
+  const { status, data } = useSession();
   try {
-    const { status, data } = useSession();
     const { data: user, status: user_status } = trpc.useQuery([
       "users.user",
       {
