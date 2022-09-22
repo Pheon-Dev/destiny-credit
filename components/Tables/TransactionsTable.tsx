@@ -42,9 +42,9 @@ useEffect(() => {
       let mm = +new_date?.split("/")[1] < 10 ? `0${+new_date?.split("/")[1]}` : `${new_date?.split("/")[1]}`;
       let dd = +new_date?.split("/")[0] < 10 ? `0${+new_date?.split("/")[0]}` : `${new_date?.split("/")[0]}`;
       
-        /* setTimeStr(`${yy}${mm}${dd}`) */
-        setTimeStr(`${yy}${dd}${mm}`)
-        console.log(time_str)
+        setTimeStr(`${yy}${mm}${dd}`)
+        /* setTimeStr(`${yy}${dd}${mm}`) */
+        /* console.log(time_str) */
       }
       return () => {
           subscribe = false;
