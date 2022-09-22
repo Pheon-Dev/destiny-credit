@@ -118,7 +118,7 @@ const TransactionRow = ({
         </tr>
       )}
       {call === "register" &&
-        transaction.transTime.startsWith(time_str) &&
+        /* transaction.transTime.startsWith(time_str) && */
         transaction.billRefNumber.startsWith("M") && (
           <tr
             style={{

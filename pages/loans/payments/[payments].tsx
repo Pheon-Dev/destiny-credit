@@ -3,13 +3,10 @@ import { useRouter } from "next/router";
 import { trpc } from "../../../utils/trpc";
 import {
   EmptyTable,
-  PaymentTable,
   Protected,
   TitleText,
-  TransactionsTable,
 } from "../../../components";
 import { Group, LoadingOverlay, Table } from "@mantine/core";
-import type { Payment, Transaction } from "@prisma/client";
 
 const PaymentsList = () => {
   try {
