@@ -37,6 +37,7 @@ export const TransactionsTable = ({
   const time_str =
     new_date.split("/")[2] + new_date.split("/")[1] + new_date.split("/")[0];
 
+  console.log(transactions)
   return (
     <>
       <Group position="apart" m="md" mt="lg">
@@ -87,7 +88,7 @@ const TransactionRow = ({
 
   return (
     <>
-      {call === "transactions" && transaction.transTime.startsWith(time_str) && (
+      {call === "transactions" && (
         <tr
           style={{
             cursor: transaction.billRefNumber !== "" ? "pointer" : "text",
