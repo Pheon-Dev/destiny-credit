@@ -9,10 +9,10 @@ export const createContextInner = async (_opts: CreateContextOptions) => {
   return {};
 };
 
-export type context = trpc.inferAsyncReturnType<typeof createContextInner>;
+export type Context = trpc.inferAsyncReturnType<typeof createContextInner>;
 
 export const createContext = async (
   opts: trpcNext.CreateNextContextOptions
-): Promise<context> => {
+): Promise<Context> => {
   return await createContextInner({});
 };

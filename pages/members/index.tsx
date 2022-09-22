@@ -8,16 +8,13 @@ import { useSession } from "next-auth/react";
 const MembersList = () => {
   const { status, data } = useSession();
   try {
-    const { data: user, status: user_status } = trpc.useQuery([
-      "users.user",
+    const { data: user, status: user_status } = trpc.users.user.useQuery(
       {
         email: `${data?.user?.email}`,
       },
-    ]);
+    );
 
-    const { data: members, status: members_status } = trpc.useQuery([
-      "members.members",
-    ]);
+    const { data: members, status: members_status } = trpc.members.members.useQuery();
 
     return (
       <Protected>

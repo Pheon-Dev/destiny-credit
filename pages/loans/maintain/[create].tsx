@@ -81,33 +81,24 @@ const CreateLoan = () => {
   const router = useRouter();
   const mid = router.query.create as string;
 
-  const member_search = trpc.useQuery([
-    "transactions.transaction",
-    {
-      id: `${mid}`,
-    },
-  ]);
+  const member_search = trpc.transactions.transaction.useQuery({
+    id: `${mid}`,
+  });
   const firstname = member_search?.data?.firstName;
   const middlename = member_search?.data?.middleName;
   const lastname = member_search?.data?.lastName;
   const phonenumber = member_search?.data?.msisdn;
-  const member_info = trpc.useQuery([
-    "members.maintain",
-    {
-      firstName: `${firstname}`,
-      lastName: `${middlename} ${lastname}`,
-      phoneNumber: `${phonenumber}`,
-    },
-  ]);
+  const member_info = trpc.members.maintain.useQuery({
+    firstName: `${firstname}`,
+    lastName: `${middlename} ${lastname}`,
+    phoneNumber: `${phonenumber}`,
+  });
 
   const { status, data } = useSession();
 
-  const { data: user, status: user_status } = trpc.useQuery([
-    "users.user",
-    {
-      email: `${data?.user?.email}`,
-    },
-  ]);
+  const { data: user, status: user_status } = trpc.users.user.useQuery({
+    email: `${data?.user?.email}`,
+  });
 
   const form = useForm({
     validate: zodResolver(loan_schema),
@@ -156,27 +147,25 @@ const CreateLoan = () => {
 
   const utils = trpc.useContext();
 
-  const { data: loans } = trpc.useQuery(["loans.member", { id: id }]) || [];
+  const { data: loans } = trpc.loans.member.useQuery({ id: id });
   const loans_data = loans?.map((l: Loan) => l) || [];
   const loanLen = loans_data?.length + 1;
 
-  const { data: members } = trpc.useQuery(["members.members"]) || [];
+  const { data: members } = trpc.members.members.useQuery();
   const members_data = members?.map((m: Member) => m) || [];
 
   const { data: products, status: products_status } =
-    trpc.useQuery(["products.products"]) || [];
+    trpc.products.products.useQuery();
   const products_data = products?.map((p: Product) => p) || [];
 
-  const product = trpc.useQuery([
-    "products.product",
-    { productName: form.values.product },
-  ]);
+  const product = trpc.products.product.useQuery({
+    productName: form.values.product,
+  });
   const pro_data = product?.data;
 
-  const { data: member, status: member_status } = trpc.useQuery([
-    "members.member",
-    { id: id },
-  ]);
+  const { data: member, status: member_status } = trpc.members.member.useQuery({
+    id: id,
+  });
 
   const memberCode = member?.memberId || "";
   const intRate = pro_data?.interestRate || 0;
@@ -515,21 +504,21 @@ const CreateLoan = () => {
     form.values.tenure,
   ]);
 
-  const maintain_member = trpc.useMutation(["members.maintain-member"], {
+  const maintain_member = trpc.members.maintain_member.useMutation({
     onSuccess: async () => {
-      await utils.invalidateQueries(["members.member"]);
+      await utils.members.member.invalidate();
     },
   });
 
-  const maintain_guarantor = trpc.useMutation(["members.maintain-guarantor"], {
+  const maintain_guarantor = trpc.members.maintain_guarantor.useMutation({
     onSuccess: async () => {
-      await utils.invalidateQueries(["members.guarantor"]);
+      await utils.members.guarantor.invalidate();
     },
   });
 
-  const maintain_loan = trpc.useMutation(["members.maintain-loan"], {
+  const maintain_loan = trpc.members.maintain_loan.useMutation({
     onSuccess: async () => {
-      await utils.invalidateQueries(["loans.loans"]);
+      await utils.loans.loans.invalidate();
       showNotification({
         id: "maintained-status",
         color: "teal",
@@ -753,22 +742,17 @@ const CreateLoan = () => {
     router,
   ]);
 
-  const maintain_collateral = trpc.useMutation(
-    ["members.maintain-collateral"],
-    {
-      onSuccess: async () => {
-        await utils.invalidateQueries(["members.collateral", { id: id }]);
-      },
-    }
-  );
+  const maintain_collateral = trpc.members.maintain_collateral.useMutation({
+    onSuccess: async (input) => {
+      await utils.members.collateral.invalidate({ id: input.id });
+    },
+  });
 
-  const collaterals = trpc.useQuery(["members.collateral", { id: id }]) || [];
-  const { data: guarantor } =
-    trpc.useQuery(["members.guarantor", { id: id }]) || [];
+  const collaterals = trpc.members.collateral.useQuery({ id: id });
+  const { data: guarantor } = trpc.members.guarantor.useQuery({ id: id });
 
-  const delete_collateral = trpc.useMutation(["members.collateral-delete"], {
+  const delete_collateral = trpc.members.collateral_delete.useMutation({
     onSuccess: async () => {
-      await utils.invalidateQueries(["members.collateral", { id: id }]);
       updateNotification({
         id: "collateral-delete-status",
         color: "red",

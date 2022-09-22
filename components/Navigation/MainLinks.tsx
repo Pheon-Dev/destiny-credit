@@ -22,12 +22,11 @@ export const MainLinks = () => {
   const [dashboardActive, setDashboardActive] = useState(true);
 
   const { status, data } = useSession();
-  const { data: user, status: user_status } = trpc.useQuery([
-    "users.user",
+  const { data: user, status: user_status } = trpc.users.user.useQuery(
     {
       email: `${data?.user?.email}`,
     },
-  ]);
+);
 
   const router = useRouter();
 

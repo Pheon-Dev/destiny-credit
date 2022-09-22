@@ -4,13 +4,8 @@ import type { AppProps } from "next/app";
 import { getCookie, setCookie } from "cookies-next";
 import Head from "next/head";
 import { NotificationsProvider } from "@mantine/notifications";
-import { withTRPC } from "@trpc/next";
-import { loggerLink } from '@trpc/client/links/loggerLink';
-import { httpBatchLink } from '@trpc/client/links/httpBatchLink';
-import type { AppRouter } from "../server/_app";
 import { SessionProvider } from "next-auth/react";
 import { useSession } from "next-auth/react";
-import superjson from "superjson";
 
 import {
   MantineProvider,
@@ -28,6 +23,7 @@ import {
   useMantineTheme,
 } from "@mantine/core";
 import { TitleText, MainLinks, Utilities } from "../components";
+import { trpc } from "../utils/trpc";
 
 const App = (props: AppProps & { colorScheme: ColorScheme }) => {
   const theme = useMantineTheme();
@@ -158,44 +154,4 @@ App.getInitialProps = ({ ctx }: { ctx: GetServerSidePropsContext }) => ({
   colorscheme: getCookie("mantine-color-scheme", ctx) || "dark",
 });
 
-const getBaseUrl = () => {
-  if (typeof window !== 'undefined') {
-    return '';
-  }
-  if (process.env.NEXT_PUBLIC_VERCEL_URL) {
-    return `https://${process.env.NEXT_PUBLIC_VERCEL_URL}`;
-  }
-
-  return `http://localhost:${process.env.PORT ?? 3000}`;
-}
-
-export default withTRPC<AppRouter>({
-  config() {
-    return {
-      links: [
-       loggerLink({
-           enabled: (opts) => process.env.NODE_ENV === "development" ||
-           (opts.direction === "down" && opts.result instanceof Error),
-         }),
-       httpBatchLink({
-           url: `${getBaseUrl()}/api/trpc`
-         }),
-      ],
-      transformer: superjson,
-    };
-  },
-  ssr: true,
-  responseMeta({ clientErrors, ctx }) {
-    if (clientErrors.length) {
-      return {
-        status: clientErrors[0].data?.httpStatus ?? 500,
-      };
-    }
-
-    const ONE_DAY_IN_SECONDS = 60 * 60 * 24;
-
-    return {
-      "Cache-Control": `s-maxage=1, stale-while-revalidate=${ONE_DAY_IN_SECONDS}`,
-    };
-  },
-})(App);
+export default trpc.withTRPC(App);

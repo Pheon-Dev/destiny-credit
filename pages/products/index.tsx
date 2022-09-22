@@ -5,7 +5,7 @@ import { Group, LoadingOverlay } from "@mantine/core";
 
 const ProductsList = () => {
   try {
-  const { data: products, status } = trpc.useQuery(["products.products"]);
+  const { data: products, status } = trpc.products.products.useQuery();
 
   return (
     <Protected>

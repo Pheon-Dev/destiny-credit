@@ -1,5 +1,4 @@
-import { createRouter } from "./create-router";
-import superjson from "superjson";
+import { t } from "./trpc";
 import {
   transactionsRouter,
   membersRouter,
@@ -9,13 +8,13 @@ import {
   logsRouter,
 } from "./routers";
 
-export const appRouter = createRouter()
-  .transformer(superjson)
-  .merge("transactions.", transactionsRouter)
-  .merge("loans.", loansRouter)
-  .merge("users.", usersRouter)
-  .merge("members.", membersRouter)
-  .merge("products.", productsRouter)
-  .merge("logs.", logsRouter)
+export const appRouter = t.router({
+  transactions: transactionsRouter,
+  loans: loansRouter,
+  users: usersRouter,
+  members: membersRouter,
+  products: productsRouter,
+  logs: logsRouter,
+});
 
 export type AppRouter = typeof appRouter;

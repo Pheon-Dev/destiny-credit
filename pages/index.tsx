@@ -6,9 +6,7 @@ import { NextPage } from "next";
 
 const Page: NextPage = () => {
   try {
-    const { data: transactions, status } = trpc.useQuery([
-      "transactions.transactions",
-    ]);
+    const { data: transactions, status } = trpc.transactions.transactions.useQuery();
     return (
       <Protected>
         <LoadingOverlay overlayBlur={2} visible={status === "loading"} />

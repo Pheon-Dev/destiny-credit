@@ -37,7 +37,7 @@ const Page: NextPage = (props): JSX.Element => {
     data: users,
     refetch,
     status: users_status,
-  } = trpc.useQuery(["users.users"]);
+  } = trpc.users.users.useQuery();
 
   const lencode = users ? users?.length + 1 : 1;
 
@@ -63,7 +63,7 @@ const Page: NextPage = (props): JSX.Element => {
     },
   });
 
-  const newUser = trpc.useMutation(["users.create-user"], {
+  const newUser = trpc.users.create_user.useMutation( {
     onSuccess: () => {
       clear();
       refetch();

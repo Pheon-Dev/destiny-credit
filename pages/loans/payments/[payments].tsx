@@ -1,11 +1,7 @@
 import React from "react";
 import { useRouter } from "next/router";
 import { trpc } from "../../../utils/trpc";
-import {
-  EmptyTable,
-  Protected,
-  TitleText,
-} from "../../../components";
+import { EmptyTable, Protected, TitleText } from "../../../components";
 import { Group, LoadingOverlay, Table } from "@mantine/core";
 
 const PaymentsList = () => {
@@ -28,27 +24,21 @@ const PaymentsList = () => {
         {/* <th>M-PESA</th> */}
       </tr>
     );
-  const TransactionsHeader = () => (
-    <tr>
-      <th>ID</th>
-      <th>Names</th>
-      <th>Amount</th>
-      <th>Phone</th>
-      <th>Type</th>
-    </tr>
-  );
-    const { data: loan, status: loan_status } = trpc.useQuery([
-      "loans.loan-payment",
-      { id: id },
-    ]);
-    const { data: member, status: member_status } = trpc.useQuery([
-      "members.member",
-      { id: `${loan?.memberId}` },
-    ]);
-    const { data: payments, status: payment_status } = trpc.useQuery([
-      "loans.payment",
-      { id: id },
-    ]);
+    const TransactionsHeader = () => (
+      <tr>
+        <th>ID</th>
+        <th>Names</th>
+        <th>Amount</th>
+        <th>Phone</th>
+        <th>Type</th>
+      </tr>
+    );
+    const { data: loan, status: loan_status } =
+      trpc.loans.loan_payment.useQuery({ id: id });
+    const { data: member, status: member_status } =
+      trpc.members.member.useQuery({ id: `${loan?.memberId}` });
+    const { data: payments, status: payment_status } =
+      trpc.loans.payment.useQuery({ id: id });
 
     const names = member?.lastName;
 
@@ -57,20 +47,18 @@ const PaymentsList = () => {
     const lastname = names?.split(" ")[1];
     const phonenumber = member?.phoneNumber;
 
-    const { data: transactions, status: transactions_status } = trpc.useQuery([
-      "loans.transactions",
-      {
+    const { data: transactions, status: transactions_status } =
+      trpc.loans.transactions.useQuery({
         firstName: `${firstname}`,
         middleName: `${middlename}`,
         lastName: `${lastname}`,
         phoneNumber: `${phonenumber}`,
-      },
-    ]);
+      });
 
     return (
       <>
         <Group position="center" m="lg">
-      <TitleText title={`${loan?.memberName}`} />
+          <TitleText title={`${loan?.memberName}`} />
         </Group>
         <Table
           striped
@@ -155,50 +143,53 @@ const PaymentsList = () => {
             <Header />
           </tfoot>
         </Table>
-      <Group position="center" m="lg">
-      <TitleText title={`M-PESA Payments`} />
-      </Group>
-      <Table striped highlightOnHover horizontalSpacing="md">
-        <thead>
-          <TransactionsHeader />
-        </thead>
-        <tbody>
-          {transactions?.map((transaction) => (
-        <tr
-        key={transaction.id}
-          /* style={{ */
-          /*   cursor: transaction.billRefNumber !== "" ? "pointer" : "text", */
-          /* }} */
-          /* onClick={() => { */
-          /*   transaction.billRefNumber !== "" */
-          /*     ? router.push(`/members/register/${transaction.transID}`) */
-          /*     : null; */
-          /* }} */
-        >
-          <td>{transaction.transID}</td>
-          <td>
-            {transaction.firstName +
-              " " +
-              transaction.middleName +
-              " " +
-              transaction.lastName}
-          </td>
-          <td>
-            {`${transaction.transAmount}`.replace(/\B(?=(\d{3})+(?!\d))/g, ",")}
-          </td>
-          <td>{transaction.msisdn}</td>
-          {transaction.billRefNumber === "" ? (
-            <td>{transaction.transTime}</td>
-          ) : (
-            <td>{transaction.billRefNumber}</td>
-          )}
-        </tr>
-          ))}
-        </tbody>
-        <tfoot>
-          <TransactionsHeader />
-        </tfoot>
-      </Table>
+        <Group position="center" m="lg">
+          <TitleText title={`M-PESA Payments`} />
+        </Group>
+        <Table striped highlightOnHover horizontalSpacing="md">
+          <thead>
+            <TransactionsHeader />
+          </thead>
+          <tbody>
+            {transactions?.map((transaction) => (
+              <tr
+                key={transaction.id}
+                /* style={{ */
+                /*   cursor: transaction.billRefNumber !== "" ? "pointer" : "text", */
+                /* }} */
+                /* onClick={() => { */
+                /*   transaction.billRefNumber !== "" */
+                /*     ? router.push(`/members/register/${transaction.transID}`) */
+                /*     : null; */
+                /* }} */
+              >
+                <td>{transaction.transID}</td>
+                <td>
+                  {transaction.firstName +
+                    " " +
+                    transaction.middleName +
+                    " " +
+                    transaction.lastName}
+                </td>
+                <td>
+                  {`${transaction.transAmount}`.replace(
+                    /\B(?=(\d{3})+(?!\d))/g,
+                    ","
+                  )}
+                </td>
+                <td>{transaction.msisdn}</td>
+                {transaction.billRefNumber === "" ? (
+                  <td>{transaction.transTime}</td>
+                ) : (
+                  <td>{transaction.billRefNumber}</td>
+                )}
+              </tr>
+            ))}
+          </tbody>
+          <tfoot>
+            <TransactionsHeader />
+          </tfoot>
+        </Table>
       </>
     );
   } catch (error) {

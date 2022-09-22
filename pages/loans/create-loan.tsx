@@ -14,19 +14,26 @@ import { useSession } from "next-auth/react";
 const MembersList = () => {
   const { status, data } = useSession();
   try {
-    const { data: user, status: user_status } = trpc.useQuery([
-      "users.user",
-      {
-        email: `${data?.user?.email}`,
-      },
-    ]);
+    const { data: user, status: user_status } = trpc.users.user.useQuery({
+      email: `${data?.user?.email}`,
+    });
 
-    const { data: members, status: members_status } = trpc.useQuery(["loans.create-loan"]);
+    const { data: members, status: members_status } =
+      trpc.loans.create_loan.useQuery();
     return (
       <Protected>
-        <LoadingOverlay overlayBlur={2} visible={members_status === "loading"} />
+        <LoadingOverlay
+          overlayBlur={2}
+          visible={members_status === "loading"}
+        />
         {(!members && <EmptyTable call="create-loan" />) ||
-          (members && <MembersTable members={members} role={`${user?.role}`} call="create-loan" />)}
+          (members && (
+            <MembersTable
+              members={members}
+              role={`${user?.role}`}
+              call="create-loan"
+            />
+          ))}
       </Protected>
     );
   } catch (error) {
@@ -41,9 +48,8 @@ const MembersList = () => {
 
 const Page: NextPage = () => {
   try {
-    const { data: transactions, status } = trpc.useQuery([
-      "transactions.transactions",
-    ]);
+    const { data: transactions, status } =
+      trpc.transactions.transactions.useQuery();
 
     return (
       <Protected>
@@ -52,7 +58,7 @@ const Page: NextPage = () => {
           (transactions && (
             <TransactionsTable transactions={transactions} call="maintain" />
           ))}
-          <Divider variant="dotted" mt="xl" />
+        <Divider variant="dotted" mt="xl" />
         <MembersList />
       </Protected>
     );

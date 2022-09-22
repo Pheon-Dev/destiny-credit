@@ -7,14 +7,11 @@ import { useSession } from "next-auth/react";
 const PaymentsList = () => {
   const { status, data } = useSession();
   try {
-    const { data: user, status: user_status } = trpc.useQuery([
-      "users.user",
-      {
-        email: `${data?.user?.email}`,
-      },
-    ]);
+    const { data: user, status: user_status } = trpc.users.user.useQuery({
+      email: `${data?.user?.email}`,
+    });
 
-    const { data: loans, status } = trpc.useQuery(["loans.loans"]);
+    const { data: loans, status } = trpc.loans.loans.useQuery();
 
     return (
       <Protected>

@@ -1,28 +1,27 @@
-import { PrismaClient } from "@prisma/client";
 import { TRPCError } from "@trpc/server";
 import { z } from "zod";
-import { createRouter } from "../create-router";
+import { t } from "../trpc";
+import { PrismaClient } from '@prisma/client';
+const prisma = new PrismaClient()
 
-const prisma = new PrismaClient();
-
-export const membersRouter = createRouter()
-  .query("members", {
-    resolve: async () => {
-      const members = await prisma.member.findMany();
-      if (!members) {
-        throw new TRPCError({
-          code: "NOT_FOUND",
-          message: `members.members not found`,
-        });
-      }
-      return members;
-    },
-  })
-  .query("member", {
-    input: z.object({
-      id: z.string(),
-    }),
-    resolve: async ({ input }) => {
+export const membersRouter = t.router({
+  members: t.procedure.query(async () => {
+    const members = await prisma.member.findMany();
+    if (!members) {
+      throw new TRPCError({
+        code: "NOT_FOUND",
+        message: `members.members not found`,
+      });
+    }
+    return members;
+  }),
+  member: t.procedure
+    .input(
+      z.object({
+        id: z.string(),
+      })
+    )
+    .query(async ({ input }) => {
       const member = await prisma.member.findFirst({
         where: {
           id: input.id,
@@ -35,15 +34,16 @@ export const membersRouter = createRouter()
         });
       }
       return member;
-    },
-  })
-  .query("maintain", {
-    input: z.object({
-      firstName: z.string(),
-      lastName: z.string(),
-      phoneNumber: z.string(),
     }),
-    resolve: async ({ input }) => {
+  maintain: t.procedure
+    .input(
+      z.object({
+        firstName: z.string(),
+        lastName: z.string(),
+        phoneNumber: z.string(),
+      })
+    )
+    .query(async ({ input }) => {
       const member = await prisma.member.findFirst({
         where: {
           firstName: input.firstName,
@@ -58,53 +58,54 @@ export const membersRouter = createRouter()
         });
       }
       return member;
-    },
-  })
-  .mutation("register", {
-    input: z.object({
-      date: z.string(),
-      branchName: z.string(),
-      memberId: z.string(),
-      firstName: z.string(),
-      lastName: z.string(),
-      dob: z.string(),
-      idPass: z.string(),
-      kraPin: z.string(),
-      phoneNumber: z.string(),
-      gender: z.string(),
-      age: z.string(),
-      religion: z.string(),
-      maritalStatus: z.string(),
-      spouseName: z.string(),
-      spouseNumber: z.string(),
-      postalAddress: z.string(),
-      postalCode: z.string(),
-      cityTown: z.string(),
-      residentialAddress: z.string(),
-      emailAddress: z.string(),
-      rentedOwned: z.string(),
-      landCareAgent: z.string(),
-      occupationEmployer: z.string(),
-      employerNumber: z.string(),
-      businessLocation: z.string(),
-      businessAge: z.string(),
-      refereeName: z.string(),
-      refereeNumber: z.string(),
-      communityPosition: z.string(),
-      mpesaCode: z.string(),
-      membershipAmount: z.string(),
-      nameKin: z.string(),
-      relationship: z.string(),
-      residentialAddressKin: z.string(),
-      postalAddressKin: z.string(),
-      postalCodeKin: z.string(),
-      cityTownKin: z.string(),
-      numberKin: z.string(),
-      group: z.boolean(),
-      maintained: z.boolean(),
-      registrarId: z.string(),
     }),
-    resolve: async ({ input }) => {
+  register: t.procedure
+    .input(
+      z.object({
+        date: z.string(),
+        branchName: z.string(),
+        memberId: z.string(),
+        firstName: z.string(),
+        lastName: z.string(),
+        dob: z.string(),
+        idPass: z.string(),
+        kraPin: z.string(),
+        phoneNumber: z.string(),
+        gender: z.string(),
+        age: z.string(),
+        religion: z.string(),
+        maritalStatus: z.string(),
+        spouseName: z.string(),
+        spouseNumber: z.string(),
+        postalAddress: z.string(),
+        postalCode: z.string(),
+        cityTown: z.string(),
+        residentialAddress: z.string(),
+        emailAddress: z.string(),
+        rentedOwned: z.string(),
+        landCareAgent: z.string(),
+        occupationEmployer: z.string(),
+        employerNumber: z.string(),
+        businessLocation: z.string(),
+        businessAge: z.string(),
+        refereeName: z.string(),
+        refereeNumber: z.string(),
+        communityPosition: z.string(),
+        mpesaCode: z.string(),
+        membershipAmount: z.string(),
+        nameKin: z.string(),
+        relationship: z.string(),
+        residentialAddressKin: z.string(),
+        postalAddressKin: z.string(),
+        postalCodeKin: z.string(),
+        cityTownKin: z.string(),
+        numberKin: z.string(),
+        group: z.boolean(),
+        maintained: z.boolean(),
+        registrarId: z.string(),
+      })
+    )
+    .mutation(async ({ input }) => {
       const member = await prisma.member.create({
         data: {
           date: input.date,
@@ -158,13 +159,14 @@ export const membersRouter = createRouter()
         });
       }
       return member;
-    },
-  })
-  .query("collateral", {
-    input: z.object({
-      id: z.string(),
     }),
-    resolve: async ({ input }) => {
+  collateral: t.procedure
+    .input(
+      z.object({
+        id: z.string(),
+      })
+    )
+    .query(async ({ input }) => {
       const collateral = await prisma.collateral.findMany({
         where: {
           memberId: input.id,
@@ -177,64 +179,65 @@ export const membersRouter = createRouter()
         });
       }
       return collateral;
-    },
-  })
-  .mutation("collateral-delete", {
-    input: z.object({
-      id: z.string(),
     }),
-    resolve: async ({ input }) => {
+  collateral_delete: t.procedure
+    .input(
+      z.object({
+        id: z.string(),
+      })
+    )
+    .mutation(async ({ input }) => {
       const collateral = await prisma.collateral.deleteMany({
         where: { id: input.id },
       });
       if (collateral.count === 0) {
         throw new TRPCError({
           code: "NOT_FOUND",
-          message: `members.collateral-delete not found`,
+          message: `members.collateral_delete not found`,
         });
       }
       return collateral;
-    },
-  })
-  .query("guarantor", {
-    input: z.object({
-      id: z.string(),
     }),
-    resolve: async ({ input }) => {
+  guarantor: t.procedure
+    .input(
+      z.object({
+        id: z.string(),
+      })
+    )
+    .query(async ({ input }) => {
       const guarantor = await prisma.guarantor.findFirst({
         where: {
           memberId: input.id,
         },
       });
       return guarantor;
-    },
-  })
-  .mutation("update-member", {
-    resolve: async () => {
-      const member = await prisma.member.updateMany({
-        where: {
-          maintained: true,
-        },
-        data: {
-          maintained: false,
-        },
-      });
-      if (member?.count === 0) {
-        throw new TRPCError({
-          code: "NOT_FOUND",
-          message: `members.update-member not found`,
-        });
-      }
-      return member;
-    },
-  })
-  .mutation("maintain-member", {
-    input: z.object({
-      id: z.string(),
-      maintained: z.boolean(),
-      updaterId: z.string(),
     }),
-    resolve: async ({ input }) => {
+  update_member: t.procedure.mutation(async ({ input }) => {
+    const member = await prisma.member.updateMany({
+      where: {
+        maintained: true,
+      },
+      data: {
+        maintained: false,
+      },
+    });
+    if (member?.count === 0) {
+      throw new TRPCError({
+        code: "NOT_FOUND",
+        message: `members.update-member not found`,
+      });
+    }
+    return member;
+  }),
+  maintain_member: t.procedure
+    .input(
+      z.object({
+        id: z.string(),
+        maintained: z.boolean(),
+        updaterId: z.string(),
+      })
+    )
+    .mutation(async ({ input }) => {
       const member = await prisma.member.update({
         where: {
           id: input.id,
@@ -247,20 +250,21 @@ export const membersRouter = createRouter()
       if (!member) {
         throw new TRPCError({
           code: "NOT_FOUND",
-          message: `members.maintain-member not found`,
+          message: `members.maintain_member not found`,
         });
       }
       return member;
-    },
-  })
-  .mutation("maintain-collateral", {
-    input: z.object({
-      item: z.string(),
-      value: z.string(),
-      memberId: z.string(),
-      updaterId: z.string(),
     }),
-    resolve: async ({ input }) => {
+  maintain_collateral: t.procedure
+    .input(
+      z.object({
+        item: z.string(),
+        value: z.string(),
+        memberId: z.string(),
+        updaterId: z.string(),
+      })
+    )
+    .mutation(async ({ input }) => {
       const collateral = await prisma.collateral.create({
         data: {
           item: input.item,
@@ -272,23 +276,24 @@ export const membersRouter = createRouter()
       if (!collateral) {
         throw new TRPCError({
           code: "NOT_FOUND",
-          message: `members.maintain-collateral not found`,
+          message: `members.maintain_collateral not found`,
         });
       }
       return collateral;
-    },
-  })
-  .mutation("maintain-guarantor", {
-    input: z.object({
-      id: z.string(),
-      guarantorName: z.string(),
-      guarantorPhone: z.string(),
-      guarantorRelationship: z.string(),
-      guarantorID: z.string(),
-      memberId: z.string(),
-      updaterId: z.string(),
     }),
-    resolve: async ({ input }) => {
+  maintain_guarantor: t.procedure
+    .input(
+      z.object({
+        id: z.string(),
+        guarantorName: z.string(),
+        guarantorPhone: z.string(),
+        guarantorRelationship: z.string(),
+        guarantorID: z.string(),
+        memberId: z.string(),
+        updaterId: z.string(),
+      })
+    )
+    .mutation(async ({ input }) => {
       await prisma.guarantor.deleteMany({
         where: {
           memberId: input.memberId,
@@ -308,37 +313,38 @@ export const membersRouter = createRouter()
       if (!guarantor) {
         throw new TRPCError({
           code: "NOT_FOUND",
-          message: `members.maintain-guarantor not found`,
+          message: `members.maintain_guarantor not found`,
         });
       }
       return guarantor;
-    },
-  })
-  .mutation("maintain-loan", {
-    input: z.object({
-      memberId: z.string(),
-      tenure: z.string(),
-      principal: z.string(),
-      maintained: z.boolean(),
-      approved: z.boolean(),
-      disbursed: z.boolean(),
-      grace: z.string(),
-      installment: z.string(),
-      productId: z.string(),
-      payoff: z.string(),
-      penalty: z.string(),
-      processingFee: z.string(),
-      sundays: z.string(),
-      memberName: z.string(),
-      productName: z.string(),
-      interest: z.string(),
-      cycle: z.string(),
-      guarantorId: z.string(),
-      startDate: z.string(),
-      loanRef: z.string(),
-      maintainerId: z.string(),
     }),
-    resolve: async ({ input }) => {
+  maintain_loan: t.procedure
+    .input(
+      z.object({
+        memberId: z.string(),
+        tenure: z.string(),
+        principal: z.string(),
+        maintained: z.boolean(),
+        approved: z.boolean(),
+        disbursed: z.boolean(),
+        grace: z.string(),
+        installment: z.string(),
+        productId: z.string(),
+        payoff: z.string(),
+        penalty: z.string(),
+        processingFee: z.string(),
+        sundays: z.string(),
+        memberName: z.string(),
+        productName: z.string(),
+        interest: z.string(),
+        cycle: z.string(),
+        guarantorId: z.string(),
+        startDate: z.string(),
+        loanRef: z.string(),
+        maintainerId: z.string(),
+      })
+    )
+    .mutation(async ({ input }) => {
       const loan = await prisma.loan.create({
         data: {
           memberId: input.memberId,
@@ -367,9 +373,9 @@ export const membersRouter = createRouter()
       if (!loan) {
         throw new TRPCError({
           code: "NOT_FOUND",
-          message: `members.maintain-loan not found`,
+          message: `members.maintain_loan not found`,
         });
       }
       return loan;
-    },
-  });
+    }),
+});

@@ -8,7 +8,7 @@ const Page: NextPage = () => {
   const router = useRouter();
   const id = router.query.member as string;
 
-  const { data: member, status } = trpc.useQuery(["members.member", {id: id}])
+  const { data: member, status } = trpc.members.member.useQuery({id: id})
 
 
   return (

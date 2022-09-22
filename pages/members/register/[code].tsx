@@ -75,23 +75,21 @@ const CreateMember = () => {
   const id = router.query.code as string;
   const { status, data } = useSession();
 
-  const { data: user, status: user_status } = trpc.useQuery([
-    "users.user",
+  const { data: user, status: user_status } = trpc.users.user.useQuery(
     {
       email: `${data?.user?.email}`,
     },
-  ]);
+);
 
   const {
     data: members,
     status: members_status,
     refetch,
-  } = trpc.useQuery(["members.members"]);
+  } = trpc.members.members.useQuery();
 
-  const { data: transaction, status: transaction_status } = trpc.useQuery([
-    "transactions.transaction",
+  const { data: transaction, status: transaction_status } = trpc.transactions.transaction.useQuery(
     { id: id },
-  ]);
+);
 
   const lencode = members ? members?.length + 1 : 0;
 
@@ -240,7 +238,7 @@ const CreateMember = () => {
     return () => (subscribe = false);
   }, [age_result, form.values.age]);
 
-  const member = trpc.useMutation(["members.register"], {
+  const member = trpc.members.register.useMutation({
     onSuccess: () => {
       updateNotification({
         id: "submit",

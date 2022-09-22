@@ -48,13 +48,12 @@ export const Utilities = () => {
   const { colorScheme, toggleColorScheme } = useMantineColorScheme();
   const router = useRouter();
 
-  const { data: user, status: user_status } = trpc.useQuery([
-    "users.user",
+  const { data: user, status: user_status } = trpc.users.user.useQuery(
     {
       email: `${data?.user?.email}`,
     },
-  ]);
-  const logs = trpc.useQuery(["logs.logs"]);
+  );
+  const logs = trpc.logs.logs.useQuery();
   const forceReload = async () => {
     try {
       if (logs)

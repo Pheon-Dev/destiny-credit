@@ -41,46 +41,30 @@ const Disburse = () => {
 
   const { status, data } = useSession();
 
-  const { data: user, status: user_status } = trpc.useQuery([
-    "users.user",
-    {
-      email: `${data?.user?.email}`,
-    },
-  ]);
+  const { data: user, status: user_status } = trpc.users.user.useQuery({
+    email: `${data?.user?.email}`,
+  });
 
-  const { data: users, status: users_status } = trpc.useQuery([
-    "users.officers",
-  ]);
+  const { data: users, status: users_status } = trpc.users.officers.useQuery();
   const users_data = users?.map((p) => p) || [];
   const user_data = users_data?.map((_) => [
     { key: _?.id, value: `${_?.id}`, label: `${_?.username}` },
   ]);
-  const { data: loan, status: loan_status } = trpc.useQuery([
-    "loans.loan",
-    { id: id },
-  ]);
-  const { data: member } = trpc.useQuery([
-    "members.member",
-    { id: `${loan?.memberId}` },
-  ]);
-  const { data: registrar } = trpc.useQuery([
-    "users.user-id",
-    {
-      id: `${member?.registrarId}`,
-    },
-  ]);
-  const { data: maintainer } = trpc.useQuery([
-    "users.user-id",
-    {
-      id: `${loan?.maintainerId}`,
-    },
-  ]);
-  const { data: approver } = trpc.useQuery([
-    "users.user-id",
-    {
-      id: `${loan?.approverId}`,
-    },
-  ]);
+  const { data: loan, status: loan_status } = trpc.loans.loan.useQuery({
+    id: id,
+  });
+  const { data: member } = trpc.members.member.useQuery({
+    id: `${loan?.memberId}`,
+  });
+  const { data: registrar } = trpc.users.user_id.useQuery({
+    id: `${member?.registrarId}`,
+  });
+  const { data: maintainer } = trpc.users.user_id.useQuery({
+    id: `${loan?.maintainerId}`,
+  });
+  const { data: approver } = trpc.users.user_id.useQuery({
+    id: `${loan?.approverId}`,
+  });
 
   const form = useForm({
     validate: zodResolver(schema),
@@ -90,9 +74,8 @@ const Disburse = () => {
     },
   });
 
-  const disburse = trpc.useMutation(["loans.disburse"], {
+  const disburse = trpc.loans.disburse.useMutation({
     onSuccess: async () => {
-      await utils.invalidateQueries(["loans.loan", { id: id }]);
       updateNotification({
         id: "submit-status",
         color: "teal",
@@ -134,30 +117,30 @@ const Disburse = () => {
   const handleSubmit = useCallback(() => {
     try {
       try {
-      if (
-        form.values.creditOfficerName &&
-        form.values.creditOfficerId &&
-        user &&
-        disbursedOn
-      ) {
-        disburse.mutate({
-          id: id,
-          disbursedOn: disbursedOn,
-          disbursed: true,
-          disburserId: `${user?.id}`,
-          updaterId: `${user?.id}`,
-          creditOfficerId: form.values.creditOfficerId,
-        });
-      }
+        if (
+          form.values.creditOfficerName &&
+          form.values.creditOfficerId &&
+          user &&
+          disbursedOn
+        ) {
+          disburse.mutate({
+            id: id,
+            disbursedOn: disbursedOn,
+            disbursed: true,
+            disburserId: `${user?.id}`,
+            updaterId: `${user?.id}`,
+            creditOfficerId: form.values.creditOfficerId,
+          });
+        }
       } catch (error) {
-      return updateNotification({
-        id: "submit-status",
-        color: "red",
-        title: `Missing Fields`,
-        message: `Please Fill All The Missing Fields Then Try Again.`,
-        icon: <IconX size={16} />,
-        autoClose: 8000,
-      });
+        return updateNotification({
+          id: "submit-status",
+          color: "red",
+          title: `Missing Fields`,
+          message: `Please Fill All The Missing Fields Then Try Again.`,
+          icon: <IconX size={16} />,
+          autoClose: 8000,
+        });
       }
     } catch (error) {
       return updateNotification({
@@ -175,235 +158,235 @@ const Disburse = () => {
     <>
       {loan && (
         <>
-            <Card key={loan?.id} shadow="sm" p="lg" radius="md" m="xl" withBorder>
-              <Card.Section withBorder inheritPadding py="xs">
-                <Group position="apart">
-                  <TitleText title={`${loan.memberName}`} />
-                  <Menu withinPortal position="bottom-end" shadow="sm">
-                    <Menu.Target>
-                      <ActionIcon>
-                        <IconDots size={16} />
-                      </ActionIcon>
-                    </Menu.Target>
+          <Card key={loan?.id} shadow="sm" p="lg" radius="md" m="xl" withBorder>
+            <Card.Section withBorder inheritPadding py="xs">
+              <Group position="apart">
+                <TitleText title={`${loan.memberName}`} />
+                <Menu withinPortal position="bottom-end" shadow="sm">
+                  <Menu.Target>
+                    <ActionIcon>
+                      <IconDots size={16} />
+                    </ActionIcon>
+                  </Menu.Target>
 
-                    <Menu.Dropdown>
-                      <Menu.Item icon={<IconFileZip size={14} />}>
-                        Download zip
-                      </Menu.Item>
-                      <Menu.Item icon={<IconEye size={14} />}>
-                        Preview all
-                      </Menu.Item>
-                      <Menu.Item icon={<IconTrash size={14} />} color="red">
-                        Delete all
-                      </Menu.Item>
-                    </Menu.Dropdown>
-                  </Menu>
-                </Group>
-              </Card.Section>
-              <Card.Section withBorder inheritPadding py="xs">
+                  <Menu.Dropdown>
+                    <Menu.Item icon={<IconFileZip size={14} />}>
+                      Download zip
+                    </Menu.Item>
+                    <Menu.Item icon={<IconEye size={14} />}>
+                      Preview all
+                    </Menu.Item>
+                    <Menu.Item icon={<IconTrash size={14} />} color="red">
+                      Delete all
+                    </Menu.Item>
+                  </Menu.Dropdown>
+                </Menu>
+              </Group>
+            </Card.Section>
+            <Card.Section withBorder inheritPadding py="xs">
+              <Grid grow>
+                <Grid.Col mt="xs" span={4}>
+                  <Text weight={500}>Loan Product</Text>
+                </Grid.Col>
+                <Grid.Col mt="xs" span={4}>
+                  <Text>{loan.productName}</Text>
+                </Grid.Col>
+              </Grid>
+              <Grid grow>
+                <Grid.Col mt="xs" span={4}>
+                  <Text weight={500}>Skipped Sundays</Text>
+                </Grid.Col>
+                <Grid.Col mt="xs" span={4}>
+                  <Text>
+                    {loan.sundays} {loan.sundays === "1" ? "Sunday" : "Sundays"}
+                  </Text>
+                </Grid.Col>
+              </Grid>
+              {loan.payoff !== "0" && (
                 <Grid grow>
                   <Grid.Col mt="xs" span={4}>
-                    <Text weight={500}>Loan Product</Text>
-                  </Grid.Col>
-                  <Grid.Col mt="xs" span={4}>
-                    <Text>{loan.productName}</Text>
-                  </Grid.Col>
-                </Grid>
-                <Grid grow>
-                  <Grid.Col mt="xs" span={4}>
-                    <Text weight={500}>Skipped Sundays</Text>
+                    <Text weight={500}>Payoff Amount</Text>
                   </Grid.Col>
                   <Grid.Col mt="xs" span={4}>
                     <Text>
-                      {loan.sundays} {loan.sundays === "1" ? "Sunday" : "Sundays"}
-                    </Text>
-                  </Grid.Col>
-                </Grid>
-                {loan.payoff !== "0" && (
-                  <Grid grow>
-                    <Grid.Col mt="xs" span={4}>
-                      <Text weight={500}>Payoff Amount</Text>
-                    </Grid.Col>
-                    <Grid.Col mt="xs" span={4}>
-                      <Text>
-                        {`KSHs. ${loan.payoff}.00`.replace(
-                          /\B(?=(\d{3})+(?!\d))/g,
-                          ","
-                        )}
-                      </Text>
-                    </Grid.Col>
-                  </Grid>
-                )}
-                <Grid grow>
-                  <Grid.Col mt="xs" span={4}>
-                    <Text weight={500}>Loan Tenure</Text>
-                  </Grid.Col>
-                  <Grid.Col mt="xs" span={4}>
-                    <Text>
-                      {loan.tenure}{" "}
-                      {loan.cycle.toLowerCase() === "daily"
-                        ? "Days"
-                        : loan.cycle.toLowerCase() === "weeks"
-                        ? "Weeks"
-                        : "Months"}
-                    </Text>
-                  </Grid.Col>
-                </Grid>
-                <Grid grow>
-                  <Grid.Col mt="xs" span={4}>
-                    <Text weight={500}>Principal Amount</Text>
-                  </Grid.Col>
-                  <Grid.Col mt="xs" span={4}>
-                    <Text>
-                      {`KSHs. ${loan.principal}.00`.replace(
+                      {`KSHs. ${loan.payoff}.00`.replace(
                         /\B(?=(\d{3})+(?!\d))/g,
                         ","
                       )}
                     </Text>
                   </Grid.Col>
                 </Grid>
+              )}
+              <Grid grow>
+                <Grid.Col mt="xs" span={4}>
+                  <Text weight={500}>Loan Tenure</Text>
+                </Grid.Col>
+                <Grid.Col mt="xs" span={4}>
+                  <Text>
+                    {loan.tenure}{" "}
+                    {loan.cycle.toLowerCase() === "daily"
+                      ? "Days"
+                      : loan.cycle.toLowerCase() === "weeks"
+                      ? "Weeks"
+                      : "Months"}
+                  </Text>
+                </Grid.Col>
+              </Grid>
+              <Grid grow>
+                <Grid.Col mt="xs" span={4}>
+                  <Text weight={500}>Principal Amount</Text>
+                </Grid.Col>
+                <Grid.Col mt="xs" span={4}>
+                  <Text>
+                    {`KSHs. ${loan.principal}.00`.replace(
+                      /\B(?=(\d{3})+(?!\d))/g,
+                      ","
+                    )}
+                  </Text>
+                </Grid.Col>
+              </Grid>
+              <Grid grow>
+                <Grid.Col mt="xs" span={4}>
+                  <Text weight={500}>Installment Amount</Text>
+                </Grid.Col>
+                <Grid.Col mt="xs" span={4}>
+                  <Text>
+                    {`KSHs. ${loan.installment}.00`.replace(
+                      /\B(?=(\d{3})+(?!\d))/g,
+                      ","
+                    )}
+                  </Text>
+                </Grid.Col>
+              </Grid>
+              <Grid grow>
+                <Grid.Col mt="xs" span={4}>
+                  <Text weight={500}>Interest Amount</Text>
+                </Grid.Col>
+                <Grid.Col mt="xs" span={4}>
+                  <Text>
+                    {`KSHs. ${loan.interest}.00`.replace(
+                      /\B(?=(\d{3})+(?!\d))/g,
+                      ","
+                    )}
+                  </Text>
+                </Grid.Col>
+              </Grid>
+              <Grid grow>
+                <Grid.Col mt="xs" span={4}>
+                  <Text weight={500}>Penalty Amount</Text>
+                </Grid.Col>
+                <Grid.Col mt="xs" span={4}>
+                  <Text>
+                    {`KSHs. ${loan.penalty}.00`.replace(
+                      /\B(?=(\d{3})+(?!\d))/g,
+                      ","
+                    )}
+                  </Text>
+                </Grid.Col>
+              </Grid>
+              <Grid grow>
+                <Grid.Col mt="xs" span={4}>
+                  <Text weight={500}>Processing Fee</Text>
+                </Grid.Col>
+                <Grid.Col mt="xs" span={4}>
+                  <Text>
+                    {`KSHs. ${loan.processingFee}.00`.replace(
+                      /\B(?=(\d{3})+(?!\d))/g,
+                      ","
+                    )}
+                  </Text>
+                </Grid.Col>
+              </Grid>
+              {loan.grace === "1" && (
                 <Grid grow>
                   <Grid.Col mt="xs" span={4}>
-                    <Text weight={500}>Installment Amount</Text>
+                    <Text weight={500}>Grace Period</Text>
                   </Grid.Col>
                   <Grid.Col mt="xs" span={4}>
-                    <Text>
-                      {`KSHs. ${loan.installment}.00`.replace(
-                        /\B(?=(\d{3})+(?!\d))/g,
-                        ","
-                      )}
-                    </Text>
+                    <Text>{loan.grace} Day</Text>
                   </Grid.Col>
                 </Grid>
-                <Grid grow>
-                  <Grid.Col mt="xs" span={4}>
-                    <Text weight={500}>Interest Amount</Text>
-                  </Grid.Col>
-                  <Grid.Col mt="xs" span={4}>
-                    <Text>
-                      {`KSHs. ${loan.interest}.00`.replace(
-                        /\B(?=(\d{3})+(?!\d))/g,
-                        ","
-                      )}
-                    </Text>
-                  </Grid.Col>
-                </Grid>
-                <Grid grow>
-                  <Grid.Col mt="xs" span={4}>
-                    <Text weight={500}>Penalty Amount</Text>
-                  </Grid.Col>
-                  <Grid.Col mt="xs" span={4}>
-                    <Text>
-                      {`KSHs. ${loan.penalty}.00`.replace(
-                        /\B(?=(\d{3})+(?!\d))/g,
-                        ","
-                      )}
-                    </Text>
-                  </Grid.Col>
-                </Grid>
-                <Grid grow>
-                  <Grid.Col mt="xs" span={4}>
-                    <Text weight={500}>Processing Fee</Text>
-                  </Grid.Col>
-                  <Grid.Col mt="xs" span={4}>
-                    <Text>
-                      {`KSHs. ${loan.processingFee}.00`.replace(
-                        /\B(?=(\d{3})+(?!\d))/g,
-                        ","
-                      )}
-                    </Text>
-                  </Grid.Col>
-                </Grid>
-                {loan.grace === "1" && (
-                  <Grid grow>
-                    <Grid.Col mt="xs" span={4}>
-                      <Text weight={500}>Grace Period</Text>
-                    </Grid.Col>
-                    <Grid.Col mt="xs" span={4}>
-                      <Text>{loan.grace} Day</Text>
-                    </Grid.Col>
-                  </Grid>
-                )}
-                <Divider variant="dotted" m="md" />
-                  <Grid grow>
-                    <Grid.Col mt="xs" span={4}>
-                      <Text weight={500}>Registrar</Text>
-                    </Grid.Col>
-                    <Grid.Col mt="xs" span={4}>
-                      <Text>{registrar?.username}</Text>
-                    </Grid.Col>
-                  </Grid>
-                  <Grid grow>
-                    <Grid.Col mt="xs" span={4}>
-                      <Text weight={500}>Maintainer</Text>
-                    </Grid.Col>
-                    <Grid.Col mt="xs" span={4}>
-                      <Text>{maintainer?.username}</Text>
-                    </Grid.Col>
-                  </Grid>
-                  <Grid grow>
-                    <Grid.Col mt="xs" span={4}>
-                      <Text weight={500}>Approver</Text>
-                    </Grid.Col>
-                    <Grid.Col mt="xs" span={4}>
-                      <Text>{approver?.username}</Text>
-                    </Grid.Col>
-                  </Grid>
-                <Divider variant="dotted" my="xl" />
-                <Grid grow>
-                  <Grid.Col mt="xs" span={4}>
-                    <Text weight={500}>First Installment Date</Text>
-                  </Grid.Col>
-                  <Grid.Col mt="xs" span={4} offset={4}>
-                    <Text>{loan.startDate}</Text>
-                  </Grid.Col>
-                </Grid>
-                <Grid grow>
-                  <Grid.Col mt="xs" span={4}>
-                    <Text weight={500}>Disbursement Date</Text>
-                  </Grid.Col>
-                  <Grid.Col mt="xs" span={4} offset={4}>
-                    <Text>{disbursedOn}</Text>
-                  </Grid.Col>
-                </Grid>
-                <Divider variant="dotted" my="xl" />
-                <Grid grow>
-                  <Grid.Col mt="xs" span={4}>
-                    <Text weight={500}>Credit Officer</Text>
-                  </Grid.Col>
-                  <Grid.Col mt="xs" span={4}>
-                    <Select
-                      placeholder="Select Officer ..."
-                      data={user_data?.map((p) => p[0].label)}
-                      {...form.getInputProps("creditOfficerName")}
-                      disabled={!users}
-                      required
-                    />
-                  </Grid.Col>
-                </Grid>
-                <Group mt="xl" position="center">
-                  <Button
-                    variant="gradient"
-                    color="blue"
-                    mt="md"
-                    radius="md"
-                    onClick={() => {
-                      showNotification({
-                        id: "submit-status",
-                        color: "teal",
-                        title: `${loan.memberName}`,
-                        message: `Disbursing Loan For ${loan.memberName} ...`,
-                        loading: true,
-                        autoClose: 50000,
-                      });
-                      handleSubmit();
-                    }}
-                  >
-                    Disburse Loan
-                  </Button>
-                </Group>
-              </Card.Section>
-            </Card>
+              )}
+              <Divider variant="dotted" m="md" />
+              <Grid grow>
+                <Grid.Col mt="xs" span={4}>
+                  <Text weight={500}>Registrar</Text>
+                </Grid.Col>
+                <Grid.Col mt="xs" span={4}>
+                  <Text>{registrar?.username}</Text>
+                </Grid.Col>
+              </Grid>
+              <Grid grow>
+                <Grid.Col mt="xs" span={4}>
+                  <Text weight={500}>Maintainer</Text>
+                </Grid.Col>
+                <Grid.Col mt="xs" span={4}>
+                  <Text>{maintainer?.username}</Text>
+                </Grid.Col>
+              </Grid>
+              <Grid grow>
+                <Grid.Col mt="xs" span={4}>
+                  <Text weight={500}>Approver</Text>
+                </Grid.Col>
+                <Grid.Col mt="xs" span={4}>
+                  <Text>{approver?.username}</Text>
+                </Grid.Col>
+              </Grid>
+              <Divider variant="dotted" my="xl" />
+              <Grid grow>
+                <Grid.Col mt="xs" span={4}>
+                  <Text weight={500}>First Installment Date</Text>
+                </Grid.Col>
+                <Grid.Col mt="xs" span={4} offset={4}>
+                  <Text>{loan.startDate}</Text>
+                </Grid.Col>
+              </Grid>
+              <Grid grow>
+                <Grid.Col mt="xs" span={4}>
+                  <Text weight={500}>Disbursement Date</Text>
+                </Grid.Col>
+                <Grid.Col mt="xs" span={4} offset={4}>
+                  <Text>{disbursedOn}</Text>
+                </Grid.Col>
+              </Grid>
+              <Divider variant="dotted" my="xl" />
+              <Grid grow>
+                <Grid.Col mt="xs" span={4}>
+                  <Text weight={500}>Credit Officer</Text>
+                </Grid.Col>
+                <Grid.Col mt="xs" span={4}>
+                  <Select
+                    placeholder="Select Officer ..."
+                    data={user_data?.map((p) => p[0].label)}
+                    {...form.getInputProps("creditOfficerName")}
+                    disabled={!users}
+                    required
+                  />
+                </Grid.Col>
+              </Grid>
+              <Group mt="xl" position="center">
+                <Button
+                  variant="gradient"
+                  color="blue"
+                  mt="md"
+                  radius="md"
+                  onClick={() => {
+                    showNotification({
+                      id: "submit-status",
+                      color: "teal",
+                      title: `${loan.memberName}`,
+                      message: `Disbursing Loan For ${loan.memberName} ...`,
+                      loading: true,
+                      autoClose: 50000,
+                    });
+                    handleSubmit();
+                  }}
+                >
+                  Disburse Loan
+                </Button>
+              </Group>
+            </Card.Section>
+          </Card>
         </>
       )}
       {!loan && (

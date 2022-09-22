@@ -42,7 +42,7 @@ const CreateProduct = () => {
     data: products,
     refetch,
     status: products_status,
-  } = trpc.useQuery(["products.products"]);
+  } = trpc.products.products.useQuery();
 
   const lencode = products ? products?.length + 1 : 0;
 
@@ -75,7 +75,7 @@ const CreateProduct = () => {
     },
   });
 
-  const product = trpc.useMutation(["products.create-product"], {
+  const product = trpc.products.create_product.useMutation({
     onSuccess: () => {
       clear();
       refetch();

@@ -1,17 +1,16 @@
-import { PrismaClient } from "@prisma/client";
 import { TRPCError } from "@trpc/server";
-import { z } from "zod";
 import axios from "axios";
-import { createRouter } from "../create-router";
+import { t } from "../trpc";
+import { PrismaClient } from '@prisma/client';
+const prisma = new PrismaClient()
+
 import { Fields, Logs } from "../../types";
 
 const LOGTAIL_API_TOKEN = process.env.NEXT_PUBLIC_LOGTAIL_API_TOKEN;
 
-const prisma = new PrismaClient();
-
-export const logsRouter = createRouter()
-  .query("logs", {
-    resolve: async () => {
+export const logsRouter = t.router({
+  logs: t.procedure
+  .query(async () => {
       try {
         const date = new Date();
         const n_date = new Date();
@@ -226,6 +225,5 @@ export const logsRouter = createRouter()
       } catch (error) {
         console.log("logs.logs");
       }
-    },
-  });
-
+  }),
+});

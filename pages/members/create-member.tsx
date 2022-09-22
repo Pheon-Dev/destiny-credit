@@ -6,9 +6,7 @@ import { trpc } from "../../utils/trpc";
 
 const Page: NextPage = () => {
   try {
-    const { data: transactions, status } = trpc.useQuery([
-      "transactions.transactions",
-    ]);
+    const { data: transactions, status } = trpc.transactions.transactions.useQuery();
 
     return (
       <Protected>
