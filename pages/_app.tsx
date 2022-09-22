@@ -173,10 +173,10 @@ export default withTRPC<AppRouter>({
   config() {
     return {
       links: [
-       loggerLink({
-           enabled: (opts) => process.env.NODE_ENV === "development" ||
-           (opts.direction === "down" && opts.result instanceof Error),
-         }),
+       /* loggerLink({ */
+       /*     enabled: (opts) => process.env.NODE_ENV === "development" || */
+       /*     (opts.direction === "down" && opts.result instanceof Error), */
+       /*   }), */
        httpBatchLink({
            url: `${getBaseUrl()}/api/trpc`
          }),
@@ -184,18 +184,18 @@ export default withTRPC<AppRouter>({
       transformer: superjson,
     };
   },
-  ssr: false,
-  /* responseMeta({ clientErrors, ctx }) { */
-  /*   if (clientErrors.length) { */
-  /*     return { */
-  /*       status: clientErrors[0].data?.httpStatus ?? 500, */
-  /*     }; */
-  /*   } */
-  /**/
-  /*   const ONE_DAY_IN_SECONDS = 60 * 60 * 24; */
-  /**/
-  /*   return { */
-  /*     "Cache-Control": `s-maxage=1, stale-while-revalidate=${ONE_DAY_IN_SECONDS}`, */
-  /*   }; */
-  /* }, */
+  ssr: true,
+  responseMeta({ clientErrors, ctx }) {
+    if (clientErrors.length) {
+      return {
+        status: clientErrors[0].data?.httpStatus ?? 500,
+      };
+    }
+
+    const ONE_DAY_IN_SECONDS = 60 * 60 * 24;
+
+    return {
+      "Cache-Control": `s-maxage=1, stale-while-revalidate=${ONE_DAY_IN_SECONDS}`,
+    };
+  },
 })(App);
