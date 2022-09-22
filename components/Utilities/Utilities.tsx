@@ -54,7 +54,7 @@ export const Utilities = () => {
       email: `${data?.user?.email}`,
     },
   ]);
-  const logs = trpc.useQuery(["transactions.logs"]);
+  const logs = trpc.useQuery(["transactions.transactions"]);
   const forceReload = async () => {
     try {
       if (logs)

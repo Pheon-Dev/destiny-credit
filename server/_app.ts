@@ -6,6 +6,7 @@ import {
   productsRouter,
   loansRouter,
   usersRouter,
+  logsRouter,
 } from "./routers";
 
 export const appRouter = createRouter()
@@ -15,5 +16,6 @@ export const appRouter = createRouter()
   .merge("users.", usersRouter)
   .merge("members.", membersRouter)
   .merge("products.", productsRouter)
+  .merge("logs.", logsRouter)
 
 export type AppRouter = typeof appRouter;
