@@ -1,4 +1,4 @@
-import React, { useCallback } from "react";
+import React, { useCallback, useState } from "react";
 import { NextPage } from "next";
 import { Protected } from "../../../components";
 import {
@@ -10,6 +10,7 @@ import {
   Menu,
   ActionIcon,
   LoadingOverlay,
+  Divider,
 } from "@mantine/core";
 import { useRouter } from "next/router";
 import { showNotification, updateNotification } from "@mantine/notifications";
@@ -26,6 +27,7 @@ import type { Loan } from "@prisma/client";
 import { useSession } from "next-auth/react";
 
 const Approve = () => {
+  const [maintainerId, setMaintainerId] = useState("");
   const router = useRouter();
   const id = router.query.id as string;
   const utils = trpc.useContext();
@@ -43,6 +45,23 @@ const Approve = () => {
     "loans.loan",
     { id: id },
   ]);
+  const { data: member } = trpc.useQuery([
+    "members.member",
+    { id: `${loan?.memberId}` },
+  ]);
+  const { data: registrar } = trpc.useQuery([
+    "users.user-id",
+    {
+      id: `${member?.registrarId}`,
+    },
+  ]);
+  const { data: maintainer } = trpc.useQuery([
+    "users.user-id",
+    {
+      id: `${loan?.maintainerId}`,
+    },
+  ]);
+
   const approve = trpc.useMutation(["loans.approve"], {
     onSuccess: async () => {
       await utils.invalidateQueries(["loans.loan", { id: id }]);
@@ -81,11 +100,10 @@ const Approve = () => {
     <>
       {loan && (
         <>
-          {loan.map((_: Loan) => (
-            <Card key={_.id} shadow="sm" p="lg" radius="md" m="xl" withBorder>
+            <Card key={loan.id} shadow="sm" p="lg" radius="md" m="xl" withBorder>
               <Card.Section withBorder inheritPadding py="xs">
                 <Group position="apart">
-                  <Text weight={700}>{_.memberName}</Text>
+                  <Text weight={700}>{loan.memberName}</Text>
                   <Menu withinPortal position="bottom-end" shadow="sm">
                     <Menu.Target>
                       <ActionIcon>
@@ -113,7 +131,7 @@ const Approve = () => {
                     <Text weight={500}>Loan Product</Text>
                   </Grid.Col>
                   <Grid.Col mt="xs" span={4}>
-                    <Text>{_.productName}</Text>
+                    <Text>{loan.productName}</Text>
                   </Grid.Col>
                 </Grid>
                 <Grid grow>
@@ -122,18 +140,18 @@ const Approve = () => {
                   </Grid.Col>
                   <Grid.Col mt="xs" span={4}>
                     <Text>
-                      {_.sundays} {_.sundays === "1" ? "Sunday" : "Sundays"}
+                      {loan.sundays} {loan.sundays === "1" ? "Sunday" : "Sundays"}
                     </Text>
                   </Grid.Col>
                 </Grid>
-                {_.payoff !== "0" && (
+                {loan.payoff !== "0" && (
                   <Grid grow>
                     <Grid.Col mt="xs" span={4}>
                       <Text weight={500}>Payoff Amount</Text>
                     </Grid.Col>
                     <Grid.Col mt="xs" span={4}>
                       <Text>
-                        {`KSHs. ${_.payoff}.00`.replace(
+                        {`KSHs. ${loan.payoff}.00`.replace(
                           /\B(?=(\d{3})+(?!\d))/g,
                           ","
                         )}
@@ -147,10 +165,10 @@ const Approve = () => {
                   </Grid.Col>
                   <Grid.Col mt="xs" span={4}>
                     <Text>
-                      {_.tenure}{" "}
-                      {_.cycle.toLowerCase() === "daily"
+                      {loan.tenure}{" "}
+                      {loan.cycle.toLowerCase() === "daily"
                         ? "Days"
-                        : _.cycle.toLowerCase() === "weeks"
+                        : loan.cycle.toLowerCase() === "weeks"
                         ? "Weeks"
                         : "Months"}
                     </Text>
@@ -162,7 +180,7 @@ const Approve = () => {
                   </Grid.Col>
                   <Grid.Col mt="xs" span={4}>
                     <Text>
-                      {`KSHs. ${_.principal}.00`.replace(
+                      {`KSHs. ${loan.principal}.00`.replace(
                         /\B(?=(\d{3})+(?!\d))/g,
                         ","
                       )}
@@ -175,7 +193,7 @@ const Approve = () => {
                   </Grid.Col>
                   <Grid.Col mt="xs" span={4}>
                     <Text>
-                      {`KSHs. ${_.installment}.00`.replace(
+                      {`KSHs. ${loan.installment}.00`.replace(
                         /\B(?=(\d{3})+(?!\d))/g,
                         ","
                       )}
@@ -188,7 +206,7 @@ const Approve = () => {
                   </Grid.Col>
                   <Grid.Col mt="xs" span={4}>
                     <Text>
-                      {`KSHs. ${_.interest}.00`.replace(
+                      {`KSHs. ${loan.interest}.00`.replace(
                         /\B(?=(\d{3})+(?!\d))/g,
                         ","
                       )}
@@ -201,7 +219,7 @@ const Approve = () => {
                   </Grid.Col>
                   <Grid.Col mt="xs" span={4}>
                     <Text>
-                      {`KSHs. ${_.penalty}.00`.replace(
+                      {`KSHs. ${loan.penalty}.00`.replace(
                         /\B(?=(\d{3})+(?!\d))/g,
                         ","
                       )}
@@ -214,23 +232,40 @@ const Approve = () => {
                   </Grid.Col>
                   <Grid.Col mt="xs" span={4}>
                     <Text>
-                      {`KSHs. ${_.processingFee}.00`.replace(
+                      {`KSHs. ${loan.processingFee}.00`.replace(
                         /\B(?=(\d{3})+(?!\d))/g,
                         ","
                       )}
                     </Text>
                   </Grid.Col>
                 </Grid>
-                {_.grace === "1" && (
+                {loan.grace === "1" && (
                   <Grid grow>
                     <Grid.Col mt="xs" span={4}>
                       <Text weight={500}>Grace Period</Text>
                     </Grid.Col>
                     <Grid.Col mt="xs" span={4}>
-                      <Text>{_.grace} Day</Text>
+                      <Text>{loan.grace} Day</Text>
                     </Grid.Col>
                   </Grid>
                 )}
+                <Divider variant="dotted" m="md" />
+                  <Grid grow>
+                    <Grid.Col mt="xs" span={4}>
+                      <Text weight={500}>Registrar</Text>
+                    </Grid.Col>
+                    <Grid.Col mt="xs" span={4}>
+                      <Text>{registrar?.username}</Text>
+                    </Grid.Col>
+                  </Grid>
+                  <Grid grow>
+                    <Grid.Col mt="xs" span={4}>
+                      <Text weight={500}>Maintainer</Text>
+                    </Grid.Col>
+                    <Grid.Col mt="xs" span={4}>
+                      <Text>{maintainer?.username}</Text>
+                    </Grid.Col>
+                  </Grid>
                 <Group mt="xl" position="center">
                   <Button
                     variant="gradient"
@@ -241,8 +276,8 @@ const Approve = () => {
                       showNotification({
                         id: "submit-status",
                         color: "teal",
-                        title: `${_.memberName}`,
-                        message: `Approving Loan For ${_.memberName} ...`,
+                        title: `${loan.memberName}`,
+                        message: `Approving Loan For ${loan.memberName} ...`,
                         loading: true,
                         autoClose: 50000,
                       });
@@ -254,7 +289,6 @@ const Approve = () => {
                 </Group>
               </Card.Section>
             </Card>
-          ))}
         </>
       )}
       {!loan && (

@@ -30,15 +30,10 @@ export const TransactionsTable = ({
       <th>Type</th>
     </tr>
   );
-  const today = new Date();
-  const date = today.toLocaleDateString();
-  /* const date = value?.toLocaleDateString(); */
-
-  /* console.log(value[0]?.toLocaleDateString()) */
   const [value, setValue] = useState(new Date());
 
   const new_date = value?.toLocaleDateString();
-  console.log(new_date);
+
   const time_str =
     new_date.split("/")[2] + new_date.split("/")[1] + new_date.split("/")[0];
 

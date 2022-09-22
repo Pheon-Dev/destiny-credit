@@ -98,7 +98,7 @@ export const loansRouter = createRouter()
       id: z.string(),
     }),
     resolve: async ({ input }) => {
-      const loan = await prisma.loan.findMany({
+      const loan = await prisma.loan.findFirst({
         where: {
           id: input.id,
         },

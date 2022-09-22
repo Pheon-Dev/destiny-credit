@@ -47,6 +47,27 @@ export const usersRouter = createRouter()
       return user;
     },
   })
+  .query("user-id", {
+    input: z.object({
+      id: z.string()
+    }),
+    resolve: async ({ input }) => {
+      const user = await prisma.user.findFirst({
+        where: {
+          id: input.id,
+        },
+        select: defaultUserSelect,
+      });
+
+      if (!user) {
+        throw new TRPCError({
+          code: "NOT_FOUND",
+          message: `users.user-id not found`,
+        });
+      }
+      return user;
+    },
+  })
   .query("user", {
     input: z.object({
       email: z.string().email(),
