@@ -1,6 +1,6 @@
 import React, { useEffect, useState } from "react";
 import { TitleText } from "../../components";
-import { Table, Group } from "@mantine/core";
+import { Table, Group, Switch } from "@mantine/core";
 import type { Transaction } from "@prisma/client";
 import { useRouter } from "next/router";
 import {
@@ -17,7 +17,8 @@ export const TransactionsTable = ({
   transactions: Transaction[];
   call: string;
 }) => {
-  const [time_str, setTimeStr] = useState("");
+  const [time, setTime] = useState("");
+  const [locale, setLocale] = useState(false);
   /* const [value, setValue] = useState<DateRangePickerValue>([ */
   /* new Date(), */
   /* new Date(), */
@@ -38,7 +39,7 @@ export const TransactionsTable = ({
   useEffect(() => {
     let subscribe = true;
     if (subscribe) {
-      let yy = +new_date?.split("/")[2];
+      let yy = new_date?.split("/")[2];
       let mm =
         +new_date?.split("/")[1] < 10
           ? `0${+new_date?.split("/")[1]}`
@@ -48,13 +49,23 @@ export const TransactionsTable = ({
           ? `0${+new_date?.split("/")[0]}`
           : `${new_date?.split("/")[0]}`;
 
-      if (process.env.NODE_ENV === "development") setTimeStr(`${yy}${mm}${dd}`);
-      if (process.env.NODE_ENV === "production") setTimeStr(`${yy}${dd}${mm}`);
+      if (+yy > 31) {
+        if (locale) setTime(`${yy}${mm}${dd}`);
+        if (!locale) setTime(`${yy}${dd}${mm}`);
+      }
+      if (+mm > 31) {
+        if (locale) setTime(`${mm}${yy}${dd}`);
+        if (!locale) setTime(`${mm}${dd}${yy}`);
+      }
+      if (+dd > 31) {
+        if (locale) setTime(`${dd}${mm}${yy}`);
+        if (!locale) setTime(`${dd}${yy}${mm}`);
+      }
     }
     return () => {
       subscribe = false;
     };
-  }, [new_date, time_str, value]);
+  }, [new_date, time, value, locale]);
 
   return (
     <>
@@ -62,6 +73,13 @@ export const TransactionsTable = ({
         {call === "transactions" && <TitleText title="Recent Transactions" />}
         {call === "register" && <TitleText title="Registration List" />}
         {call === "maintain" && <TitleText title="Maintain a New Loan" />}
+        <Switch
+          label={`${locale ? "YYYY/MM/DD" : "YYYY/DD/MM"}`}
+          checked={locale}
+          onChange={(e) => setLocale(e.currentTarget.checked)}
+          onLabel="YDM"
+          offLabel="YMD"
+        />
         <DatePicker
           value={value}
           firstDayOfWeek="sunday"
@@ -81,7 +99,7 @@ export const TransactionsTable = ({
               key={index}
               transaction={transaction}
               call={call}
-              time_str={time_str}
+              time={time}
             />
           ))}
         </tbody>
@@ -96,17 +114,17 @@ export const TransactionsTable = ({
 const TransactionRow = ({
   transaction,
   call,
-  time_str,
+  time,
 }: {
   transaction: Transaction;
   call: string;
-  time_str: string;
+  time: string;
 }) => {
   const router = useRouter();
 
   return (
     <>
-      {call === "transactions" && transaction.transTime.startsWith(time_str) && (
+      {call === "transactions" && transaction.transTime.startsWith(time) && (
         <tr
           style={{
             cursor: transaction.billRefNumber !== "" ? "pointer" : "text",
@@ -137,7 +155,7 @@ const TransactionRow = ({
         </tr>
       )}
       {call === "register" &&
-        transaction.transTime.startsWith(time_str) &&
+        transaction.transTime.startsWith(time) &&
         transaction.billRefNumber.startsWith("M") && (
           <tr
             style={{
@@ -170,7 +188,7 @@ const TransactionRow = ({
           </tr>
         )}
       {call === "maintain" &&
-        transaction.transTime.startsWith(time_str) &&
+        transaction.transTime.startsWith(time) &&
         transaction.billRefNumber.startsWith("P") && (
           <tr
             style={{
