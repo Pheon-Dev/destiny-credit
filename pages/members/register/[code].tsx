@@ -17,6 +17,7 @@ import { Protected, TitleText } from "../../../components";
 import { useRouter } from "next/router";
 import { showNotification, updateNotification } from "@mantine/notifications";
 import { trpc } from "../../../utils/trpc";
+import dayjs from "dayjs";
 
 const schema = z.object({
   date: z.date({ required_error: "Select Todays' Date" }),
@@ -434,6 +435,7 @@ const CreateMember = () => {
               inputFormat="DD-MM-YYYY"
               dropdownType="modal"
               firstDayOfWeek="sunday"
+              maxDate={dayjs(new Date()).toDate()}
               // renderDay={(date) => {
               //   const today = new Date();
               //   const day = date.getDate();
@@ -515,6 +517,7 @@ const CreateMember = () => {
               inputFormat="DD-MM-YYYY"
               dropdownType="modal"
               firstDayOfWeek="sunday"
+              maxDate={dayjs(new Date()).toDate()}
               {...form.getInputProps("dob")}
               required
             />

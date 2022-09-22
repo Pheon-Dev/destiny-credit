@@ -1,8 +1,14 @@
-import React from "react";
+import React, { useState } from "react";
 import { TitleText } from "../../components";
 import { Table, Group } from "@mantine/core";
 import type { Transaction } from "@prisma/client";
 import { useRouter } from "next/router";
+import {
+  DatePicker,
+  DateRangePicker,
+  DateRangePickerValue,
+} from "@mantine/dates";
+import dayjs from "dayjs";
 
 export const TransactionsTable = ({
   transactions,
@@ -11,6 +17,10 @@ export const TransactionsTable = ({
   transactions: Transaction[];
   call: string;
 }) => {
+  /* const [value, setValue] = useState<DateRangePickerValue>([ */
+  /* new Date(), */
+  /* new Date(), */
+  /* ]) */
   const Header = () => (
     <tr>
       <th>ID</th>
@@ -20,13 +30,32 @@ export const TransactionsTable = ({
       <th>Type</th>
     </tr>
   );
+  const today = new Date();
+  const date = today.toLocaleDateString();
+  /* const date = value?.toLocaleDateString(); */
+
+  /* console.log(value[0]?.toLocaleDateString()) */
+  const [value, setValue] = useState(new Date());
+
+  const new_date = value?.toLocaleDateString();
+  console.log(new_date);
+  const time_str =
+    new_date.split("/")[2] + new_date.split("/")[1] + new_date.split("/")[0];
 
   return (
     <>
-      <Group position="center" m="lg">
-        {call === "transactions" && <TitleText title="Todays Transactions" />}
+      <Group position="apart" m="md" mt="lg">
+        {call === "transactions" && <TitleText title="Recent Transactions" />}
         {call === "register" && <TitleText title="Registration List" />}
         {call === "maintain" && <TitleText title="Maintain a New Loan" />}
+        <DatePicker
+          value={value}
+          firstDayOfWeek="sunday"
+          onChange={(e) => {
+            e && setValue(new Date(e));
+          }}
+          maxDate={dayjs(new Date()).toDate()}
+        />
       </Group>
       <Table striped highlightOnHover horizontalSpacing="md" mb="xl">
         <thead>
@@ -34,7 +63,12 @@ export const TransactionsTable = ({
         </thead>
         <tbody>
           {transactions?.map((transaction, index) => (
-            <TransactionRow key={index} transaction={transaction} call={call} />
+            <TransactionRow
+              key={index}
+              transaction={transaction}
+              call={call}
+              time_str={time_str}
+            />
           ))}
         </tbody>
         <tfoot>
@@ -48,15 +82,13 @@ export const TransactionsTable = ({
 const TransactionRow = ({
   transaction,
   call,
+  time_str,
 }: {
   transaction: Transaction;
   call: string;
+  time_str: string;
 }) => {
   const router = useRouter();
-  const today = new Date("2022-09-19");
-  const date = today.toLocaleDateString();
-
-  const time_str = date.split("/")[2] + date.split("/")[1] + date.split("/")[0];
 
   return (
     <>
