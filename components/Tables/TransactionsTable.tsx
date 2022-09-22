@@ -1,4 +1,4 @@
-import React, { useState } from "react";
+import React, { useEffect, useState } from "react";
 import { TitleText } from "../../components";
 import { Table, Group } from "@mantine/core";
 import type { Transaction } from "@prisma/client";
@@ -17,6 +17,7 @@ export const TransactionsTable = ({
   transactions: Transaction[];
   call: string;
 }) => {
+  const [time_str, setTimeStr] = useState("");
   /* const [value, setValue] = useState<DateRangePickerValue>([ */
   /* new Date(), */
   /* new Date(), */
@@ -34,9 +35,21 @@ export const TransactionsTable = ({
 
   const new_date = value?.toLocaleDateString();
 
-  const time_str =
-    new_date.split("/")[2] + new_date.split("/")[1] + new_date.split("/")[0];
-    console.log(time_str)
+useEffect(() => {
+    let subscribe = true;
+    if (subscribe) {
+      let yy = +new_date?.split("/")[2];
+      let mm = +new_date?.split("/")[1] < 10 ? `0${+new_date?.split("/")[1]}` : `${new_date?.split("/")[1]}`;
+      let dd = +new_date?.split("/")[0] < 10 ? `0${+new_date?.split("/")[0]}` : `${new_date?.split("/")[0]}`;
+      
+        /* setTimeStr(`${yy}${mm}${dd}`) */
+        setTimeStr(`${yy}${dd}${mm}`)
+        console.log(time_str)
+      }
+      return () => {
+          subscribe = false;
+        }
+  }, [new_date, time_str, value])
 
   return (
     <>
@@ -88,127 +101,102 @@ const TransactionRow = ({
 
   return (
     <>
-      {call === "transactions" && (
-        <>
-          {transaction?.transTime.startsWith(time_str) && (
-            <>
-              <tr
-                style={{
-                  cursor: transaction.billRefNumber !== "" ? "pointer" : "text",
-                }}
-                onClick={() => {
-                  transaction.billRefNumber !== ""
-                    ? router.push(`/members/register/${transaction.transID}`)
-                    : null;
-                }}
-              >
-                <td>{transaction.transID}</td>
-                <td>
-                  {transaction.firstName +
-                    " " +
-                    transaction.middleName +
-                    " " +
-                    transaction.lastName}
-                </td>
-                <td>
-                  {`${transaction.transAmount}`.replace(
-                    /\B(?=(\d{3})+(?!\d))/g,
-                    ","
-                  )}
-                </td>
-                <td>{transaction.msisdn}</td>
-                {transaction.billRefNumber === "" ? (
-                  <td>{transaction.transTime}</td>
-                ) : (
-                  <td>{transaction.billRefNumber}</td>
-                )}
-              </tr>
-            </>
+      {call === "transactions" && transaction.transTime.startsWith(time_str) && (
+        <tr
+          style={{
+            cursor: transaction.billRefNumber !== "" ? "pointer" : "text",
+          }}
+          onClick={() => {
+            transaction.billRefNumber !== ""
+              ? router.push(`/members/register/${transaction.transID}`)
+              : null;
+          }}
+        >
+          <td>{transaction.transID}</td>
+          <td>
+            {transaction.firstName +
+              " " +
+              transaction.middleName +
+              " " +
+              transaction.lastName}
+          </td>
+          <td>
+            {`${transaction.transAmount}`.replace(/\B(?=(\d{3})+(?!\d))/g, ",")}
+          </td>
+          <td>{transaction.msisdn}</td>
+          {transaction.billRefNumber === "" ? (
+            <td>{transaction.transTime}</td>
+          ) : (
+            <td>{transaction.billRefNumber}</td>
           )}
-        </>
+        </tr>
       )}
-      {call === "register" && (
-        <>
-          {transaction.transTime.startsWith(time_str) && (
-            <>
-              {transaction.billRefNumber.startsWith("M") && (
-                <>
-                  <tr
-                    style={{
-                      cursor: "pointer",
-                    }}
-                    onClick={() => {
-                      router.push(`/members/register/${transaction.transID}`);
-                    }}
-                  >
-                    <td>{transaction.transID}</td>
-                    <td>
-                      {transaction.firstName +
-                        " " +
-                        transaction.middleName +
-                        " " +
-                        transaction.lastName}
-                    </td>
-                    <td>
-                      {`${transaction.transAmount}`.replace(
-                        /\B(?=(\d{3})+(?!\d))/g,
-                        ","
-                      )}
-                    </td>
-                    <td>{transaction.msisdn}</td>
-                    {transaction.billRefNumber === "" ? (
-                      <td>{transaction.transTime}</td>
-                    ) : (
-                      <td>{transaction.billRefNumber}</td>
-                    )}
-                  </tr>
-                </>
+      {call === "register" &&
+        transaction.transTime.startsWith(time_str) &&
+        transaction.billRefNumber.startsWith("M") && (
+          <tr
+            style={{
+              cursor: "pointer",
+            }}
+            onClick={() => {
+              router.push(`/members/register/${transaction.transID}`);
+            }}
+          >
+            <td>{transaction.transID}</td>
+            <td>
+              {transaction.firstName +
+                " " +
+                transaction.middleName +
+                " " +
+                transaction.lastName}
+            </td>
+            <td>
+              {`${transaction.transAmount}`.replace(
+                /\B(?=(\d{3})+(?!\d))/g,
+                ","
               )}
-            </>
-          )}
-        </>
-      )}
-      {call === "maintain" && (
-        <>
-          {transaction.transTime.startsWith(time_str) && (
-            <>
-              {transaction.billRefNumber.startsWith("P") && (
-                <>
-                  <tr
-                    style={{
-                      cursor: "pointer",
-                    }}
-                    onClick={() => {
-                      router.push(`/loans/maintain/${transaction.transID}`);
-                    }}
-                  >
-                    <td>{transaction.transID}</td>
-                    <td>
-                      {transaction.firstName +
-                        " " +
-                        transaction.middleName +
-                        " " +
-                        transaction.lastName}
-                    </td>
-                    <td>
-                      {`${transaction.transAmount}`.replace(
-                        /\B(?=(\d{3})+(?!\d))/g,
-                        ","
-                      )}
-                    </td>
-                    <td>{transaction.msisdn}</td>
-                    {transaction.billRefNumber === "" ? (
-                      <td>{transaction.transTime}</td>
-                    ) : (
-                      <td>{transaction.billRefNumber}</td>
-                    )}
-                  </tr>
-                </>
+            </td>
+            <td>{transaction.msisdn}</td>
+            {transaction.billRefNumber === "" ? (
+              <td>{transaction.transTime}</td>
+            ) : (
+              <td>{transaction.billRefNumber}</td>
+            )}
+          </tr>
+        )}
+      {call === "maintain" &&
+        transaction.transTime.startsWith(time_str) &&
+        transaction.billRefNumber.startsWith("P") && (
+          <tr
+            style={{
+              cursor: "pointer",
+            }}
+            onClick={() => {
+              router.push(`/loans/maintain/${transaction.transID}`);
+            }}
+          >
+            <td>{transaction.transID}</td>
+            <td>
+              {transaction.firstName +
+                " " +
+                transaction.middleName +
+                " " +
+                transaction.lastName}
+            </td>
+            <td>
+              {`${transaction.transAmount}`.replace(
+                /\B(?=(\d{3})+(?!\d))/g,
+                ","
               )}
-            </>
-          )}
-        </>
-      )}
+            </td>
+            <td>{transaction.msisdn}</td>
+            {transaction.billRefNumber === "" ? (
+              <td>{transaction.transTime}</td>
+            ) : (
+              <td>{transaction.billRefNumber}</td>
+            )}
+          </tr>
+        )}
     </>
   );
 };
