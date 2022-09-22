@@ -35,21 +35,26 @@ export const TransactionsTable = ({
 
   const new_date = value?.toLocaleDateString();
 
-useEffect(() => {
+  useEffect(() => {
     let subscribe = true;
     if (subscribe) {
       let yy = +new_date?.split("/")[2];
-      let mm = +new_date?.split("/")[1] < 10 ? `0${+new_date?.split("/")[1]}` : `${new_date?.split("/")[1]}`;
-      let dd = +new_date?.split("/")[0] < 10 ? `0${+new_date?.split("/")[0]}` : `${new_date?.split("/")[0]}`;
-      
-        setTimeStr(`${yy}${mm}${dd}`)
-        /* setTimeStr(`${yy}${dd}${mm}`) */
-        /* console.log(time_str) */
-      }
-      return () => {
-          subscribe = false;
-        }
-  }, [new_date, time_str, value])
+      let mm =
+        +new_date?.split("/")[1] < 10
+          ? `0${+new_date?.split("/")[1]}`
+          : `${new_date?.split("/")[1]}`;
+      let dd =
+        +new_date?.split("/")[0] < 10
+          ? `0${+new_date?.split("/")[0]}`
+          : `${new_date?.split("/")[0]}`;
+
+      if (process.env.NODE_ENV === "development") setTimeStr(`${yy}${mm}${dd}`);
+      if (process.env.NODE_ENV === "production") setTimeStr(`${yy}${dd}${mm}`);
+    }
+    return () => {
+      subscribe = false;
+    };
+  }, [new_date, time_str, value]);
 
   return (
     <>
