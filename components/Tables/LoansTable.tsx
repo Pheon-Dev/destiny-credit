@@ -2,7 +2,7 @@ import React from "react";
 import type { Loan } from "@prisma/client";
 import { useRouter } from "next/router";
 import { IconEdit } from "@tabler/icons";
-import { Table, Badge, Group } from "@mantine/core";
+import { Table, Badge, Group, Tooltip } from "@mantine/core";
 import { TitleText } from "../Text/TitleText";
 
 export const LoansTable = ({
@@ -78,29 +78,63 @@ const LoansRow = ({
           </td>
           <td>
             {loan.approved ? (
+            <>
+            {role === "CO" &&
+              <Badge
+                style={{ cursor: "pointer" }}
+                variant="gradient"
+                gradient={{
+                  from: "indigo",
+                  to: "grey",
+                }}
+              >
+                Pending
+              </Badge>
+            }
+            {role !== "CO" &&
               <Badge
                 style={{ cursor: "pointer" }}
                 onClick={() => router.push(`/loans/disburse/${loan.id}`)}
-                variant="gradient"
-                gradient={{
-                  from: "teal",
-                  to: "lime",
-                }}
-              >
-                Disburse
-              </Badge>
-            ) : (
-              <Badge
-                style={{ cursor: "pointer" }}
-                onClick={() => router.push(`/loans/approve/${loan.id}`)}
                 variant="gradient"
                 gradient={{
                   from: "indigo",
                   to: "cyan",
                 }}
               >
+                Disburse
+              </Badge>
+            }
+              </>
+            ) : (
+            <>
+            {role === "CO" &&
+            <Tooltip label="Approval" color="gray" withArrow>
+              <Badge
+                style={{ cursor: "pointer" }}
+                variant="gradient"
+                gradient={{
+                  from: "grey",
+                  to: "indigo",
+                }}
+              >
+                Pending
+              </Badge>
+              </Tooltip>
+            }
+            {role !== "CO" &&
+              <Badge
+                style={{ cursor: "pointer" }}
+                onClick={() => router.push(`/loans/approve/${loan.id}`)}
+                variant="gradient"
+                gradient={{
+                  from: "indigo",
+                  to: "red",
+                }}
+              >
                 Approve
               </Badge>
+            }
+              </>
             )}
           </td>
           {role !== "CO" && (
@@ -141,6 +175,20 @@ const LoansRow = ({
                 Disbursed
               </Badge>
             ) : (
+            <>
+            {role === "CO" &&
+              <Badge
+                style={{ cursor: "pointer" }}
+                variant="gradient"
+                gradient={{
+                  from: "indigo",
+                  to: "grey",
+                }}
+              >
+                Pending
+              </Badge>
+            }
+            {role !== "CO" &&
               <Badge
                 style={{ cursor: "pointer" }}
                 onClick={() => router.push(`/loans/disburse/${loan.id}`)}
@@ -152,6 +200,8 @@ const LoansRow = ({
               >
                 Disburse
               </Badge>
+            }
+              </>
             )}
           </td>
           {role !== "CO" && (
@@ -180,6 +230,22 @@ const LoansRow = ({
           </td>
           <td>
             {!loan.disbursed && !loan.approved && loan.maintained && (
+            <>
+            {role === "CO" &&
+            <Tooltip label="Approval" color="gray" withArrow>
+              <Badge
+                style={{ cursor: "pointer" }}
+                variant="gradient"
+                gradient={{
+                  from: "grey",
+                  to: "indigo",
+                }}
+              >
+                Pending
+              </Badge>
+              </Tooltip>
+            }
+            {role !== "CO" &&
               <Badge
                 style={{ cursor: "pointer" }}
                 onClick={() => router.push(`/loans/approve/${loan.id}`)}
@@ -191,8 +257,26 @@ const LoansRow = ({
               >
                 Approve
               </Badge>
+            }
+              </>
             )}
             {!loan.disbursed && loan.approved && (
+            <>
+            {role === "CO" &&
+            <Tooltip label="Disbursement" color="gray" withArrow>
+              <Badge
+                style={{ cursor: "pointer" }}
+                variant="gradient"
+                gradient={{
+                  from: "grey",
+                  to: "green",
+                }}
+              >
+                Pending
+              </Badge>
+              </Tooltip>
+            }
+            {role !== "CO" &&
               <Badge
                 style={{ cursor: "pointer" }}
                 onClick={() => router.push(`/loans/disburse/${loan.id}`)}
@@ -204,6 +288,8 @@ const LoansRow = ({
               >
                 Disburse
               </Badge>
+            }
+              </>
             )}
             {loan.disbursed && (
               <Badge
