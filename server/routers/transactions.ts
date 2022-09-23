@@ -1,8 +1,8 @@
 import { TRPCError } from "@trpc/server";
 import { z } from "zod";
 import { t } from "../trpc";
-import { PrismaClient } from '@prisma/client';
-const prisma = new PrismaClient()
+import { PrismaClient } from "@prisma/client";
+const prisma = new PrismaClient();
 
 export const transactionsRouter = t.router({
   transaction: t.procedure
@@ -12,20 +12,18 @@ export const transactionsRouter = t.router({
       })
     )
     .query(async ({ input }) => {
+      if (!input.id) return;
       const transaction = await prisma.transaction.findFirst({
         where: {
           transID: input.id,
         },
         orderBy: {
-          createdAt: "desc",
+          transTime: "desc",
         },
       });
 
       if (!transaction) {
-        throw new TRPCError({
-          code: "NOT_FOUND",
-          message: `transaction not found`,
-        });
+        return;
       }
 
       return transaction;
@@ -34,7 +32,7 @@ export const transactionsRouter = t.router({
     const transactions = await prisma.transaction.findMany({
       where: {},
       orderBy: {
-        createdAt: "desc",
+        transTime: "desc",
       },
     });
 

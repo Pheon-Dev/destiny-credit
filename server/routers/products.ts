@@ -6,7 +6,12 @@ const prisma = new PrismaClient()
 
 export const productsRouter = t.router({
   products: t.procedure.query(async () => {
-    const products = await prisma.product.findMany();
+    const products = await prisma.product.findMany({
+      where: {},
+      orderBy: {
+        createdAt: "desc",
+      },
+    });
     if (!products) {
       throw new TRPCError({
         code: "NOT_FOUND",
@@ -22,6 +27,7 @@ export const productsRouter = t.router({
       })
     )
     .query(async ({ input }) => {
+      if (!input.productName) return 
       const product = await prisma.product.findFirst({
         where: {
           productName: input.productName,

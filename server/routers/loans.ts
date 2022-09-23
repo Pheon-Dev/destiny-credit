@@ -6,17 +6,27 @@ const prisma = new PrismaClient()
 
 export const loansRouter = t.router({
   create_loan: t.procedure.query(async () => {
-    const members = await prisma.member.findMany();
+    const members = await prisma.member.findMany({
+      where: {},
+      orderBy: {
+        createdAt: "desc",
+      },
+    });
     if (!members) {
       throw new TRPCError({
         code: "NOT_FOUND",
-        message: `loans.create-loan not found`,
+        message: `loans.create_loan not found`,
       });
     }
     return members;
   }),
   loans: t.procedure.query(async () => {
-    const loans = await prisma.loan.findMany();
+    const loans = await prisma.loan.findMany({
+      where: {},
+      orderBy: {
+        createdAt: "desc",
+      },
+    });
     if (!loans) {
       throw new TRPCError({
         code: "NOT_FOUND",
@@ -35,6 +45,7 @@ export const loansRouter = t.router({
       })
     )
     .query(async ({ input }) => {
+      if (isNaN(+input.phoneNumber)) return;
       const transactions = await prisma.transaction.findMany({
         where: {
           firstName: input.firstName,
@@ -42,12 +53,12 @@ export const loansRouter = t.router({
           middleName: input.middleName,
           msisdn: input.phoneNumber,
         },
+      orderBy: {
+        transTime: "desc",
+      },
       });
       if (!transactions) {
-        throw new TRPCError({
-          code: "NOT_FOUND",
-          message: `loans.transactions not found`,
-        });
+        return;
       }
       return transactions;
     }),
@@ -58,10 +69,14 @@ export const loansRouter = t.router({
       })
     )
     .query(async ({ input }) => {
+      if (!input.id) return;
       const payment = await prisma.payment.findMany({
         where: {
           loanId: input.id,
         },
+      orderBy: {
+        createdAt: "desc",
+      },
       });
       if (!payment) {
         throw new TRPCError({
@@ -78,6 +93,7 @@ export const loansRouter = t.router({
       })
     )
     .query(async ({ input }) => {
+      if (!input.id) return;
       const loan = await prisma.loan.findFirst({
         where: {
           id: input.id,
@@ -86,7 +102,7 @@ export const loansRouter = t.router({
       if (!loan) {
         throw new TRPCError({
           code: "NOT_FOUND",
-          message: `loans.loan-payment not found`,
+          message: `loans.loan_payment not found`,
         });
       }
       return loan;
@@ -98,6 +114,7 @@ export const loansRouter = t.router({
       })
     )
     .query(async ({ input }) => {
+      if (!input.id) return;
       const loan = await prisma.loan.findFirst({
         where: {
           id: input.id,
@@ -176,10 +193,14 @@ export const loansRouter = t.router({
       })
     )
     .query(async ({ input }) => {
+      if (!input.id) return;
       const loan = await prisma.loan.findMany({
         where: {
           memberId: input.id,
         },
+      orderBy: {
+        createdAt: "desc",
+      },
       });
       if (!loan) {
         throw new TRPCError({
@@ -189,12 +210,12 @@ export const loansRouter = t.router({
       }
       return loan;
     }),
-  delete_loans: t.procedure.query(async ({ input }) => {
+  delete_loans: t.procedure.query(async () => {
     const loan = await prisma.loan.deleteMany();
     if (loan?.count === 0) {
       throw new TRPCError({
         code: "NOT_FOUND",
-        message: `loans.delete-loans not found`,
+        message: `loans.delete_loans not found`,
       });
     }
     return loan;

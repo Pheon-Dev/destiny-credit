@@ -1,12 +1,22 @@
 import { TRPCError } from "@trpc/server";
 import { z } from "zod";
 import { t } from "../trpc";
-import { PrismaClient } from '@prisma/client';
-const prisma = new PrismaClient()
+import { PrismaClient } from "@prisma/client";
+const prisma = new PrismaClient();
 
 export const membersRouter = t.router({
   members: t.procedure.query(async () => {
-    const members = await prisma.member.findMany();
+    const members = await prisma.member.findMany({
+      where: {},
+      include: {
+        loans: true,
+        collaterals: true,
+        guarantor: true,
+      },
+      orderBy: {
+        createdAt: "desc",
+      },
+    });
     if (!members) {
       throw new TRPCError({
         code: "NOT_FOUND",
@@ -22,6 +32,7 @@ export const membersRouter = t.router({
       })
     )
     .query(async ({ input }) => {
+      if (input.id === "") return;
       const member = await prisma.member.findFirst({
         where: {
           id: input.id,
@@ -44,6 +55,7 @@ export const membersRouter = t.router({
       })
     )
     .query(async ({ input }) => {
+      if (input.firstName === "") return;
       const member = await prisma.member.findFirst({
         where: {
           firstName: input.firstName,
@@ -167,16 +179,14 @@ export const membersRouter = t.router({
       })
     )
     .query(async ({ input }) => {
+      if (input.id === "") return;
       const collateral = await prisma.collateral.findMany({
         where: {
           memberId: input.id,
         },
       });
       if (!collateral) {
-        throw new TRPCError({
-          code: "NOT_FOUND",
-          message: `members.collateral not found`,
-        });
+        return;
       }
       return collateral;
     }),
@@ -205,14 +215,18 @@ export const membersRouter = t.router({
       })
     )
     .query(async ({ input }) => {
+      if (input.id === "") return;
       const guarantor = await prisma.guarantor.findFirst({
         where: {
           memberId: input.id,
         },
       });
+      if (!guarantor) {
+        return;
+      }
       return guarantor;
     }),
-  update_member: t.procedure.mutation(async ({ input }) => {
+  update_member: t.procedure.mutation(async () => {
     const member = await prisma.member.updateMany({
       where: {
         maintained: true,
@@ -224,7 +238,7 @@ export const membersRouter = t.router({
     if (member?.count === 0) {
       throw new TRPCError({
         code: "NOT_FOUND",
-        message: `members.update-member not found`,
+        message: `members.update_member not found`,
       });
     }
     return member;

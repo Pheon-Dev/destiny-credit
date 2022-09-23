@@ -17,6 +17,10 @@ export const usersRouter = t.router({
   users: t.procedure.query(async () => {
     const users = await prisma.user.findMany({
       select: defaultUserSelect,
+      where: {},
+      orderBy: {
+        createdAt: "desc"
+      },
     });
     if (!users) {
       throw new TRPCError({
@@ -32,13 +36,13 @@ export const usersRouter = t.router({
         role: "CO",
       },
       select: defaultUserSelect,
+      orderBy: {
+        createdAt: "desc"
+      },
     });
 
     if (!user) {
-      throw new TRPCError({
-        code: "NOT_FOUND",
-        message: `users.officers not found`,
-      });
+      return
     }
     return user;
   }),
@@ -49,6 +53,7 @@ export const usersRouter = t.router({
       })
     )
     .query(async ({ input }) => {
+      if (input.id === "") return
       const user = await prisma.user.findFirst({
         where: {
           id: input.id,
@@ -57,20 +62,18 @@ export const usersRouter = t.router({
       });
 
       if (!user) {
-        throw new TRPCError({
-          code: "NOT_FOUND",
-          message: `users.user-id not found`,
-        });
+        return
       }
       return user;
     }),
   user: t.procedure
     .input(
       z.object({
-        email: z.string().email(),
+        email: z.string()
       })
     )
     .query(async ({ input }) => {
+      if (input.email === "") return
       const user = await prisma.user.findFirst({
         where: {
           email: input.email,
@@ -79,10 +82,7 @@ export const usersRouter = t.router({
       });
 
       if (!user) {
-        throw new TRPCError({
-          code: "NOT_FOUND",
-          message: `users.user not found`,
-        });
+        return
       }
       return user;
     }),
