@@ -1523,7 +1523,7 @@ const CreateLoan = () => {
                       placeholder="Select Product ..."
                       data={product_data?.map((p) => p[0].label)}
                       {...form.getInputProps("product")}
-                      disabled={product?.status === "success" ? false : true}
+                      disabled={products_status === "success" ? false : true}
                       required
                     />
                   </Grid.Col>
