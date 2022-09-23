@@ -261,7 +261,6 @@ const CreateLoan = () => {
       form.values.tenure &&
       form.values.principal &&
       form.values.member &&
-      form.values.maintained &&
       form.values.grace &&
       form.values.installment &&
       form.values.memberId &&
@@ -271,8 +270,8 @@ const CreateLoan = () => {
       form.values.processingFee &&
       form.values.product &&
       form.values.sundays &&
-      form.values.tenure &&
-      form.values.interest
+      form.values.interest &&
+      form.values.maintained
     ) {
       if (active === 1) guarantor_form.validate();
       if (
@@ -288,7 +287,7 @@ const CreateLoan = () => {
           updateNotification({
             id: "maintainance-status",
             color: "red",
-            title: "Guarantor Missing Fields!",
+            title: "Step Two Missing Fields!",
             message: `Please Fill in All the Missing Fields`,
             icon: <IconX size={16} />,
             autoClose: 5000,
@@ -296,11 +295,27 @@ const CreateLoan = () => {
         });
       return setActive((current) => (current < 3 ? current + 1 : current));
     }
+    console.table({
+      tenure: form.values.tenure,
+      principal: form.values.principal,
+      member: form.values.member,
+      maintained: form.values.maintained,
+      grace: form.values.grace,
+      installment: form.values.installment,
+      memberId: form.values.memberId,
+      productId: form.values.productId,
+      payoff: form.values.payoff,
+      penalty: form.values.penalty,
+      processingFee: form.values.processingFee,
+      product: form.values.product,
+      sundays: form.values.sundays,
+      interest: form.values.interest,
+    })
     setTimeout(() => {
       updateNotification({
         id: "maintainance-status",
         color: "red",
-        title: "Loan Missing Fields!",
+        title: "Step One Missing Fields!",
         message: `Please Fill in All the Missing Fields`,
         icon: <IconX size={16} />,
         autoClose: 5000,
