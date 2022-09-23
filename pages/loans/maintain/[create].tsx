@@ -101,11 +101,11 @@ const CreateLoan = () => {
   const [phonenumber, setPhonenumber] = useState("");
 
   if (member_search?.data) {
-  setFirstname(member_search?.data?.firstName);
-  setMiddlename(member_search?.data?.middleName);
-  setLastname(member_search?.data?.lastName);
-  setPhonenumber(member_search?.data?.msisdn);
-    }
+    setFirstname(member_search?.data?.firstName);
+    setMiddlename(member_search?.data?.middleName);
+    setLastname(member_search?.data?.lastName);
+    setPhonenumber(member_search?.data?.msisdn);
+  }
 
   const member_info = trpc.members.maintain.useQuery({
     firstName: firstname || "",
@@ -180,7 +180,6 @@ const CreateLoan = () => {
   const product = trpc.products.product.useQuery({
     productName: form.values.product || "",
   });
-  const pro_data = product?.data;
 
   const { data: member, status: member_status } = trpc.members.member.useQuery({
     id: id || "",
@@ -256,6 +255,7 @@ const CreateLoan = () => {
       });
     }
     form.setFieldValue("principal", `${form.values.principal}`);
+    form.setFieldValue("memberId", `${id}`);
     form.validate();
     if (
       form.values.tenure &&
@@ -295,22 +295,6 @@ const CreateLoan = () => {
         });
       return setActive((current) => (current < 3 ? current + 1 : current));
     }
-    console.table({
-      tenure: form.values.tenure,
-      principal: form.values.principal,
-      member: form.values.member,
-      maintained: form.values.maintained,
-      grace: form.values.grace,
-      installment: form.values.installment,
-      memberId: form.values.memberId,
-      productId: form.values.productId,
-      payoff: form.values.payoff,
-      penalty: form.values.penalty,
-      processingFee: form.values.processingFee,
-      product: form.values.product,
-      sundays: form.values.sundays,
-      interest: form.values.interest,
-    })
     setTimeout(() => {
       updateNotification({
         id: "maintainance-status",
@@ -372,6 +356,7 @@ const CreateLoan = () => {
   };
 
   const fillForm = () => {
+    form.setFieldValue("memberId", `${id}`);
     form.setFieldValue("member", `${member?.firstName} ${member?.lastName}`);
     form.setFieldValue("productId", `${product?.data?.id}`);
     form.setFieldValue("productName", `${proName}`);
@@ -495,6 +480,7 @@ const CreateLoan = () => {
     if (subscribe) {
       if (mid.length > 10) setId(mid);
       if (mid.length < 11) setId(`${member_info?.data?.id}`);
+    form.setFieldValue("memberId", `${id}`);
 
       if (member) {
         setMemberCode(`${member?.memberId}`);
