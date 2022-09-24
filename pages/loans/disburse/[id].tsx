@@ -26,7 +26,6 @@ import {
   IconX,
 } from "@tabler/icons";
 import { trpc } from "../../../utils/trpc";
-import type { Loan, User } from "@prisma/client";
 import { useSession } from "next-auth/react";
 
 const schema = z.object({
@@ -42,7 +41,7 @@ const Disburse = () => {
   const { status, data } = useSession();
 
   const { data: user, status: user_status } = trpc.users.user.useQuery({
-    email: `${data?.user?.email}`,
+      email: `${data?.user?.email}` || "",
   });
 
   const { data: users, status: users_status } = trpc.users.officers.useQuery();

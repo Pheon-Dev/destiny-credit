@@ -35,7 +35,7 @@ const Approve = () => {
   const { status, data } = useSession();
 
   const { data: user, status: user_status } = trpc.users.user.useQuery({
-    email: `${data?.user?.email}`,
+      email: `${data?.user?.email}` || "",
   });
 
   const { data: loan, status: loan_status } = trpc.loans.loan.useQuery({

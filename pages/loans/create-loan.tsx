@@ -15,7 +15,7 @@ const MembersList = () => {
   const { status, data } = useSession();
   try {
     const { data: user, status: user_status } = trpc.users.user.useQuery({
-      email: `${data?.user?.email}`,
+      email: `${data?.user?.email}` || "",
     });
 
     const { data: members, status: members_status } =

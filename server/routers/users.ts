@@ -1,8 +1,8 @@
 import { TRPCError } from "@trpc/server";
 import { z } from "zod";
 import { t } from "../trpc";
-import { Prisma, PrismaClient } from '@prisma/client';
-const prisma = new PrismaClient()
+import { Prisma, PrismaClient } from "@prisma/client";
+const prisma = new PrismaClient();
 
 const defaultUserSelect = Prisma.validator<Prisma.UserSelect>()({
   id: true,
@@ -19,7 +19,7 @@ export const usersRouter = t.router({
       select: defaultUserSelect,
       where: {},
       orderBy: {
-        createdAt: "desc"
+        createdAt: "desc",
       },
     });
     if (!users) {
@@ -37,12 +37,12 @@ export const usersRouter = t.router({
       },
       select: defaultUserSelect,
       orderBy: {
-        createdAt: "desc"
+        createdAt: "desc",
       },
     });
 
     if (!user) {
-      return
+      return;
     }
     return user;
   }),
@@ -53,7 +53,7 @@ export const usersRouter = t.router({
       })
     )
     .query(async ({ input }) => {
-      if (input.id === "") return
+      if (input.id === "") return;
       const user = await prisma.user.findFirst({
         where: {
           id: input.id,
@@ -62,18 +62,25 @@ export const usersRouter = t.router({
       });
 
       if (!user) {
-        return
+        return;
       }
       return user;
     }),
+  delete_all: t.procedure.query(async () => {
+    const user = await prisma.verificationToken.deleteMany({
+      where: {},
+    });
+
+    return user;
+  }),
   user: t.procedure
     .input(
       z.object({
-        email: z.string()
+        email: z.string(),
       })
     )
     .query(async ({ input }) => {
-      if (input.email === "") return
+      if (input.email === "undefined" || input.email === "") return;
       const user = await prisma.user.findFirst({
         where: {
           email: input.email,
@@ -82,7 +89,7 @@ export const usersRouter = t.router({
       });
 
       if (!user) {
-        return
+        return;
       }
       return user;
     }),
