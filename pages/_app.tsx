@@ -20,6 +20,7 @@ import {
   ScrollArea,
   MediaQuery,
   Burger,
+  Text,
   useMantineTheme,
 } from "@mantine/core";
 import { TitleText, MainLinks, Utilities } from "../components";
@@ -144,7 +145,7 @@ const App = (props: AppProps & { colorScheme: ColorScheme }) => {
       </Head>
 
       <SessionProvider session={pageProps.session}>
-        <AppContent />
+      <AppContent />
       </SessionProvider>
     </>
   );

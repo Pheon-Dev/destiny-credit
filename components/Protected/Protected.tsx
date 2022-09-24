@@ -8,11 +8,11 @@ interface Props {
 
 export const Protected: FC<Props> = ({ children }): JSX.Element => {
   const { status, data } = useSession();
-  console.log(data)
+  /* console.log(status) */
 
   useEffect(() => {
-    if (status === "unauthenticated") signIn();
-    /* if (status === "unauthenticated") Router.replace("/auth/sign-in"); */
+    /* if (status === "unauthenticated") signIn(); */
+    if (status === "unauthenticated") Router.replace("/auth/sign-in");
   }, [status]);
 
   return <>{status === "authenticated" && <>{children}</>}</>;
