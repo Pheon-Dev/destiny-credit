@@ -8,6 +8,7 @@ interface Props {
 
 export const Protected: FC<Props> = ({ children }): JSX.Element => {
   const { status, data } = useSession();
+  console.log(data)
 
   useEffect(() => {
     if (status === "unauthenticated") signIn();
