@@ -12,7 +12,7 @@ export const transactionsRouter = t.router({
       })
     )
     .query(async ({ input }) => {
-      if (!input.id) return;
+      if (input.id === "") return;
       const transaction = await prisma.transaction.findFirst({
         where: {
           transID: input.id,

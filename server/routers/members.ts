@@ -112,7 +112,6 @@ export const membersRouter = t.router({
         postalCodeKin: z.string(),
         cityTownKin: z.string(),
         numberKin: z.string(),
-        group: z.boolean(),
         maintained: z.boolean(),
         registrarId: z.string(),
       })
@@ -158,7 +157,6 @@ export const membersRouter = t.router({
           postalCodeKin: input.postalCodeKin,
           cityTownKin: input.cityTownKin,
           numberKin: input.numberKin,
-          group: input.group,
           maintained: input.maintained,
           ratings: 0,
           registrarId: input.registrarId,
@@ -207,6 +205,19 @@ export const membersRouter = t.router({
         });
       }
       return collateral;
+    }),
+  member_delete: t.procedure
+    .input(
+      z.object({
+        id: z.string(),
+      })
+    )
+    .mutation(async ({ input }) => {
+      return await prisma.member.deleteMany({
+        where: {
+          id: input.id,
+        },
+      });
     }),
   guarantor: t.procedure
     .input(

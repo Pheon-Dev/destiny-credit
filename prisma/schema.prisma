@@ -49,6 +49,8 @@ model User {
   updatedAt          DateTime     @updatedAt
   username           String?
   email              String?      @unique
+  emailVerified      DateTime?
+  state              String?
   password           String?
   firstName          String?
   lastName           String?
@@ -65,12 +67,14 @@ model User {
   updatedLoans       Loan[]       @relation("UpdatedBy")
   handledPayments    Payment[]    @relation("HandledBy")
   updatedPayments    Payment[]    @relation("UpdatedBy")
+  createdGroups      Group[]      @relation("CreatedBy")
+  approvedGroups     Group[]      @relation("ApprovedBy")
+  updatedGroups      Group[]      @relation("UpdatedBy")
   createdProducts    Product[]    @relation("CreatedBy")
   approvedProducts   Product[]    @relation("ApprovedBy")
   updatedProducts    Product[]    @relation("UpdatedBy")
   updatedCollaterals Collateral[] @relation("UpdatedBy")
   updatedGuarantors  Guarantor[]  @relation("UpdatedBy")
-  // role               Role         @default(CO)
 }
 
 model VerificationToken {
@@ -124,9 +128,12 @@ model Member {
   cityTownKin           String
   numberKin             String
   loans                 Loan[]
+  leader                Group[]      @relation("LedBy")
+  initiator             Group[]      @relation("InitiatedBy")
+  group                 Group?       @relation("Group", fields: [groupId], references: [id], onDelete: NoAction, onUpdate: NoAction)
+  groupId               String?
   collaterals           Collateral[]
   guarantor             Guarantor[]
-  group                 Boolean      @default(false)
   ratings               Int          @default(0)
   maintained            Boolean      @default(false)
   registrar             User?        @relation("RegisteredBy", fields: [registrarId], references: [id])
@@ -236,7 +243,7 @@ model Payment {
   outsBalance   String
   currInstDate  String
   nextInstDate  String
-  // mpesa         String
+  mpesa         String?
   loan          Loan     @relation(fields: [loanId], references: [id])
   loanId        String
   handler       User?    @relation("HandledBy", fields: [handlerId], references: [id])
@@ -276,6 +283,28 @@ model Product {
   @@index(id)
 }
 
+model Group {
+  id          String   @id @default(uuid())
+  createdAt   DateTime @default(now())
+  updatedAt   DateTime @updatedAt
+  groupName   String
+  groupRef    String
+  members     Member[] @relation("Group")
+  leader      Member?  @relation("LedBy", fields: [leaderId], references: [id], onDelete: NoAction, onUpdate: NoAction)
+  leaderId    String?
+  initiator   Member?  @relation("InitiatedBy", fields: [initiatorId], references: [id], onDelete: NoAction, onUpdate: NoAction)
+  initiatorId String?
+  creator     User?    @relation("CreatedBy", fields: [creatorId], references: [id])
+  creatorId   String?
+  approver    User?    @relation("ApprovedBy", fields: [approverId], references: [id])
+  approverId  String?
+  updater     User?    @relation("UpdatedBy", fields: [updaterId], references: [id])
+  updaterId   String?
+  state       String?
+
+  @@index(id)
+}
+
 model Transaction {
   id                String   @id @default(uuid())
   createdAt         DateTime @default(now())
@@ -293,13 +322,7 @@ model Transaction {
   firstName         String
   middleName        String
   lastName          String
+  state             String?
 
   @@index(id)
-}
-
-enum Role {
-  CO
-  CA
-  MD
-  AU
 }

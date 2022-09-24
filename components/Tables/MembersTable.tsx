@@ -1,9 +1,10 @@
-import React from "react";
+import React, { useCallback } from "react";
 import type { Member } from "@prisma/client";
 import { useRouter } from "next/router";
 import { IconEdit } from "@tabler/icons";
 import { Table, Badge, Group } from "@mantine/core";
 import { TitleText } from "../Text/TitleText";
+import { trpc } from "../../utils/trpc";
 
 export const MembersTable = ({
   members,
@@ -30,7 +31,7 @@ export const MembersTable = ({
     <>
       <Group position="center" m="lg">
         {call === "create-loan" && (
-          <TitleText title="Newly Registered Members" />
+          <TitleText title="Registered Members" />
         )}
         {call === "all-members" && <TitleText title="All Members List" />}
       </Group>
@@ -66,6 +67,20 @@ const MemberRow = ({
   role: string;
 }) => {
   const router = useRouter();
+  const utils = trpc.useContext();
+  const deleteMemberById = trpc.members.member_delete.useMutation({
+    onSuccess: async () => {
+      await utils.members.members.invalidate();
+    },
+  });
+  const deleteMember = useCallback(
+    (id: string) => {
+      deleteMemberById.mutate({
+        id: id,
+      });
+    },
+    [deleteMemberById]
+  );
 
   return (
     <>
@@ -106,7 +121,9 @@ const MemberRow = ({
           {role !== "CO" && (
             <td
               style={{ cursor: "pointer" }}
-              onClick={() => router.push(`/members/details/${member.id}`)}
+              onClick={() => {
+                router.push(`/members/details/${member.id}`);
+              }}
             >
               <IconEdit size={24} />
             </td>
@@ -136,7 +153,10 @@ const MemberRow = ({
           {role !== "CO" && (
             <td
               style={{ cursor: "pointer" }}
-              onClick={() => router.push(`/members/details/${member.id}`)}
+              onClick={() => {
+                /* deleteMember(`${member.id}`); */
+                router.push(`/members/details/${member.id}`);
+              }}
             >
               <IconEdit size={24} />
             </td>

@@ -143,7 +143,6 @@ const CreateMember = () => {
       postalCodeKin: "",
       cityTownKin: "",
       numberKin: "",
-      group: false,
       maintained: false,
     },
   });
@@ -292,7 +291,6 @@ const CreateMember = () => {
     form.setFieldValue("postalCodeKin", "");
     form.setFieldValue("cityTownKin", "");
     form.setFieldValue("numberKin", "");
-    form.setFieldValue("group", false);
     form.setFieldValue("maintained", false);
   };
 
@@ -339,7 +337,6 @@ const CreateMember = () => {
             form.values.postalCodeKin &&
             form.values.cityTownKin &&
             form.values.numberKin) ||
-          form.values.group ||
           form.values.maintained
         ) {
           member.mutate({
@@ -382,7 +379,6 @@ const CreateMember = () => {
             postalCodeKin: form.values.postalCodeKin.toUpperCase(),
             cityTownKin: form.values.cityTownKin.toUpperCase(),
             numberKin: form.values.numberKin.toUpperCase(),
-            group: false,
             maintained: false,
             registrarId: `${user?.id}`,
           });
@@ -956,7 +952,6 @@ const CreateMember = () => {
                   : form.setFieldValue("employerNumber", "NA");
               }
               form.setFieldValue("branchName", "Eldoret");
-              form.setFieldValue("group", false);
               form.setFieldValue("maintained", false);
               form.validate();
               showNotification({

@@ -84,7 +84,8 @@ export const Utilities = () => {
 
   const handleSignOut = () => {
     try {
-      router.push("/auth/sign-in");
+      /* router.push("/api/auth/signin"); */
+      /* router.push("/auth/sign-in"); */
       signOut();
     } catch (error) {
       setTimeout(() => {
@@ -245,7 +246,7 @@ export const Utilities = () => {
                   </Menu.Target>
 
                   <Menu.Dropdown>
-                    <Menu.Item onClick={() => signOut()} icon={<IconLogout size={14} />} color="red">
+                    <Menu.Item onClick={() => handleSignOut()} icon={<IconLogout size={14} />} color="red">
                     Sign Out
                     </Menu.Item>
                   </Menu.Dropdown>
