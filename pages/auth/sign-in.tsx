@@ -70,6 +70,7 @@ const Page: NextPage = (props): JSX.Element => {
           });
         }
       }
+        setLoading(false);
       return updateNotification({
         id: "sing-in-status",
         color: "red",
@@ -79,6 +80,7 @@ const Page: NextPage = (props): JSX.Element => {
         autoClose: 8000,
       });
     } catch (error) {
+        setLoading(false);
       updateNotification({
         id: "sing-in-status",
         title: "Sign In Error!",

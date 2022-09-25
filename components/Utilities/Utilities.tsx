@@ -50,7 +50,7 @@ export const Utilities = () => {
     if (subscribe) {
       setEmail(`${data?.user?.email}`);
     }
-  }, [data]);
+  }, [data, router?.pathname]);
 
   const { data: user } = trpc.users.user.useQuery({
     email: email,
