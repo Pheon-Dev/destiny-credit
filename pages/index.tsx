@@ -9,9 +9,6 @@ const Page: NextPage = () => {
   const { data: transactions, fetchStatus } =
     trpc.transactions.transactions.useQuery();
 
-    console.log("LOGS :", logs)
-    console.log("TRAN :", transactions)
-
   return (
     <Protected>
       <div style={{ position: "relative" }}>
