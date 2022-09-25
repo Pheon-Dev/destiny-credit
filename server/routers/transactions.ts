@@ -29,20 +29,25 @@ export const transactionsRouter = t.router({
       return transaction;
     }),
   transactions: t.procedure.query(async () => {
-    const transactions = await prisma.transaction.findMany({
-      where: {},
-      orderBy: {
-        transTime: "desc",
-      },
-    });
+    try {
+      const transactions = await prisma.transaction.findMany({
+        where: {},
+        orderBy: {
+          transTime: "desc",
+        },
+      });
 
-    if (!transactions) {
+      if (!transactions) {
+        return;
+      }
+
+      return transactions;
+    } catch (error) {
+      console.log("transactions.transactions: ", error)
       throw new TRPCError({
         code: "NOT_FOUND",
-        message: `transactions not found`,
+        message: `transactions.transactions ${error}`,
       });
     }
-
-    return transactions;
   }),
 });

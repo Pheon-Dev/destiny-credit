@@ -12,6 +12,7 @@ import { Protected } from "../Protected/Protected";
 import { useRouter } from "next/router";
 import { useSession } from "next-auth/react";
 import { trpc } from "../../utils/trpc";
+import Link from "next/link";
 
 interface Data {
   id: number;
@@ -23,25 +24,22 @@ export const MainLinks = () => {
   const router = useRouter();
 
   const [email, setEmail] = useState("");
-  const [next, setNext] = useState("/");
 
   const { data } = useSession();
+
+  const { data: user } = trpc.users.user.useQuery({
+    email: email,
+  });
 
   useEffect(() => {
     let subscribe = true;
     if (subscribe) {
       setEmail(`${data?.user?.email}`);
-
-      next !== "/" && router.push(next);
     }
     return () => {
       subscribe = false;
     };
-  }, [data, router.pathname, email, next]);
-
-  const { data: user } = trpc.users.user.useQuery({
-    email: email,
-  });
+  }, [data, email, user?.role]);
 
   const LinkRouter = ({
     data,
@@ -56,7 +54,7 @@ export const MainLinks = () => {
   }) => {
     return (
       <NavLink
-      defaultOpened={open}
+        defaultOpened={open}
         styles={{
           root: {
             borderRadius: 6,
@@ -72,21 +70,18 @@ export const MainLinks = () => {
         childrenOffset={24}
       >
         {data?.map((item: Data) => (
-          <NavLink
-            styles={{
-              root: {
-                borderRadius: 6,
-                margin: 2,
-              },
-            }}
-            label={<Text weight={500}>{item.name}</Text>}
-            active={router.pathname === item.url}
-            onClick={() => {
-              setNext(`${item.url}`);
-              item.url === "/" && router.push(item.url);
-            }}
-            key={item.url}
-          />
+          <Link href={item.url} key={item.url}>
+            <NavLink
+              styles={{
+                root: {
+                  borderRadius: 6,
+                  margin: 2,
+                },
+              }}
+              label={<Text weight={500}>{item.name}</Text>}
+              active={router.pathname === item.url}
+            />
+          </Link>
         ))}
       </NavLink>
     );
@@ -135,7 +130,7 @@ export const MainLinks = () => {
             icon={<IconReport size={16} stroke={1.5} />}
             data={reports_data}
             title="Reports"
-          open={false}
+            open={false}
           />
         )}
       </Box>
