@@ -9,18 +9,10 @@ const LOGTAIL_API_TOKEN = process.env.NEXT_PUBLIC_LOGTAIL_API_TOKEN;
 
 export const logsRouter = t.router({
   logs: t.procedure.query(async () => {
+    try {
       const date = new Date();
 
       date.setDate(date.getDate() - 3);
-
-      let str_date: string = date.toLocaleDateString();
-
-      const when =
-        str_date.split("/")[2] +
-        "-" +
-        str_date.split("/")[1] +
-        "-" +
-        str_date.split("/")[0];
 
       const url =
         `https://logtail.com/api/v1/query?source_ids=158744&query=transID`;
@@ -181,5 +173,8 @@ export const logsRouter = t.router({
         return;
       }
       return logs;
+  } catch (error) {
+    return;
+  }
   }),
 });
