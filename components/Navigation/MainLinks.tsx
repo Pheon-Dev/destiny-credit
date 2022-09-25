@@ -47,13 +47,16 @@ export const MainLinks = () => {
     data,
     title,
     icon,
+    open,
   }: {
     data: Data[];
     title: string;
     icon: any;
+    open: boolean;
   }) => {
     return (
       <NavLink
+      defaultOpened={open}
         styles={{
           root: {
             borderRadius: 6,
@@ -96,26 +99,31 @@ export const MainLinks = () => {
           icon={<IconHome size={16} stroke={1.5} />}
           data={dashboard_data}
           title="Home"
+          open={true}
         />
         <LinkRouter
           icon={<IconUsers size={16} stroke={1.5} />}
           data={members_data}
           title="Members"
+          open={true}
         />
         <LinkRouter
           icon={<IconCash size={16} stroke={1.5} />}
           data={loans_data}
           title="Loans"
+          open={true}
         />
         <LinkRouter
           icon={<IconBrandAsana size={16} stroke={1.5} />}
           data={groups_data}
           title="Groups"
+          open={false}
         />
         <LinkRouter
           icon={<IconTag size={16} stroke={1.5} />}
           data={products_data}
           title="Products"
+          open={false}
         />
         {/* <LinkRouter */}
         {/*   icon={<IconApps size={16} stroke={1.5} />} */}
@@ -127,6 +135,7 @@ export const MainLinks = () => {
             icon={<IconReport size={16} stroke={1.5} />}
             data={reports_data}
             title="Reports"
+          open={false}
           />
         )}
       </Box>
