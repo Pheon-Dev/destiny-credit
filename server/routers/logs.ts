@@ -106,6 +106,12 @@ export const logsRouter = t.router({
             transID: transaction[0].transID,
           },
         });
+        if (!search) {
+          throw new TRPCError({
+            code: "NOT_FOUND",
+            message: `logs.search not found`,
+          });
+        }
         try {
           if (search.length > 1) {
             const duplicate = await prisma.transaction.findFirst({
@@ -113,12 +119,25 @@ export const logsRouter = t.router({
                 transID: transaction[0].transID,
               },
             });
+            if (!duplicate) {
+              throw new TRPCError({
+                code: "NOT_FOUND",
+                message: `logs.duplicate not found`,
+              });
+            }
 
-            return await prisma.transaction.deleteMany({
+            const delete_duplicate = await prisma.transaction.deleteMany({
               where: {
                 transID: duplicate?.transID,
               },
             });
+            if (!delete_duplicate) {
+              throw new TRPCError({
+                code: "NOT_FOUND",
+                message: `logs.delete_duplicate not found`,
+              });
+            }
+            return delete_duplicate;
           }
           if (search.length === 1) {
             return;
@@ -126,8 +145,8 @@ export const logsRouter = t.router({
           if (
             transaction[0].transactionType === "PAY BILL" ||
             transaction[0].transactionType === "CUSTOMER MERCHANT PAYMENT"
-          )
-            return await prisma.transaction.create({
+          ) {
+            const new_transaction = await prisma.transaction.create({
               data: {
                 transactionType: transaction[0]?.transactionType,
                 transID: transaction[0]?.transID,
@@ -145,6 +164,16 @@ export const logsRouter = t.router({
                 state: "new",
               },
             });
+
+            if (!new_transaction) {
+              throw new TRPCError({
+                code: "NOT_FOUND",
+                message: `logs.delete_duplicate not found`,
+              });
+            }
+            return new_transaction;
+          }
+          return;
         } catch (error) {
           return;
         }
