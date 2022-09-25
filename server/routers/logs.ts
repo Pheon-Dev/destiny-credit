@@ -110,7 +110,7 @@ export const logsRouter = t.router({
 
           const search = await prisma.transaction.findMany({
             where: {
-              transID: transaction[0]?.transID,
+              transID: transaction[0].transID,
             },
           });
           try {
