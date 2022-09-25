@@ -23,31 +23,29 @@ export const transactionsRouter = t.router({
       });
 
       if (!transaction) {
-        return;
+        throw new TRPCError({
+          code: "NOT_FOUND",
+          message: `transactions.transaction not found`,
+        });
       }
 
       return transaction;
     }),
   transactions: t.procedure.query(async () => {
-    try {
-      const transactions = await prisma.transaction.findMany({
-        where: {},
-        orderBy: {
-          transTime: "desc",
-        },
-      });
+    const transactions = await prisma.transaction.findMany({
+      where: {},
+      orderBy: {
+        transTime: "desc",
+      },
+    });
 
-      if (!transactions) {
-        return;
-      }
-
-      return transactions;
-    } catch (error) {
-      console.log("transactions.transactions: ", error)
+    if (!transactions) {
       throw new TRPCError({
         code: "NOT_FOUND",
-        message: `transactions.transactions ${error}`,
+        message: `transactions.transactions not found`,
       });
     }
+
+    return transactions;
   }),
 });

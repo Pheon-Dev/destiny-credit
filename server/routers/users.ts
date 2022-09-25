@@ -42,7 +42,10 @@ export const usersRouter = t.router({
     });
 
     if (!user) {
-      return;
+      throw new TRPCError({
+        code: "NOT_FOUND",
+        message: `users.user not found`,
+      });
     }
     return user;
   }),
@@ -62,7 +65,10 @@ export const usersRouter = t.router({
       });
 
       if (!user) {
-        return;
+        throw new TRPCError({
+          code: "NOT_FOUND",
+          message: `users.user_id not found`,
+        });
       }
       return user;
     }),
