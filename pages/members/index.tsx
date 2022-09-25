@@ -27,14 +27,10 @@ const MembersList = () => {
     <Protected>
       <div style={{ position: "relative" }}>
         <LoadingOverlay overlayBlur={2} visible={fetchStatus === "fetching"} />
-        {(members?.length === 0 && <EmptyTable call="all-members" />) ||
-          (members && (
-            <MembersTable
-              members={members}
-              role={`${user?.role}`}
-              call="all-members"
-            />
-          ))}
+        {!members && <EmptyTable call="all-members" />}
+        {members && (
+          <MembersTable members={members} call="all-members" role={`${user?.role}`} />
+        )}
       </div>
     </Protected>
   );

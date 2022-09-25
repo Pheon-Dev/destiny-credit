@@ -5,6 +5,7 @@ import { TransactionsTable, Protected, EmptyTable } from "../../components";
 import { trpc } from "../../utils/trpc";
 
 const Page: NextPage = () => {
+  trpc.logs.logs.useQuery();
   const { data: transactions, fetchStatus } =
     trpc.transactions.transactions.useQuery();
 
@@ -12,10 +13,10 @@ const Page: NextPage = () => {
     <Protected>
       <div style={{ position: "relative" }}>
         <LoadingOverlay overlayBlur={2} visible={fetchStatus === "fetching"} />
-        {(transactions?.length === 0 && <EmptyTable call="register" />) ||
-          (transactions && (
-            <TransactionsTable transactions={transactions} call="register" />
-          ))}
+        {!transactions && <EmptyTable call="register" />}
+        {transactions && (
+          <TransactionsTable transactions={transactions} call="register" />
+        )}
       </div>
     </Protected>
   );

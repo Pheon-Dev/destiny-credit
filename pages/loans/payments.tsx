@@ -27,14 +27,10 @@ const PaymentsList = () => {
     <Protected>
       <div style={{ position: "relative" }}>
         <LoadingOverlay overlayBlur={2} visible={fetchStatus === "fetching"} />
-        {(loans?.length === 0 && <EmptyTable call="payments" />) ||
-          (loans && (
-            <PaymentsTable
-              role={`${user?.role}`}
-              loans={loans}
-              call="payments"
-            />
-          ))}
+        {!loans && <EmptyTable call="payments" />}
+        {loans && (
+          <PaymentsTable role={`${user?.role}`} loans={loans} call="payments" />
+        )}
       </div>
     </Protected>
   );

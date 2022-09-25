@@ -23,6 +23,7 @@ const Page: NextPage = () => {
     }
   }, [data]);
 
+  trpc.logs.logs.useQuery();
   const { data: user } = trpc.users.user.useQuery({
     email: email,
   });
@@ -37,22 +38,22 @@ const Page: NextPage = () => {
     <Protected>
       <div style={{ position: "relative" }}>
         <LoadingOverlay overlayBlur={2} visible={mems_status === "fetching"} />
-        {(transactions?.length === 0 && <EmptyTable call="maintain" />) ||
-          (transactions && (
-            <TransactionsTable transactions={transactions} call="maintain" />
-          ))}
+        {!transactions && <EmptyTable call="maintain" />}
+        {transactions && (
+          <TransactionsTable transactions={transactions} call="maintain" />
+        )}
         <Divider variant="dotted" mt="xl" />
       </div>
       <div style={{ position: "relative" }}>
         <LoadingOverlay overlayBlur={2} visible={trans_status === "fetching"} />
-        {(!members && <EmptyTable call="create-loan" />) ||
-          (members && (
-            <MembersTable
-              members={members}
-              role={`${user?.role}`}
-              call="create-loan"
-            />
-          ))}
+        {!members && <EmptyTable call="create-loan" />}
+        {members && (
+          <MembersTable
+            members={members}
+            role={`${user?.role}`}
+            call="create-loan"
+          />
+        )}
       </div>
     </Protected>
   );

@@ -2,33 +2,27 @@ import React from "react";
 import { trpc } from "../../utils/trpc";
 import { ProductsTable, Protected, TitleText } from "../../components";
 import { Group, LoadingOverlay } from "@mantine/core";
+import { NextPage } from "next";
 
 const ProductsList = () => {
-  try {
-  const { data: products, status } = trpc.products.products.useQuery();
+  const { data: products, fetchStatus } = trpc.products.products.useQuery();
 
   return (
     <Protected>
-      <LoadingOverlay overlayBlur={2} visible={status === "loading"} />
-      {products && <ProductsTable products={products} />}
-      {products?.length === 0 && (
-        <Group position="center">
-        <TitleText title="No Created Products" />
-        </Group>
-      )}
+      <div style={{ position: "relative" }}>
+        <LoadingOverlay overlayBlur={2} visible={fetchStatus === "fetching"} />
+        {products && <ProductsTable products={products} />}
+        {!products && (
+          <Group position="center">
+            <TitleText title="No Created Products" />
+          </Group>
+        )}
+      </div>
     </Protected>
   );
-  } catch (error) {
-    console.log(error);
-    return (
-      <Protected>
-        <TitleText title="No Created Products" />
-      </Protected>
-    );
-  }
 };
 
-const Page = () => {
+const Page: NextPage = () => {
   return <ProductsList />;
 };
 
