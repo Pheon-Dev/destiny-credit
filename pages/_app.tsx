@@ -139,32 +139,36 @@ const App = (props: AppProps & { colorScheme: ColorScheme }) => {
       </Head>
 
       <SessionProvider session={pageProps.session}>
-      <AppContent />
+        <AppContent />
       </SessionProvider>
     </>
   );
-}
+};
 
 App.getInitialProps = ({ ctx }: { ctx: GetServerSidePropsContext }) => ({
   colorscheme: getCookie("mantine-color-scheme", ctx) || "dark",
 });
 
 export async function getServerSideProps(ctx: GetServerSidePropsContext) {
- const session = await unstable_getServerSession(ctx.req, ctx.res, authOptions);
-    if (!session) {
-        return {
-            redirect: {
-                destination: "/",
-                permanent: false,
-              },
-          }
-      }
+  const session = await unstable_getServerSession(
+    ctx.req,
+    ctx.res,
+    authOptions
+  );
+  if (!session) {
+    return {
+      redirect: {
+        destination: "/",
+        permanent: false,
+      },
+    };
+  }
 
-      return {
-          props: {
-              session
-            }
-        }
-    }
+  return {
+    props: {
+      session,
+    },
+  };
+}
 
 export default trpc.withTRPC(App);

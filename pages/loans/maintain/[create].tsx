@@ -93,7 +93,7 @@ const CreateLoan = () => {
   const mid = router.query.create as string;
 
   const member_search = trpc.transactions.transaction.useQuery({
-    id: mid || "",
+    id: mid.length === 10 ? mid : ""
   });
   const [firstname, setFirstname] = useState("");
   const [middlename, setMiddlename] = useState("");
