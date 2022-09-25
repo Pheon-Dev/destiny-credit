@@ -5,9 +5,12 @@ import { LoadingOverlay } from "@mantine/core";
 import { NextPage } from "next";
 
 const Page: NextPage = () => {
-  trpc.logs.logs.useQuery();
+  const logs = trpc.logs.logs.useQuery();
   const { data: transactions, fetchStatus } =
     trpc.transactions.transactions.useQuery();
+
+    console.log("LOGS :", logs)
+    console.log("TRAN :", transactions)
 
   return (
     <Protected>
