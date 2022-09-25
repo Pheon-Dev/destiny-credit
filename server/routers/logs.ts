@@ -23,7 +23,7 @@ export const logsRouter = t.router({
         str_date.split("/")[0];
 
       const url =
-        `https://logtail.com/api/v1/query?source_ids=158744&query=transID&from=${when}`;
+        `https://logtail.com/api/v1/query?source_ids=158744&query=transID`;
 
       const token = LOGTAIL_API_TOKEN;
       const headers = {
@@ -180,6 +180,6 @@ export const logsRouter = t.router({
       if (!logs) {
         return;
       }
-      return transactions;
+      return logs;
   }),
 });
