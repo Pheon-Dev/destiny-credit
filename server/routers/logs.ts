@@ -9,13 +9,12 @@ const LOGTAIL_API_TOKEN = process.env.NEXT_PUBLIC_LOGTAIL_API_TOKEN;
 
 export const logsRouter = t.router({
   logs: t.procedure.query(async () => {
-    try {
       const date = new Date();
 
-      date.setDate(date.getDate() - 3);
+      date.setDate(date.getDate() - 2);
 
       const url =
-        `https://logtail.com/api/v1/query?source_ids=158744&query=transID`;
+        "https://logtail.com/api/v1/query?source_ids=158744&query=transID";
 
       const token = LOGTAIL_API_TOKEN;
       const headers = {
@@ -132,8 +131,8 @@ export const logsRouter = t.router({
               return;
             }
             if (
-              transaction[0]?.transactionType === "PAY BILL" ||
-              transaction[0]?.transactionType === "CUSTOMER MERCHANT PAYMENT"
+              transaction[0].transactionType === "PAY BILL" ||
+              transaction[0].transactionType === "CUSTOMER MERCHANT PAYMENT"
             )
 
               return await prisma.transaction.create({
@@ -173,8 +172,5 @@ export const logsRouter = t.router({
         return;
       }
       return logs;
-  } catch (error) {
-    return;
-  }
   }),
 });

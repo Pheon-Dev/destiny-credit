@@ -56,11 +56,11 @@ export const Utilities = () => {
     email: email,
   });
 
-  const logs = trpc.logs.logs.useQuery();
+  /* const logs = trpc.logs.logs.useQuery(); */
 
   const forceReload = async () => {
     try {
-      if (logs)
+      /* if (logs) */
         updateNotification({
           id: "transactions-status",
           color: "teal",
