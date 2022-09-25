@@ -70,7 +70,7 @@ const Page: NextPage = (props): JSX.Element => {
           });
         }
       }
-        setLoading(false);
+      setLoading(false);
       return updateNotification({
         id: "sing-in-status",
         color: "red",
@@ -80,7 +80,7 @@ const Page: NextPage = (props): JSX.Element => {
         autoClose: 8000,
       });
     } catch (error) {
-        setLoading(false);
+      setLoading(false);
       updateNotification({
         id: "sing-in-status",
         title: "Sign In Error!",
@@ -96,9 +96,9 @@ const Page: NextPage = (props): JSX.Element => {
     let sub = true;
     if (sub) {
       if (status === "authenticated") router.push("/");
-      if (router.pathname === "/auth/sign-in") setVisible(false)
+      if (router.pathname === "/auth/sign-in") setVisible(false);
       if (status === "unauthenticated") setVisible(false);
-      if (loading) setVisible(true)
+      if (loading) setVisible(true);
     }
     return () => {
       sub = false;

@@ -11,10 +11,19 @@ export const logsRouter = t.router({
   logs: t.procedure.query(async () => {
       const date = new Date();
 
-      date.setDate(date.getDate() - 2);
+      date.setDate(date.getDate() - 3);
+
+      let str_date: string = date.toLocaleDateString();
+
+      const when =
+        str_date.split("/")[2] +
+        "-" +
+        str_date.split("/")[1] +
+        "-" +
+        str_date.split("/")[0];
 
       const url =
-        "https://logtail.com/api/v1/query?source_ids=158744&query=transID";
+        `https://logtail.com/api/v1/query?source_ids=158744&query=transID&from=${when}`;
 
       const token = LOGTAIL_API_TOKEN;
       const headers = {
@@ -150,6 +159,7 @@ export const logsRouter = t.router({
                   firstName: transaction[0]?.firstName,
                   middleName: transaction[0]?.middleName,
                   lastName: transaction[0]?.lastName,
+                  state: "new"
                 },
               });
           } catch (error) {
@@ -170,6 +180,6 @@ export const logsRouter = t.router({
       if (!logs) {
         return;
       }
-      return logs;
+      return transactions;
   }),
 });
