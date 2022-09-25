@@ -86,24 +86,8 @@ export const usersRouter = t.router({
       })
     )
     .query(async ({ input }) => {
-      if (input.email === "undefined")
-        return {
-          id: "",
-          username: "",
-          role: "",
-          firstName: "",
-          lastName: "",
-          email: "",
-        };
-      if (input.email === "")
-        return {
-          id: "",
-          username: "",
-          role: "",
-          firstName: "",
-          lastName: "",
-          email: "",
-        };
+      if (input.email === "undefined") return;
+      if (input.email === "") return;
       const user = await prisma.user.findFirst({
         where: {
           email: input.email,
