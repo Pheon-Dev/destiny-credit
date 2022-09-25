@@ -1,4 +1,4 @@
-import React, { useEffect, useState } from "react";
+import React from "react";
 import {
   EmptyTable,
   MembersTable,
@@ -12,20 +12,11 @@ import { NextPage } from "next";
 import { useSession } from "next-auth/react";
 
 const Page: NextPage = () => {
-  const [email, setEmail] = useState("");
-
   const { data } = useSession();
 
-  useEffect(() => {
-    let subscribe = true;
-    if (subscribe) {
-      setEmail(`${data?.user?.email}`);
-    }
-  }, [data]);
-
-  trpc.logs.logs.useQuery();
+  const logs = trpc.logs.logs.useQuery();
   const { data: user } = trpc.users.user.useQuery({
-    email: email,
+    email: `${data?.user?.email}` || "",
   });
 
   const { data: members, fetchStatus: mems_status } =
@@ -38,7 +29,7 @@ const Page: NextPage = () => {
     <Protected>
       <div style={{ position: "relative" }}>
         <LoadingOverlay overlayBlur={2} visible={mems_status === "fetching"} />
-        {!transactions && <EmptyTable call="maintain" />}
+        {!transactions && !logs && <EmptyTable call="maintain" />}
         {transactions && (
           <TransactionsTable transactions={transactions} call="maintain" />
         )}

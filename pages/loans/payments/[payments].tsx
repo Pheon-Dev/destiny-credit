@@ -1,4 +1,4 @@
-import React, { useEffect, useState } from "react";
+import React from "react";
 import { useRouter } from "next/router";
 import { trpc } from "../../../utils/trpc";
 import { Protected, TitleText } from "../../../components";
@@ -7,19 +7,10 @@ import { useSession } from "next-auth/react";
 import { NextPage } from "next";
 
 const PaymentsList = () => {
-  const [email, setEmail] = useState("");
-
   const { data } = useSession();
 
-  useEffect(() => {
-    let subscribe = true;
-    if (subscribe) {
-      setEmail(`${data?.user?.email}`);
-    }
-  }, [data]);
-
   const { data: user } = trpc.users.user.useQuery({
-    email: email,
+    email: `${data?.user?.email}` || "",
   });
 
     const router = useRouter();

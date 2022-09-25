@@ -64,25 +64,25 @@ export const trpc = createTRPCNext<AppRouter, SSRContext>({
            * @link http://localhost:3000/docs/v10/header
            * @link http://localhost:3000/docs/v10/ssr
            */
-          headers() {
-            if (ctx?.req) {
-              // To use SSR properly, you need to forward the client's headers to the server
-              // This is so you can pass through things like cookies when we're server-side rendering
-
-              // If you're using Node 18, omit the "connection" header
-              const {
-                // eslint-disable-next-line @typescript-eslint/no-unused-vars
-                connection: _connection,
-                ...headers
-              } = ctx.req.headers;
-              return {
-                ...headers,
-                // Optional: inform server that it's an SSR request
-                'x-ssr': '1',
-              };
-            }
-            return {};
-          },
+          /* headers() { */
+          /*   if (ctx?.req) { */
+          /*     // To use SSR properly, you need to forward the client's headers to the server */
+          /*     // This is so you can pass through things like cookies when we're server-side rendering */
+          /**/
+          /*     // If you're using Node 18, omit the "connection" header */
+          /*     const { */
+          /*       // eslint-disable-next-line @typescript-eslint/no-unused-vars */
+          /*       connection: _connection, */
+          /*       ...headers */
+          /*     } = ctx.req.headers; */
+          /*     return { */
+          /*       ...headers, */
+          /*       // Optional: inform server that it's an SSR request */
+          /*       'x-ssr': '1', */
+          /*     }; */
+          /*   } */
+          /*   return {}; */
+          /* }, */
         }),
       ],
       /**
@@ -94,30 +94,30 @@ export const trpc = createTRPCNext<AppRouter, SSRContext>({
   /**
    * @link https://trpc.io/docs/ssr
    */
-  ssr: true,
+  ssr: false,
   /**
    * Set headers or status code when doing SSR
    */
-  responseMeta(opts) {
-    const ctx = opts.ctx as SSRContext;
-
-    if (ctx.status) {
-      // If HTTP status set, propagate that
-      return {
-        status: ctx.status,
-      };
-    }
-
-    const error = opts.clientErrors[0];
-    if (error) {
-      // Propagate http first error from API calls
-      return {
-        status: error.data?.httpStatus ?? 500,
-      };
-    }
-
-    // for app caching with SSR see https://trpc.io/docs/caching
-
-    return {};
-  },
+  /* responseMeta(opts) { */
+  /*   const ctx = opts.ctx as SSRContext; */
+  /**/
+  /*   if (ctx.status) { */
+  /*     // If HTTP status set, propagate that */
+  /*     return { */
+  /*       status: ctx.status, */
+  /*     }; */
+  /*   } */
+  /**/
+  /*   const error = opts.clientErrors[0]; */
+  /*   if (error) { */
+  /*     // Propagate http first error from API calls */
+  /*     return { */
+  /*       status: error.data?.httpStatus ?? 500, */
+  /*     }; */
+  /*   } */
+  /**/
+  /*   // for app caching with SSR see https://trpc.io/docs/caching */
+  /**/
+  /*   return {}; */
+  /* }, */
 });

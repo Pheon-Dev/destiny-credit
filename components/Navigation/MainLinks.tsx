@@ -1,4 +1,4 @@
-import React, { useEffect, useState } from "react";
+import React from "react";
 import {
   IconHome,
   IconUsers,
@@ -23,23 +23,11 @@ interface Data {
 export const MainLinks = () => {
   const router = useRouter();
 
-  const [email, setEmail] = useState("");
-
   const { data } = useSession();
 
   const { data: user } = trpc.users.user.useQuery({
-    email: email,
+    email: `${data?.user?.email}` || "",
   });
-
-  useEffect(() => {
-    let subscribe = true;
-    if (subscribe) {
-      setEmail(`${data?.user?.email}`);
-    }
-    return () => {
-      subscribe = false;
-    };
-  }, [data, email, user?.role]);
 
   const LinkRouter = ({
     data,

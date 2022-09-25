@@ -1,4 +1,4 @@
-import React, { useEffect, useState } from "react";
+import React from "react";
 import { EmptyTable, MembersTable, Protected } from "../../components";
 import { LoadingOverlay } from "@mantine/core";
 import { NextPage } from "next";
@@ -6,19 +6,10 @@ import { trpc } from "../../utils/trpc";
 import { useSession } from "next-auth/react";
 
 const MembersList = () => {
-  const [email, setEmail] = useState("");
-
   const { data } = useSession();
 
-  useEffect(() => {
-    let subscribe = true;
-    if (subscribe) {
-      setEmail(`${data?.user?.email}`);
-    }
-  }, [data]);
-
   const { data: user } = trpc.users.user.useQuery({
-    email: email,
+    email: `${data?.user?.email}` || "",
   });
 
   const { data: members, fetchStatus } = trpc.members.members.useQuery();

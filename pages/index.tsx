@@ -5,7 +5,7 @@ import { LoadingOverlay } from "@mantine/core";
 import { NextPage } from "next";
 
 const Page: NextPage = () => {
-  trpc.logs.logs.useQuery();
+  const logs = trpc.logs.logs.useQuery();
   const { data: transactions, fetchStatus } =
     trpc.transactions.transactions.useQuery();
 
@@ -13,7 +13,7 @@ const Page: NextPage = () => {
     <Protected>
       <div style={{ position: "relative" }}>
         <LoadingOverlay overlayBlur={2} visible={fetchStatus === "fetching"} />
-        {!transactions && <EmptyTable call="transactions" />}
+        {!transactions && !logs && <EmptyTable call="transactions" />}
         {transactions && (
           <TransactionsTable transactions={transactions} call="transactions" />
         )}

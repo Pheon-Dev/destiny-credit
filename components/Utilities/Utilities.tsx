@@ -32,28 +32,20 @@ import { signOut, useSession } from "next-auth/react";
 import { useMantineColorScheme } from "@mantine/core";
 import { IconSun, IconMoonStars } from "@tabler/icons";
 import { trpc } from "../../utils/trpc";
-import { useEffect, useState } from "react";
+import { useState } from "react";
 import { TitleText } from "../Text/TitleText";
 
 export const Utilities = () => {
   const [scroll, scrollTo] = useWindowScroll();
   const [open, setOpen] = useState(false);
-  const [email, setEmail] = useState("");
 
   const { status, data } = useSession();
   const { colorScheme, toggleColorScheme } = useMantineColorScheme();
 
   const router = useRouter();
 
-  useEffect(() => {
-    let subscribe = true;
-    if (subscribe) {
-      setEmail(`${data?.user?.email}`);
-    }
-  }, [data, router?.pathname]);
-
   const { data: user } = trpc.users.user.useQuery({
-    email: email,
+    email: `${data?.user?.email}` || "",
   });
 
   const handleSignOut = () => {
