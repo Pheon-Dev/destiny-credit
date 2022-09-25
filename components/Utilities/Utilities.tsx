@@ -56,34 +56,6 @@ export const Utilities = () => {
     email: email,
   });
 
-  /* const logs = trpc.logs.logs.useQuery(); */
-
-  const forceReload = async () => {
-    try {
-      /* if (logs) */
-        updateNotification({
-          id: "transactions-status",
-          color: "teal",
-          title: "M-PESA Transactions",
-          message: `Updated Recent M-PESA Transactions`,
-          icon: <IconCheck size={16} />,
-          autoClose: 8000,
-        });
-      Router.replace(Router.asPath);
-    } catch (error) {
-      setTimeout(() => {
-        updateNotification({
-          id: "transactions-status",
-          title: "Transaction Fetch Error!",
-          message: `${error}. Please Try Again Later`,
-          icon: <IconX size={16} />,
-          color: "red",
-          autoClose: 4000,
-        });
-      });
-    }
-  };
-
   const handleSignOut = () => {
     try {
       setOpen(false);
@@ -125,53 +97,24 @@ export const Utilities = () => {
                 />
               </Tooltip>
               {status === "authenticated" && (
-                <Tooltip color="blue" withArrow label="Refresh">
-                  <Tabs.Tab
-                    onClick={() => {
-                      showNotification({
-                        id: "transactions-status",
-                        color: "teal",
-                        title: "Loading Transactions",
-                        message: "Fetching Recent M-PESA Transactions ...",
-                        loading: true,
-                        autoClose: 50000,
-                      });
-                      forceReload();
-                    }}
-                    value="refresh"
-                    icon={<IconArrowsLeftRight style={{ padding: 2 }} />}
-                  />
-                </Tooltip>
+                <>
+                  <Tooltip color="blue" withArrow label="Search">
+                    <Tabs.Tab
+                      value="search"
+                      onClick={() => setOpen((prev) => !prev)}
+                      icon={<IconSearch style={{ padding: 2 }} />}
+                    />
+                  </Tooltip>
+                  <Tooltip color="blue" withArrow label="Account">
+                    <Tabs.Tab
+                      value="account"
+                      onClick={() => setOpen((prev) => !prev)}
+                      icon={<IconUser style={{ padding: 2 }} />}
+                    />
+                  </Tooltip>
+                </>
               )}
             </Tabs.List>
-          </StyledTabs>
-          <StyledTabs>
-            {status === "authenticated" && (
-              <Tabs.List>
-                <Tooltip color="blue" withArrow label="Search">
-                  <Tabs.Tab
-                    value="search"
-                    onClick={() => setOpen((prev) => !prev)}
-                    icon={<IconSearch style={{ padding: 2 }} />}
-                  />
-                </Tooltip>
-                <Tooltip color="blue" withArrow label="Account">
-                  <Tabs.Tab
-                    value="account"
-                    onClick={() => setOpen((prev) => !prev)}
-                    icon={<IconUser style={{ padding: 2 }} />}
-                  />
-                </Tooltip>
-                <Tooltip color="blue" withArrow label="Apps">
-                  <Tabs.Tab
-                    value="apps"
-                    onClick={() => setOpen((prev) => !prev)}
-                    icon={<IconCategory2 style={{ padding: 2 }} />}
-                    disabled
-                  />
-                </Tooltip>
-              </Tabs.List>
-            )}
           </StyledTabs>
         </Group>
       </Affix>
