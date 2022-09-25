@@ -5,11 +5,13 @@ import { LoadingOverlay } from "@mantine/core";
 import { NextPage } from "next";
 
 const Page: NextPage = () => {
-  try {
-    const { data: transactions, status } = trpc.transactions.transactions.useQuery();
-    return (
-      <Protected>
-        <LoadingOverlay overlayBlur={2} visible={status === "loading"} />
+  const { data: transactions, fetchStatus } =
+    trpc.transactions.transactions.useQuery();
+
+  return (
+    <Protected>
+      <div style={{ position: "relative" }}>
+        <LoadingOverlay overlayBlur={2} visible={fetchStatus === "fetching"} />
         {(transactions?.length === 0 && <EmptyTable call="transactions" />) ||
           (transactions && (
             <TransactionsTable
@@ -17,15 +19,8 @@ const Page: NextPage = () => {
               call="transactions"
             />
           ))}
-      </Protected>
-    );
-  } catch (error) {
-    console.log(error);
-    return (
-      <Protected>
-        <EmptyTable call="transactions" />
-      </Protected>
-    );
-  }
+      </div>
+    </Protected>
+  );
 };
 export default Page;

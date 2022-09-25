@@ -1,4 +1,4 @@
-import React from "react";
+import React, { useEffect, useState } from "react";
 import { EmptyTable, MembersTable, Protected } from "../../components";
 import { LoadingOverlay } from "@mantine/core";
 import { NextPage } from "next";
@@ -6,22 +6,27 @@ import { trpc } from "../../utils/trpc";
 import { useSession } from "next-auth/react";
 
 const MembersList = () => {
-  const { status, data } = useSession();
-  try {
-    const { data: user, status: user_status } = trpc.users.user.useQuery(
-      {
-      email: `${data?.user?.email}` || "",
-      },
-    );
+  const [email, setEmail] = useState("");
 
-    const { data: members, status: members_status } = trpc.members.members.useQuery();
+  const { data } = useSession();
 
-    return (
-      <Protected>
-        <LoadingOverlay
-          overlayBlur={2}
-          visible={members_status === "loading"}
-        />
+  useEffect(() => {
+    let subscribe = true;
+    if (subscribe) {
+      setEmail(`${data?.user?.email}`);
+    }
+  }, [data]);
+
+  const { data: user } = trpc.users.user.useQuery({
+    email: email,
+  });
+
+  const { data: members, fetchStatus } = trpc.members.members.useQuery();
+
+  return (
+    <Protected>
+      <div style={{ position: "relative" }}>
+        <LoadingOverlay overlayBlur={2} visible={fetchStatus === "fetching"} />
         {(members?.length === 0 && <EmptyTable call="all-members" />) ||
           (members && (
             <MembersTable
@@ -30,16 +35,9 @@ const MembersList = () => {
               call="all-members"
             />
           ))}
-      </Protected>
-    );
-  } catch (error) {
-    console.log(error);
-    return (
-      <Protected>
-        <EmptyTable call="all-members" />
-      </Protected>
-    );
-  }
+      </div>
+    </Protected>
+  );
 };
 
 const Page: NextPage = () => {

@@ -1,4 +1,3 @@
-import { TRPCError } from "@trpc/server";
 import axios from "axios";
 import { t } from "../trpc";
 import { PrismaClient } from "@prisma/client";
@@ -10,28 +9,9 @@ const LOGTAIL_API_TOKEN = process.env.NEXT_PUBLIC_LOGTAIL_API_TOKEN;
 
 export const logsRouter = t.router({
   logs: t.procedure.query(async () => {
-    try {
       const date = new Date();
-      const n_date = new Date();
 
       date.setDate(date.getDate() - 2);
-      let str_date: string = date.toLocaleDateString();
-      let str_ndate: string = n_date.toLocaleDateString();
-      let str_tdate: string = n_date.toLocaleTimeString();
-
-      const new_date =
-        str_date.split("/")[2] +
-        "-" +
-        str_date.split("/")[1] +
-        "-" +
-        str_date.split("/")[0];
-
-      const now_date =
-        str_ndate.split("/")[2] +
-        "-" +
-        str_ndate.split("/")[1] +
-        "-" +
-        str_ndate.split("/")[0];
 
       const url =
         "https://logtail.com/api/v1/query?source_ids=158744&query=transID";
@@ -54,11 +34,7 @@ export const logsRouter = t.router({
       log.data?.map(async (t: Logs) => {
         if (t?.message.startsWith("START")) {
           const data = t?.message.split("{")[1].split("}")[0];
-          /* transactions.push({ */
-          /*   transaction: data.split(",").map((e) => */
-          /*     e.trim() */
-          /*   ), */
-          /* }); */
+
           let transactionType = data
             .split(",")[0]
             .split(":")[1]
@@ -127,7 +103,6 @@ export const logsRouter = t.router({
             middleName: middleName.toUpperCase(),
             lastName: lastName.toUpperCase(),
           });
-          /* console.log(transaction[0].transactionType); */
 
           transactions.push({
             transaction,
@@ -135,7 +110,7 @@ export const logsRouter = t.router({
 
           const search = await prisma.transaction.findMany({
             where: {
-              transID: transaction[0].transID,
+              transID: transaction[0]?.transID,
             },
           });
           try {
@@ -145,7 +120,7 @@ export const logsRouter = t.router({
                   transID: transaction[0].transID,
                 },
               });
-              /* console.log("Duplicate :", duplicate?.firstName); */
+
               return await prisma.transaction.deleteMany({
                 where: {
                   transID: duplicate?.transID,
@@ -153,14 +128,13 @@ export const logsRouter = t.router({
               });
             }
             if (search.length === 1) {
-              /* console.log("Logged :", transaction[0]?.firstName + ":" + transaction[0]?.transID + ":" + transaction[0]?.transAmount); */
               return;
             }
             if (
               transaction[0]?.transactionType === "PAY BILL" ||
               transaction[0]?.transactionType === "CUSTOMER MERCHANT PAYMENT"
             )
-              /* console.log("New :", transaction[0]?.firstName); */
+
               return await prisma.transaction.create({
                 data: {
                   transactionType: transaction[0]?.transactionType,
@@ -179,10 +153,7 @@ export const logsRouter = t.router({
                 },
               });
           } catch (error) {
-            throw new TRPCError({
-              code: "NOT_FOUND",
-              message: `logs.logs ${error}`,
-            });
+            return;
           }
         }
         return {
@@ -190,15 +161,6 @@ export const logsRouter = t.router({
         };
       });
 
-      /* if (transactions.length > 0) */
-      /*   return { */
-      /*     data: transactions.length, */
-      /*     from: new_date + " " + str_tdate, */
-      /*     to: now_date + " " + str_tdate, */
-      /*     message: "Transactions Upto Date", */
-      /*   }; */
-
-      /* return await prisma.transaction.findMany(); */
       const logs = await prisma.transaction.findMany({
         where: {},
         orderBy: {
@@ -206,20 +168,8 @@ export const logsRouter = t.router({
         },
       });
       if (!logs) {
-        throw new TRPCError({
-          code: "NOT_FOUND",
-          message: `logs.logs not found`,
-        });
+        return;
       }
       return logs;
-      /* return { */
-      /*   data: transactions.length, */
-      /*   from: new_date + " " + str_tdate, */
-      /*   to: now_date + " " + str_tdate, */
-      /*   message: "No New Transactions", */
-      /* }; */
-    } catch (error) {
-      console.log("logs.logs");
-    }
   }),
 });

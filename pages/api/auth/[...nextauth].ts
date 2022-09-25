@@ -3,7 +3,6 @@ import { PrismaClient } from "@prisma/client";
 import NextAuth from "next-auth";
 import type { NextAuthOptions } from "next-auth";
 import CredentialsProvider from "next-auth/providers/credentials";
-import { NextApiHandler } from "next";
 
 const prisma = new PrismaClient();
 const SECRET = process.env.NEXT_PUBLIC_JWT_SECRET;
@@ -55,7 +54,4 @@ const authOptions: NextAuthOptions = {
   },
 };
 
-const authHandler: NextApiHandler = (req, res) =>
-  NextAuth(req, res, authOptions);
-
-export default authHandler;
+export default NextAuth(authOptions);

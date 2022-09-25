@@ -1,4 +1,4 @@
-import React, { useEffect } from "react";
+import React, { useEffect, useState } from "react";
 import { signIn, useSession } from "next-auth/react";
 import { NextPage } from "next";
 import { z } from "zod";
@@ -11,6 +11,7 @@ import {
   Box,
   Group,
   Text,
+  LoadingOverlay,
 } from "@mantine/core";
 import { useRouter } from "next/router";
 import { showNotification, updateNotification } from "@mantine/notifications";
@@ -23,6 +24,8 @@ const schema = z.object({
 
 const Page: NextPage = (props): JSX.Element => {
   const { status, data } = useSession();
+  const [visible, setVisible] = useState(false);
+  const [loading, setLoading] = useState(false);
   const router = useRouter();
 
   const form = useForm({
@@ -35,15 +38,16 @@ const Page: NextPage = (props): JSX.Element => {
 
   const handleSubmit = async () => {
     try {
-      const res = await signIn("credentials", {
-        username: form.values.username,
-        password: form.values.password,
-        redirect: false,
-      });
+      if (form.values.username && form.values.password) {
+        setLoading(true);
+        const res = await signIn("credentials", {
+          username: form.values.username,
+          password: form.values.password,
+          redirect: false,
+        });
 
-      if (res?.ok) {
-        router.replace(router.asPath);
-        setTimeout(() => {
+        if (res?.ok) {
+          router.replace(router.asPath);
           updateNotification({
             id: "sing-in-status",
             color: "teal",
@@ -52,12 +56,10 @@ const Page: NextPage = (props): JSX.Element => {
             icon: <IconCheck size={16} />,
             autoClose: 8000,
           });
-        });
-        return router.push("/");
-      }
+          return router.push("/");
+        }
 
-      if (res?.error) {
-        return setTimeout(() => {
+        if (res?.error) {
           updateNotification({
             id: "sing-in-status",
             color: "red",
@@ -66,18 +68,24 @@ const Page: NextPage = (props): JSX.Element => {
             icon: <IconX size={16} />,
             autoClose: 8000,
           });
-        });
+        }
       }
+      return updateNotification({
+        id: "sing-in-status",
+        color: "red",
+        title: "Missing Fields!",
+        message: `Please Fill in The Credentials to Continue!`,
+        icon: <IconX size={16} />,
+        autoClose: 8000,
+      });
     } catch (error) {
-      setTimeout(() => {
-        updateNotification({
-          id: "sing-in-status",
-          title: "Sign In Error!",
-          message: `Please Try Signing In Again!`,
-          icon: <IconX size={16} />,
-          color: "red",
-          autoClose: 4000,
-        });
+      updateNotification({
+        id: "sing-in-status",
+        title: "Sign In Error!",
+        message: `Please Try Signing In Again!`,
+        icon: <IconX size={16} />,
+        color: "red",
+        autoClose: 4000,
       });
     }
   };
@@ -85,17 +93,18 @@ const Page: NextPage = (props): JSX.Element => {
   useEffect(() => {
     let sub = true;
     if (sub) {
-      setTimeout(() => {
-          if (status === "authenticated") router.push("/");
-        }, 5000)
+      if (status === "authenticated") router.push("/");
+      if (router.pathname === "/auth/sign-in") setVisible(false)
+      if (status === "unauthenticated") setVisible(false);
+      if (loading) setVisible(true)
     }
     return () => {
       sub = false;
     };
-  }, [status, router]);
+  }, [status, router, visible, loading]);
 
   return (
-    <div style={{position: "relative"}}>
+    <>
       <Card
         sx={{ maxWidth: 360 }}
         mx="auto"
@@ -103,8 +112,9 @@ const Page: NextPage = (props): JSX.Element => {
         p="lg"
         radius="md"
         withBorder
-        style={{ marginTop: "200px" }}
+        style={{ marginTop: "200px", position: "relative" }}
       >
+        <LoadingOverlay overlayBlur={2} visible={visible} />
         <Card.Section>
           <Box p="lg">
             <form>
@@ -149,6 +159,7 @@ const Page: NextPage = (props): JSX.Element => {
                       loading: true,
                       autoClose: 50000,
                     });
+                    setLoading(true);
                     handleSubmit();
                   }}
                 >
@@ -159,7 +170,7 @@ const Page: NextPage = (props): JSX.Element => {
           </Box>
         </Card.Section>
       </Card>
-    </div>
+    </>
   );
 };
 

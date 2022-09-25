@@ -1,21 +1,32 @@
-import React from "react";
+import React, { useEffect, useState } from "react";
 import { trpc } from "../../utils/trpc";
 import { EmptyTable, PaymentsTable, Protected } from "../../components";
 import { LoadingOverlay } from "@mantine/core";
 import { useSession } from "next-auth/react";
+import { NextPage } from "next";
 
 const PaymentsList = () => {
-  const { status, data } = useSession();
-  try {
-    const { data: user, status: user_status } = trpc.users.user.useQuery({
-      email: `${data?.user?.email}` || "",
-    });
+  const [email, setEmail] = useState("");
 
-    const { data: loans, status } = trpc.loans.loans.useQuery();
+  const { data } = useSession();
 
-    return (
-      <Protected>
-        <LoadingOverlay overlayBlur={2} visible={status === "loading"} />
+  useEffect(() => {
+    let subscribe = true;
+    if (subscribe) {
+      setEmail(`${data?.user?.email}`);
+    }
+  }, [data]);
+
+  const { data: user } = trpc.users.user.useQuery({
+    email: email,
+  });
+
+  const { data: loans, fetchStatus } = trpc.loans.loans.useQuery();
+
+  return (
+    <Protected>
+      <div style={{ position: "relative" }}>
+        <LoadingOverlay overlayBlur={2} visible={fetchStatus === "fetching"} />
         {(loans?.length === 0 && <EmptyTable call="payments" />) ||
           (loans && (
             <PaymentsTable
@@ -24,19 +35,12 @@ const PaymentsList = () => {
               call="payments"
             />
           ))}
-      </Protected>
-    );
-  } catch (error) {
-    console.log(error);
-    return (
-      <Protected>
-        <EmptyTable call="payments" />
-      </Protected>
-    );
-  }
+      </div>
+    </Protected>
+  );
 };
 
-const Page = () => {
+const Page: NextPage = () => {
   return <PaymentsList />;
 };
 

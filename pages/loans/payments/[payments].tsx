@@ -1,11 +1,27 @@
-import React from "react";
+import React, { useEffect, useState } from "react";
 import { useRouter } from "next/router";
 import { trpc } from "../../../utils/trpc";
-import { EmptyTable, Protected, TitleText } from "../../../components";
+import { Protected, TitleText } from "../../../components";
 import { Group, LoadingOverlay, Table } from "@mantine/core";
+import { useSession } from "next-auth/react";
+import { NextPage } from "next";
 
 const PaymentsList = () => {
-  try {
+  const [email, setEmail] = useState("");
+
+  const { data } = useSession();
+
+  useEffect(() => {
+    let subscribe = true;
+    if (subscribe) {
+      setEmail(`${data?.user?.email}`);
+    }
+  }, [data]);
+
+  const { data: user } = trpc.users.user.useQuery({
+    email: email,
+  });
+
     const router = useRouter();
     const id = router.query.payments as string;
 
@@ -33,11 +49,11 @@ const PaymentsList = () => {
         <th>Type</th>
       </tr>
     );
-    const { data: loan, status: loan_status } =
+    const { data: loan, fetchStatus: loan_status } =
       trpc.loans.loan_payment.useQuery({ id: id });
-    const { data: member, status: member_status } =
+    const { data: member, fetchStatus: member_status } =
       trpc.members.member.useQuery({ id: `${loan?.memberId}` });
-    const { data: payments, status: payment_status } =
+    const { data: payments, fetchStatus: payment_status } =
       trpc.loans.payment.useQuery({ id: id });
 
     const names = member?.lastName;
@@ -47,7 +63,7 @@ const PaymentsList = () => {
     const lastname = names?.split(" ")[1];
     const phonenumber = member?.phoneNumber;
 
-    const { data: transactions, status: transactions_status } =
+    const { data: transactions, fetchStatus: transactions_status } =
       trpc.loans.transactions.useQuery({
         firstName: `${firstname}`,
         middleName: `${middlename}`,
@@ -56,7 +72,7 @@ const PaymentsList = () => {
       });
 
     return (
-      <>
+      <Protected>
         <Group position="center" m="lg">
           <TitleText title={`${loan?.memberName}`} />
         </Group>
@@ -68,7 +84,7 @@ const PaymentsList = () => {
         >
           <LoadingOverlay
             overlayBlur={2}
-            visible={payment_status === "loading"}
+            visible={payment_status === "fetching"}
           />
           <thead>
             <Header />
@@ -190,19 +206,12 @@ const PaymentsList = () => {
             <TransactionsHeader />
           </tfoot>
         </Table>
-      </>
-    );
-  } catch (error) {
-    console.log(error);
-    return (
-      <Protected>
-        <EmptyTable call="payment" />
       </Protected>
     );
-  }
+
 };
 
-const Page = () => {
+const Page: NextPage = () => {
   return <PaymentsList />;
 };
 

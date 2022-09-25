@@ -25,6 +25,8 @@ import {
 } from "@mantine/core";
 import { TitleText, MainLinks, Utilities } from "../components";
 import { trpc } from "../utils/trpc";
+import { unstable_getServerSession } from "next-auth";
+import authOptions from "./api/auth/[...nextauth]";
 
 const App = (props: AppProps & { colorScheme: ColorScheme }) => {
   const theme = useMantineTheme();
@@ -34,8 +36,6 @@ const App = (props: AppProps & { colorScheme: ColorScheme }) => {
     props.colorScheme
   );
 
-  /* const [isSSR, setIsSSR] = useState(true); */
-
   const toggleColorScheme = (value?: ColorScheme) => {
     const nextColorScheme =
       value || (colorScheme === "dark" ? "light" : "dark");
@@ -44,12 +44,6 @@ const App = (props: AppProps & { colorScheme: ColorScheme }) => {
       maxAge: 60 * 60 * 24 * 30,
     });
   };
-
-  /* useEffect(() => { */
-  /*   setIsSSR(false); */
-  /* }, []); */
-
-  /* if (isSSR) return null; */
 
   const AppContent = () => {
     const { status, data } = useSession();
@@ -154,5 +148,23 @@ const App = (props: AppProps & { colorScheme: ColorScheme }) => {
 App.getInitialProps = ({ ctx }: { ctx: GetServerSidePropsContext }) => ({
   colorscheme: getCookie("mantine-color-scheme", ctx) || "dark",
 });
+
+export async function getServerSideProps(ctx: GetServerSidePropsContext) {
+ const session = await unstable_getServerSession(ctx.req, ctx.res, authOptions);
+    if (!session) {
+        return {
+            redirect: {
+                destination: "/",
+                permanent: false,
+              },
+          }
+      }
+
+      return {
+          props: {
+              session
+            }
+        }
+    }
 
 export default trpc.withTRPC(App);
