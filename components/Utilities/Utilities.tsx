@@ -110,77 +110,13 @@ export const Utilities = () => {
           </StyledTabs>
         </Group>
       </Affix>
-      {/* <Menu */}
-      {/* shadow="md" */}
-      {/* openDelay={100} */}
-      {/* closeDelay={400} */}
-      {/* width={200} */}
-      {/* position="bottom-end" */}
-      {/* withArrow */}
-      {/* > */}
-      {/*   <Menu.Dropdown> */}
-      {/*     <Menu.Item */}
-      {/*       onClick={() => { */}
-      {/*         toggleColorScheme(); */}
-      {/*       }} */}
-      {/*       icon={ */}
-      {/*         colorScheme === "dark" ? ( */}
-      {/*           <IconSun color="yellow" size={20} stroke={1.5} /> */}
-      {/*         ) : ( */}
-      {/*           <IconMoonStars color="blue" size={20} stroke={1.5} /> */}
-      {/*         ) */}
-      {/*       } */}
-      {/*     > */}
-      {/*       {colorScheme === "dark" ? "Light Theme" : "Dark Theme"} */}
-      {/*     </Menu.Item> */}
-      {/*     {status === "authenticated" && ( */}
-      {/*       <> */}
-      {/*         <Menu.Divider /> */}
-      {/*         <Menu.Item icon={<IconSettings size={20} />}>Settings</Menu.Item> */}
-      {/*         <Menu.Item icon={<IconMessageCircle size={20} />} disabled> */}
-      {/*           Messages */}
-      {/*         </Menu.Item> */}
-      {/*         <Menu.Item */}
-      {/*           icon={<IconSearch size={20} />} */}
-      {/*           rightSection={ */}
-      {/*             <Text size="xs" color="dimmed"> */}
-      {/*               CTRL+K */}
-      {/*             </Text> */}
-      {/*           } */}
-      {/*           disabled */}
-      {/*         > */}
-      {/*           Search */}
-      {/*         </Menu.Item> */}
-      {/*         <Menu.Divider /> */}
-      {/*         <Menu.Item icon={<IconRefresh size={20} />}> */}
-      {/*           Reload Page */}
-      {/*         </Menu.Item> */}
-      {/*         <Menu.Item */}
-      {/*           onClick={() => { */}
-      {/*             showNotification({ */}
-      {/*               id: "sign-out-status", */}
-      {/*               color: "teal", */}
-      {/*               title: "Sign Out", */}
-      {/*               message: "Signing Out of Destiny Credit LTD ...", */}
-      {/*               loading: true, */}
-      {/*               autoClose: 10000, */}
-      {/*             }); */}
-      {/*             handleSignOut(); */}
-      {/*           }} */}
-      {/*           icon={<IconLogout size={20} />} */}
-      {/*           color="red" */}
-      {/*         > */}
-      {/*           Sign Out */}
-      {/*         </Menu.Item> */}
-      {/*       </> */}
-      {/*     )} */}
-      {/*   </Menu.Dropdown> */}
-      {/*  </Menu> */}
       {user && (
-        <Modal
+        <Drawer
           opened={open}
           onClose={() => setOpen(false)}
           title="Account Info"
+          padding="xl"
+          size="xl"
         >
           <Card shadow="sm" p="lg" radius="md" withBorder>
             <Card.Section withBorder inheritPadding py="xs">
@@ -252,7 +188,7 @@ export const Utilities = () => {
               </Grid>
             </Card.Section>
           </Card>
-        </Modal>
+        </Drawer>
       )}
       <Affix position={{ bottom: 20, right: 20 }}>
         <Transition transition="slide-up" mounted={scroll.y > 0}>

@@ -32,6 +32,32 @@ export const transactionsRouter = t.router({
 
       return transaction;
     }),
+  state: t.procedure
+    .input(
+      z.object({
+        id: z.string(),
+        state: z.string(),
+      })
+    )
+    .mutation(async ({ input }) => {
+      const transaction = await prisma.transaction.updateMany({
+        where: {
+          id: input.id,
+        },
+        data: {
+          state: input.state,
+        },
+      });
+
+      if (transaction?.count === 0) {
+        throw new TRPCError({
+          code: "NOT_FOUND",
+          message: `transactions.state not found`,
+        });
+      }
+
+      return transaction;
+    }),
   transactions: t.procedure.query(async () => {
     const transactions = await prisma.transaction.findMany({
       where: {},

@@ -23,7 +23,6 @@ import {
   IconX,
 } from "@tabler/icons";
 import { trpc } from "../../../utils/trpc";
-import type { Loan } from "@prisma/client";
 import { useSession } from "next-auth/react";
 
 const Approve = () => {
