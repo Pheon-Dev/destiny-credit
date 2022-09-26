@@ -159,7 +159,7 @@ const TransactionRow = ({
   handler: string;
   updater: string;
 }) => {
-  const [state, setState] = useState(`${transaction.state}`);
+  const [state, setState] = useState("");
   const [value, setValue] = useState("loan");
   const [updaterId, setUpdaterId] = useState("");
   const [handlerId, setHandlerId] = useState("");
@@ -178,45 +178,45 @@ const TransactionRow = ({
   useEffect(() => {
     let subscribe = true;
     if (subscribe) {
-      setHandlerId(handler)
-      setUpdaterId(updater)
+      setHandlerId(handler);
+      setUpdaterId(updater);
     }
 
     return () => {
       subscribe = false;
     };
-  }, [state, value]);
+  }, [state, value, open]);
 
-  const handleState = useCallback(
-    (status: string) => {
-      try {
-        if (transaction.state === status) return;
-        setState(status);
-        if (transaction.id && state !== "new") {
-          state === "clicked" && handle.mutate({
+  const handleState = useCallback(() => {
+    try {
+      if (transaction.state === "clicked") return;
+      if (transaction.state === "handled") return;
+      if (transaction.id && state !== "new") {
+        state === "clicked" &&
+          handle.mutate({
             id: transaction.id,
             handlerId: `${transaction?.handlerId}`,
             updaterId: `${transaction?.updaterId}`,
-            payment: `${value}`,
+            payment: `${transaction?.payment}`,
             state: `${state}`,
           });
-          state === "handled" && handle.mutate({
+        state === "handled" &&
+          handle.mutate({
             id: transaction.id,
             handlerId: `${handlerId}`,
             updaterId: `${updaterId}`,
             payment: `${value}`,
             state: `${state}`,
           });
-}
-        if (handle.error) {
-          throw new Error("Error Handling State");
-        }
-        return;
-      } catch (error) {
-        return;
       }
-    },
-    [
+      if (handle.error) {
+        throw new Error("Error Handling State");
+      }
+      return;
+    } catch (error) {
+      return;
+    }
+  }, [
     handle,
     transaction.id,
     handler,
@@ -226,8 +226,7 @@ const TransactionRow = ({
     value,
     state,
     transaction.id,
-    ]
-  );
+  ]);
 
   return (
     <>
@@ -238,7 +237,8 @@ const TransactionRow = ({
           }}
           onClick={() => {
             setOpen(true);
-            handleState("clicked");
+            setState("clicked");
+            handleState();
           }}
         >
           <td>{transaction.transID}</td>
@@ -258,27 +258,25 @@ const TransactionRow = ({
           ) : (
             <td>{transaction.billRefNumber}</td>
           )}
+          <td>
+            <Group position="center">
           {state === "new" && (
-            <td>
-              <Group position="center">
                 <IconCheck color="grey" size={20} />
-              </Group>
-            </td>
+          )}
+          {transaction.state === "new" && (
+                <IconCheck color="grey" size={20} />
+          )}
+          {transaction.state === "clicked" && (
+                <IconChecks color="grey" size={20} />
           )}
           {state === "clicked" && (
-            <td>
-              <Group position="center">
                 <IconChecks color="grey" size={20} />
-              </Group>
-            </td>
           )}
-          {state === "handled" && (
-            <td>
-              <Group position="center">
+          {transaction.state === "handled" && (
                 <IconChecks color="blue" size={20} />
+          )}
               </Group>
             </td>
-          )}
         </tr>
       )}
       {call === "register" &&
@@ -441,8 +439,9 @@ const TransactionRow = ({
               <Button
                 variant="light"
                 onClick={() => {
-        setOpen(false);
-                  handleState("handled");
+                  setOpen(false);
+                  setState("handled");
+                  handleState();
                 }}
                 m="md"
               >
