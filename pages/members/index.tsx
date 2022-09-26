@@ -17,7 +17,7 @@ const MembersList = () => {
   return (
     <Protected>
       <div style={{ position: "relative" }}>
-        <LoadingOverlay overlayBlur={2} visible={fetchStatus === "fetching"} />
+        {/* <LoadingOverlay overlayBlur={2} visible={fetchStatus === "fetching"} /> */}
         {!members && <EmptyTable call="all-members" />}
         {members && (
           <MembersTable members={members} call="all-members" role={`${user?.role}`} />

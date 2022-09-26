@@ -28,7 +28,7 @@ const Page: NextPage = () => {
   return (
     <Protected>
       <div style={{ position: "relative" }}>
-        <LoadingOverlay overlayBlur={2} visible={mems_status === "fetching"} />
+        {/* <LoadingOverlay overlayBlur={2} visible={mems_status === "fetching"} /> */}
         {!transactions && !logs && <EmptyTable call="maintain" />}
         {transactions && (
           <TransactionsTable transactions={transactions} call="maintain" />
@@ -36,7 +36,7 @@ const Page: NextPage = () => {
         <Divider variant="dotted" mt="xl" />
       </div>
       <div style={{ position: "relative" }}>
-        <LoadingOverlay overlayBlur={2} visible={trans_status === "fetching"} />
+        {/* <LoadingOverlay overlayBlur={2} visible={trans_status === "fetching"} /> */}
         {!members && <EmptyTable call="create-loan" />}
         {members && (
           <MembersTable

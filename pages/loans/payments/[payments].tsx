@@ -73,10 +73,10 @@ const PaymentsList = () => {
           horizontalSpacing="md"
           style={{ position: "relative" }}
         >
-          <LoadingOverlay
-            overlayBlur={2}
-            visible={payment_status === "fetching"}
-          />
+          {/* <LoadingOverlay */}
+          {/*   overlayBlur={2} */}
+          {/*   visible={payment_status === "fetching"} */}
+          {/* /> */}
           <thead>
             <Header />
           </thead>

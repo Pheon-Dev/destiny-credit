@@ -12,7 +12,7 @@ const Page: NextPage = () => {
   return (
     <Protected>
       <div style={{ position: "relative" }}>
-        <LoadingOverlay overlayBlur={2} visible={fetchStatus === "fetching"} />
+        {/* <LoadingOverlay overlayBlur={2} visible={fetchStatus === "fetching"} /> */}
         {!transactions && !logs && <EmptyTable call="transactions" />}
         {transactions && (
           <TransactionsTable transactions={transactions} call="transactions" />

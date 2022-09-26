@@ -10,7 +10,7 @@ const ProductsList = () => {
   return (
     <Protected>
       <div style={{ position: "relative" }}>
-        <LoadingOverlay overlayBlur={2} visible={fetchStatus === "fetching"} />
+        {/* <LoadingOverlay overlayBlur={2} visible={fetchStatus === "fetching"} /> */}
         {products && <ProductsTable products={products} />}
         {!products && (
           <Group position="center">
