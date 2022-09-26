@@ -11,6 +11,7 @@ const defaultUserSelect = Prisma.validator<Prisma.UserSelect>()({
   lastName: true,
   email: true,
   role: true,
+  state: true,
 });
 
 export const usersRouter = t.router({
@@ -95,10 +96,45 @@ export const usersRouter = t.router({
         select: defaultUserSelect,
       });
 
+      if (user) {
+      await prisma.user.updateMany({
+        where: {
+          email: input.email,
+        },
+        data: {
+          state: "online"
+        },
+      });
+      }
+
       if (!user) {
         throw new TRPCError({
           code: "NOT_FOUND",
           message: `users.user not found`,
+        });
+      }
+      return user;
+    }),
+  signout: t.procedure
+    .input(
+      z.object({
+        email: z.string(),
+      })
+    )
+    .mutation(async ({ input }) => {
+      const user = await prisma.user.updateMany({
+        where : {
+          email: input.email,
+        },
+        data: {
+          state: "offline",
+        },
+      });
+
+      if (!user) {
+        throw new TRPCError({
+          code: "NOT_FOUND",
+          message: `users.signout not found`,
         });
       }
       return user;
@@ -123,13 +159,14 @@ export const usersRouter = t.router({
           password: input.password,
           email: input.email,
           role: input.role,
+          state: "offline",
         },
       });
 
       if (!user) {
         throw new TRPCError({
           code: "NOT_FOUND",
-          message: `users.create-user not found`,
+          message: `users.create_user not found`,
         });
       }
       return user;

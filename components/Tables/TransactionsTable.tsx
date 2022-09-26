@@ -180,6 +180,7 @@ const TransactionRow = ({
     if (subscribe) {
       setHandlerId(handler);
       setUpdaterId(updater);
+      if ((transaction.state = "new")) setState("new");
     }
 
     return () => {
@@ -260,23 +261,20 @@ const TransactionRow = ({
           )}
           <td>
             <Group position="center">
-          {state === "new" && (
+              {transaction.state === "new" && (
                 <IconCheck color="grey" size={20} />
-          )}
-          {transaction.state === "new" && (
-                <IconCheck color="grey" size={20} />
-          )}
-          {transaction.state === "clicked" && (
+              )}
+              {transaction.state === "clicked" && (
                 <IconChecks color="grey" size={20} />
-          )}
-          {state === "clicked" && (
-                <IconChecks color="grey" size={20} />
-          )}
-          {transaction.state === "handled" && (
+              )}
+              {/* {state === "clicked" && ( */}
+              {/*       <IconChecks color="grey" size={20} /> */}
+              {/* )} */}
+              {transaction.state === "handled" && (
                 <IconChecks color="blue" size={20} />
-          )}
-              </Group>
-            </td>
+              )}
+            </Group>
+          </td>
         </tr>
       )}
       {call === "register" &&

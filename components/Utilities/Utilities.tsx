@@ -1,4 +1,4 @@
-import { showNotification, updateNotification } from "@mantine/notifications";
+import { updateNotification } from "@mantine/notifications";
 import {
   Tabs,
   TabsProps,
@@ -9,30 +9,33 @@ import {
   Transition,
   Tooltip,
   Drawer,
-  Modal,
   Card,
   Group,
   Grid,
   ActionIcon,
+  Accordion,
+  Indicator,
+  List,
+  ThemeIcon,
 } from "@mantine/core";
 import { useWindowScroll } from "@mantine/hooks";
 import {
-  IconCategory2,
   IconArrowUp,
   IconSearch,
-  IconArrowsLeftRight,
   IconUser,
   IconCheck,
   IconLogout,
   IconX,
   IconDots,
+  IconDotsVertical,
+  IconCircleDot,
 } from "@tabler/icons";
-import Router, { useRouter } from "next/router";
+import { useRouter } from "next/router";
 import { signOut, useSession } from "next-auth/react";
 import { useMantineColorScheme } from "@mantine/core";
 import { IconSun, IconMoonStars } from "@tabler/icons";
 import { trpc } from "../../utils/trpc";
-import { useState } from "react";
+import { useCallback, useState } from "react";
 import { TitleText } from "../Text/TitleText";
 
 export const Utilities = () => {
@@ -44,15 +47,34 @@ export const Utilities = () => {
 
   const router = useRouter();
 
+  const { data: users } = trpc.users.users.useQuery();
   const { data: user } = trpc.users.user.useQuery({
     email: `${data?.user?.email}` || "",
   });
 
-  const handleSignOut = () => {
+  const utils = trpc.useContext();
+  const signout = trpc.users.signout.useMutation({
+    onSuccess: async () => {
+      await utils.users.user.invalidate({ email: `${data?.user?.email}` });
+      updateNotification({
+        id: "sign-out-status",
+        title: "Signed Out Successfully!",
+        message: `Good Bye, See you Soon ...`,
+        icon: <IconCheck size={16} />,
+        color: "green",
+        autoClose: 4000,
+      });
+    },
+  });
+
+  const handleSignOut = useCallback(() => {
     try {
       setOpen(false);
-      router.push("/auth/sign-in");
+      signout.mutate({
+        email: `${data?.user?.email}`,
+      });
       signOut();
+      router.push("/auth/sign-in");
     } catch (error) {
       setTimeout(() => {
         updateNotification({
@@ -65,7 +87,7 @@ export const Utilities = () => {
         });
       });
     }
-  };
+  }, [data?.user?.email, signout]);
 
   return (
     <>
@@ -137,7 +159,7 @@ export const Utilities = () => {
                 <Menu withinPortal position="bottom-end" shadow="sm">
                   <Menu.Target>
                     <ActionIcon>
-                      <IconDots size={16} />
+                      <IconDotsVertical size={16} />
                     </ActionIcon>
                   </Menu.Target>
 
@@ -188,6 +210,41 @@ export const Utilities = () => {
               </Grid>
             </Card.Section>
           </Card>
+          <Group position="center" m="md">
+            <TitleText title="Online Users" />
+          </Group>
+          <List
+            spacing="md"
+            m="xl"
+            size="sm"
+            center
+            icon={
+              <ThemeIcon color="grey" size={12} radius="xl">
+                <></>
+              </ThemeIcon>
+            }
+          >
+            {users &&
+              users?.map((user) => (
+                <List.Item
+                  value={user?.id}
+                  key={user?.id}
+                  icon={
+                    user?.state === "online" && (
+                      <ThemeIcon color="green" size={12} radius="xl">
+                        <></>
+                      </ThemeIcon>
+                    )
+                  }
+                >
+                  <Group position="center">
+                    <Text>
+                      {user?.firstName} {user?.lastName}
+                    </Text>
+                  </Group>
+                </List.Item>
+              ))}
+          </List>
         </Drawer>
       )}
       <Affix position={{ bottom: 20, right: 20 }}>
