@@ -36,12 +36,23 @@ export const trpc = createTRPCNext<AppRouter, SSRContext>({
     };
   },
   ssr: true,
-  responseMeta({ clientErrors, ctx }) {
-    if (clientErrors.length) {
+  responseMeta(opts) {
+    const ctx = opts.ctx as SSRContext;
+
+    if (ctx.status) {
       return {
-        status: clientErrors[0].data?.httpStatus ?? 500,
+        status: ctx.status,
       };
     }
+
+    const error = opts.clientErrors[0];
+    if (error) {
+      return {
+        status: error.data?.httpStatus ?? 500,
+      };
+    }
+
+    /* return {}; */
 
     const ONE_DAY_IN_SECONDS = 60 * 60 * 24;
 
@@ -49,23 +60,4 @@ export const trpc = createTRPCNext<AppRouter, SSRContext>({
       "Cache-Control": `s-maxage=1, stale-while-revalidate=${ONE_DAY_IN_SECONDS}`,
     };
   },
-
-  /* responseMeta(opts) { */
-  /*   const ctx = opts.ctx as SSRContext; */
-  /**/
-  /*   if (ctx.status) { */
-  /*     return { */
-  /*       status: ctx.status, */
-  /*     }; */
-  /*   } */
-  /**/
-  /*   const error = opts.clientErrors[0]; */
-  /*   if (error) { */
-  /*     return { */
-  /*       status: error.data?.httpStatus ?? 500, */
-  /*     }; */
-  /*   } */
-  /**/
-  /*   return {}; */
-  /* }, */
 });
