@@ -37,6 +37,9 @@ export const transactionsRouter = t.router({
       z.object({
         id: z.string(),
         state: z.string(),
+        updaterId: z.string(),
+        handlerId: z.string(),
+        payment: z.string(),
       })
     )
     .mutation(async ({ input }) => {
@@ -46,6 +49,9 @@ export const transactionsRouter = t.router({
         },
         data: {
           state: input.state,
+          updaterId: input.updaterId,
+          handlerId: input.handlerId,
+          payment: input.payment,
         },
       });
 

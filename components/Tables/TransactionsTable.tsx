@@ -44,16 +44,17 @@ import { trpc } from "../../utils/trpc";
 export const TransactionsTable = ({
   transactions,
   call,
+  handler,
+  updater,
 }: {
   transactions: Transaction[];
   call: string;
+  handler: string;
+  updater: string;
 }) => {
   const [time, setTime] = useState("");
   const [locale, setLocale] = useState(false);
-  /* const [value, setValue] = useState<DateRangePickerValue>([ */
-  /* new Date(), */
-  /* new Date(), */
-  /* ]) */
+
   const Header = () => (
     <tr>
       <th>ID</th>
@@ -132,6 +133,8 @@ export const TransactionsTable = ({
               transaction={transaction}
               call={call}
               time={time}
+              handler={handler}
+              updater={updater}
             />
           ))}
         </tbody>
@@ -147,13 +150,19 @@ const TransactionRow = ({
   transaction,
   call,
   time,
+  handler,
+  updater,
 }: {
   transaction: Transaction;
   call: string;
   time: string;
+  handler: string;
+  updater: string;
 }) => {
   const [state, setState] = useState(`${transaction.state}`);
   const [value, setValue] = useState("loan");
+  const [updaterId, setUpdaterId] = useState("");
+  const [handlerId, setHandlerId] = useState("");
   const [open, setOpen] = useState(false);
   const router = useRouter();
   const utils = trpc.useContext();
@@ -166,24 +175,59 @@ const TransactionRow = ({
     },
   });
 
-  const handleState = useCallback(() => {
-    try {
-      setState("clicked");
-      if (transaction.state === "clicked") return;
-      if (transaction.state === "handled") return;
-      if (transaction.id && state !== "new")
-        handle.mutate({
-          id: transaction.id,
-          state: `${state}`,
-        });
-
-      if (handle.error) {
-        throw new Error("Error Handling State");
-      }
-    } catch (error) {
-      return;
+  useEffect(() => {
+    let subscribe = true;
+    if (subscribe) {
+      setHandlerId(handler)
+      setUpdaterId(updater)
     }
-  }, [handle, transaction.id]);
+
+    return () => {
+      subscribe = false;
+    };
+  }, [state, value]);
+
+  const handleState = useCallback(
+    (status: string) => {
+      try {
+        if (transaction.state === status) return;
+        setState(status);
+        if (transaction.id && state !== "new") {
+          state === "clicked" && handle.mutate({
+            id: transaction.id,
+            handlerId: `${transaction?.handlerId}`,
+            updaterId: `${transaction?.updaterId}`,
+            payment: `${value}`,
+            state: `${state}`,
+          });
+          state === "handled" && handle.mutate({
+            id: transaction.id,
+            handlerId: `${handlerId}`,
+            updaterId: `${updaterId}`,
+            payment: `${value}`,
+            state: `${state}`,
+          });
+}
+        if (handle.error) {
+          throw new Error("Error Handling State");
+        }
+        return;
+      } catch (error) {
+        return;
+      }
+    },
+    [
+    handle,
+    transaction.id,
+    handler,
+    updater,
+    handlerId,
+    updaterId,
+    value,
+    state,
+    transaction.id,
+    ]
+  );
 
   return (
     <>
@@ -193,8 +237,8 @@ const TransactionRow = ({
             cursor: "pointer",
           }}
           onClick={() => {
-            setOpen(true)
-            handleState();
+            setOpen(true);
+            handleState("clicked");
           }}
         >
           <td>{transaction.transID}</td>
@@ -306,7 +350,7 @@ const TransactionRow = ({
           </tr>
         )}
       <Modal
-      padding="md"
+        padding="md"
         opened={open}
         onClose={() => setOpen(false)}
         title={`Transaction Info`}
@@ -315,9 +359,14 @@ const TransactionRow = ({
           <Card.Section withBorder inheritPadding py="xs">
             <Group position="apart">
               <Group position="center" mt="md" mb="xs">
-
                 <TitleText
-                  title={`${transaction.firstName}` + " " + `${transaction.middleName}` + " " + `${transaction.lastName}`}
+                  title={
+                    `${transaction.firstName}` +
+                    " " +
+                    `${transaction.middleName}` +
+                    " " +
+                    `${transaction.lastName}`
+                  }
                 />
               </Group>
             </Group>
@@ -328,12 +377,11 @@ const TransactionRow = ({
                 <Text weight={500}>Paid Via</Text>
               </Grid.Col>
               <Grid.Col mt="xs" span={4}>
-              {transaction?.transactionType === "CUSTOMER MERCHANT PAYMENT" && (
-                  <Text>Till (Buy Goods)</Text>
-              )}
-              {transaction?.transactionType === "PAY BILL" && (
+                {transaction?.transactionType ===
+                  "CUSTOMER MERCHANT PAYMENT" && <Text>Till (Buy Goods)</Text>}
+                {transaction?.transactionType === "PAY BILL" && (
                   <Text>Pay Bill</Text>
-              )}
+                )}
               </Grid.Col>
             </Grid>
             <Grid grow>
@@ -349,52 +397,60 @@ const TransactionRow = ({
                 <Text weight={500}>Amount</Text>
               </Grid.Col>
               <Grid.Col mt="xs" span={4}>
-                <Text>{`KSHs. ${transaction.transAmount}`.replace(
-                /\B(?=(\d{3})+(?!\d))/g,
-                ","
-              )}</Text>
+                <Text>
+                  {`KSHs. ${transaction.transAmount}`.replace(
+                    /\B(?=(\d{3})+(?!\d))/g,
+                    ","
+                  )}
+                </Text>
               </Grid.Col>
             </Grid>
             {transaction?.billRefNumber !== "" && (
-                <Grid grow>
-                  <Grid.Col mt="xs" span={4}>
-                    <Text weight={500}>Description</Text>
-                  </Grid.Col>
-                  <Grid.Col mt="xs" span={4}>
-                    <Text>{transaction?.billRefNumber}</Text>
-                  </Grid.Col>
-                </Grid>
+              <Grid grow>
+                <Grid.Col mt="xs" span={4}>
+                  <Text weight={500}>Description</Text>
+                </Grid.Col>
+                <Grid.Col mt="xs" span={4}>
+                  <Text>{transaction?.billRefNumber}</Text>
+                </Grid.Col>
+              </Grid>
             )}
           </Card.Section>
         </Card>
-        <Box
-      m="md"
-      >
-      <Group position="center" m="md">
-      <TitleText title="Payment" />
-</Group>
-          <Radio.Group
-          value={value}
-          onChange={setValue}
-          name="paymentFor"
-          label="Please select an account to affirm this transaction ..."
-          description="NOTE: Don't forget to submit after selection, no changes will be made upon cancellation."
-          withAsterisk
-          >
-          <Radio value="membership" label="Membership Fee" />
-          <Radio value="processing" label="Processing Fee" />
-          <Radio value="crb" label="CRB Fee" />
-          <Radio value="loan" label="Loan" />
-          <Radio value="other" label="Others" />
-          <Radio value="mpc" label="Membership | Processing | CRB" />
-
-          </Radio.Group>
-          <Group position="center">
-          <Button variant="light" onClick={() => {
-              handleState()
-            }} m="md">Submit</Button>
-          </Group>
-</Box>
+        {transaction.state !== "handled" && (
+          <Box m="md">
+            <Group position="center" m="md">
+              <TitleText title="Payment" />
+            </Group>
+            <Radio.Group
+              value={value}
+              onChange={setValue}
+              name="paymentFor"
+              label="Please select an account to affirm this transaction ..."
+              description="NOTE: Don't forget to submit after selection, no changes will be made upon cancellation."
+              withAsterisk
+            >
+              <Radio value="membership" label="Membership Fee" />
+              <Radio value="processing" label="Processing Fee" />
+              <Radio value="crb" label="CRB Fee" />
+              <Radio value="loan" label="Loan" />
+              <Radio value="other" label="Others" />
+              <Radio value="mpc" label="Membership | Processing | CRB" />
+            </Radio.Group>
+            <Group position="center">
+              <Button
+                variant="light"
+                onClick={() => {
+        setOpen(false);
+                  handleState("handled");
+                }}
+                m="md"
+              >
+                Submit
+              </Button>
+            </Group>
+          </Box>
+        )}
       </Modal>
     </>
   );

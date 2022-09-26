@@ -31,7 +31,7 @@ const Page: NextPage = () => {
         {/* <LoadingOverlay overlayBlur={2} visible={mems_status === "fetching"} /> */}
         {!transactions && !logs && <EmptyTable call="maintain" />}
         {transactions && (
-          <TransactionsTable transactions={transactions} call="maintain" />
+          <TransactionsTable transactions={transactions} call="maintain" handler={`${user?.id}`} updater={`${user?.id}`} />
         )}
         <Divider variant="dotted" mt="xl" />
       </div>

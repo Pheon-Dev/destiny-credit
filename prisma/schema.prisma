@@ -44,39 +44,41 @@ model Session {
 }
 
 model User {
-  id                 String       @id @default(uuid())
-  createdAt          DateTime     @default(now())
-  updatedAt          DateTime     @updatedAt
-  username           String?
-  name               String?
-  image              String?
-  email              String?      @unique
-  emailVerified      DateTime?
-  state              String?
-  password           String?
-  firstName          String?
-  lastName           String?
-  role               String?      @default("CO")
-  accounts           Account[]
-  sessions           Session[]
-  registeredMembers  Member[]     @relation("RegisteredBy")
-  approvedMembers    Member[]     @relation("ApprovedBy")
-  updatedMembers     Member[]     @relation("UpdatedBy")
-  officiatesLoans    Loan[]       @relation("CreditOfficer")
-  maintainedLoans    Loan[]       @relation("MaintainedBy")
-  approvedLoans      Loan[]       @relation("ApprovedBy")
-  disbursedLoans     Loan[]       @relation("DisbursedBy")
-  updatedLoans       Loan[]       @relation("UpdatedBy")
-  handledPayments    Payment[]    @relation("HandledBy")
-  updatedPayments    Payment[]    @relation("UpdatedBy")
-  createdGroups      Group[]      @relation("CreatedBy")
-  approvedGroups     Group[]      @relation("ApprovedBy")
-  updatedGroups      Group[]      @relation("UpdatedBy")
-  createdProducts    Product[]    @relation("CreatedBy")
-  approvedProducts   Product[]    @relation("ApprovedBy")
-  updatedProducts    Product[]    @relation("UpdatedBy")
-  updatedCollaterals Collateral[] @relation("UpdatedBy")
-  updatedGuarantors  Guarantor[]  @relation("UpdatedBy")
+  id                  String        @id @default(uuid())
+  createdAt           DateTime      @default(now())
+  updatedAt           DateTime      @updatedAt
+  username            String?
+  name                String?
+  image               String?
+  email               String?       @unique
+  emailVerified       DateTime?
+  state               String?
+  password            String?
+  firstName           String?
+  lastName            String?
+  role                String?       @default("CO")
+  accounts            Account[]
+  sessions            Session[]
+  registeredMembers   Member[]      @relation("RegisteredBy")
+  approvedMembers     Member[]      @relation("ApprovedBy")
+  updatedMembers      Member[]      @relation("UpdatedBy")
+  officiatesLoans     Loan[]        @relation("CreditOfficer")
+  maintainedLoans     Loan[]        @relation("MaintainedBy")
+  approvedLoans       Loan[]        @relation("ApprovedBy")
+  disbursedLoans      Loan[]        @relation("DisbursedBy")
+  updatedLoans        Loan[]        @relation("UpdatedBy")
+  handledTransactions Transaction[] @relation("HandledBy")
+  updatedTransactions Transaction[] @relation("UpdatedBy")
+  handledPayments     Payment[]     @relation("HandledBy")
+  updatedPayments     Payment[]     @relation("UpdatedBy")
+  createdGroups       Group[]       @relation("CreatedBy")
+  approvedGroups      Group[]       @relation("ApprovedBy")
+  updatedGroups       Group[]       @relation("UpdatedBy")
+  createdProducts     Product[]     @relation("CreatedBy")
+  approvedProducts    Product[]     @relation("ApprovedBy")
+  updatedProducts     Product[]     @relation("UpdatedBy")
+  updatedCollaterals  Collateral[]  @relation("UpdatedBy")
+  updatedGuarantors   Guarantor[]   @relation("UpdatedBy")
 }
 
 model VerificationToken {
@@ -325,6 +327,11 @@ model Transaction {
   middleName        String
   lastName          String
   state             String?
+  payment           String?
+  updater           User?    @relation("UpdatedBy", fields: [updaterId], references: [id])
+  updaterId         String?
+  handler           User?    @relation("HandledBy", fields: [handlerId], references: [id])
+  handlerId         String?
 
   @@index(id)
 }
