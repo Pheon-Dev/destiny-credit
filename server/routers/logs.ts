@@ -17,6 +17,7 @@ export const logsRouter = t.router({
 
       const url =
         "https://logtail.com/api/v1/query?source_ids=158744&query=transID";
+      /* const url = "https://logtail.com/api/v1/query?source_ids=158744&query=transID"; */
 
       const token = LOGTAIL_API_TOKEN;
       const headers = {
@@ -228,5 +229,24 @@ export const logsRouter = t.router({
     } catch (error) {
       console.log("logs.logs", error);
     }
+  }),
+  log: t.procedure.query(async () => {
+    const url =
+      "https://logtail.com/api/v1/query?source_ids=158744&query=transID";
+    /* const url = "https://logtail.com/api/v1/query?source_ids=158744&query=transID"; */
+
+    const token = LOGTAIL_API_TOKEN;
+    const headers = {
+      Authorization: `Bearer ${token}`,
+    };
+
+    let response = await axios.request({
+      method: "GET",
+      url,
+      headers,
+    });
+
+    const log = response.data;
+    return log;
   }),
 });
