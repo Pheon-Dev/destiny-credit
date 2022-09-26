@@ -11,6 +11,10 @@ import {
   Grid,
   Text,
   Accordion,
+  Tabs,
+  Radio,
+  Box,
+  Button,
 } from "@mantine/core";
 import type { Transaction } from "@prisma/client";
 import { useRouter } from "next/router";
@@ -24,10 +28,15 @@ import {
   IconBrightness,
   IconBrightness2,
   IconBrightnessHalf,
+  IconCash,
   IconCheck,
   IconChecks,
   IconClock,
+  IconDeviceMobileMessage,
   IconDots,
+  IconDotsVertical,
+  IconExclamationMark,
+  IconFloatRight,
   IconLogout,
 } from "@tabler/icons";
 import { trpc } from "../../utils/trpc";
@@ -144,6 +153,7 @@ const TransactionRow = ({
   time: string;
 }) => {
   const [state, setState] = useState(`${transaction.state}`);
+  const [value, setValue] = useState("loan");
   const [open, setOpen] = useState(false);
   const router = useRouter();
   const utils = trpc.useContext();
@@ -296,40 +306,42 @@ const TransactionRow = ({
           </tr>
         )}
       <Modal
+      padding="md"
         opened={open}
         onClose={() => setOpen(false)}
-        title="Transaction Info"
+        title={`Transaction Info`}
       >
-        <Card shadow="sm" p="lg" radius="md" withBorder>
+        <Card shadow="sm" p="md" radius="md" withBorder>
           <Card.Section withBorder inheritPadding py="xs">
             <Group position="apart">
               <Group position="center" mt="md" mb="xs">
+
                 <TitleText
                   title={`${transaction.firstName}` + " " + `${transaction.middleName}` + " " + `${transaction.lastName}`}
                 />
               </Group>
-              <Menu withinPortal position="bottom-end" shadow="sm">
-                <Menu.Target>
-                  <ActionIcon>
-                    <IconDots size={16} />
-                  </ActionIcon>
-                </Menu.Target>
-
-                <Menu.Dropdown>
-                  <Menu.Item icon={<IconLogout size={14} />} color="red">
-                    Sign Out
-                  </Menu.Item>
-                </Menu.Dropdown>
-              </Menu>
             </Group>
           </Card.Section>
           <Card.Section withBorder inheritPadding py="xs">
             <Grid grow>
               <Grid.Col mt="xs" span={4}>
-                <Text weight={500}>Transaction Type</Text>
+                <Text weight={500}>Paid Via</Text>
               </Grid.Col>
               <Grid.Col mt="xs" span={4}>
-                <Text>{transaction?.transactionType}</Text>
+              {transaction?.transactionType === "CUSTOMER MERCHANT PAYMENT" && (
+                  <Text>Till (Buy Goods)</Text>
+              )}
+              {transaction?.transactionType === "PAY BILL" && (
+                  <Text>Pay Bill</Text>
+              )}
+              </Grid.Col>
+            </Grid>
+            <Grid grow>
+              <Grid.Col mt="xs" span={4}>
+                <Text weight={500}>Phone Number</Text>
+              </Grid.Col>
+              <Grid.Col mt="xs" span={4}>
+                <Text>+{transaction.msisdn}</Text>
               </Grid.Col>
             </Grid>
             <Grid grow>
@@ -337,22 +349,52 @@ const TransactionRow = ({
                 <Text weight={500}>Amount</Text>
               </Grid.Col>
               <Grid.Col mt="xs" span={4}>
-                <Text>{`${transaction.transAmount}`.replace(
+                <Text>{`KSHs. ${transaction.transAmount}`.replace(
                 /\B(?=(\d{3})+(?!\d))/g,
                 ","
               )}</Text>
               </Grid.Col>
             </Grid>
-            <Grid grow>
-              <Grid.Col mt="xs" span={4}>
-                <Text weight={500}>Description</Text>
-              </Grid.Col>
-              <Grid.Col mt="xs" span={4}>
-                <Text>{transaction?.billRefNumber}</Text>
-              </Grid.Col>
-            </Grid>
+            {transaction?.billRefNumber !== "" && (
+                <Grid grow>
+                  <Grid.Col mt="xs" span={4}>
+                    <Text weight={500}>Description</Text>
+                  </Grid.Col>
+                  <Grid.Col mt="xs" span={4}>
+                    <Text>{transaction?.billRefNumber}</Text>
+                  </Grid.Col>
+                </Grid>
+            )}
           </Card.Section>
         </Card>
+        <Box
+      m="md"
+      >
+      <Group position="center" m="md">
+      <TitleText title="Payment" />
+</Group>
+          <Radio.Group
+          value={value}
+          onChange={setValue}
+          name="paymentFor"
+          label="Please select an account to affirm this transaction ..."
+          description="NOTE: Don't forget to submit after selection, no changes will be made upon cancellation."
+          withAsterisk
+          >
+          <Radio value="membership" label="Membership Fee" />
+          <Radio value="processing" label="Processing Fee" />
+          <Radio value="crb" label="CRB Fee" />
+          <Radio value="loan" label="Loan" />
+          <Radio value="other" label="Others" />
+          <Radio value="mpc" label="Membership | Processing | CRB" />
+
+          </Radio.Group>
+          <Group position="center">
+          <Button variant="light" onClick={() => {
+              handleState()
+            }} m="md">Submit</Button>
+          </Group>
+</Box>
       </Modal>
     </>
   );
