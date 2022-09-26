@@ -234,26 +234,13 @@ export const logsRouter = t.router({
       const n_date = new Date();
 
       date.setDate(date.getDate() - 3);
-      let str_date: string = date.toLocaleDateString();
-      let str_ndate: string = n_date.toLocaleDateString();
-      let str_tdate: string = n_date.toLocaleTimeString();
 
-      const new_date =
-        str_date.split("/")[2] +
-        "-" +
-        str_date.split("/")[1] +
-        "-" +
-        str_date.split("/")[0];
+      const new_date = date.toJSON()
 
-      const now_date =
-        str_ndate.split("/")[2] +
-        "-" +
-        str_ndate.split("/")[1] +
-        "-" +
-        str_ndate.split("/")[0];
+      const now_date = n_date.toJSON()
 
     const url =
-      `https://logtail.com/api/v1/query?source_ids=158744&query=transID&from=${new_date}&to=${now_date}`
+      `https://logtail.com/api/v1/query?source_ids=158744&query=transID&from=${new_date}`
     /* const url = "https://logtail.com/api/v1/query?source_ids=158744&query=transID"; */
 
     const token = LOGTAIL_API_TOKEN;
