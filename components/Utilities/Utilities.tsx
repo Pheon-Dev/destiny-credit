@@ -84,8 +84,7 @@ export const Utilities = () => {
             autoClose: 4000,
           });
         }
-          signOut();
-          return router.push("/auth/sign-in");
+          return signOut();
       }
     } catch (error) {
       setTimeout(() => {
@@ -127,14 +126,16 @@ export const Utilities = () => {
                   <Tooltip color="blue" withArrow label="Search">
                     <Tabs.Tab
                       value="search"
-                      onClick={() => setOpen((prev) => !prev)}
+                      disabled
+                      /* onClick={() => setOpen((prev) => !prev)} */
                       icon={<IconSearch style={{ padding: 2 }} />}
                     />
                   </Tooltip>
                   <Tooltip color="blue" withArrow label="Account">
                     <Tabs.Tab
                       value="account"
-                      onClick={() => setOpen((prev) => !prev)}
+                      onClick={() => setOpen(true)}
+                      disabled={!user}
                       icon={<IconUser style={{ padding: 2 }} />}
                     />
                   </Tooltip>

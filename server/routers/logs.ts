@@ -87,6 +87,7 @@ export const logsRouter = t.router({
         let firstName = data.split(",")[10].split(":")[1].trim().split("'")[1];
         let middleName = data.split(",")[11].split(":")[1].trim().split("'")[1];
         let lastName = data.split(",")[12].split(":")[1].trim().split("'")[1];
+        let state = "new";
 
         let transaction: Array<Fields> = [];
         transaction.push({
@@ -109,6 +110,23 @@ export const logsRouter = t.router({
           transaction,
         });
 
+        const member = await prisma.member.findFirst({
+          where: {
+            firstName: transaction[0].firstName,
+            lastName: transaction[0].middleName + " " + transaction[0]?.lastName,
+          },
+        });
+        if (!member) {
+          return {
+            message: "Error Searching Member ...",
+            from: new_date,
+            to: now_date,
+          };
+        }
+
+        if (member) state = "registered"
+
+
         const search = await prisma.transaction.findMany({
           where: {
             transID: transaction[0].transID,
@@ -117,7 +135,7 @@ export const logsRouter = t.router({
 
         if (!search) {
           return {
-            message: "Error Searching ...",
+            message: "Error Searching Match ...",
             from: new_date,
             to: now_date,
           };
@@ -176,7 +194,8 @@ export const logsRouter = t.router({
                 firstName: transaction[0]?.firstName,
                 middleName: transaction[0]?.middleName,
                 lastName: transaction[0]?.lastName,
-                state: "new",
+                state: state,
+                payment: "",
               },
             });
 

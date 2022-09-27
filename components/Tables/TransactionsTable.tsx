@@ -196,12 +196,9 @@ const TransactionRow = ({
         state === "clicked" &&
           handle.mutate({
             id: transaction.id,
-            /* handlerId: `${transaction?.handlerId}`, */
-            /* updaterId: `${transaction?.updaterId}`, */
-            /* payment: `${transaction?.payment}`, */
-            handlerId: `${handlerId}`,
-            updaterId: `${updaterId}`,
-            payment: `${value}`,
+            handlerId: `${transaction?.handlerId}`,
+            updaterId: `${transaction?.updaterId}`,
+            payment: `${transaction?.payment}`,
             state: `${state}`,
           });
         state === "handled" &&
@@ -416,7 +413,41 @@ const TransactionRow = ({
             )}
           </Card.Section>
         </Card>
-        {transaction.state !== "handled" && (
+        {transaction.state !== "registered" && (
+          <Box m="md">
+            <Group position="center" m="md">
+              <TitleText title="New Customer" />
+            </Group>
+            <Radio.Group
+              value={value}
+              onChange={setValue}
+              name="paymentFor"
+              label="This is a transaction from an unregistered member ..."
+              description={`Proceed to Register ${transaction.firstName} ${transaction.middleName} ${transaction.lastName}`}
+              withAsterisk
+            >
+              <Radio value="membership" label="Membership Fee" />
+              <Radio value="processing" label="Processing Fee" />
+              <Radio value="crb" label="CRB Fee" />
+              <Radio value="all" label="all" />
+            </Radio.Group>
+            <Group position="center">
+              <Button
+                variant="light"
+                onClick={() => {
+                  setOpen(false);
+                  setState("registered");
+                  handleState();
+              router.push(`/members/register/${transaction.transID}`);
+                }}
+                m="md"
+              >
+                Register
+              </Button>
+            </Group>
+          </Box>
+        )}
+        {transaction.payment === "" && (
           <Box m="md">
             <Group position="center" m="md">
               <TitleText title="Payment" />
@@ -429,12 +460,11 @@ const TransactionRow = ({
               description="NOTE: Don't forget to submit after selection, no changes will be made upon cancellation."
               withAsterisk
             >
-              <Radio value="membership" label="Membership Fee" />
               <Radio value="processing" label="Processing Fee" />
               <Radio value="crb" label="CRB Fee" />
               <Radio value="loan" label="Loan" />
+              <Radio value="pc" label="Processing & CRB" />
               <Radio value="other" label="Others" />
-              <Radio value="mpc" label="Membership | Processing | CRB" />
             </Radio.Group>
             <Group position="center">
               <Button
