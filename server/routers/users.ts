@@ -87,8 +87,9 @@ export const usersRouter = t.router({
       })
     )
     .query(async ({ input }) => {
-      if (input.email === "undefined") return;
-      if (input.email === "") return;
+      if (input.email === "undefined")
+        return await prisma.user.findFirst({ where: {} });
+      if (input.email === "") return await prisma.user.findFirst({ where: {} });
       const user = await prisma.user.findFirst({
         where: {
           email: input.email,
@@ -97,14 +98,14 @@ export const usersRouter = t.router({
       });
 
       if (user) {
-      await prisma.user.updateMany({
-        where: {
-          email: input.email,
-        },
-        data: {
-          state: "online"
-        },
-      });
+        await prisma.user.updateMany({
+          where: {
+            email: input.email,
+          },
+          data: {
+            state: "online",
+          },
+        });
       }
 
       if (!user) {
@@ -118,13 +119,13 @@ export const usersRouter = t.router({
   signout: t.procedure
     .input(
       z.object({
-        email: z.string(),
+        id: z.string(),
       })
     )
     .mutation(async ({ input }) => {
       const user = await prisma.user.updateMany({
-        where : {
-          email: input.email,
+        where: {
+          id: input.id,
         },
         data: {
           state: "offline",

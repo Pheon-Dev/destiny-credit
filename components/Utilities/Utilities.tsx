@@ -1,4 +1,4 @@
-import { updateNotification } from "@mantine/notifications";
+import { showNotification, updateNotification } from "@mantine/notifications";
 import {
   Tabs,
   TabsProps,
@@ -49,13 +49,13 @@ export const Utilities = () => {
 
   const { data: users } = trpc.users.users.useQuery();
   const { data: user } = trpc.users.user.useQuery({
-    email: `${data?.user?.email}` || "",
+    email:`${data?.user?.email || ""}` || "",
   });
 
   const utils = trpc.useContext();
   const signout = trpc.users.signout.useMutation({
     onSuccess: async () => {
-      await utils.users.user.invalidate({ email: `${data?.user?.email}` });
+      await utils.users.users.invalidate();
       updateNotification({
         id: "sign-out-status",
         title: "Signed Out Successfully!",
@@ -69,12 +69,24 @@ export const Utilities = () => {
 
   const handleSignOut = useCallback(() => {
     try {
-      setOpen(false);
-      signout.mutate({
-        email: `${data?.user?.email}`,
-      });
-      signOut();
-      router.push("/auth/sign-in");
+      if (user?.id) {
+        setOpen(false);
+        signout.mutate({
+          id: `${user?.id}`,
+        });
+        if (signout.isError) {
+          return updateNotification({
+            id: "sign-out-status",
+            title: "Sign Out Error!",
+            message: `Please Try Again!`,
+            icon: <IconX size={16} />,
+            color: "red",
+            autoClose: 4000,
+          });
+        }
+          signOut();
+          return router.push("/auth/sign-in");
+      }
     } catch (error) {
       setTimeout(() => {
         updateNotification({
@@ -87,7 +99,7 @@ export const Utilities = () => {
         });
       });
     }
-  }, [data?.user?.email, signout]);
+  }, [user?.id, router, signout]);
 
   return (
     <>
@@ -165,7 +177,15 @@ export const Utilities = () => {
 
                   <Menu.Dropdown>
                     <Menu.Item
-                      onClick={() => handleSignOut()}
+                      onClick={() => {
+                        showNotification({
+                          id: "sign-out-status",
+                          title: "Sign Out",
+                          message: `Signing Out ${user?.username} ...`,
+                          loading: true
+                        });
+                        handleSignOut();
+                      }}
                       icon={<IconLogout size={14} />}
                       color="red"
                     >
