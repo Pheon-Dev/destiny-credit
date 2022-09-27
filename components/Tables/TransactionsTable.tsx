@@ -14,14 +14,9 @@ import {
 } from "@mantine/core";
 import type { Transaction } from "@prisma/client";
 import { useRouter } from "next/router";
-import {
-  DatePicker,
-} from "@mantine/dates";
+import { DatePicker } from "@mantine/dates";
 import dayjs from "dayjs";
-import {
-  IconCheck,
-  IconChecks,
-} from "@tabler/icons";
+import { IconCheck, IconChecks } from "@tabler/icons";
 import { trpc } from "../../utils/trpc";
 
 export const TransactionsTable = ({
@@ -170,48 +165,51 @@ const TransactionRow = ({
     };
   }, [state, value, open]);
 
-  const handleState = useCallback((status: string) => {
-    try {
-      setState(status)
-      if (transaction.state === "clicked") return;
-      if (transaction.state === "handled") return;
-      if (transaction.id) {
-        console.log(state)
-        state === "clicked" &&
-          handle.mutate({
-            id: transaction.id,
-            handlerId: `${transaction?.handlerId}`,
-            updaterId: `${transaction?.updaterId}`,
-            payment: `${transaction?.payment}`,
-            state: `${state}`,
-          });
-        state === "handled" &&
-          handle.mutate({
-            id: transaction.id,
-            handlerId: `${handlerId}`,
-            updaterId: `${updaterId}`,
-            payment: `${value}`,
-            state: `${state}`,
-          });
+  const handleState = useCallback(
+    (status: string) => {
+      try {
+        setState(status);
+        if (transaction.state === "clicked") return;
+        if (transaction.state === "handled") return;
+        if (transaction.id) {
+          console.log(state);
+          state === "clicked" &&
+            handle.mutate({
+              id: transaction.id,
+              handlerId: `${transaction?.handlerId}`,
+              updaterId: `${transaction?.updaterId}`,
+              payment: `${transaction?.payment}`,
+              state: `${state}`,
+            });
+          state === "handled" &&
+            handle.mutate({
+              id: transaction.id,
+              handlerId: `${handlerId}`,
+              updaterId: `${updaterId}`,
+              payment: `${value}`,
+              state: `${state}`,
+            });
+        }
+        if (handle.error) {
+          throw new Error("Error Handling State");
+        }
+        return;
+      } catch (error) {
+        return;
       }
-      if (handle.error) {
-        throw new Error("Error Handling State");
-      }
-      return;
-    } catch (error) {
-      return;
-    }
-  }, [
-    handle,
-    transaction.id,
-    handler,
-    updater,
-    handlerId,
-    updaterId,
-    value,
-    state,
-    transaction.id,
-  ]);
+    },
+    [
+      handle,
+      transaction.id,
+      handler,
+      updater,
+      handlerId,
+      updaterId,
+      value,
+      state,
+      transaction.id,
+    ]
+  );
 
   return (
     <>
@@ -247,11 +245,12 @@ const TransactionRow = ({
               {transaction.state === "new" && state !== "clicked" && (
                 <IconCheck color="grey" size={20} />
               )}
-              {transaction.state === "clicked" && (
+              {(transaction.state === "clicked" && (
                 <IconChecks color="grey" size={20} />
-              ) || state === "clicked" && transaction.state !== "handled" && (
-                <IconChecks color="grey" size={20} />
-              )}
+              )) ||
+                (state === "clicked" && transaction.state !== "handled" && (
+                  <IconChecks color="grey" size={20} />
+                ))}
               {transaction.state === "handled" && (
                 <IconChecks color="blue" size={20} />
               )}
@@ -418,8 +417,8 @@ const TransactionRow = ({
                 variant="light"
                 onClick={() => {
                   setOpen(false);
-            handleState("registered")
-              router.push(`/members/register/${transaction.transID}`);
+                  handleState("registered");
+                  router.push(`/members/register/${transaction.transID}`);
                 }}
                 m="md"
               >
@@ -452,7 +451,7 @@ const TransactionRow = ({
                 variant="light"
                 onClick={() => {
                   setOpen(false);
-            handleState("handled")
+                  handleState("handled");
                 }}
                 m="md"
               >
