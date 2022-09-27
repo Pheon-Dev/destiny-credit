@@ -3,7 +3,6 @@ import {
   Tabs,
   TabsProps,
   Text,
-  Menu,
   Button,
   Affix,
   Transition,
@@ -12,9 +11,6 @@ import {
   Card,
   Group,
   Grid,
-  ActionIcon,
-  Accordion,
-  Indicator,
   List,
   ThemeIcon,
 } from "@mantine/core";
@@ -26,9 +22,6 @@ import {
   IconCheck,
   IconLogout,
   IconX,
-  IconDots,
-  IconDotsVertical,
-  IconCircleDot,
 } from "@tabler/icons";
 import { useRouter } from "next/router";
 import { signOut, useSession } from "next-auth/react";
@@ -85,7 +78,17 @@ export const Utilities = () => {
             autoClose: 4000,
           });
         }
-        return signOut();
+        if (signout) {
+          return signOut();
+        }
+          return updateNotification({
+            id: "sign-out-status",
+            title: "Sign Out Error!",
+            message: `Please Try Again!`,
+            icon: <IconX size={16} />,
+            color: "red",
+            autoClose: 4000,
+          });
       }
     } catch (error) {
       setTimeout(() => {
@@ -244,28 +247,26 @@ export const Utilities = () => {
           </List>
           <Card shadow="sm" p="lg" radius="md" withBorder>
             <Card.Section withBorder inheritPadding py="xs">
-              <Group position="apart" 
-              style={{
-                  cursor: "pointer"
+              <Group
+                position="apart"
+                style={{
+                  cursor: "pointer",
                 }}
-                      onClick={() => {
-                        showNotification({
-                          id: "sign-out-status",
-                          title: "Sign Out",
-                          message: `Signing Out ${user?.username} ...`,
-                          loading: true,
-                        });
-                        handleSignOut();
-                      }}
+                onClick={() => {
+                  showNotification({
+                    id: "sign-out-status",
+                    title: "Sign Out",
+                    message: `Signing Out ${user?.username} ...`,
+                    loading: true,
+                  });
+                  handleSignOut();
+                }}
               >
-                    <Text
-                    color="red"
-                    >
-                      Sign Out
-                    </Text>
-                      <IconLogout color="red" size={24} />
+                <Text color="red">Sign Out</Text>
+                <IconLogout color="red" size={24} />
               </Group>
-              </Card.Section></Card>
+            </Card.Section>
+          </Card>
         </Drawer>
       )}
       <Affix position={{ bottom: 20, right: 20 }}>
