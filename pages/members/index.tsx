@@ -1,6 +1,5 @@
 import React from "react";
 import { EmptyTable, MembersTable, Protected } from "../../components";
-import { LoadingOverlay } from "@mantine/core";
 import { NextPage } from "next";
 import { trpc } from "../../utils/trpc";
 import { useSession } from "next-auth/react";
@@ -16,13 +15,14 @@ const MembersList = () => {
 
   return (
     <Protected>
-      <div style={{ position: "relative" }}>
-        {/* <LoadingOverlay overlayBlur={2} visible={fetchStatus === "fetching"} /> */}
-        {!members && <EmptyTable call="all-members" />}
-        {members && (
-          <MembersTable members={members} call="all-members" role={`${user?.role}`} />
-        )}
-      </div>
+      {!members && <EmptyTable status={fetchStatus} call="all-members" />}
+      {members && (
+        <MembersTable
+          members={members}
+          call="all-members"
+          role={`${user?.role}`}
+        />
+      )}
     </Protected>
   );
 };

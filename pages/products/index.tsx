@@ -1,7 +1,10 @@
 import React from "react";
 import { trpc } from "../../utils/trpc";
-import { ProductsTable, Protected, TitleText } from "../../components";
-import { Group, LoadingOverlay } from "@mantine/core";
+import {
+  EmptyTable,
+  ProductsTable,
+  Protected,
+} from "../../components";
 import { NextPage } from "next";
 
 const ProductsList = () => {
@@ -10,13 +13,8 @@ const ProductsList = () => {
   return (
     <Protected>
       <div style={{ position: "relative" }}>
-        {/* <LoadingOverlay overlayBlur={2} visible={fetchStatus === "fetching"} /> */}
         {products && <ProductsTable products={products} />}
-        {!products && (
-          <Group position="center">
-            <TitleText title="No Created Products" />
-          </Group>
-        )}
+        {!products && <EmptyTable call="products" status={fetchStatus} />}
       </div>
     </Protected>
   );

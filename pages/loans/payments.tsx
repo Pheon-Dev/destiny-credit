@@ -1,7 +1,6 @@
 import React from "react";
 import { trpc } from "../../utils/trpc";
 import { EmptyTable, PaymentsTable, Protected } from "../../components";
-import { LoadingOverlay } from "@mantine/core";
 import { useSession } from "next-auth/react";
 import { NextPage } from "next";
 
@@ -17,8 +16,7 @@ const PaymentsList = () => {
   return (
     <Protected>
       <div style={{ position: "relative" }}>
-        {/* <LoadingOverlay overlayBlur={2} visible={fetchStatus === "fetching"} /> */}
-        {!loans && <EmptyTable call="payments" />}
+        {!loans && <EmptyTable call="payments" status={fetchStatus} />}
         {loans && (
           <PaymentsTable role={`${user?.role}`} loans={loans} call="payments" />
         )}

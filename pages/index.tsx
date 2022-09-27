@@ -1,7 +1,6 @@
 import React from "react";
 import { TransactionsTable, Protected, EmptyTable } from "../components";
 import { trpc } from "../utils/trpc";
-import { LoadingOverlay } from "@mantine/core";
 import { NextPage } from "next";
 import { useSession } from "next-auth/react";
 
@@ -19,8 +18,7 @@ const Page: NextPage = () => {
   return (
     <Protected>
       <div style={{ position: "relative" }}>
-        {/* <LoadingOverlay overlayBlur={2} visible={fetchStatus === "fetching"} /> */}
-        {!transactions && !logs && <EmptyTable call="transactions" />}
+        {!transactions && !logs && <EmptyTable call="transactions" status={fetchStatus} />}
         {transactions && (
           <TransactionsTable transactions={transactions} call="transactions" handler={`${user?.id}`} updater={`${user?.id}`} />
         )}

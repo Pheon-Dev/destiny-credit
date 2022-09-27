@@ -5,7 +5,7 @@ import {
   Protected,
   TransactionsTable,
 } from "../../components";
-import { Divider, LoadingOverlay } from "@mantine/core";
+import { Divider } from "@mantine/core";
 import { trpc } from "../../utils/trpc";
 
 import { NextPage } from "next";
@@ -28,16 +28,21 @@ const Page: NextPage = () => {
   return (
     <Protected>
       <div style={{ position: "relative" }}>
-        {/* <LoadingOverlay overlayBlur={2} visible={mems_status === "fetching"} /> */}
-        {!transactions && !logs && <EmptyTable call="maintain" />}
+        {!transactions && !logs && (
+          <EmptyTable call="maintain" status={trans_status} />
+        )}
         {transactions && (
-          <TransactionsTable transactions={transactions} call="maintain" handler={`${user?.id}`} updater={`${user?.id}`} />
+          <TransactionsTable
+            transactions={transactions}
+            call="maintain"
+            handler={`${user?.id}`}
+            updater={`${user?.id}`}
+          />
         )}
         <Divider variant="dotted" mt="xl" />
       </div>
       <div style={{ position: "relative" }}>
-        {/* <LoadingOverlay overlayBlur={2} visible={trans_status === "fetching"} /> */}
-        {!members && <EmptyTable call="create-loan" />}
+        {!members && <EmptyTable call="create-loan" status={mems_status} />}
         {members && (
           <MembersTable
             members={members}

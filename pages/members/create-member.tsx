@@ -1,5 +1,4 @@
 import React from "react";
-import { LoadingOverlay } from "@mantine/core";
 import { NextPage } from "next";
 import { TransactionsTable, Protected, EmptyTable } from "../../components";
 import { trpc } from "../../utils/trpc";
@@ -19,10 +18,14 @@ const Page: NextPage = () => {
   return (
     <Protected>
       <div style={{ position: "relative" }}>
-        {/* <LoadingOverlay overlayBlur={2} visible={fetchStatus === "fetching"} /> */}
-        {!transactions && <EmptyTable call="register" />}
+        {!transactions && <EmptyTable call="register" status={fetchStatus} />}
         {transactions && (
-          <TransactionsTable transactions={transactions} call="register" handler={`${user?.id}`} updater={`${user?.id}`} />
+          <TransactionsTable
+            transactions={transactions}
+            call="register"
+            handler={`${user?.id}`}
+            updater={`${user?.id}`}
+          />
         )}
       </div>
     </Protected>
