@@ -428,8 +428,7 @@ const TransactionRow = ({
             </Group>
           </Box>
         )}
-        {/* {transaction.payment === "" && ( */}
-        {!transaction.payment && (
+        {transaction.payment === "" && (
           <Box m="md">
             <Group position="center" m="md">
               <TitleText title="Payment" />
