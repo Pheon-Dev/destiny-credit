@@ -5,7 +5,7 @@ import { NextPage } from "next";
 import { useSession } from "next-auth/react";
 
 const Page: NextPage = () => {
-  const { data } = useSession();
+  const { data, status } = useSession();
 
   const logs = trpc.logs.logs.useQuery();
   const { data: user } = trpc.users.user.useQuery({
@@ -18,6 +18,7 @@ const Page: NextPage = () => {
   return (
     <Protected>
       <div style={{ position: "relative" }}>
+        {status === "loading" && <EmptyTable call="transactions" status={fetchStatus} />}
         {!transactions && !logs && <EmptyTable call="transactions" status={fetchStatus} />}
         {transactions && (
           <TransactionsTable transactions={transactions} call="transactions" handler={`${user?.id}`} updater={`${user?.id}`} />

@@ -170,31 +170,6 @@ export const Utilities = () => {
                     }`}
                   />
                 </Group>
-                <Menu withinPortal position="bottom-end" shadow="sm">
-                  <Menu.Target>
-                    <ActionIcon>
-                      <IconDotsVertical size={16} />
-                    </ActionIcon>
-                  </Menu.Target>
-
-                  <Menu.Dropdown>
-                    <Menu.Item
-                      onClick={() => {
-                        showNotification({
-                          id: "sign-out-status",
-                          title: "Sign Out",
-                          message: `Signing Out ${user?.username} ...`,
-                          loading: true,
-                        });
-                        handleSignOut();
-                      }}
-                      icon={<IconLogout size={14} />}
-                      color="red"
-                    >
-                      Sign Out
-                    </Menu.Item>
-                  </Menu.Dropdown>
-                </Menu>
               </Group>
             </Card.Section>
             <Card.Section withBorder inheritPadding py="xs">
@@ -267,6 +242,30 @@ export const Utilities = () => {
                 </List.Item>
               ))}
           </List>
+          <Card shadow="sm" p="lg" radius="md" withBorder>
+            <Card.Section withBorder inheritPadding py="xs">
+              <Group position="apart" 
+              style={{
+                  cursor: "pointer"
+                }}
+                      onClick={() => {
+                        showNotification({
+                          id: "sign-out-status",
+                          title: "Sign Out",
+                          message: `Signing Out ${user?.username} ...`,
+                          loading: true,
+                        });
+                        handleSignOut();
+                      }}
+              >
+                    <Text
+                    color="red"
+                    >
+                      Sign Out
+                    </Text>
+                      <IconLogout color="red" size={24} />
+              </Group>
+              </Card.Section></Card>
         </Drawer>
       )}
       <Affix position={{ bottom: 20, right: 20 }}>
