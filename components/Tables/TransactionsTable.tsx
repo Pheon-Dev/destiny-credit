@@ -196,9 +196,12 @@ const TransactionRow = ({
         state === "clicked" &&
           handle.mutate({
             id: transaction.id,
-            handlerId: `${transaction?.handlerId}`,
-            updaterId: `${transaction?.updaterId}`,
-            payment: `${transaction?.payment}`,
+            /* handlerId: `${transaction?.handlerId}`, */
+            /* updaterId: `${transaction?.updaterId}`, */
+            /* payment: `${transaction?.payment}`, */
+            handlerId: `${handlerId}`,
+            updaterId: `${updaterId}`,
+            payment: `${value}`,
             state: `${state}`,
           });
         state === "handled" &&
