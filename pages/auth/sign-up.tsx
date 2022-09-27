@@ -1,4 +1,4 @@
-import React, { useCallback, useEffect } from "react";
+import React, { useCallback, useEffect, useState } from "react";
 import { NextPage } from "next";
 import { z } from "zod";
 import { useForm, zodResolver } from "@mantine/form";
@@ -46,14 +46,14 @@ const Page: NextPage = (props): JSX.Element => {
       ? lencode > 99
         ? lencode > 999
           ? lencode
-          : "DCL-0" + `${lencode}`
-        : "DCL-00" + `${lencode}`
-      : "DCL-000" + `${lencode}`;
+          : "0" + `${lencode}`
+        : "00" + `${lencode}`
+      : "000" + `${lencode}`;
 
   const form = useForm({
     validate: zodResolver(schema),
     initialValues: {
-      username: `${usercode}`,
+      username: `FName&{usercode}`,
       password: "",
       firstName: "",
       lastName: "",
@@ -63,7 +63,7 @@ const Page: NextPage = (props): JSX.Element => {
     },
   });
 
-  const newUser = trpc.users.create_user.useMutation( {
+  const newUser = trpc.users.create_user.useMutation({
     onSuccess: () => {
       clear();
       refetch();
@@ -140,11 +140,16 @@ const Page: NextPage = (props): JSX.Element => {
       });
     }
   }, [newUser, form.values]);
+  const caps = (n: string) => {
+    return n.charAt(0).toUpperCase() + n.slice(1);
+  };
+  let name = `${caps(form.values.firstName)[0]}${caps(form.values.lastName)}`;
 
   useEffect(() => {
     let subscribe = true;
     if (subscribe) {
-      form.setFieldValue("username", `${usercode}`);
+      form.setFieldValue("username", `${name !== "undefined" ? name : "DCredit"}${usercode}`);
+
       if (form.values.password.length > 7 && form.values.confirm.length > 7) {
         if (form.values.password !== form.values.confirm) {
           form.setFieldError("confirm", "Passwords don't match!");
@@ -179,122 +184,122 @@ const Page: NextPage = (props): JSX.Element => {
       subscribe = false;
     };
   }, [
+    form.values.username,
     form.values.password,
     form.values.confirm,
     users,
     usercode,
+    name,
   ]);
 
-    return (
-      <>
-        <Card
-          sx={{ maxWidth: 360 }}
-          mx="auto"
-          shadow="sm"
-          p="lg"
-          radius="md"
-          withBorder
-          style={{ marginTop: "50px", position: "relative" }}
-        >
-          <LoadingOverlay
-            overlayBlur={2}
-            visible={users_status === "loading"}
-          />
-          <Card.Section>
-            <Box p="lg">
-              <form>
-                <TextInput
-                  label="User Name"
-                  placeholder="User Name ..."
-                  {...form.getInputProps("username")}
-                  required
-                />
-                <TextInput
-                  label="First Name"
-                  placeholder="First Name ..."
-                  {...form.getInputProps("firstName")}
-                  required
-                />
-                <TextInput
-                  label="Last Name"
-                  placeholder="Last Name ..."
-                  {...form.getInputProps("lastName")}
-                  required
-                />
-                <TextInput
-                  label="Email Address"
-                  type="email"
-                  placeholder="Email Address ..."
-                  {...form.getInputProps("email")}
-                  required
-                />
-                <PasswordInput
-                  label="New Password"
-                  placeholder="********"
-                  mt="sm"
-                  {...form.getInputProps("password")}
-                  required
-                />
-                <PasswordInput
-                  label="Confirm Password"
-                  placeholder="********"
-                  mt="sm"
-                  {...form.getInputProps("confirm")}
-                  required
-                />
-                <Select
-                  mt="md"
-                  label="Assign Role"
-                  placeholder="Select Role"
-                  data={[
-                    { value: "CO", label: "Credit Officer" },
-                    { value: "CA", label: "Credit Admin" },
-                    { value: "MD", label: "Managing Director" },
-                    { value: "AU", label: "Auditor" },
-                  ]}
-                  {...form.getInputProps("role")}
-                  required
-                />
+  return (
+    <>
+      <Card
+        sx={{ maxWidth: 360 }}
+        mx="auto"
+        shadow="sm"
+        p="lg"
+        radius="md"
+        withBorder
+        style={{ marginTop: "50px", position: "relative" }}
+      >
+        <LoadingOverlay overlayBlur={2} visible={users_status === "loading"} />
+        <Card.Section>
+          <Box p="lg">
+            <form>
+              <TextInput
+                label="User Name"
+                placeholder="User Name ..."
+                {...form.getInputProps("username")}
+                disabled
+                required
+              />
+              <TextInput
+                label="First Name"
+                placeholder="First Name ..."
+                {...form.getInputProps("firstName")}
+                required
+              />
+              <TextInput
+                label="Last Name"
+                placeholder="Last Name ..."
+                {...form.getInputProps("lastName")}
+                required
+              />
+              <TextInput
+                label="Email Address"
+                type="email"
+                placeholder="Email Address ..."
+                {...form.getInputProps("email")}
+                required
+              />
+              <PasswordInput
+                label="New Password"
+                placeholder="********"
+                mt="sm"
+                {...form.getInputProps("password")}
+                required
+              />
+              <PasswordInput
+                label="Confirm Password"
+                placeholder="********"
+                mt="sm"
+                {...form.getInputProps("confirm")}
+                required
+              />
+              <Select
+                mt="md"
+                label="Assign Role"
+                placeholder="Select Role"
+                data={[
+                  { value: "CO", label: "Credit Officer" },
+                  { value: "CA", label: "Credit Admin" },
+                  { value: "MD", label: "Managing Director" },
+                  { value: "AU", label: "Auditor" },
+                ]}
+                {...form.getInputProps("role")}
+                required
+              />
 
-                <Group mt="md">
-                  <Text color="gray">Already have an account?</Text>
-                  <Text
-                    style={{ cursor: "pointer" }}
-                    onClick={() => router.push("/auth/sign-in")}
-                    color="blue"
-                  >
-                    Sign In
-                  </Text>
-                </Group>
-                <Group mt="xl">
-                  <Button
-                    variant="light"
-                    color="blue"
-                    fullWidth
-                    mt="md"
-                    radius="md"
-                    onClick={() => {
-                      form.validate();
-                      showNotification({
-                        id: "submit",
-                        color: "teal",
-                        title: "Signing Up",
-                        message: `Registering New User ${form.values.username} ...`,
-                        loading: true,
-                        autoClose: 50000,
-                      });
-                      createUser();
-                    }}
-                  >
-                    Sign Up
-                  </Button>
-                </Group>
-              </form>
-            </Box>
-          </Card.Section>
-        </Card>
-      </>
-    );
+              <Group mt="md">
+                <Text color="gray">Already have an account?</Text>
+                <Text
+                  style={{ cursor: "pointer" }}
+                  onClick={() => router.push("/auth/sign-in")}
+                  color="blue"
+                >
+                  Sign In
+                </Text>
+              </Group>
+              <Group mt="xl">
+                <Button
+                  variant="light"
+                  color="blue"
+                  fullWidth
+                  mt="md"
+                  radius="md"
+                  onClick={() => {
+                    form.validate();
+                    showNotification({
+                      id: "submit",
+                      color: "teal",
+                      title: "Signing Up",
+                      message: `Registering New User ${form.values.username} ...`,
+                      loading: true,
+                      autoClose: 50000,
+                    });
+                    createUser();
+                  }}
+                >
+                  Sign Up
+                </Button>
+              </Group>
+            </form>
+          </Box>
+        </Card.Section>
+      </Card>
+    </>
+  );
 };
 
 export default Page;
