@@ -120,6 +120,7 @@ export const usersRouter = t.router({
     .input(
       z.object({
         id: z.string(),
+        state: z.string(),
       })
     )
     .mutation(async ({ input }) => {
@@ -128,7 +129,7 @@ export const usersRouter = t.router({
           id: input.id,
         },
         data: {
-          state: "offline",
+          state: input.state,
         },
       });
 

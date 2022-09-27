@@ -49,7 +49,7 @@ export const Utilities = () => {
 
   const { data: users } = trpc.users.users.useQuery();
   const { data: user } = trpc.users.user.useQuery({
-    email:`${data?.user?.email || ""}` || "",
+    email: `${data?.user?.email || ""}` || "",
   });
 
   const utils = trpc.useContext();
@@ -73,8 +73,9 @@ export const Utilities = () => {
         setOpen(false);
         signout.mutate({
           id: `${user?.id}`,
+          state: "offline",
         });
-        if (signout.isError) {
+        if (!signout) {
           return updateNotification({
             id: "sign-out-status",
             title: "Sign Out Error!",
@@ -84,7 +85,7 @@ export const Utilities = () => {
             autoClose: 4000,
           });
         }
-          return signOut();
+        return signOut();
       }
     } catch (error) {
       setTimeout(() => {
@@ -183,7 +184,7 @@ export const Utilities = () => {
                           id: "sign-out-status",
                           title: "Sign Out",
                           message: `Signing Out ${user?.username} ...`,
-                          loading: true
+                          loading: true,
                         });
                         handleSignOut();
                       }}
