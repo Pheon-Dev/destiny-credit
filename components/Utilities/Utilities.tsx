@@ -81,14 +81,14 @@ export const Utilities = () => {
         if (signout) {
           return signOut();
         }
-          return updateNotification({
-            id: "sign-out-status",
-            title: "Sign Out Error!",
-            message: `Please Try Again!`,
-            icon: <IconX size={16} />,
-            color: "red",
-            autoClose: 4000,
-          });
+        return updateNotification({
+          id: "sign-out-status",
+          title: "Sign Out Error!",
+          message: `Please Try Again!`,
+          icon: <IconX size={16} />,
+          color: "red",
+          autoClose: 4000,
+        });
       }
     } catch (error) {
       setTimeout(() => {

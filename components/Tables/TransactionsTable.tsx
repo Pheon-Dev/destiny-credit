@@ -6,12 +6,8 @@ import {
   Switch,
   Modal,
   Card,
-  Menu,
-  ActionIcon,
   Grid,
   Text,
-  Accordion,
-  Tabs,
   Radio,
   Box,
   Button,
@@ -20,24 +16,11 @@ import type { Transaction } from "@prisma/client";
 import { useRouter } from "next/router";
 import {
   DatePicker,
-  DateRangePicker,
-  DateRangePickerValue,
 } from "@mantine/dates";
 import dayjs from "dayjs";
 import {
-  IconBrightness,
-  IconBrightness2,
-  IconBrightnessHalf,
-  IconCash,
   IconCheck,
   IconChecks,
-  IconClock,
-  IconDeviceMobileMessage,
-  IconDots,
-  IconDotsVertical,
-  IconExclamationMark,
-  IconFloatRight,
-  IconLogout,
 } from "@tabler/icons";
 import { trpc } from "../../utils/trpc";
 
@@ -180,7 +163,6 @@ const TransactionRow = ({
     if (subscribe) {
       setHandlerId(handler);
       setUpdaterId(updater);
-      if ((transaction.state = "new")) setState("new");
     }
 
     return () => {
@@ -188,11 +170,13 @@ const TransactionRow = ({
     };
   }, [state, value, open]);
 
-  const handleState = useCallback(() => {
+  const handleState = useCallback((status: string) => {
     try {
+      setState(status)
       if (transaction.state === "clicked") return;
       if (transaction.state === "handled") return;
-      if (transaction.id && state !== "new") {
+      if (transaction.id) {
+        console.log(state)
         state === "clicked" &&
           handle.mutate({
             id: transaction.id,
@@ -238,8 +222,7 @@ const TransactionRow = ({
           }}
           onClick={() => {
             setOpen(true);
-            setState("clicked");
-            handleState();
+            handleState("clicked");
           }}
         >
           <td>{transaction.transID}</td>
@@ -261,15 +244,14 @@ const TransactionRow = ({
           )}
           <td>
             <Group position="center">
-              {transaction.state === "new" && (
+              {transaction.state === "new" && state !== "clicked" && (
                 <IconCheck color="grey" size={20} />
               )}
               {transaction.state === "clicked" && (
                 <IconChecks color="grey" size={20} />
+              ) || state === "clicked" && transaction.state !== "handled" && (
+                <IconChecks color="grey" size={20} />
               )}
-              {/* {state === "clicked" && ( */}
-              {/*       <IconChecks color="grey" size={20} /> */}
-              {/* )} */}
               {transaction.state === "handled" && (
                 <IconChecks color="blue" size={20} />
               )}
@@ -436,8 +418,7 @@ const TransactionRow = ({
                 variant="light"
                 onClick={() => {
                   setOpen(false);
-                  setState("registered");
-                  handleState();
+            handleState("registered")
               router.push(`/members/register/${transaction.transID}`);
                 }}
                 m="md"
@@ -447,7 +428,8 @@ const TransactionRow = ({
             </Group>
           </Box>
         )}
-        {transaction.payment === "" && (
+        {/* {transaction.payment === "" && ( */}
+        {!transaction.payment && (
           <Box m="md">
             <Group position="center" m="md">
               <TitleText title="Payment" />
@@ -471,8 +453,7 @@ const TransactionRow = ({
                 variant="light"
                 onClick={() => {
                   setOpen(false);
-                  setState("handled");
-                  handleState();
+            handleState("handled")
                 }}
                 m="md"
               >
