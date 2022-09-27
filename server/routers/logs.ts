@@ -19,7 +19,7 @@ export const logsRouter = t.router({
 
     const now_date = n_date.toJSON();
 
-    const url = `https://logtail.com/api/v1/query?source_ids=158744&query=transID&from=${new_date}`;
+    const url = `https://logtail.com/api/v1/query?source_ids=158744&query=transID&from=${new_date}&to=${now_date}`;
 
     const token = LOGTAIL_API_TOKEN;
     const headers = {
@@ -116,13 +116,13 @@ export const logsRouter = t.router({
             lastName: transaction[0].middleName + " " + transaction[0]?.lastName,
           },
         });
-        if (!member) {
-          return {
-            message: "Error Searching Member ...",
-            from: new_date,
-            to: now_date,
-          };
-        }
+        /* if (!member) { */
+        /*   return { */
+        /*     message: "Error Searching Member ...", */
+        /*     from: new_date, */
+        /*     to: now_date, */
+        /*   }; */
+        /* } */
 
         if (member) state = "registered"
 
