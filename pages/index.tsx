@@ -8,7 +8,6 @@ const Page: NextPage = () => {
   const { data, status } = useSession();
 
   const logs = trpc.logs.logs.useQuery();
-  console.log(logs)
   const { data: user } = trpc.users.user.useQuery({
     email: `${data?.user?.email}` || "",
   });
@@ -25,6 +24,7 @@ const Page: NextPage = () => {
           <TransactionsTable transactions={transactions} call="transactions" handler={`${user?.id}`} updater={`${user?.id}`} />
         )}
       </div>
+      <pre>{JSON.stringify(logs, undefined, 2)}</pre>
     </Protected>
   );
 };
