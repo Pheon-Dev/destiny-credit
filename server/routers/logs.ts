@@ -116,13 +116,13 @@ export const logsRouter = t.router({
             lastName: transaction[0].middleName + " " + transaction[0]?.lastName,
           },
         });
-        /* if (!member) { */
-        /*   return { */
-        /*     message: "Error Searching Member ...", */
-        /*     from: new_date, */
-        /*     to: now_date, */
-        /*   }; */
-        /* } */
+        if (!member) {
+          return {
+            message: "Error Searching Member ...",
+            from: new_date,
+            to: now_date,
+          };
+        }
 
         if (member) state = "registered"
 
@@ -141,40 +141,27 @@ export const logsRouter = t.router({
           };
         }
 
-        if (search.length > 1) {
-          return;
-        }
-
         try {
           if (search.length > 1) {
-            const duplicate = await prisma.transaction.findFirst({
+            const duplicate = await prisma.transaction.findMany({
               where: {
                 transID: transaction[0].transID,
               },
             });
-            if (!duplicate) {
-              throw new TRPCError({
-                code: "NOT_FOUND",
-                message: `logs.duplicate not found`,
-              });
-            }
 
-            const delete_duplicate = await prisma.transaction.deleteMany({
+            const delete_duplicate = await prisma.transaction.delete({
               where: {
-                transID: duplicate?.transID,
+                id: duplicate[0].id,
               },
             });
-            if (!delete_duplicate) {
-              throw new TRPCError({
-                code: "NOT_FOUND",
-                message: `logs.delete_duplicate not found`,
-              });
-            }
+
             return delete_duplicate;
           }
+
           if (search.length === 1) {
             return;
           }
+
           if (
             transaction[0].transactionType === "PAY BILL" ||
             transaction[0].transactionType === "CUSTOMER MERCHANT PAYMENT"

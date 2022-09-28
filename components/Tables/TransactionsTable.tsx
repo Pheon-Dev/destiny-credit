@@ -32,6 +32,7 @@ export const TransactionsTable = ({
 }) => {
   const [time, setTime] = useState("");
   const [locale, setLocale] = useState(false);
+  const logs = trpc.logs.logs.useQuery();
 
   const Header = () => (
     <tr>
@@ -87,7 +88,9 @@ export const TransactionsTable = ({
         <Switch
           label={`${locale ? "YYYY/MM/DD" : "YYYY/DD/MM"}`}
           checked={locale}
-          onChange={(e) => setLocale(e.currentTarget.checked)}
+          onChange={(e) => {
+            setLocale(e.currentTarget.checked);
+          }}
           onLabel="YDM"
           offLabel="YMD"
         />
@@ -167,12 +170,12 @@ const TransactionRow = ({
 
   const handleState = useCallback(
     (status: string) => {
+    setState(status);
       try {
-        setState(status);
+        console.log(state);
         if (transaction.state === "clicked") return;
         if (transaction.state === "handled") return;
         if (transaction.id) {
-          console.log(state);
           state === "clicked" &&
             handle.mutate({
               id: transaction.id,
@@ -242,7 +245,12 @@ const TransactionRow = ({
           )}
           <td>
             <Group position="center">
+              {state === "" && transaction.state === "registered" && (
+                <IconCheck color="grey" size={20} />
+              )}
               {transaction.state === "new" && state !== "clicked" && (
+                <IconCheck color="grey" size={20} />
+              ) || !transaction.state && state !== "clicked" && (
                 <IconCheck color="grey" size={20} />
               )}
               {(transaction.state === "clicked" && (
