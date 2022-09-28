@@ -24,7 +24,7 @@ const Page: NextPage = () => {
           <TransactionsTable transactions={transactions} call="transactions" handler={`${user?.id}`} updater={`${user?.id}`} />
         )}
       </div>
-      <pre>{JSON.stringify(logs, undefined, 2)}</pre>
+      <pre>{JSON.stringify(transactions, undefined, 2)}</pre>
     </Protected>
   );
 };
