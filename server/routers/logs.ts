@@ -141,6 +141,10 @@ export const logsRouter = t.router({
           };
         }
 
+          if (search.length === 1) {
+            return;
+          }
+
         try {
           if (search.length > 1) {
             const duplicate = await prisma.transaction.findMany({
@@ -156,10 +160,6 @@ export const logsRouter = t.router({
             });
 
             return delete_duplicate;
-          }
-
-          if (search.length === 1) {
-            return;
           }
 
           if (
