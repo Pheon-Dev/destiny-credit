@@ -41,6 +41,7 @@
     "react-icons": "^4.4.0",
     "react-query": "3",
     "react-router-dom": "^6.3.0",
+    "remove": "^0.1.5",
     "superjson": "^1.9.1",
     "uuid": "^9.0.0",
     "uuidv4": "^6.2.13",
