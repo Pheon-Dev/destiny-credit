@@ -1,5 +1,7 @@
 import { httpBatchLink, loggerLink } from "@trpc/client";
 import { createTRPCNext } from "@trpc/next";
+import { DataTransformer } from "@trpc/server";
+import { devalue } from "devalue";
 import { NextPageContext } from "next";
 import superjson from "superjson";
 import type { AppRouter } from "../server/_app";
@@ -13,6 +15,14 @@ function getBaseUrl() {
   }
 
   return `http://localhost:${process.env.PORT ?? 3000}`;
+}
+
+export const transformer = {
+  input: superjson,
+  output: {
+    serialize: (o: DataTransformer) => devalue(o),
+    deserialize: (o: DataTransformer) => eval(`(${o})`),
+  }
 }
 
 export interface SSRContext extends NextPageContext {
@@ -32,7 +42,13 @@ export const trpc = createTRPCNext<AppRouter, SSRContext>({
           url: `${getBaseUrl()}/api/trpc`,
         }),
       ],
-      transformer: superjson,
+      transformer: {
+  input: superjson,
+  output: {
+    serialize: (o: DataTransformer) => devalue(o),
+    deserialize: (o: DataTransformer) => eval(`(${o})`),
+  }
+}
     };
   },
   ssr: true,

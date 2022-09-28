@@ -113,7 +113,7 @@ export const logsRouter = t.router({
         const member = await prisma.member.findFirst({
           where: {
             firstName: transaction[0].firstName,
-            lastName: transaction[0].middleName + " " + transaction[0]?.lastName,
+            lastName: transaction[0].middleName + " " + transaction[0].lastName,
           },
         });
         if (!member) state= "new";
