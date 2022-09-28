@@ -8,6 +8,7 @@ const Page: NextPage = () => {
   const { data, status } = useSession();
 
   const logs = trpc.logs.logs.useQuery();
+  console.log(logs)
   const { data: user } = trpc.users.user.useQuery({
     email: `${data?.user?.email}` || "",
   });
