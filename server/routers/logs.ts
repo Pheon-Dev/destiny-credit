@@ -116,16 +116,9 @@ export const logsRouter = t.router({
             lastName: transaction[0].middleName + " " + transaction[0]?.lastName,
           },
         });
-        if (!member) {
-          return {
-            message: "Error Searching Member ...",
-            from: new_date,
-            to: now_date,
-          };
-        }
+        if (!member) state= "new";
 
         if (member) state = "registered"
-
 
         const search = await prisma.transaction.findMany({
           where: {
