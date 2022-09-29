@@ -30,6 +30,9 @@ export const trpc = createTRPCNext<AppRouter, SSRContext>({
         }),
         httpBatchLink({
           url: `${getBaseUrl()}/api/trpc`,
+          headers: {
+            "Content-Type": "application/json",
+          },
         }),
       ],
       transformer: superjson,

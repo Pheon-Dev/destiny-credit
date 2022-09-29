@@ -17,14 +17,22 @@ const Page: NextPage = () => {
 
   return (
     <Protected>
-      <div style={{ position: "relative" }}>
-        {status === "loading" && <EmptyTable call="transactions" status={fetchStatus} />}
-        {!transactions && !logs && <EmptyTable call="transactions" status={fetchStatus} />}
-        {transactions && (
-          <TransactionsTable transactions={transactions} call="transactions" handler={`${user?.id}`} updater={`${user?.id}`} />
+      <>
+        {status === "loading" && (
+          <EmptyTable call="transactions" status={fetchStatus} />
         )}
-      </div>
-      <pre>{JSON.stringify(transactions, undefined, 2)}</pre>
+        {!transactions && !logs && (
+          <EmptyTable call="transactions" status={fetchStatus} />
+        )}
+        {transactions && (
+          <TransactionsTable
+            transactions={transactions}
+            call="transactions"
+            handler={`${user?.id}`}
+            updater={`${user?.id}`}
+          />
+        )}
+      </>
     </Protected>
   );
 };

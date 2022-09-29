@@ -155,10 +155,8 @@ export const logsRouter = t.router({
             return delete_duplicate;
           }
 
-          if (
-            transaction[0].transactionType === "PAY BILL" ||
-            transaction[0].transactionType === "CUSTOMER MERCHANT PAYMENT"
-          ) {
+          if (isNaN(+transaction[0].transAmount))return;
+
             const new_transaction = await prisma.transaction.create({
               data: {
                 transactionType: transaction[0]?.transactionType,
@@ -184,8 +182,6 @@ export const logsRouter = t.router({
                 code: "NOT_FOUND",
                 message: `logs.delete_duplicate not found`,
               });
-            }
-            return new_transaction;
           }
           return {
             message: "Error Matching Requirements ...",
