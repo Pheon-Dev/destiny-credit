@@ -1,4 +1,4 @@
-import { httpBatchLink, loggerLink } from "@trpc/client";
+import { httpBatchLink, httpLink, loggerLink } from "@trpc/client";
 import { createTRPCNext } from "@trpc/next";
 import { NextPageContext } from "next";
 import superjson from "superjson";
@@ -28,12 +28,17 @@ export const trpc = createTRPCNext<AppRouter, SSRContext>({
             process.env.NODE_ENV === "development" ||
             (opts.direction === "down" && opts.result instanceof Error),
         }),
-        httpBatchLink({
+        httpLink({
           url: `${getBaseUrl()}/api/trpc`,
-          headers: {
-            "Content-Type": "application/json",
-          },
         }),
+        /* httpBatchLink({ */
+        /*   url: `${getBaseUrl()}/api/trpc`, */
+        /*   headers() { */
+        /*     return { */
+        /*       "Content-Type": "application/json", */
+        /*     } */
+        /*   }, */
+        /* }), */
       ],
       transformer: superjson,
     };
