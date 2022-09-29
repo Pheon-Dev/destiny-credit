@@ -5,7 +5,6 @@ const prisma = new PrismaClient();
 
 import { Fields, Logs } from "../../types";
 import { TRPCError } from "@trpc/server";
-import { trpc } from "../../utils/trpc";
 
 const LOGTAIL_API_TOKEN = process.env.NEXT_PUBLIC_LOGTAIL_API_TOKEN;
 
@@ -117,18 +116,21 @@ export const logsRouter = t.router({
         });
 
         console.log("---------------  Six  -------------");
-        const member = trpc.members.maintain.useQuery({
-            firstName: `${transaction[0].firstName}`,
-            lastName: `${transaction[0].middleName} ${transaction[0].lastName}`,
-            phoneNumber: `${transaction[0].msisdn}`,
+        const member = await prisma.member.findFirst({
+          where: {
+            firstName: transaction[0].firstName,
+            lastName: transaction[0].middleName + " " + transaction[0].lastName,
+          },
         });
         if (!member) state = "new";
 
         if (member) state = "registered";
 
         console.log("---------------  Seven  -------------");
-        const search = trpc.transactions.search.useQuery({
-            id: `${transaction[0].transID}`,
+        const search = await prisma.transaction.findMany({
+          where: {
+            transID: transaction[0].transID,
+          },
         });
 
         if (!search) {
@@ -140,59 +142,64 @@ export const logsRouter = t.router({
         }
 
         console.log("---------------  Eight  -------------");
-        if (search.data?.length === 1) {
+        if (search.length === 1) {
           return;
         }
 
-        if (search.data) {
+        if (search) {
+          try {
+            console.log("---------------  Nine  -------------");
+            if (search.length > 1) {
+              console.log("---------------  Ten  -------------");
+              const delete_duplicate = await prisma.transaction.delete({
+                where: {
+                  id: search[0].id,
+                },
+              });
 
-        try {
-          console.log("---------------  Nine  -------------");
-          if (search.data?.length > 1) {
-            console.log("---------------  Ten  -------------");
+              console.log("---------------  Eleven  -------------");
+              return delete_duplicate;
+            }
 
-            const delete_duplicate = trpc.transactions.duplicate.useQuery({
-                id: `${search.data[0]?.id}`,
+            console.log("---------------  Twelve  -------------");
+            if (isNaN(+transaction[0].transAmount) === true) {
+              return console.log("---------------  Thirteen  -------------");
+            }
+
+            console.log(
+              "---------------  Fourteen  -------------",
+              isNaN(+transaction[0].transAmount)
+            );
+
+            const new_transaction = await prisma.transaction.create({
+              data: {
+                transactionType: transaction[0]?.transactionType,
+                transID: transaction[0]?.transID,
+                transTime: transaction[0]?.transTime,
+                transAmount: transaction[0]?.transAmount,
+                businessShortCode: transaction[0]?.businessShortCode,
+                billRefNumber: transaction[0]?.billRefNumber,
+                invoiceNumber: transaction[0]?.invoiceNumber,
+                orgAccountBalance: transaction[0]?.orgAccountBalance,
+                thirdPartyTransID: transaction[0]?.thirdPartyTransID,
+                msisdn: transaction[0]?.msisdn,
+                firstName: transaction[0]?.firstName,
+                middleName: transaction[0]?.middleName,
+                lastName: transaction[0]?.lastName,
+                state: state,
+                payment: "",
+              },
             });
-
-            console.log("---------------  Eleven  -------------");
-            return delete_duplicate;
+            console.log("---------------  Fifteen  -------------");
+            return new_transaction;
+          } catch (error) {
+            console.log("---------------  Sixteen  -------------");
+            return {
+              message: "Error Writing ...",
+              from: new_date,
+              to: now_date,
+            };
           }
-
-          console.log("---------------  Twelve  -------------");
-          if (isNaN(+transaction[0].transAmount) === true) {
-            return console.log("---------------  Thirteen  -------------");
-          }
-
-          console.log("---------------  Fourteen  -------------", isNaN(+transaction[0].transAmount));
-
-          const new_transaction = trpc.transactions.create.useQuery({
-              transactionType: transaction[0]?.transactionType,
-              transID: transaction[0]?.transID,
-              transTime: transaction[0]?.transTime,
-              transAmount: transaction[0]?.transAmount,
-              businessShortCode: transaction[0]?.businessShortCode,
-              billRefNumber: transaction[0]?.billRefNumber,
-              invoiceNumber: transaction[0]?.invoiceNumber,
-              orgAccountBalance: transaction[0]?.orgAccountBalance,
-              thirdPartyTransID: transaction[0]?.thirdPartyTransID,
-              msisdn: transaction[0]?.msisdn,
-              firstName: transaction[0]?.firstName,
-              middleName: transaction[0]?.middleName,
-              lastName: transaction[0]?.lastName,
-              state: state,
-              payment: "",
-          });
-          console.log("---------------  Fifteen  -------------");
-          return new_transaction
-        } catch (error) {
-          console.log("---------------  Sixteen  -------------");
-          return {
-            message: "Error Writing ...",
-            from: new_date,
-            to: now_date,
-          };
-        }
         }
       }
     });
