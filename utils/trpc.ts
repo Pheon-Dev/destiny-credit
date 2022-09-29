@@ -28,17 +28,17 @@ export const trpc = createTRPCNext<AppRouter, SSRContext>({
             process.env.NODE_ENV === "development" ||
             (opts.direction === "down" && opts.result instanceof Error),
         }),
-        httpLink({
-          url: `${getBaseUrl()}/api/trpc`,
-        }),
-        /* httpBatchLink({ */
+        /* httpLink({ */
         /*   url: `${getBaseUrl()}/api/trpc`, */
-        /*   headers() { */
-        /*     return { */
-        /*       "Content-Type": "application/json", */
-        /*     } */
-        /*   }, */
         /* }), */
+        httpBatchLink({
+          url: `${getBaseUrl()}/api/trpc`,
+          headers() {
+            return {
+              "Content-Type": "application/json",
+            }
+          },
+        }),
       ],
       transformer: superjson,
     };

@@ -18,6 +18,7 @@ export const logsRouter = t.router({
     const new_date = date.toJSON();
 
     const now_date = n_date.toJSON();
+    console.log("---------------  One  -------------");
 
     const url = `https://logtail.com/api/v1/query?source_ids=158744&query=transID&from=${new_date}&to=${now_date}`;
 
@@ -34,7 +35,9 @@ export const logsRouter = t.router({
 
     const log = response.data;
     let transactions = [{}];
+    console.log("---------------  Two  -------------");
     log.data?.map(async (t: Logs) => {
+      console.log("---------------  Three  -------------");
       if (t?.message.match("INTERNAL_SERVER_ERROR"))
         return {
           data: t?.message.length,
@@ -42,7 +45,9 @@ export const logsRouter = t.router({
           from: new_date,
           to: now_date,
         };
+      console.log("---------------  Four  -------------");
       if (t?.message.startsWith("START")) {
+        console.log("---------------  Five  -------------");
         const data = t?.message.split("{")[1].split("}")[0];
         let transactionType = data
           .split(",")[0]
@@ -110,16 +115,18 @@ export const logsRouter = t.router({
           transaction,
         });
 
+        console.log("---------------  Six  -------------");
         const member = await prisma.member.findFirst({
           where: {
             firstName: transaction[0].firstName,
             lastName: transaction[0].middleName + " " + transaction[0].lastName,
           },
         });
-        if (!member) state= "new";
+        if (!member) state = "new";
 
-        if (member) state = "registered"
+        if (member) state = "registered";
 
+        console.log("---------------  Seven  -------------");
         const search = await prisma.transaction.findMany({
           where: {
             transID: transaction[0].transID,
@@ -134,12 +141,15 @@ export const logsRouter = t.router({
           };
         }
 
-          if (search.length === 1) {
-            return;
-          }
+        console.log("---------------  Eight  -------------");
+        if (search.length === 1) {
+          return;
+        }
 
         try {
+          console.log("---------------  Nine  -------------");
           if (search.length > 1) {
+            console.log("---------------  Ten  -------------");
             const duplicate = await prisma.transaction.findMany({
               where: {
                 transID: transaction[0].transID,
@@ -152,43 +162,38 @@ export const logsRouter = t.router({
               },
             });
 
+            console.log("---------------  Eleven  -------------");
             return delete_duplicate;
           }
 
-          if (isNaN(+transaction[0].transAmount))return;
-
-            const new_transaction = await prisma.transaction.create({
-              data: {
-                transactionType: transaction[0]?.transactionType,
-                transID: transaction[0]?.transID,
-                transTime: transaction[0]?.transTime,
-                transAmount: transaction[0]?.transAmount,
-                businessShortCode: transaction[0]?.businessShortCode,
-                billRefNumber: transaction[0]?.billRefNumber,
-                invoiceNumber: transaction[0]?.invoiceNumber,
-                orgAccountBalance: transaction[0]?.orgAccountBalance,
-                thirdPartyTransID: transaction[0]?.thirdPartyTransID,
-                msisdn: transaction[0]?.msisdn,
-                firstName: transaction[0]?.firstName,
-                middleName: transaction[0]?.middleName,
-                lastName: transaction[0]?.lastName,
-                state: state,
-                payment: "",
-              },
-            });
-
-            if (!new_transaction) {
-              throw new TRPCError({
-                code: "NOT_FOUND",
-                message: `logs.delete_duplicate not found`,
-              });
+          console.log("---------------  Twelve  -------------");
+          if (isNaN(+transaction[0].transAmount) === true) {
+            return console.log("---------------  Thirteen  -------------");
           }
-          return {
-            message: "Error Matching Requirements ...",
-            from: new_date,
-            to: now_date,
-          };
+
+          console.log("---------------  Fourteen  -------------", isNaN(+transaction[0].transAmount));
+
+          return await prisma.transaction.create({
+            data: {
+              transactionType: transaction[0]?.transactionType,
+              transID: transaction[0]?.transID,
+              transTime: transaction[0]?.transTime,
+              transAmount: transaction[0]?.transAmount,
+              businessShortCode: transaction[0]?.businessShortCode,
+              billRefNumber: transaction[0]?.billRefNumber,
+              invoiceNumber: transaction[0]?.invoiceNumber,
+              orgAccountBalance: transaction[0]?.orgAccountBalance,
+              thirdPartyTransID: transaction[0]?.thirdPartyTransID,
+              msisdn: transaction[0]?.msisdn,
+              firstName: transaction[0]?.firstName,
+              middleName: transaction[0]?.middleName,
+              lastName: transaction[0]?.lastName,
+              state: state,
+              payment: "",
+            },
+          });
         } catch (error) {
+          console.log("---------------  Fifteen  -------------");
           return {
             message: "Error Writing ...",
             from: new_date,
@@ -197,6 +202,7 @@ export const logsRouter = t.router({
         }
       }
     });
+    console.log("---------------  Sixteen  -------------");
     return {
       message: `${transactions.length} Total Results Found!`,
       data: transactions,
