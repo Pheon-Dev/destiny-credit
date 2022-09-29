@@ -40,7 +40,7 @@ export const trpc = createTRPCNext<AppRouter, SSRContext>({
           },
         }),
       ],
-      transformer: superjson,
+      /* transformer: superjson, */
     };
   },
   ssr: true,
