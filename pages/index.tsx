@@ -32,6 +32,7 @@ const Page: NextPage = () => {
             updater={`${user?.id}`}
           />
         )}
+        <pre>{JSON.stringify(logs, undefined, 2)}</pre>
       </>
     </Protected>
   );

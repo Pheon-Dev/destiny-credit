@@ -5,6 +5,7 @@ const prisma = new PrismaClient();
 
 import { Fields, Logs } from "../../types";
 import { TRPCError } from "@trpc/server";
+import { trpc } from "../../utils/trpc";
 
 const LOGTAIL_API_TOKEN = process.env.NEXT_PUBLIC_LOGTAIL_API_TOKEN;
 
@@ -116,21 +117,18 @@ export const logsRouter = t.router({
         });
 
         console.log("---------------  Six  -------------");
-        const member = await prisma.member.findFirst({
-          where: {
-            firstName: transaction[0].firstName,
-            lastName: transaction[0].middleName + " " + transaction[0].lastName,
-          },
+        const member = trpc.members.maintain.useQuery({
+            firstName: `${transaction[0].firstName}`,
+            lastName: `${transaction[0].middleName} ${transaction[0].lastName}`,
+            phoneNumber: `${transaction[0].msisdn}`,
         });
         if (!member) state = "new";
 
         if (member) state = "registered";
 
         console.log("---------------  Seven  -------------");
-        const search = await prisma.transaction.findMany({
-          where: {
-            transID: transaction[0].transID,
-          },
+        const search = trpc.transactions.search.useQuery({
+            id: `${transaction[0].transID}`,
         });
 
         if (!search) {
@@ -142,24 +140,19 @@ export const logsRouter = t.router({
         }
 
         console.log("---------------  Eight  -------------");
-        if (search.length === 1) {
+        if (search.data?.length === 1) {
           return;
         }
 
+        if (search.data) {
+
         try {
           console.log("---------------  Nine  -------------");
-          if (search.length > 1) {
+          if (search.data?.length > 1) {
             console.log("---------------  Ten  -------------");
-            const duplicate = await prisma.transaction.findMany({
-              where: {
-                transID: transaction[0].transID,
-              },
-            });
 
-            const delete_duplicate = await prisma.transaction.delete({
-              where: {
-                id: duplicate[0].id,
-              },
+            const delete_duplicate = trpc.transactions.duplicate.useQuery({
+                id: `${search.data[0]?.id}`,
             });
 
             console.log("---------------  Eleven  -------------");
@@ -173,8 +166,7 @@ export const logsRouter = t.router({
 
           console.log("---------------  Fourteen  -------------", isNaN(+transaction[0].transAmount));
 
-          const new_transaction = await prisma.transaction.create({
-            data: {
+          const new_transaction = trpc.transactions.create.useQuery({
               transactionType: transaction[0]?.transactionType,
               transID: transaction[0]?.transID,
               transTime: transaction[0]?.transTime,
@@ -188,9 +180,8 @@ export const logsRouter = t.router({
               firstName: transaction[0]?.firstName,
               middleName: transaction[0]?.middleName,
               lastName: transaction[0]?.lastName,
-              state: "",
+              state: state,
               payment: "",
-            },
           });
           console.log("---------------  Fifteen  -------------");
           return new_transaction
@@ -201,6 +192,7 @@ export const logsRouter = t.router({
             from: new_date,
             to: now_date,
           };
+        }
         }
       }
     });
