@@ -23,45 +23,45 @@ export const trpc = createTRPCNext<AppRouter, SSRContext>({
   config() {
     return {
       links: [
-        loggerLink({
-          enabled: (opts) =>
-            process.env.NODE_ENV === "development" ||
-            (opts.direction === "down" && opts.result instanceof Error),
-        }),
-        /* httpLink({ */
-        /*   url: `${getBaseUrl()}/api/trpc`, */
+        /* loggerLink({ */
+        /*   enabled: (opts) => */
+        /*     process.env.NODE_ENV === "development" || */
+        /*     (opts.direction === "down" && opts.result instanceof Error), */
         /* }), */
-        httpBatchLink({
+        httpLink({
           url: `${getBaseUrl()}/api/trpc`,
         }),
+        /* httpBatchLink({ */
+        /*   url: `${getBaseUrl()}/api/trpc`, */
+        /* }), */
       ],
       transformer: superjson,
     };
   },
-  ssr: true,
-  responseMeta(opts) {
-    const ctx = opts.ctx as SSRContext;
-
-    if (ctx.status) {
-      return {
-        status: ctx.status,
-      };
-    }
-
-    const error = opts.clientErrors[0];
-    if (error) {
-      return {
-        status: error.data?.httpStatus ?? 500,
-      };
-    }
-
+  ssr: false,
+  /* responseMeta(opts) { */
+  /*   const ctx = opts.ctx as SSRContext; */
+  /**/
+  /*   if (ctx.status) { */
+  /*     return { */
+  /*       status: ctx.status, */
+  /*     }; */
+  /*   } */
+  /**/
+  /*   const error = opts.clientErrors[0]; */
+  /*   if (error) { */
+  /*     return { */
+  /*       status: error.data?.httpStatus ?? 500, */
+  /*     }; */
+  /*   } */
+  /**/
     /* return {}; */
-
-    const ONE_DAY_IN_SECONDS = 60 * 60 * 24;
-
-    return {
-      "Cache-Control": `s-maxage=1, stale-while-revalidate=${ONE_DAY_IN_SECONDS}`,
-              "Content-Type": "application/json",
-    };
-  },
+  /**/
+  /*   const ONE_DAY_IN_SECONDS = 60 * 60 * 24; */
+  /**/
+  /*   return { */
+  /*     "Cache-Control": `s-maxage=1, stale-while-revalidate=${ONE_DAY_IN_SECONDS}`, */
+  /*     "Content-Type": "application/json", */
+  /*   }; */
+  /* }, */
 });
