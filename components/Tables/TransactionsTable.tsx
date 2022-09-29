@@ -32,7 +32,6 @@ export const TransactionsTable = ({
 }) => {
   const [time, setTime] = useState("");
   const [locale, setLocale] = useState(false);
-  const logs = trpc.logs.logs.useQuery();
 
   const Header = () => (
     <tr>

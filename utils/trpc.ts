@@ -33,14 +33,9 @@ export const trpc = createTRPCNext<AppRouter, SSRContext>({
         /* }), */
         httpBatchLink({
           url: `${getBaseUrl()}/api/trpc`,
-          headers() {
-            return {
-              "Content-Type": "application/json",
-            }
-          },
         }),
       ],
-      /* transformer: superjson, */
+      transformer: superjson,
     };
   },
   ssr: true,
@@ -66,6 +61,7 @@ export const trpc = createTRPCNext<AppRouter, SSRContext>({
 
     return {
       "Cache-Control": `s-maxage=1, stale-while-revalidate=${ONE_DAY_IN_SECONDS}`,
+              "Content-Type": "application/json",
     };
   },
 });
