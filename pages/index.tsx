@@ -7,7 +7,7 @@ import { useSession } from "next-auth/react";
 const Page: NextPage = () => {
   const { data, status } = useSession();
 
-  const logs = trpc.logs.logs.useQuery();
+  const logs = trpc.logs.logs.useQuery()
   const { data: user } = trpc.users.user.useQuery({
     email: `${data?.user?.email}` || "",
   });
