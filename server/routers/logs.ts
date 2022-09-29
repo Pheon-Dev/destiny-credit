@@ -115,16 +115,16 @@ export const logsRouter = t.router({
           transaction,
         });
 
-        console.log("---------------  Six  -------------");
-        const member = await prisma.member.findFirst({
-          where: {
-            firstName: transaction[0].firstName,
-            lastName: transaction[0].middleName + " " + transaction[0].lastName,
-          },
-        });
-        if (!member) state = "new";
-
-        if (member) state = "registered";
+        /* console.log("---------------  Six  -------------"); */
+        /* const member = await prisma.member.findFirst({ */
+        /*   where: { */
+        /*     firstName: transaction[0].firstName, */
+        /*     lastName: transaction[0].middleName + " " + transaction[0].lastName, */
+        /*   }, */
+        /* }); */
+        /* if (!member) state = "new"; */
+        /**/
+        /* if (member) state = "registered"; */
 
         console.log("---------------  Seven  -------------");
         const search = await prisma.transaction.findMany({
@@ -188,7 +188,7 @@ export const logsRouter = t.router({
               firstName: transaction[0]?.firstName,
               middleName: transaction[0]?.middleName,
               lastName: transaction[0]?.lastName,
-              state: state,
+              state: "",
               payment: "",
             },
           });
