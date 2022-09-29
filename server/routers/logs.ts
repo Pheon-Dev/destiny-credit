@@ -115,65 +115,65 @@ export const logsRouter = t.router({
           transaction,
         });
 
-        /* console.log("---------------  Six  -------------"); */
-        /* const member = await prisma.member.findFirst({ */
-        /*   where: { */
-        /*     firstName: transaction[0].firstName, */
-        /*     lastName: transaction[0].middleName + " " + transaction[0].lastName, */
-        /*   }, */
-        /* }); */
-        /* if (!member) state = "new"; */
-        /**/
-        /* if (member) state = "registered"; */
+        console.log("---------------  Six  -------------");
+        const member = await prisma.member.findFirst({
+          where: {
+            firstName: transaction[0].firstName,
+            lastName: transaction[0].middleName + " " + transaction[0].lastName,
+          },
+        });
+        if (!member) state = "new";
 
-        /* console.log("---------------  Seven  -------------"); */
-        /* const search = await prisma.transaction.findMany({ */
-        /*   where: { */
-        /*     transID: transaction[0].transID, */
-        /*   }, */
-        /* }); */
-        /**/
-        /* if (!search) { */
-        /*   return { */
-        /*     message: "Error Searching Match ...", */
-        /*     from: new_date, */
-        /*     to: now_date, */
-        /*   }; */
-        /* } */
-        /**/
-        /* console.log("---------------  Eight  -------------"); */
-        /* if (search.length === 1) { */
-        /*   return; */
-        /* } */
+        if (member) state = "registered";
+
+        console.log("---------------  Seven  -------------");
+        const search = await prisma.transaction.findMany({
+          where: {
+            transID: transaction[0].transID,
+          },
+        });
+
+        if (!search) {
+          return {
+            message: "Error Searching Match ...",
+            from: new_date,
+            to: now_date,
+          };
+        }
+
+        console.log("---------------  Eight  -------------");
+        if (search.length === 1) {
+          return;
+        }
 
         try {
-          /* console.log("---------------  Nine  -------------"); */
-          /* if (search.length > 1) { */
-          /*   console.log("---------------  Ten  -------------"); */
-          /*   const duplicate = await prisma.transaction.findMany({ */
-          /*     where: { */
-          /*       transID: transaction[0].transID, */
-          /*     }, */
-          /*   }); */
-          /**/
-          /*   const delete_duplicate = await prisma.transaction.delete({ */
-          /*     where: { */
-          /*       id: duplicate[0].id, */
-          /*     }, */
-          /*   }); */
-          /**/
-          /*   console.log("---------------  Eleven  -------------"); */
-          /*   return delete_duplicate; */
-          /* } */
-          /**/
-          /* console.log("---------------  Twelve  -------------"); */
+          console.log("---------------  Nine  -------------");
+          if (search.length > 1) {
+            console.log("---------------  Ten  -------------");
+            const duplicate = await prisma.transaction.findMany({
+              where: {
+                transID: transaction[0].transID,
+              },
+            });
+
+            const delete_duplicate = await prisma.transaction.delete({
+              where: {
+                id: duplicate[0].id,
+              },
+            });
+
+            console.log("---------------  Eleven  -------------");
+            return delete_duplicate;
+          }
+
+          console.log("---------------  Twelve  -------------");
           if (isNaN(+transaction[0].transAmount) === true) {
             return console.log("---------------  Thirteen  -------------");
           }
 
           console.log("---------------  Fourteen  -------------", isNaN(+transaction[0].transAmount));
 
-          return await prisma.transaction.create({
+          const new_transaction = await prisma.transaction.create({
             data: {
               transactionType: transaction[0]?.transactionType,
               transID: transaction[0]?.transID,
@@ -192,8 +192,10 @@ export const logsRouter = t.router({
               payment: "",
             },
           });
-        } catch (error) {
           console.log("---------------  Fifteen  -------------");
+          return new_transaction
+        } catch (error) {
+          console.log("---------------  Sixteen  -------------");
           return {
             message: "Error Writing ...",
             from: new_date,
@@ -202,7 +204,7 @@ export const logsRouter = t.router({
         }
       }
     });
-    console.log("---------------  Sixteen  -------------");
+    console.log("---------------  Seventeen  -------------");
     return {
       message: `${transactions.length} Total Results Found!`,
       data: transactions,
