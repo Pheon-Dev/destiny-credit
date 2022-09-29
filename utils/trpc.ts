@@ -49,6 +49,7 @@ export const trpc = createTRPCNext<AppRouter, SSRContext>({
                 ...headers,
                 // Optional: inform server that it's an SSR request
                 'x-ssr': '1',
+                /* 'Content-Type': 'application/json', */
               };
             }
             return {};

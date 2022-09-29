@@ -1,9 +1,7 @@
-import { PrismaClient } from "@prisma/client";
+import { prisma } from "../../server/prisma";
 import axios from "axios";
 import type { NextApiRequest, NextApiResponse } from "next";
 import { Fields, Logs } from "../../types";
-
-const prisma = new PrismaClient();
 
 const LOGTAIL_API_TOKEN = process.env.NEXT_PUBLIC_LOGTAIL_API_TOKEN;
 
