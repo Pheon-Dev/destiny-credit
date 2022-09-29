@@ -1,8 +1,7 @@
 import { TRPCError } from "@trpc/server";
 import { z } from "zod";
 import { t } from "../trpc";
-import { PrismaClient } from '@prisma/client';
-const prisma = new PrismaClient()
+import { prisma } from "../prisma";
 
 export const loansRouter = t.router({
   create_loan: t.procedure.query(async () => {

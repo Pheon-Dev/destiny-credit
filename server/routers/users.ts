@@ -1,8 +1,8 @@
 import { TRPCError } from "@trpc/server";
 import { z } from "zod";
 import { t } from "../trpc";
-import { Prisma, PrismaClient } from "@prisma/client";
-const prisma = new PrismaClient();
+import { Prisma } from "@prisma/client";
+import { prisma } from "../prisma";
 
 const defaultUserSelect = Prisma.validator<Prisma.UserSelect>()({
   id: true,

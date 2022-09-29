@@ -1,7 +1,6 @@
 import axios from "axios";
 import { t } from "../trpc";
-import { PrismaClient } from "@prisma/client";
-const prisma = new PrismaClient();
+import { prisma } from "../prisma";
 
 import { Fields, Logs } from "../../types";
 
@@ -115,15 +114,15 @@ export const logsRouter = t.router({
         });
 
         /* console.log("---------------  Six  -------------"); */
-        const member = await prisma.member.findFirst({
-          where: {
-            firstName: transaction[0].firstName,
-            lastName: transaction[0].middleName + " " + transaction[0].lastName,
-          },
-        });
-        if (!member) state = "new";
-
-        if (member) state = "registered";
+        /* const member = await prisma.member.findFirst({ */
+        /*   where: { */
+        /*     firstName: transaction[0].firstName, */
+        /*     lastName: transaction[0].middleName + " " + transaction[0].lastName, */
+        /*   }, */
+        /* }); */
+        /* if (!member) state = "new"; */
+        /**/
+        /* if (member) state = "registered"; */
 
         /* console.log("---------------  Seven  -------------"); */
         const search = await prisma.transaction.findMany({
