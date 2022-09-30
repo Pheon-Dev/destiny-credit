@@ -189,13 +189,13 @@ const TransactionRow = ({
       if (transaction.id) {
         console.log(state);
         console.log(paymentFor);
-        /* handle.mutate({ */
-        /*   id: transaction.id, */
-        /*   handlerId: `${handlerId}`, */
-        /*   updaterId: `${updaterId}`, */
-        /*   payment: `${paymentFor}`, */
-        /*   state: `${state}`, */
-        /* }); */
+        handle.mutate({
+          id: transaction.id,
+          handlerId: `${handlerId}`,
+          updaterId: `${updaterId}`,
+          payment: `${paymentFor}`,
+          state: `${state}`,
+        });
       }
       if (handle.error) {
         throw new Error("Error Handling State");

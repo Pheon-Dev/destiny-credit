@@ -2,9 +2,18 @@ import React from "react";
 import { useRouter } from "next/router";
 import { trpc } from "../../../utils/trpc";
 import { Protected, TitleText } from "../../../components";
-import { Group, LoadingOverlay, Table } from "@mantine/core";
+import { Group, LoadingOverlay, Table, Text } from "@mantine/core";
 import { useSession } from "next-auth/react";
 import { NextPage } from "next";
+
+import { useState } from "react";
+import { TransferList, TransferListData } from "@mantine/core";
+import { Transaction } from "@prisma/client";
+
+type Transfer = {
+  label: string;
+  recent: string;
+};
 
 const PaymentsList = () => {
   const { data } = useSession();
@@ -13,57 +22,180 @@ const PaymentsList = () => {
     email: `${data?.user?.email}` || "",
   });
 
-    const router = useRouter();
-    const id = router.query.payments as string;
+  const router = useRouter();
+  const id = router.query.payments as string;
+  const Header = () => (
+    <tr>
+      <th>Paid Amount</th>
+      <th>O|S Arrears</th>
+      <th>Paid Arrears</th>
+      <th>O|S Penalty</th>
+      <th>Paid Penalty</th>
+      <th>O|S Interest</th>
+      <th>Paid Interest</th>
+      <th>O|S Principal</th>
+      <th>Paid Principal</th>
+      <th>O|S Balance</th>
+      {/* <th>M-PESA</th> */}
+    </tr>
+  );
+  const TransactionsHeader = () => (
+    <tr>
+      <th>ID</th>
+      <th>Names</th>
+      <th>Amount</th>
+      <th>Phone</th>
+      <th>Type</th>
+    </tr>
+  );
+  const { data: loan, fetchStatus: loan_status } =
+    trpc.loans.loan_payment.useQuery({ id: id });
+  const { data: member, fetchStatus: member_status } =
+    trpc.members.member.useQuery({ id: `${loan?.memberId}` });
+  const { data: payments, fetchStatus: payment_status } =
+    trpc.loans.payment.useQuery({ id: id });
 
-    const Header = () => (
-      <tr>
-        <th>Paid Amount</th>
-        <th>O|S Arrears</th>
-        <th>Paid Arrears</th>
-        <th>O|S Penalty</th>
-        <th>Paid Penalty</th>
-        <th>O|S Interest</th>
-        <th>Paid Interest</th>
-        <th>O|S Principal</th>
-        <th>Paid Principal</th>
-        <th>O|S Balance</th>
-        {/* <th>M-PESA</th> */}
-      </tr>
-    );
-    const TransactionsHeader = () => (
-      <tr>
-        <th>ID</th>
-        <th>Names</th>
-        <th>Amount</th>
-        <th>Phone</th>
-        <th>Type</th>
-      </tr>
-    );
-    const { data: loan, fetchStatus: loan_status } =
-      trpc.loans.loan_payment.useQuery({ id: id });
-    const { data: member, fetchStatus: member_status } =
-      trpc.members.member.useQuery({ id: `${loan?.memberId}` });
-    const { data: payments, fetchStatus: payment_status } =
-      trpc.loans.payment.useQuery({ id: id });
+  const names = member?.lastName;
 
-    const names = member?.lastName;
+  const firstname = member?.firstName;
+  const middlename = names?.split(" ")[0];
+  const lastname = names?.split(" ")[1];
+  const phonenumber = member?.phoneNumber;
 
-    const firstname = member?.firstName;
-    const middlename = names?.split(" ")[0];
-    const lastname = names?.split(" ")[1];
-    const phonenumber = member?.phoneNumber;
+  const { data: transactions, fetchStatus: transactions_status } =
+    trpc.loans.transactions.useQuery({
+      firstName: `${firstname}`,
+      middleName: `${middlename}`,
+      lastName: `${lastname}`,
+      phoneNumber: `${phonenumber}`,
+    });
 
-    const { data: transactions, fetchStatus: transactions_status } =
-      trpc.loans.transactions.useQuery({
-        firstName: `${firstname}`,
-        middleName: `${middlename}`,
-        lastName: `${lastname}`,
-        phoneNumber: `${phonenumber}`,
-      });
+  let handled: any = [];
+  let recent: any = [];
 
+  const date = (time: string) => {
+    const day = time.slice(6, 8);
+    const month = time.slice(4, 6);
+    const year = time.slice(0, 4);
+    const when = day + "-" + month + "-" + year;
+    return when;
+  };
+
+  transactions?.map(
+    (t: Transaction) =>
+      (t.payment === "" &&
+        recent.push({
+          value: `${t.id}`,
+          label: `${t.transID.slice(0,2) + "..." + t.transID.slice(7)}:
+          ${date(
+            `${t.transTime}`
+          )}
+          ${`paid ${t.transAmount} /=`.replace(
+            /\B(?=(\d{3})+(?!\d))/g,
+            ","
+          )}
+          ${t.billRefNumber === "" ? "via Till" : "via Pay Bill"}
+          `,
+        })) ||
+      (t.payment === "handled" &&
+        handled.push({
+          value: `${t.id}`,
+          label: `${t.transID.slice(0,2) + "..." + t.transID.slice(7)}:
+          ${date(
+            `${t.transTime}`
+          )}
+          ${`paid ${t.transAmount} /=`.replace(
+            /\B(?=(\d{3})+(?!\d))/g,
+            ","
+          )}
+          ${t.billRefNumber === "" ? "via Till" : "via Pay Bill"}
+          `,
+        })) ||
+      (!t.payment &&
+        recent.push({
+          value: `${t.id}`,
+          label: `${t.transID.slice(0,2) + "..." + t.transID.slice(7)}:
+          ${date(
+            `${t.transTime}`
+          )}
+          ${`paid ${t.transAmount} /=`.replace(
+            /\B(?=(\d{3})+(?!\d))/g,
+            ","
+          )}
+          ${t.billRefNumber === "" ? "via Till" : "via Pay Bill"}
+          `,
+        }))
+  );
+
+  const initialValues: TransferListData = [recent, handled];
+
+  const HandlePayments = () => {
+    const [data, setData] = useState<TransferListData>(initialValues);
+    console.log(data[1]);
     return (
-      <Protected>
+      <>
+        <Group position="center" m="lg">
+          <TitleText title={`M-PESA Payments`} />
+        </Group>
+        <TransferList
+          value={data}
+          onChange={setData}
+          searchPlaceholder="Search..."
+          nothingFound="Nothing here"
+          titles={["Recent", "Handled"]}
+          breakpoint="sm"
+        />
+        <Table striped highlightOnHover horizontalSpacing="md">
+          <thead>
+            <TransactionsHeader />
+          </thead>
+          <tbody>
+            {transactions?.map((transaction) => (
+              <tr
+                key={transaction.id}
+                /* style={{ */
+                /*   cursor: transaction.billRefNumber !== "" ? "pointer" : "text", */
+                /* }} */
+                /* onClick={() => { */
+                /*   transaction.billRefNumber !== "" */
+                /*     ? router.push(`/members/register/${transaction.transID}`) */
+                /*     : null; */
+                /* }} */
+              >
+                <td>{transaction.transID}</td>
+                <td>
+                  {transaction.firstName +
+                    " " +
+                    transaction.middleName +
+                    " " +
+                    transaction.lastName}
+                </td>
+                <td>
+                  {`${transaction.transAmount}`.replace(
+                    /\B(?=(\d{3})+(?!\d))/g,
+                    ","
+                  )}
+                </td>
+                <td>{transaction.msisdn}</td>
+                {transaction.billRefNumber === "" ? (
+                  <td>{transaction.transTime}</td>
+                ) : (
+                  <td>{transaction.billRefNumber}</td>
+                )}
+              </tr>
+            ))}
+          </tbody>
+          <tfoot>
+            <TransactionsHeader />
+          </tfoot>
+        </Table>
+      </>
+    );
+  };
+
+  const RecentPayments = () => {
+    return (
+      <>
         <Group position="center" m="lg">
           <TitleText title={`${loan?.memberName}`} />
         </Group>
@@ -150,56 +282,15 @@ const PaymentsList = () => {
             <Header />
           </tfoot>
         </Table>
-        <Group position="center" m="lg">
-          <TitleText title={`M-PESA Payments`} />
-        </Group>
-        <Table striped highlightOnHover horizontalSpacing="md">
-          <thead>
-            <TransactionsHeader />
-          </thead>
-          <tbody>
-            {transactions?.map((transaction) => (
-              <tr
-                key={transaction.id}
-                /* style={{ */
-                /*   cursor: transaction.billRefNumber !== "" ? "pointer" : "text", */
-                /* }} */
-                /* onClick={() => { */
-                /*   transaction.billRefNumber !== "" */
-                /*     ? router.push(`/members/register/${transaction.transID}`) */
-                /*     : null; */
-                /* }} */
-              >
-                <td>{transaction.transID}</td>
-                <td>
-                  {transaction.firstName +
-                    " " +
-                    transaction.middleName +
-                    " " +
-                    transaction.lastName}
-                </td>
-                <td>
-                  {`${transaction.transAmount}`.replace(
-                    /\B(?=(\d{3})+(?!\d))/g,
-                    ","
-                  )}
-                </td>
-                <td>{transaction.msisdn}</td>
-                {transaction.billRefNumber === "" ? (
-                  <td>{transaction.transTime}</td>
-                ) : (
-                  <td>{transaction.billRefNumber}</td>
-                )}
-              </tr>
-            ))}
-          </tbody>
-          <tfoot>
-            <TransactionsHeader />
-          </tfoot>
-        </Table>
-      </Protected>
+      </>
     );
-
+  };
+  return (
+    <Protected>
+      <RecentPayments />
+      <HandlePayments />
+    </Protected>
+  );
 };
 
 const Page: NextPage = () => {
