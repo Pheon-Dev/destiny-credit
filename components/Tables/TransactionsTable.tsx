@@ -11,6 +11,7 @@ import {
   Radio,
   Box,
   Button,
+  Loader,
 } from "@mantine/core";
 import type { Transaction } from "@prisma/client";
 import { useRouter } from "next/router";
@@ -24,11 +25,13 @@ export const TransactionsTable = ({
   call,
   handler,
   updater,
+  status,
 }: {
   transactions: Transaction[];
   call: string;
   handler: string;
   updater: string;
+  status: string;
 }) => {
   const [time, setTime] = useState("");
   const [locale, setLocale] = useState(false);
@@ -84,6 +87,10 @@ export const TransactionsTable = ({
         {call === "transactions" && <TitleText title="Recent Transactions" />}
         {call === "register" && <TitleText title="Registration List" />}
         {call === "maintain" && <TitleText title="Maintain a New Loan" />}
+        {status === "fetching" &&(<Loader />)}
+        {process.env.NODE_ENV === "development" && (
+        <>
+        {status === "paused" && (
         <Switch
           label={`${locale ? "YYYY/MM/DD" : "YYYY/DD/MM"}`}
           checked={locale}
@@ -93,6 +100,19 @@ export const TransactionsTable = ({
           onLabel="YDM"
           offLabel="YMD"
         />
+        ) || status === "idle" && (
+        <Switch
+          label={`${locale ? "YYYY/MM/DD" : "YYYY/DD/MM"}`}
+          checked={locale}
+          onChange={(e) => {
+            setLocale(e.currentTarget.checked);
+          }}
+          onLabel="YDM"
+          offLabel="YMD"
+        />
+        )}
+        </>
+        )}
         <DatePicker
           value={value}
           firstDayOfWeek="sunday"
@@ -171,18 +191,9 @@ const TransactionRow = ({
     (status: string) => {
     setState(status);
       try {
-        console.log(state);
-        if (transaction.state === "clicked") return;
+        /* console.log(state); */
         if (transaction.state === "handled") return;
         if (transaction.id) {
-          state === "clicked" &&
-            handle.mutate({
-              id: transaction.id,
-              handlerId: `${transaction?.handlerId}`,
-              updaterId: `${transaction?.updaterId}`,
-              payment: `${transaction?.payment}`,
-              state: `${state}`,
-            });
           state === "handled" &&
             handle.mutate({
               id: transaction.id,
@@ -222,7 +233,6 @@ const TransactionRow = ({
           }}
           onClick={() => {
             setOpen(true);
-            handleState("clicked");
           }}
         >
           <td>{transaction.transID}</td>
@@ -245,19 +255,13 @@ const TransactionRow = ({
           <td>
             <Group position="center">
               {state === "" && transaction.state === "registered" && (
-                <IconCheck color="grey" size={20} />
-              )}
-              {transaction.state === "new" && state !== "clicked" && (
-                <IconCheck color="grey" size={20} />
-              ) || !transaction.state && state !== "clicked" && (
-                <IconCheck color="grey" size={20} />
-              )}
-              {(transaction.state === "clicked" && (
                 <IconChecks color="grey" size={20} />
-              )) ||
-                (state === "clicked" && transaction.state !== "handled" && (
-                  <IconChecks color="grey" size={20} />
-                ))}
+              )}
+              {transaction.state === "new" && (
+                <IconCheck color="grey" size={20} />
+              ) || !transaction.state && (
+                <IconCheck color="grey" size={20} />
+              )}
               {transaction.state === "handled" && (
                 <IconChecks color="blue" size={20} />
               )}

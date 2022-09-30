@@ -34,6 +34,7 @@ const Page: NextPage = () => {
         {transactions && (
           <TransactionsTable
             transactions={transactions}
+            status={trans_status}
             call="maintain"
             handler={`${user?.id}`}
             updater={`${user?.id}`}

@@ -27,12 +27,14 @@ const Page: NextPage = () => {
         {transactions && (
           <TransactionsTable
             transactions={transactions}
+            status={fetchStatus}
             call="transactions"
             handler={`${user?.id}`}
             updater={`${user?.id}`}
           />
         )}
-        <pre>{JSON.stringify(logs, undefined, 2)}</pre>
+        <pre>{JSON.stringify(logs.data?.message, undefined, 2)}</pre>
+        <pre>{JSON.stringify(transactions, undefined, 2)}</pre>
       </>
     </Protected>
   );

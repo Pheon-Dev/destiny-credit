@@ -22,6 +22,7 @@ const Page: NextPage = () => {
         {transactions && (
           <TransactionsTable
             transactions={transactions}
+            status={fetchStatus}
             call="register"
             handler={`${user?.id}`}
             updater={`${user?.id}`}
