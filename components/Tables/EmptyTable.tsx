@@ -42,9 +42,7 @@ export const EmptyTable = ({
             {call === "payment" && (
               <TitleText title="No Payments Made To This Loan Yet" />
             )}
-            {call === "products" && (
-            <TitleText title="No Created Products" />
-            )}
+            {call === "products" && <TitleText title="No Created Products" />}
           </Group>
           <Group position="center" m="lg">
             {/* <LoadingOverlay overlayBlur={2} visible={true} /> */}
@@ -55,28 +53,19 @@ export const EmptyTable = ({
         <>
           <Group position="center" m="xl">
             {call === "transactions" && (
-              <TitleText title="Loading Recent Transactions Made" />
+              <TitleText title="Recent Transactions" />
             )}
-            {call === "register" && (
-              <TitleText title="Loading New Members to Register" />
-            )}
-            {call === "all-members" && (
-              <TitleText title="Loading Registered Members" />
-            )}
-            {call === "create-loan" && (
-              <TitleText title="Loading Maintenance List" />
-            )}
-            {call === "approvals" && (
-              <TitleText title="Loading Maintained Loans Pending Approval" />
-            )}
+            {call === "register" && <TitleText title="Registration List" />}
+            {call === "maintain" && <TitleText title="Maintain a New Loan" />}
+            {call === "create-loan" && <TitleText title="Registered Members" />}
+            {call === "all-members" && <TitleText title="All Members List" />}
+            {call === "approvals" && <TitleText title="Approvals List" />}
             {call === "disbursements" && (
-              <TitleText title="Loading Approved Pending Disbursement" />
+              <TitleText title="Disbursements List" />
             )}
-            {call === "all-loans" && (
-              <TitleText title="Loading Disbursed Loans" />
-            )}
-            {call === "payments" && <TitleText title="Loading Active Loans" />}
-            {call === "products" && <TitleText title="Loading Available Products" />}
+            {call === "all-loans" && <TitleText title="All Loans List" />}
+            {call === "payments" && <TitleText title="Payments List" />}
+            {call === "products" && <TitleText title="Products List" />}
             {call === "payment" && (
               <TitleText title="Loading Payments Made To This Loan" />
             )}
