@@ -260,8 +260,6 @@ const TransactionRow = ({
     transaction.state,
     registerMember,
     payment,
-    handler,
-    updater,
     handlerId,
     updaterId,
     transaction.id,

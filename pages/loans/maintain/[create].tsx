@@ -784,6 +784,8 @@ const CreateLoan = ({
     }
   }, [
     form,
+    user?.id,
+    user,
     guarantor_form,
     id,
     maintain_guarantor,

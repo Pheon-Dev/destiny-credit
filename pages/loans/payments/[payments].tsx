@@ -178,21 +178,8 @@ const PaymentsList = ({ email, status }: { email: string; status: string }) => {
       } catch (error) {
         console.log("Error Handling State!");
       }
-    }, [data[1], user?.id, handle]);
+    }, [data[1], user?.id, handle, data]);
 
-    /* handleState() */
-    /* useEffect(() => { */
-    /*     let subscribe = true; */
-    /*     if (subscribe) { */
-    /*         handleState() */
-    /*       } */
-    /**/
-    /*       return () => { */
-    /*           subscribe = false */
-    /*         } */
-    /*   }, [data[1]]) */
-
-    /* console.log(data[1]) */
     return (
       <>
         <Group position="center" m="lg">
