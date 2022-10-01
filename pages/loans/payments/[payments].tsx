@@ -178,7 +178,7 @@ const PaymentsList = ({ email, status }: { email: string; status: string }) => {
       } catch (error) {
         console.log("Error Handling State!");
       }
-    }, [data[1], user?.id, handle, data]);
+    }, [handle, data]);
 
     return (
       <>
@@ -420,7 +420,7 @@ const Page: NextPage = () => {
 
   return (
     <Protected>
-      {check.length > 0 && <PaymentsList email={email} status={status} />}
+      {check?.length > 0 && <PaymentsList email={email} status={status} />}
     </Protected>
   );
 };

@@ -13,7 +13,7 @@ const Page: NextPage = () => {
 
   return (
     <Protected>
-      {check.length > 0 && (
+      {check?.length > 0 && (
         <MembersTable call={call} email={email} status={status} />
       )}
       {check === "" && <EmptyTable call={call} status={status} />}

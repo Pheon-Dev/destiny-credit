@@ -48,32 +48,6 @@ export const TransactionsTable = ({
     email: `${email}`,
   });
 
-  useEffect(() => {
-    let subscribe = true;
-    if (subscribe) {
-      setUser({
-        id: `${user_data?.data?.id}`,
-        role: `${user_data?.data?.role}`,
-        username: `${user_data?.data?.username}`,
-        firstname: `${user_data?.data?.firstName}`,
-        lastname: `${user_data?.data?.lastName}`,
-        email: `${user_data?.data?.email}`,
-        state: `${user_data?.data?.state}`,
-      });
-    }
-    return () => {
-      subscribe = false;
-    };
-  }, [
-    user_data?.data?.id,
-    user_data?.data?.role,
-    user_data?.data?.username,
-    user_data?.data?.firstName,
-    user_data?.data?.lastName,
-    user_data?.data?.email,
-    user_data?.data?.state,
-  ]);
-
   const { data: transactions, fetchStatus } =
     trpc.transactions.transactions.useQuery();
 
@@ -116,11 +90,33 @@ export const TransactionsTable = ({
         if (locale) setTime(`${dd}${mm}${yy}`);
         if (!locale) setTime(`${dd}${yy}${mm}`);
       }
+      setUser({
+        id: `${user_data?.data?.id}`,
+        role: `${user_data?.data?.role}`,
+        username: `${user_data?.data?.username}`,
+        firstname: `${user_data?.data?.firstName}`,
+        lastname: `${user_data?.data?.lastName}`,
+        email: `${user_data?.data?.email}`,
+        state: `${user_data?.data?.state}`,
+      });
     }
     return () => {
       subscribe = false;
     };
-  }, [new_date, time, value, locale]);
+  }, [
+    user_data?.data?.id,
+    user_data?.data?.role,
+    user_data?.data?.username,
+    user_data?.data?.firstName,
+    user_data?.data?.lastName,
+    user_data?.data?.email,
+    user_data?.data?.state,
+    new_date,
+    time,
+    value,
+    locale,
+    fetchStatus,
+  ]);
 
   return (
     <>
@@ -262,7 +258,6 @@ const TransactionRow = ({
     payment,
     handlerId,
     updaterId,
-    transaction.id,
   ]);
 
   useEffect(() => {

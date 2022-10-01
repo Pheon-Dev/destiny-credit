@@ -34,8 +34,6 @@ export const Utilities = () => {
   const { status, data } = useSession();
   const email = `${data?.user?.email}`;
   const check = email.split("@")[1];
-  console.log(status)
-  console.log(data)
 
   return (
     <>{check !== "" && <UtilitiesComponent email={email} status={status} />}</>
@@ -97,7 +95,6 @@ const UtilitiesComponent = ({
     };
   }, [
     status,
-    router,
     user_data?.data?.id,
     user_data?.data?.role,
     user_data?.data?.username,

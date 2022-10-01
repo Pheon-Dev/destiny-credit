@@ -19,7 +19,7 @@ const Page: NextPage = () => {
 
   return (
     <Protected>
-      {check.length > 0 && (
+      {check?.length > 0 && (
         <>
           <TransactionsTable call={call} email={email} status={status} />
           <Divider variant="dotted" mt="xl" />

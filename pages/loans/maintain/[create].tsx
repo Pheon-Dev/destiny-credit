@@ -784,7 +784,6 @@ const CreateLoan = ({
     }
   }, [
     form,
-    user?.id,
     user,
     guarantor_form,
     id,
@@ -883,7 +882,7 @@ const CreateLoan = ({
         autoClose: 4000,
       });
     }
-  }, [collateral_form, form.values.memberId, maintain_collateral]);
+  }, [collateral_form, form.values.memberId, maintain_collateral, user?.id]);
 
   const deleteCollateral = useCallback(() => {
     try {
@@ -1939,7 +1938,7 @@ const Page: NextPage = () => {
 
   return (
     <Protected>
-      {check.length > 0 && (
+      {check?.length > 0 && (
         <CreateLoan
           email={email}
           status={status}

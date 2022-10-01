@@ -326,7 +326,7 @@ const Page: NextPage = () => {
 
   return (
     <Protected>
-      {check.length > 0 && <Approve email={email} status={status} />}
+      {check?.length > 0 && <Approve email={email} status={status} />}
     </Protected>
   );
 };
