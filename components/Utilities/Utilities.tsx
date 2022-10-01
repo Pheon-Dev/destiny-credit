@@ -30,12 +30,21 @@ import { IconSun, IconMoonStars } from "@tabler/icons";
 import { trpc } from "../../utils/trpc";
 import { useCallback, useEffect, useState } from "react";
 import { TitleText } from "../Text/TitleText";
-
 export const Utilities = () => {
+  const { status, data } = useSession();
+  if (data?.user?.email)
+    return <UtilitiesElement email={`${data?.user?.email}`} status={status} />;
+};
+const UtilitiesElement = ({
+  email,
+  status,
+}: {
+  email: string;
+  status: string;
+}) => {
   const [scroll, scrollTo] = useWindowScroll();
   const [open, setOpen] = useState(false);
 
-  const { status, data } = useSession();
   const { colorScheme, toggleColorScheme } = useMantineColorScheme();
 
   const router = useRouter();
@@ -51,36 +60,27 @@ export const Utilities = () => {
     state: "",
   });
 
-  if (data?.user?.email) {
-    const user_data = trpc.users.user.useQuery({
-      email: `${data?.user?.email}`,
-    });
+  const user_data = trpc.users.user.useQuery({
+    email: `${email}`,
+  });
 
-    useEffect(() => {
-      setUser({
-        id: `${user_data?.data?.id}`,
-        role: `${user_data?.data?.role}`,
-        username: `${user_data?.data?.username}`,
-        firstname: `${user_data?.data?.firstName}`,
-        lastname: `${user_data?.data?.lastName}`,
-        email: `${user_data?.data?.email}`,
-        state: `${user_data?.data?.state}`,
-      });
-    }, []);
-  }
+  useEffect(() => {
+    setUser({
+      id: `${user_data?.data?.id}`,
+      role: `${user_data?.data?.role}`,
+      username: `${user_data?.data?.username}`,
+      firstname: `${user_data?.data?.firstName}`,
+      lastname: `${user_data?.data?.lastName}`,
+      email: `${user_data?.data?.email}`,
+      state: `${user_data?.data?.state}`,
+    });
+  }, []);
 
   const utils = trpc.useContext();
   const signout = trpc.users.signout.useMutation({
     onSuccess: async () => {
       await utils.users.users.invalidate();
-      updateNotification({
-        id: "sign-out-status",
-        title: "Signed Out Successfully!",
-        message: `Good Bye, See you Soon ...`,
-        icon: <IconCheck size={16} />,
-        color: "green",
-        autoClose: 4000,
-      });
+      return signOut();
     },
   });
 
@@ -103,7 +103,12 @@ export const Utilities = () => {
           });
         }
         if (signout) {
-          return signOut();
+          return updateNotification({
+            id: "sign-out-status",
+            title: "Sign Out",
+            message: `Signing Out ${user?.username} ...`,
+            loading: true,
+          });
         }
         return updateNotification({
           id: "sign-out-status",
@@ -173,7 +178,7 @@ export const Utilities = () => {
           </StyledTabs>
         </Group>
       </Affix>
-      {user && (
+      {user?.username && (
         <Drawer
           opened={open}
           onClose={() => setOpen(false)}
@@ -205,7 +210,7 @@ export const Utilities = () => {
                   <Text weight={500}>Username</Text>
                 </Grid.Col>
                 <Grid.Col mt="xs" span={4}>
-                  <Text>{user?.username}</Text>
+                  <Text>{user.username}</Text>
                 </Grid.Col>
               </Grid>
               <Grid grow>
