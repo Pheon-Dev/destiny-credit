@@ -79,6 +79,8 @@ model User {
   updatedProducts     Product[]     @relation("UpdatedBy")
   updatedCollaterals  Collateral[]  @relation("UpdatedBy")
   updatedGuarantors   Guarantor[]   @relation("UpdatedBy")
+
+  @@index(fields: [id, email, username])
 }
 
 model VerificationToken {
@@ -131,6 +133,7 @@ model Member {
   postalCodeKin         String
   cityTownKin           String
   numberKin             String
+  activeLoan            Boolean?
   loans                 Loan[]
   leader                Group[]      @relation("LedBy")
   initiator             Group[]      @relation("InitiatedBy")
@@ -147,7 +150,7 @@ model Member {
   updater               User?        @relation("UpdatedBy", fields: [updaterId], references: [id])
   updaterId             String?
 
-  @@index(id)
+  @@index(fields: [id, firstName, lastName])
 }
 
 model Guarantor {
@@ -162,9 +165,9 @@ model Guarantor {
   memberId              String
   updater               User?    @relation("UpdatedBy", fields: [updaterId], references: [id])
   updaterId             String?
-  Loan                  Loan[]
+  guaranteedLoan        Loan[]
 
-  @@index(id)
+  @@index(fields: [id, memberId])
 }
 
 model Collateral {
@@ -178,7 +181,7 @@ model Collateral {
   updater   User?    @relation("UpdatedBy", fields: [updaterId], references: [id])
   updaterId String?
 
-  @@index(id)
+  @@index(fields: [id, memberId])
 }
 
 model Loan {
@@ -228,7 +231,7 @@ model Loan {
   updater          User?     @relation("UpdatedBy", fields: [updaterId], references: [id])
   updaterId        String?
 
-  @@index(id)
+  @@index(fields: [id, memberId, productId])
 }
 
 model Payment {
@@ -255,7 +258,7 @@ model Payment {
   updater       User?    @relation("UpdatedBy", fields: [updaterId], references: [id])
   updaterId     String?
 
-  @@index(id)
+  @@index(fields: [id, loanId])
 }
 
 model Product {
@@ -284,7 +287,7 @@ model Product {
   updaterId      String?
   Loan           Loan[]
 
-  @@index(id)
+  @@index(fields: [id])
 }
 
 model Group {
@@ -306,7 +309,7 @@ model Group {
   updaterId   String?
   state       String?
 
-  @@index(id)
+  @@index(fields: [id])
 }
 
 model Transaction {
@@ -333,5 +336,5 @@ model Transaction {
   handler           User?    @relation("HandledBy", fields: [handlerId], references: [id])
   handlerId         String?
 
-  @@index(id)
+  @@index(fields: [id, transID, firstName, lastName])
 }

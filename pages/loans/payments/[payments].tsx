@@ -1,8 +1,8 @@
-import React from "react";
+import React, { useCallback, useEffect } from "react";
 import { useRouter } from "next/router";
 import { trpc } from "../../../utils/trpc";
 import { Protected, TitleText } from "../../../components";
-import { Group, LoadingOverlay, Table, Text } from "@mantine/core";
+import { Button, Group, LoadingOverlay, Table, Text } from "@mantine/core";
 import { useSession } from "next-auth/react";
 import { NextPage } from "next";
 
@@ -83,45 +83,39 @@ const PaymentsList = () => {
 
   transactions?.map(
     (t: Transaction) =>
-      (t.payment === "" &&
+      (t.state === "new" &&
         recent.push({
           value: `${t.id}`,
-          label: `${t.transID.slice(0,2) + "..." + t.transID.slice(7)}:
-          ${date(
-            `${t.transTime}`
-          )}
-          ${`paid ${t.transAmount} /=`.replace(
-            /\B(?=(\d{3})+(?!\d))/g,
-            ","
-          )}
+          label: `${t.transID.slice(0, 2) + "..." + t.transID.slice(7)}:
+          ${date(`${t.transTime}`)}
+          ${`paid ${t.transAmount} /=`.replace(/\B(?=(\d{3})+(?!\d))/g, ",")}
           ${t.billRefNumber === "" ? "via Till" : "via Pay Bill"}
           `,
         })) ||
-      (t.payment === "handled" &&
+      (t.state === "registered" &&
+        recent.push({
+          value: `${t.id}`,
+          label: `${t.transID.slice(0, 2) + "..." + t.transID.slice(7)}:
+          ${date(`${t.transTime}`)}
+          ${`paid ${t.transAmount} /=`.replace(/\B(?=(\d{3})+(?!\d))/g, ",")}
+          ${t.billRefNumber === "" ? "via Till" : "via Pay Bill"}
+          `,
+        })) ||
+      (t.state === "handled" &&
         handled.push({
           value: `${t.id}`,
-          label: `${t.transID.slice(0,2) + "..." + t.transID.slice(7)}:
-          ${date(
-            `${t.transTime}`
-          )}
-          ${`paid ${t.transAmount} /=`.replace(
-            /\B(?=(\d{3})+(?!\d))/g,
-            ","
-          )}
+          label: `${t.transID.slice(0, 2) + "..." + t.transID.slice(7)}:
+          ${date(`${t.transTime}`)}
+          ${`paid ${t.transAmount} /=`.replace(/\B(?=(\d{3})+(?!\d))/g, ",")}
           ${t.billRefNumber === "" ? "via Till" : "via Pay Bill"}
           `,
         })) ||
-      (!t.payment &&
+      (!t.state &&
         recent.push({
           value: `${t.id}`,
-          label: `${t.transID.slice(0,2) + "..." + t.transID.slice(7)}:
-          ${date(
-            `${t.transTime}`
-          )}
-          ${`paid ${t.transAmount} /=`.replace(
-            /\B(?=(\d{3})+(?!\d))/g,
-            ","
-          )}
+          label: `${t.transID.slice(0, 2) + "..." + t.transID.slice(7)}:
+          ${date(`${t.transTime}`)}
+          ${`paid ${t.transAmount} /=`.replace(/\B(?=(\d{3})+(?!\d))/g, ",")}
           ${t.billRefNumber === "" ? "via Till" : "via Pay Bill"}
           `,
         }))
@@ -131,20 +125,65 @@ const PaymentsList = () => {
 
   const HandlePayments = () => {
     const [data, setData] = useState<TransferListData>(initialValues);
-    console.log(data[1]);
+
+    const utils = trpc.useContext();
+    const handle = trpc.transactions.state.useMutation({
+      onSuccess: async () => {
+        await utils.transactions.transactions.invalidate();
+      },
+    });
+
+    const handleState = useCallback(() => {
+      try {
+        if (data[1]) {
+          data[1].map((d) => {
+            handle.mutate({
+              id: d.value,
+              handlerId: `${user?.id}`,
+              updaterId: `${user?.id}`,
+              payment: `loan`,
+              state: `handled`,
+            });
+            /* console.log(d) */
+          });
+        }
+      } catch (error) {
+        console.log("Error Handling State!");
+      }
+    }, [data[1], user?.id, handle]);
+
+            /* handleState() */
+    /* useEffect(() => { */
+    /*     let subscribe = true; */
+    /*     if (subscribe) { */
+    /*         handleState() */
+    /*       } */
+    /**/
+    /*       return () => { */
+    /*           subscribe = false */
+    /*         } */
+    /*   }, [data[1]]) */
+
+/* console.log(data[1]) */
     return (
       <>
         <Group position="center" m="lg">
           <TitleText title={`M-PESA Payments`} />
         </Group>
+        <Group position="center" m="lg">
         <TransferList
           value={data}
           onChange={setData}
+          listHeight={300}
           searchPlaceholder="Search..."
           nothingFound="Nothing here"
           titles={["Recent", "Handled"]}
           breakpoint="sm"
         />
+        {data[1].length > 0 && (
+        <Button variant="gradient" onClick={handleState}>Handle</Button>
+        )}
+        </Group>
         <Table striped highlightOnHover horizontalSpacing="md">
           <thead>
             <TransactionsHeader />
@@ -213,6 +252,74 @@ const PaymentsList = () => {
             <Header />
           </thead>
           <tbody>
+            {transactions?.map((payment) => (
+              <tr key={payment?.id} style={{ cursor: "auto" }}>
+            {payment?.state === "handled" && (
+            <>
+                <td>
+                  {`${payment.transAmount}`.replace(/\B(?=(\d{3})+(?!\d))/g, ",")}
+                </td>
+                <td>
+                  {`${Number(loan?.principal) - +payment?.transAmount}`.replace(
+                    /\B(?=(\d{3})+(?!\d))/g,
+                    ","
+                  )}
+                </td>
+                <td>
+                  {`${Number(loan?.principal) - +payment?.transAmount}`.replace(
+                    /\B(?=(\d{3})+(?!\d))/g,
+                    ","
+                  )}
+                </td>
+                <td>
+                  {`${Number(loan?.principal) - +payment?.transAmount}`.replace(
+                    /\B(?=(\d{3})+(?!\d))/g,
+                    ","
+                  )}
+                </td>
+                <td>
+                  {`${Number(loan?.principal) - +payment?.transAmount}`.replace(
+                    /\B(?=(\d{3})+(?!\d))/g,
+                    ","
+                  )}
+                </td>
+                <td>
+                  {`${Number(loan?.principal) - +payment?.transAmount}`.replace(
+                    /\B(?=(\d{3})+(?!\d))/g,
+                    ","
+                  )}
+                </td>
+                <td>
+                  {`${Number(loan?.principal) - +payment?.transAmount}`.replace(
+                    /\B(?=(\d{3})+(?!\d))/g,
+                    ","
+                  )}
+                </td>
+                <td>
+                  {`${Number(loan?.principal) - +payment?.transAmount}`.replace(
+                    /\B(?=(\d{3})+(?!\d))/g,
+                    ","
+                  )}
+                </td>
+                <td>
+                  {`${Number(loan?.principal) - +payment?.transAmount}`.replace(
+                    /\B(?=(\d{3})+(?!\d))/g,
+                    ","
+                  )}
+                </td>
+                <td>
+                  {`${Number(loan?.principal) - +payment?.transAmount}`.replace(
+                    /\B(?=(\d{3})+(?!\d))/g,
+                    ","
+                  )}
+                </td>
+                {/* <td> */}
+                {/*   {payment.mpesa} */}
+                {/* </td> */}
+            </>
+            )}
+              </tr>
+            ))}
             {payments?.map((payment) => (
               <tr key={payment?.id} style={{ cursor: "auto" }}>
                 <td>
@@ -289,6 +396,7 @@ const PaymentsList = () => {
     <Protected>
       <RecentPayments />
       <HandlePayments />
+      <pre>{JSON.stringify(transactions, undefined, 2)}</pre>
     </Protected>
   );
 };
