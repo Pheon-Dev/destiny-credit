@@ -1,10 +1,19 @@
 import React from "react";
-import { TitleText } from "../../components";
+import { TitleText, EmptyTable } from "../../components";
 import { Table, Group, Badge } from "@mantine/core";
 import type { Product } from "@prisma/client";
 import { useRouter } from "next/router";
+import { trpc } from "../../utils/trpc";
+import { useSession } from "next-auth/react";
 
-export const ProductsTable = ({ products }: { products: Product[] }) => {
+export const ProductsTable = ({ call }: { call: string }) => {
+  const { data } = useSession();
+
+  const { data: user } = trpc.users.user.useQuery({
+    email: `${data?.user?.email}` || "",
+  });
+
+  const { data: products, fetchStatus } = trpc.products.products.useQuery();
   const Header = () => (
     <tr>
       <th>Code</th>
@@ -17,35 +26,40 @@ export const ProductsTable = ({ products }: { products: Product[] }) => {
 
   return (
     <>
-      <Group position="center" m="lg">
-        <TitleText title="Products List" />
-      </Group>
-      <Table striped highlightOnHover horizontalSpacing="md">
-        <thead>
-          <Header />
-        </thead>
-        {!products && (
-          <tbody>
-            <tr>
-              <Group position="center" m="lg">
-                <TitleText title="Products List is Empty, Create a New One" />
-              </Group>
-            </tr>
-          </tbody>
-        )}
-        {products && (
-          <>
-            <tbody>
-              {products?.map((product) => (
-                <ProductRow key={product.productId} product={product} />
-              ))}
-            </tbody>
-            <tfoot>
+      {!products && <EmptyTable call={call} status={fetchStatus} />}
+      {products && (
+        <>
+          <Group position="center" m="lg">
+            <TitleText title="Products List" />
+          </Group>
+          <Table striped highlightOnHover horizontalSpacing="md">
+            <thead>
               <Header />
-            </tfoot>
-          </>
-        )}
-      </Table>
+            </thead>
+            {!products && (
+              <tbody>
+                <tr>
+                  <Group position="center" m="lg">
+                    <TitleText title="Products List is Empty, Create a New One" />
+                  </Group>
+                </tr>
+              </tbody>
+            )}
+            {products && (
+              <>
+                <tbody>
+                  {products?.map((product) => (
+                    <ProductRow key={product.productId} product={product} />
+                  ))}
+                </tbody>
+                <tfoot>
+                  <Header />
+                </tfoot>
+              </>
+            )}
+          </Table>
+        </>
+      )}
     </>
   );
 };

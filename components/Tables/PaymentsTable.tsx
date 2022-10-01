@@ -4,16 +4,18 @@ import { useRouter } from "next/router";
 import { IconEdit } from "@tabler/icons";
 import { Table, Badge, Group } from "@mantine/core";
 import { TitleText } from "../Text/TitleText";
+import { useSession } from "next-auth/react";
+import { EmptyTable } from "../../components";
+import { trpc } from "../../utils/trpc";
 
-export const PaymentsTable = ({
-  loans,
-  call,
-  role,
-}: {
-  loans: Loan[];
-  call: string;
-  role: string;
-}) => {
+export const PaymentsTable = ({ call }: { call: string }) => {
+  const { data } = useSession();
+
+  const { data: loans, fetchStatus } = trpc.loans.loans.useQuery();
+  const { data: user } = trpc.users.user.useQuery({
+    email: `${data?.user?.email}` || "",
+  });
+
   const Header = () => (
     <tr>
       <th>Names</th>
@@ -22,27 +24,37 @@ export const PaymentsTable = ({
       <th>Installment</th>
       <th>Tenure</th>
       <th>Status</th>
-      {role !== "CO" && <th>Action</th>}
+      {user?.role !== "CO" && <th>Action</th>}
     </tr>
   );
   return (
     <>
-      <Group position="center" m="lg">
-        {call === "payments" && <TitleText title="Payments List" />}
-      </Group>
-      <Table striped highlightOnHover horizontalSpacing="md">
-        <thead>
-          <Header />
-        </thead>
-        <tbody>
-          {loans?.map((loan) => (
-            <PaymentsRow key={loan.id} loan={loan} call={call} role={role} />
-          ))}
-        </tbody>
-        <tfoot>
-          <Header />
-        </tfoot>
-      </Table>
+      {!loans && <EmptyTable call="payments" status={fetchStatus} />}
+      {loans && (
+        <>
+          <Group position="center" m="lg">
+            {call === "payments" && <TitleText title="Payments List" />}
+          </Group>
+          <Table striped highlightOnHover horizontalSpacing="md">
+            <thead>
+              <Header />
+            </thead>
+            <tbody>
+              {loans?.map((loan) => (
+                <PaymentsRow
+                  key={loan.id}
+                  loan={loan}
+                  call={call}
+                  role={`${user?.role}`}
+                />
+              ))}
+            </tbody>
+            <tfoot>
+              <Header />
+            </tfoot>
+          </Table>
+        </>
+      )}
     </>
   );
 };

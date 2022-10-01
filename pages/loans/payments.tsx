@@ -1,32 +1,13 @@
 import React from "react";
-import { trpc } from "../../utils/trpc";
-import { EmptyTable, PaymentsTable, Protected } from "../../components";
-import { useSession } from "next-auth/react";
+import { PaymentsTable, Protected } from "../../components";
 import { NextPage } from "next";
 
-const PaymentsList = () => {
-  const { data } = useSession();
-
-  const { data: user } = trpc.users.user.useQuery({
-    email: `${data?.user?.email}` || "",
-  });
-
-  const { data: loans, fetchStatus } = trpc.loans.loans.useQuery();
-
+const Page: NextPage = () => {
   return (
     <Protected>
-      <div style={{ position: "relative" }}>
-        {!loans && <EmptyTable call="payments" status={fetchStatus} />}
-        {loans && (
-          <PaymentsTable role={`${user?.role}`} loans={loans} call="payments" />
-        )}
-      </div>
+      <PaymentsTable call="payments" />
     </Protected>
   );
-};
-
-const Page: NextPage = () => {
-  return <PaymentsList />;
 };
 
 export default Page;

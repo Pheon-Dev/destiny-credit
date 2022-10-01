@@ -5,16 +5,19 @@ import { IconEdit } from "@tabler/icons";
 import { Table, Badge, Group } from "@mantine/core";
 import { TitleText } from "../Text/TitleText";
 import { trpc } from "../../utils/trpc";
+import { useSession } from "next-auth/react";
+import { EmptyTable } from "./EmptyTable";
 
-export const MembersTable = ({
-  members,
-  call,
-  role,
-}: {
-  members: Member[];
-  call: string;
-  role: string;
-}) => {
+export const MembersTable = ({ call }: { call: string }) => {
+  const { data } = useSession();
+
+  const logs = trpc.logs.logs.useQuery();
+  const { data: user } = trpc.users.user.useQuery({
+    email: `${data?.user?.email}` || "",
+  });
+
+  const { data: members, fetchStatus } = trpc.loans.create_loan.useQuery();
+
   const Header = () => (
     <tr>
       <th>Code</th>
@@ -23,36 +26,39 @@ export const MembersTable = ({
       <th>ID</th>
       <th>Date</th>
       <th>Status</th>
-      {role !== "CO" && <th>Action</th>}
+      {user?.role !== "CO" && <th>Action</th>}
     </tr>
   );
 
   return (
     <>
-      <Group position="center" m="lg">
-        {call === "create-loan" && (
-          <TitleText title="Registered Members" />
-        )}
-        {call === "all-members" && <TitleText title="All Members List" />}
-      </Group>
-      <Table striped highlightOnHover horizontalSpacing="md">
-        <thead>
-          <Header />
-        </thead>
-        <tbody>
-          {members?.map((member) => (
-            <MemberRow
-              key={member.memberId}
-              member={member}
-              call={call}
-              role={role}
-            />
-          ))}
-        </tbody>
-        <tfoot>
-          <Header />
-        </tfoot>
-      </Table>
+      {!members && <EmptyTable status={fetchStatus} call={call} />}
+      {members && (
+        <>
+          <Group position="center" m="lg">
+            {call === "create-loan" && <TitleText title="Registered Members" />}
+            {call === "all-members" && <TitleText title="All Members List" />}
+          </Group>
+          <Table striped highlightOnHover horizontalSpacing="md">
+            <thead>
+              <Header />
+            </thead>
+            <tbody>
+              {members?.map((member) => (
+                <MemberRow
+                  key={member.memberId}
+                  member={member}
+                  call={call}
+                  role={`${user?.role}`}
+                />
+              ))}
+            </tbody>
+            <tfoot>
+              <Header />
+            </tfoot>
+          </Table>
+        </>
+      )}
     </>
   );
 };

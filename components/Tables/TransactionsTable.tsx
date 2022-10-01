@@ -1,5 +1,5 @@
 import React, { useCallback, useEffect, useState } from "react";
-import { TitleText } from "../../components";
+import { TitleText, EmptyTable } from "../../components";
 import {
   Table,
   Group,
@@ -20,22 +20,20 @@ import { DatePicker } from "@mantine/dates";
 import dayjs from "dayjs";
 import { IconCheck, IconChecks } from "@tabler/icons";
 import { trpc } from "../../utils/trpc";
+import { useSession } from "next-auth/react";
 
-export const TransactionsTable = ({
-  transactions,
-  call,
-  handler,
-  updater,
-  status,
-}: {
-  transactions: Transaction[];
-  call: string;
-  handler: string;
-  updater: string;
-  status: string;
-}) => {
+export const TransactionsTable = ({ call }: { call: string }) => {
   const [time, setTime] = useState("");
   const [locale, setLocale] = useState(false);
+  const { data, status } = useSession();
+
+  const logs = trpc.logs.logs.useQuery();
+  const { data: user } = trpc.users.user.useQuery({
+    email: `${data?.user?.email}` || "",
+  });
+
+  const { data: transactions, fetchStatus } =
+    trpc.transactions.transactions.useQuery();
 
   const Header = () => (
     <tr>
@@ -84,62 +82,76 @@ export const TransactionsTable = ({
 
   return (
     <>
-      <Group position="apart" m="md" mt="lg">
-        {call === "transactions" && <TitleText title="Recent Transactions" />}
-        {call === "register" && <TitleText title="Registration List" />}
-        {call === "maintain" && <TitleText title="Maintain a New Loan" />}
-        {status === "fetching" && <Loader />}
-        {(status === "paused" && (
-          <Switch
-            label={`${locale ? "YYYY/MM/DD" : "YYYY/DD/MM"}`}
-            checked={locale}
-            onChange={(e) => {
-              setLocale(e.currentTarget.checked);
-            }}
-            onLabel="YDM"
-            offLabel="YMD"
-          />
-        )) ||
-          (status === "idle" && (
-            <Switch
-              label={`${locale ? "YYYY/MM/DD" : "YYYY/DD/MM"}`}
-              checked={locale}
+      {status === "loading" && (
+        <EmptyTable call={call} status={fetchStatus} />
+      )}
+      {!transactions && (
+          <EmptyTable call={call} status={fetchStatus} />
+      )}
+      {transactions && (
+        <>
+          <Group position="apart" m="md" mt="lg">
+            {call === "transactions" && (
+              <TitleText title="Recent Transactions" />
+            )}
+            {call === "register" && <TitleText title="Registration List" />}
+            {call === "maintain" && <TitleText title="Maintain a New Loan" />}
+            {fetchStatus === "fetching" && <Loader />}
+            {(fetchStatus === "paused" && (
+              <Switch
+                label={`${locale ? "YYYY/MM/DD" : "YYYY/DD/MM"}`}
+                checked={locale}
+                onChange={(e) => {
+                  setLocale(e.currentTarget.checked);
+                }}
+                onLabel="YDM"
+                offLabel="YMD"
+              />
+            )) ||
+              (fetchStatus === "idle" && (
+                <Switch
+                  label={`${locale ? "YYYY/MM/DD" : "YYYY/DD/MM"}`}
+                  checked={locale}
+                  onChange={(e) => {
+                    setLocale(e.currentTarget.checked);
+                  }}
+                  onLabel="YDM"
+                  offLabel="YMD"
+                />
+              ))}
+            <DatePicker
+              value={value}
+              firstDayOfWeek="sunday"
               onChange={(e) => {
-                setLocale(e.currentTarget.checked);
+                e && setValue(new Date(e));
               }}
-              onLabel="YDM"
-              offLabel="YMD"
+              maxDate={dayjs(new Date()).toDate()}
             />
-          ))}
-        <DatePicker
-          value={value}
-          firstDayOfWeek="sunday"
-          onChange={(e) => {
-            e && setValue(new Date(e));
-          }}
-          maxDate={dayjs(new Date()).toDate()}
-        />
-      </Group>
-      <Table striped highlightOnHover horizontalSpacing="md" mb="xl">
-        <thead>
-          <Header />
-        </thead>
-        <tbody>
-          {transactions?.map((transaction, index) => (
-            <TransactionRow
-              key={index}
-              transaction={transaction}
-              call={call}
-              time={time}
-              handler={handler}
-              updater={updater}
-            />
-          ))}
-        </tbody>
-        <tfoot>
-          <Header />
-        </tfoot>
-      </Table>
+          </Group>
+          <Table striped highlightOnHover horizontalSpacing="md" mb="xl">
+            <thead>
+              <Header />
+            </thead>
+            <tbody>
+              {transactions?.map((transaction, index) => (
+                <TransactionRow
+                  key={index}
+                  transaction={transaction}
+                  call={call}
+                  time={time}
+                  handler={`${user?.id}`}
+                  updater={`${user?.id}`}
+                />
+              ))}
+            </tbody>
+            <tfoot>
+              <Header />
+            </tfoot>
+          </Table>
+        </>
+      )}
+      <pre>{JSON.stringify(logs.data?.message, undefined, 2)}</pre>
+      <pre>{JSON.stringify(transactions, undefined, 2)}</pre>
     </>
   );
 };

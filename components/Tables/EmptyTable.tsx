@@ -1,6 +1,6 @@
 import React from "react";
 import { TitleText } from "../../components";
-import { Grid, Group, LoadingOverlay, Skeleton } from "@mantine/core";
+import { Group, Skeleton } from "@mantine/core";
 
 export const EmptyTable = ({
   call,

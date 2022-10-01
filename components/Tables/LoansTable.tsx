@@ -4,16 +4,19 @@ import { useRouter } from "next/router";
 import { IconEdit } from "@tabler/icons";
 import { Table, Badge, Group, Tooltip } from "@mantine/core";
 import { TitleText } from "../Text/TitleText";
+import { EmptyTable } from "./EmptyTable";
+import { trpc } from "../../utils/trpc";
+import { useSession } from "next-auth/react";
 
-export const LoansTable = ({
-  loans,
-  call,
-  role,
-}: {
-  loans: Loan[];
-  call: string;
-  role: string;
-}) => {
+export const LoansTable = ({ call }: { call: string }) => {
+  const { data } = useSession();
+
+  const { data: user } = trpc.users.user.useQuery({
+    email: `${data?.user?.email}` || "",
+  });
+
+  const { data: loans, fetchStatus } = trpc.loans.loans.useQuery();
+
   const Header = () => (
     <tr>
       <th>Names</th>
@@ -22,30 +25,42 @@ export const LoansTable = ({
       <th>Installment</th>
       <th>Tenure</th>
       <th>Status</th>
-      {role !== "CO" && <th>Action</th>}
+      {user?.role !== "CO" && <th>Action</th>}
     </tr>
   );
   return (
     <>
-      <Group position="center" m="lg">
-        {call === "approvals" && <TitleText title="Approvals List" />}
-        {call === "disbursements" && <TitleText title="Disbursements List" />}
-        {call === "all-loans" && <TitleText title="All Loans List" />}
-      </Group>
+      {!loans && <EmptyTable call="all-loans" status={fetchStatus} />}
+      {loans && (
+        <>
+          <Group position="center" m="lg">
+            {call === "approvals" && <TitleText title="Approvals List" />}
+            {call === "disbursements" && (
+              <TitleText title="Disbursements List" />
+            )}
+            {call === "all-loans" && <TitleText title="All Loans List" />}
+          </Group>
 
-      <Table striped highlightOnHover horizontalSpacing="md">
-        <thead>
-          <Header />
-        </thead>
-        <tbody>
-          {loans?.map((loan) => (
-            <LoansRow key={loan.id} loan={loan} call={call} role={role} />
-          ))}
-        </tbody>
-        <tfoot>
-          <Header />
-        </tfoot>
-      </Table>
+          <Table striped highlightOnHover horizontalSpacing="md">
+            <thead>
+              <Header />
+            </thead>
+            <tbody>
+              {loans?.map((loan) => (
+                <LoansRow
+                  key={loan.id}
+                  loan={loan}
+                  call={call}
+                  role={`${user?.role}`}
+                />
+              ))}
+            </tbody>
+            <tfoot>
+              <Header />
+            </tfoot>
+          </Table>
+        </>
+      )}
     </>
   );
 };
@@ -78,62 +93,62 @@ const LoansRow = ({
           </td>
           <td>
             {loan.approved ? (
-            <>
-            {role === "CO" &&
-              <Badge
-                style={{ cursor: "pointer" }}
-                variant="gradient"
-                gradient={{
-                  from: "indigo",
-                  to: "grey",
-                }}
-              >
-                Pending
-              </Badge>
-            }
-            {role !== "CO" &&
-              <Badge
-                style={{ cursor: "pointer" }}
-                onClick={() => router.push(`/loans/disburse/${loan.id}`)}
-                variant="gradient"
-                gradient={{
-                  from: "indigo",
-                  to: "cyan",
-                }}
-              >
-                Disburse
-              </Badge>
-            }
+              <>
+                {role === "CO" && (
+                  <Badge
+                    style={{ cursor: "pointer" }}
+                    variant="gradient"
+                    gradient={{
+                      from: "indigo",
+                      to: "grey",
+                    }}
+                  >
+                    Pending
+                  </Badge>
+                )}
+                {role !== "CO" && (
+                  <Badge
+                    style={{ cursor: "pointer" }}
+                    onClick={() => router.push(`/loans/disburse/${loan.id}`)}
+                    variant="gradient"
+                    gradient={{
+                      from: "indigo",
+                      to: "cyan",
+                    }}
+                  >
+                    Disburse
+                  </Badge>
+                )}
               </>
             ) : (
-            <>
-            {role === "CO" &&
-            <Tooltip label="Approval" color="gray" withArrow>
-              <Badge
-                style={{ cursor: "pointer" }}
-                variant="gradient"
-                gradient={{
-                  from: "grey",
-                  to: "indigo",
-                }}
-              >
-                Pending
-              </Badge>
-              </Tooltip>
-            }
-            {role !== "CO" &&
-              <Badge
-                style={{ cursor: "pointer" }}
-                onClick={() => router.push(`/loans/approve/${loan.id}`)}
-                variant="gradient"
-                gradient={{
-                  from: "indigo",
-                  to: "red",
-                }}
-              >
-                Approve
-              </Badge>
-            }
+              <>
+                {role === "CO" && (
+                  <Tooltip label="Approval" color="gray" withArrow>
+                    <Badge
+                      style={{ cursor: "pointer" }}
+                      variant="gradient"
+                      gradient={{
+                        from: "grey",
+                        to: "indigo",
+                      }}
+                    >
+                      Pending
+                    </Badge>
+                  </Tooltip>
+                )}
+                {role !== "CO" && (
+                  <Badge
+                    style={{ cursor: "pointer" }}
+                    onClick={() => router.push(`/loans/approve/${loan.id}`)}
+                    variant="gradient"
+                    gradient={{
+                      from: "indigo",
+                      to: "red",
+                    }}
+                  >
+                    Approve
+                  </Badge>
+                )}
               </>
             )}
           </td>
@@ -175,32 +190,32 @@ const LoansRow = ({
                 Disbursed
               </Badge>
             ) : (
-            <>
-            {role === "CO" &&
-              <Badge
-                style={{ cursor: "pointer" }}
-                variant="gradient"
-                gradient={{
-                  from: "indigo",
-                  to: "grey",
-                }}
-              >
-                Pending
-              </Badge>
-            }
-            {role !== "CO" &&
-              <Badge
-                style={{ cursor: "pointer" }}
-                onClick={() => router.push(`/loans/disburse/${loan.id}`)}
-                variant="gradient"
-                gradient={{
-                  from: "indigo",
-                  to: "cyan",
-                }}
-              >
-                Disburse
-              </Badge>
-            }
+              <>
+                {role === "CO" && (
+                  <Badge
+                    style={{ cursor: "pointer" }}
+                    variant="gradient"
+                    gradient={{
+                      from: "indigo",
+                      to: "grey",
+                    }}
+                  >
+                    Pending
+                  </Badge>
+                )}
+                {role !== "CO" && (
+                  <Badge
+                    style={{ cursor: "pointer" }}
+                    onClick={() => router.push(`/loans/disburse/${loan.id}`)}
+                    variant="gradient"
+                    gradient={{
+                      from: "indigo",
+                      to: "cyan",
+                    }}
+                  >
+                    Disburse
+                  </Badge>
+                )}
               </>
             )}
           </td>
@@ -230,65 +245,65 @@ const LoansRow = ({
           </td>
           <td>
             {!loan.disbursed && !loan.approved && loan.maintained && (
-            <>
-            {role === "CO" &&
-            <Tooltip label="Approval" color="gray" withArrow>
-              <Badge
-                style={{ cursor: "pointer" }}
-                variant="gradient"
-                gradient={{
-                  from: "grey",
-                  to: "indigo",
-                }}
-              >
-                Pending
-              </Badge>
-              </Tooltip>
-            }
-            {role !== "CO" &&
-              <Badge
-                style={{ cursor: "pointer" }}
-                onClick={() => router.push(`/loans/approve/${loan.id}`)}
-                variant="gradient"
-                gradient={{
-                  from: "indigo",
-                  to: "red",
-                }}
-              >
-                Approve
-              </Badge>
-            }
+              <>
+                {role === "CO" && (
+                  <Tooltip label="Approval" color="gray" withArrow>
+                    <Badge
+                      style={{ cursor: "pointer" }}
+                      variant="gradient"
+                      gradient={{
+                        from: "grey",
+                        to: "indigo",
+                      }}
+                    >
+                      Pending
+                    </Badge>
+                  </Tooltip>
+                )}
+                {role !== "CO" && (
+                  <Badge
+                    style={{ cursor: "pointer" }}
+                    onClick={() => router.push(`/loans/approve/${loan.id}`)}
+                    variant="gradient"
+                    gradient={{
+                      from: "indigo",
+                      to: "red",
+                    }}
+                  >
+                    Approve
+                  </Badge>
+                )}
               </>
             )}
             {!loan.disbursed && loan.approved && (
-            <>
-            {role === "CO" &&
-            <Tooltip label="Disbursement" color="gray" withArrow>
-              <Badge
-                style={{ cursor: "pointer" }}
-                variant="gradient"
-                gradient={{
-                  from: "grey",
-                  to: "green",
-                }}
-              >
-                Pending
-              </Badge>
-              </Tooltip>
-            }
-            {role !== "CO" &&
-              <Badge
-                style={{ cursor: "pointer" }}
-                onClick={() => router.push(`/loans/disburse/${loan.id}`)}
-                variant="gradient"
-                gradient={{
-                  from: "red",
-                  to: "blue",
-                }}
-              >
-                Disburse
-              </Badge>
-            }
+              <>
+                {role === "CO" && (
+                  <Tooltip label="Disbursement" color="gray" withArrow>
+                    <Badge
+                      style={{ cursor: "pointer" }}
+                      variant="gradient"
+                      gradient={{
+                        from: "grey",
+                        to: "green",
+                      }}
+                    >
+                      Pending
+                    </Badge>
+                  </Tooltip>
+                )}
+                {role !== "CO" && (
+                  <Badge
+                    style={{ cursor: "pointer" }}
+                    onClick={() => router.push(`/loans/disburse/${loan.id}`)}
+                    variant="gradient"
+                    gradient={{
+                      from: "red",
+                      to: "blue",
+                    }}
+                  >
+                    Disburse
+                  </Badge>
+                )}
               </>
             )}
             {loan.disbursed && (
