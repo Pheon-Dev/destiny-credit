@@ -1,4 +1,4 @@
-import React, { useCallback, useEffect } from "react";
+import React, { useState, useEffect, useCallback } from "react";
 import { z } from "zod";
 import { useForm, zodResolver } from "@mantine/form";
 import { NextPage } from "next";
@@ -40,9 +40,33 @@ const Disburse = () => {
 
   const { status, data } = useSession();
 
-  const { data: user, status: user_status } = trpc.users.user.useQuery({
-      email: `${data?.user?.email}` || "",
+  const [user, setUser] = useState({
+    id: "",
+    role: "",
+    email: "",
+    username: "",
+    firstname: "",
+    lastname: "",
+    state: "",
   });
+
+  if (data?.user?.email) {
+    const user_data = trpc.users.user.useQuery({
+      email: `${data?.user?.email}`,
+    });
+
+    useEffect(() => {
+      setUser({
+        id: `${user_data?.data?.id}`,
+        role: `${user_data?.data?.role}`,
+        username: `${user_data?.data?.username}`,
+        firstname: `${user_data?.data?.firstName}`,
+        lastname: `${user_data?.data?.lastName}`,
+        email: `${user_data?.data?.email}`,
+        state: `${user_data?.data?.state}`,
+      });
+    }, []);
+  }
 
   const { data: users, status: users_status } = trpc.users.officers.useQuery();
   const users_data = users?.map((p) => p) || [];

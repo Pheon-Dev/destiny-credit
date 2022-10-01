@@ -12,9 +12,8 @@ import {
   Box,
   Button,
   Loader,
-  List,
 } from "@mantine/core";
-import type { Transaction } from "@prisma/client";
+import type { Transaction, User } from "@prisma/client";
 import { useRouter } from "next/router";
 import { DatePicker } from "@mantine/dates";
 import dayjs from "dayjs";
@@ -28,9 +27,34 @@ export const TransactionsTable = ({ call }: { call: string }) => {
   const { data, status } = useSession();
 
   const logs = trpc.logs.logs.useQuery();
-  const { data: user } = trpc.users.user.useQuery({
-    email: `${data?.user?.email}` || "",
+
+  const [user, setUser] = useState({
+    id: "",
+    role: "",
+    email: "",
+    username: "",
+    firstname: "",
+    lastname: "",
+    state: "",
   });
+
+  if (data?.user?.email) {
+    const user_data = trpc.users.user.useQuery({
+      email: `${data?.user?.email}`,
+    });
+
+    useEffect(() => {
+      setUser({
+        id: `${user_data?.data?.id}`,
+        role: `${user_data?.data?.role}`,
+        username: `${user_data?.data?.username}`,
+        firstname: `${user_data?.data?.firstName}`,
+        lastname: `${user_data?.data?.lastName}`,
+        email: `${user_data?.data?.email}`,
+        state: `${user_data?.data?.state}`,
+      });
+    }, []);
+  }
 
   const { data: transactions, fetchStatus } =
     trpc.transactions.transactions.useQuery();
@@ -82,12 +106,8 @@ export const TransactionsTable = ({ call }: { call: string }) => {
 
   return (
     <>
-      {status === "loading" && (
-        <EmptyTable call={call} status={fetchStatus} />
-      )}
-      {!transactions && (
-          <EmptyTable call={call} status={fetchStatus} />
-      )}
+      {status === "loading" && <EmptyTable call={call} status={fetchStatus} />}
+      {!transactions && <EmptyTable call={call} status={fetchStatus} />}
       {transactions && (
         <>
           <Group position="apart" m="md" mt="lg">

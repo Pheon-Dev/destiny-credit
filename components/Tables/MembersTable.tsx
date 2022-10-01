@@ -1,4 +1,4 @@
-import React, { useCallback } from "react";
+import React, { useState, useEffect, useCallback } from "react";
 import type { Member } from "@prisma/client";
 import { useRouter } from "next/router";
 import { IconEdit } from "@tabler/icons";
@@ -12,9 +12,34 @@ export const MembersTable = ({ call }: { call: string }) => {
   const { data } = useSession();
 
   const logs = trpc.logs.logs.useQuery();
-  const { data: user } = trpc.users.user.useQuery({
-    email: `${data?.user?.email}` || "",
+
+  const [user, setUser] = useState({
+    id: "",
+    role: "",
+    email: "",
+    username: "",
+    firstname: "",
+    lastname: "",
+    state: "",
   });
+
+  if (data?.user?.email) {
+    const user_data = trpc.users.user.useQuery({
+      email: `${data?.user?.email}`,
+    });
+
+    useEffect(() => {
+      setUser({
+        id: `${user_data?.data?.id}`,
+        role: `${user_data?.data?.role}`,
+        username: `${user_data?.data?.username}`,
+        firstname: `${user_data?.data?.firstName}`,
+        lastname: `${user_data?.data?.lastName}`,
+        email: `${user_data?.data?.email}`,
+        state: `${user_data?.data?.state}`,
+      });
+    }, []);
+  }
 
   const { data: members, fetchStatus } = trpc.loans.create_loan.useQuery();
 

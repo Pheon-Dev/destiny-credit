@@ -28,7 +28,7 @@ import { signOut, useSession } from "next-auth/react";
 import { useMantineColorScheme } from "@mantine/core";
 import { IconSun, IconMoonStars } from "@tabler/icons";
 import { trpc } from "../../utils/trpc";
-import { useCallback, useState } from "react";
+import { useCallback, useEffect, useState } from "react";
 import { TitleText } from "../Text/TitleText";
 
 export const Utilities = () => {
@@ -41,9 +41,33 @@ export const Utilities = () => {
   const router = useRouter();
 
   const { data: users } = trpc.users.users.useQuery();
-  const { data: user } = trpc.users.user.useQuery({
-    email: `${data?.user?.email || ""}` || "",
+  const [user, setUser] = useState({
+    id: "",
+    role: "",
+    email: "",
+    username: "",
+    firstname: "",
+    lastname: "",
+    state: "",
   });
+
+  if (data?.user?.email) {
+    const user_data = trpc.users.user.useQuery({
+      email: `${data?.user?.email}`,
+    });
+
+    useEffect(() => {
+      setUser({
+        id: `${user_data?.data?.id}`,
+        role: `${user_data?.data?.role}`,
+        username: `${user_data?.data?.username}`,
+        firstname: `${user_data?.data?.firstName}`,
+        lastname: `${user_data?.data?.lastName}`,
+        email: `${user_data?.data?.email}`,
+        state: `${user_data?.data?.state}`,
+      });
+    }, []);
+  }
 
   const utils = trpc.useContext();
   const signout = trpc.users.signout.useMutation({
@@ -197,7 +221,7 @@ export const Utilities = () => {
                   <Text weight={500}>First Name</Text>
                 </Grid.Col>
                 <Grid.Col mt="xs" span={4}>
-                  <Text>{user?.firstName}</Text>
+                  <Text>{user?.firstname}</Text>
                 </Grid.Col>
               </Grid>
               <Grid grow>
@@ -205,7 +229,7 @@ export const Utilities = () => {
                   <Text weight={500}>Last Name</Text>
                 </Grid.Col>
                 <Grid.Col mt="xs" span={4}>
-                  <Text>{user?.lastName}</Text>
+                  <Text>{user?.lastname}</Text>
                 </Grid.Col>
               </Grid>
             </Card.Section>

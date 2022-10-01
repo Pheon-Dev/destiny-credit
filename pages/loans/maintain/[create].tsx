@@ -93,7 +93,7 @@ const CreateLoan = () => {
   const mid = router.query.create as string;
 
   const member_search = trpc.transactions.transaction.useQuery({
-    id: mid.length === 10 ? mid : ""
+    id: mid.length === 10 ? mid : "",
   });
   const [firstname, setFirstname] = useState("");
   const [middlename, setMiddlename] = useState("");
@@ -115,9 +115,33 @@ const CreateLoan = () => {
 
   const { status, data } = useSession();
 
-  const { data: user, status: user_status } = trpc.users.user.useQuery({
-    email: data?.user?.email?.toString() || "",
+  const [user, setUser] = useState({
+    id: "",
+    role: "",
+    email: "",
+    username: "",
+    firstname: "",
+    lastname: "",
+    state: "",
   });
+
+  if (data?.user?.email) {
+    const user_data = trpc.users.user.useQuery({
+      email: `${data?.user?.email}`,
+    });
+
+    useEffect(() => {
+      setUser({
+        id: `${user_data?.data?.id}`,
+        role: `${user_data?.data?.role}`,
+        username: `${user_data?.data?.username}`,
+        firstname: `${user_data?.data?.firstName}`,
+        lastname: `${user_data?.data?.lastName}`,
+        email: `${user_data?.data?.email}`,
+        state: `${user_data?.data?.state}`,
+      });
+    }, []);
+  }
 
   const form = useForm({
     validate: zodResolver(loan_schema),
@@ -480,7 +504,7 @@ const CreateLoan = () => {
     if (subscribe) {
       if (mid.length > 10) setId(mid);
       if (mid.length < 11) setId(`${member_info?.data?.id}`);
-    form.setFieldValue("memberId", `${id}`);
+      form.setFieldValue("memberId", `${id}`);
 
       if (member) {
         setMemberCode(`${member?.memberId}`);
