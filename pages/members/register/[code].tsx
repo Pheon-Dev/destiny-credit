@@ -70,10 +70,9 @@ const schema = z.object({
   numberKin: z.string().min(2, { message: "Enter  Phone # (kin)" }),
 });
 
-const CreateMember = () => {
+const CreateMember = ({ email, status }: { email: string; status: string }) => {
   const router = useRouter();
   const id = router.query.code as string;
-  const { status, data } = useSession();
 
   const [user, setUser] = useState({
     id: "",
@@ -85,23 +84,21 @@ const CreateMember = () => {
     state: "",
   });
 
-  if (data?.user?.email) {
-    const user_data = trpc.users.user.useQuery({
-      email: `${data?.user?.email}`,
-    });
+  const user_data = trpc.users.user.useQuery({
+    email: `${email}`,
+  });
 
-    useEffect(() => {
-      setUser({
-        id: `${user_data?.data?.id}`,
-        role: `${user_data?.data?.role}`,
-        username: `${user_data?.data?.username}`,
-        firstname: `${user_data?.data?.firstName}`,
-        lastname: `${user_data?.data?.lastName}`,
-        email: `${user_data?.data?.email}`,
-        state: `${user_data?.data?.state}`,
-      });
-    }, []);
-  }
+  useEffect(() => {
+    setUser({
+      id: `${user_data?.data?.id}`,
+      role: `${user_data?.data?.role}`,
+      username: `${user_data?.data?.username}`,
+      firstname: `${user_data?.data?.firstName}`,
+      lastname: `${user_data?.data?.lastName}`,
+      email: `${user_data?.data?.email}`,
+      state: `${user_data?.data?.state}`,
+    });
+  }, []);
 
   const {
     data: members,
@@ -994,9 +991,14 @@ const CreateMember = () => {
 };
 
 const Page = () => {
+  const { status, data } = useSession();
+
+  const email = `${data?.user?.email}`;
+  const check = email.split("@")[1];
+
   return (
     <Protected>
-      <CreateMember />
+      {check.length > 0 && <CreateMember email={email} status={status} />}
     </Protected>
   );
 };

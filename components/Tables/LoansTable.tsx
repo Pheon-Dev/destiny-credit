@@ -6,11 +6,16 @@ import { Table, Badge, Group, Tooltip } from "@mantine/core";
 import { TitleText } from "../Text/TitleText";
 import { EmptyTable } from "./EmptyTable";
 import { trpc } from "../../utils/trpc";
-import { useSession } from "next-auth/react";
 
-export const LoansTable = ({ call }: { call: string }) => {
-  const { data } = useSession();
-
+export const LoansTable = ({
+  call,
+  status,
+  email,
+}: {
+  call: string;
+  status: string;
+  email: string;
+}) => {
   const [user, setUser] = useState({
     id: "",
     role: "",
@@ -21,23 +26,21 @@ export const LoansTable = ({ call }: { call: string }) => {
     state: "",
   });
 
-  if (data?.user?.email) {
-    const user_data = trpc.users.user.useQuery({
-      email: `${data?.user?.email}`,
-    });
+  const user_data = trpc.users.user.useQuery({
+    email: `${email}`,
+  });
 
-    useEffect(() => {
-      setUser({
-        id: `${user_data?.data?.id}`,
-        role: `${user_data?.data?.role}`,
-        username: `${user_data?.data?.username}`,
-        firstname: `${user_data?.data?.firstName}`,
-        lastname: `${user_data?.data?.lastName}`,
-        email: `${user_data?.data?.email}`,
-        state: `${user_data?.data?.state}`,
-      });
-    }, []);
-  }
+  useEffect(() => {
+    setUser({
+      id: `${user_data?.data?.id}`,
+      role: `${user_data?.data?.role}`,
+      username: `${user_data?.data?.username}`,
+      firstname: `${user_data?.data?.firstName}`,
+      lastname: `${user_data?.data?.lastName}`,
+      email: `${user_data?.data?.email}`,
+      state: `${user_data?.data?.state}`,
+    });
+  }, []);
 
   const { data: loans, fetchStatus } = trpc.loans.loans.useQuery();
 

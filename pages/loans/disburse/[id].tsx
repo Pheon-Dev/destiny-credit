@@ -33,12 +33,10 @@ const schema = z.object({
   creditOfficerName: z.string().min(2, { message: "Officer not Selected" }),
 });
 
-const Disburse = () => {
+const Disburse = ({ email, status }: { email: string; status: string }) => {
   const router = useRouter();
   const id = router.query.id as string;
   const utils = trpc.useContext();
-
-  const { status, data } = useSession();
 
   const [user, setUser] = useState({
     id: "",
@@ -50,23 +48,21 @@ const Disburse = () => {
     state: "",
   });
 
-  if (data?.user?.email) {
-    const user_data = trpc.users.user.useQuery({
-      email: `${data?.user?.email}`,
-    });
+  const u_data = trpc.users.user.useQuery({
+    email: `${email}`,
+  });
 
-    useEffect(() => {
-      setUser({
-        id: `${user_data?.data?.id}`,
-        role: `${user_data?.data?.role}`,
-        username: `${user_data?.data?.username}`,
-        firstname: `${user_data?.data?.firstName}`,
-        lastname: `${user_data?.data?.lastName}`,
-        email: `${user_data?.data?.email}`,
-        state: `${user_data?.data?.state}`,
-      });
-    }, []);
-  }
+  useEffect(() => {
+    setUser({
+      id: `${u_data?.data?.id}`,
+      role: `${u_data?.data?.role}`,
+      username: `${u_data?.data?.username}`,
+      firstname: `${u_data?.data?.firstName}`,
+      lastname: `${u_data?.data?.lastName}`,
+      email: `${u_data?.data?.email}`,
+      state: `${u_data?.data?.state}`,
+    });
+  }, []);
 
   const { data: users, status: users_status } = trpc.users.officers.useQuery();
   const users_data = users?.map((p) => p) || [];
@@ -420,9 +416,14 @@ const Disburse = () => {
 };
 
 const Page: NextPage = () => {
+  const { status, data } = useSession();
+
+  const email = `${data?.user?.email}`;
+  const check = email.split("@")[1];
+
   return (
     <Protected>
-      <Disburse />
+      {check.length > 0 && <Disburse email={email} status={status} />}
     </Protected>
   );
 };

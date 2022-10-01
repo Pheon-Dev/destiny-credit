@@ -19,7 +19,6 @@ import {
   IconArrowUp,
   IconSearch,
   IconUser,
-  IconCheck,
   IconLogout,
   IconX,
 } from "@tabler/icons";
@@ -30,12 +29,18 @@ import { IconSun, IconMoonStars } from "@tabler/icons";
 import { trpc } from "../../utils/trpc";
 import { useCallback, useEffect, useState } from "react";
 import { TitleText } from "../Text/TitleText";
+
 export const Utilities = () => {
   const { status, data } = useSession();
-  if (data?.user?.email)
-    return <UtilitiesElement email={`${data?.user?.email}`} status={status} />;
+  const email = `${data?.user?.email}`;
+  const check = email.split("@")[1];
+
+  return (
+    <>{check !== "" && <UtilitiesComponent email={email} status={status} />}</>
+  );
 };
-const UtilitiesElement = ({
+
+const UtilitiesComponent = ({
   email,
   status,
 }: {

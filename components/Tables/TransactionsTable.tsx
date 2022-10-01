@@ -13,18 +13,24 @@ import {
   Button,
   Loader,
 } from "@mantine/core";
-import type { Transaction, User } from "@prisma/client";
+import type { Transaction } from "@prisma/client";
 import { useRouter } from "next/router";
 import { DatePicker } from "@mantine/dates";
 import dayjs from "dayjs";
 import { IconCheck, IconChecks } from "@tabler/icons";
 import { trpc } from "../../utils/trpc";
-import { useSession } from "next-auth/react";
 
-export const TransactionsTable = ({ call }: { call: string }) => {
+export const TransactionsTable = ({
+  call,
+  status,
+  email,
+}: {
+  call: string;
+  status: string;
+  email: string;
+}) => {
   const [time, setTime] = useState("");
   const [locale, setLocale] = useState(false);
-  const { data, status } = useSession();
 
   const logs = trpc.logs.logs.useQuery();
 
@@ -38,23 +44,21 @@ export const TransactionsTable = ({ call }: { call: string }) => {
     state: "",
   });
 
-  if (data?.user?.email) {
-    const user_data = trpc.users.user.useQuery({
-      email: `${data?.user?.email}`,
-    });
+  const user_data = trpc.users.user.useQuery({
+    email: `${email}`,
+  });
 
-    useEffect(() => {
-      setUser({
-        id: `${user_data?.data?.id}`,
-        role: `${user_data?.data?.role}`,
-        username: `${user_data?.data?.username}`,
-        firstname: `${user_data?.data?.firstName}`,
-        lastname: `${user_data?.data?.lastName}`,
-        email: `${user_data?.data?.email}`,
-        state: `${user_data?.data?.state}`,
-      });
-    }, []);
-  }
+  useEffect(() => {
+    setUser({
+      id: `${user_data?.data?.id}`,
+      role: `${user_data?.data?.role}`,
+      username: `${user_data?.data?.username}`,
+      firstname: `${user_data?.data?.firstName}`,
+      lastname: `${user_data?.data?.lastName}`,
+      email: `${user_data?.data?.email}`,
+      state: `${user_data?.data?.state}`,
+    });
+  }, []);
 
   const { data: transactions, fetchStatus } =
     trpc.transactions.transactions.useQuery();

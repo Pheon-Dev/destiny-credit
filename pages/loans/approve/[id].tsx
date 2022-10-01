@@ -25,12 +25,10 @@ import {
 import { trpc } from "../../../utils/trpc";
 import { useSession } from "next-auth/react";
 
-const Approve = () => {
+const Approve = ({ email, status }: { email: string; status: string }) => {
   const router = useRouter();
   const id = router.query.id as string;
   const utils = trpc.useContext();
-
-  const { status, data } = useSession();
 
   const [user, setUser] = useState({
     id: "",
@@ -42,23 +40,21 @@ const Approve = () => {
     state: "",
   });
 
-  if (data?.user?.email) {
-    const user_data = trpc.users.user.useQuery({
-      email: `${data?.user?.email}`,
-    });
+  const user_data = trpc.users.user.useQuery({
+    email: `${email}`,
+  });
 
-    useEffect(() => {
-      setUser({
-        id: `${user_data?.data?.id}`,
-        role: `${user_data?.data?.role}`,
-        username: `${user_data?.data?.username}`,
-        firstname: `${user_data?.data?.firstName}`,
-        lastname: `${user_data?.data?.lastName}`,
-        email: `${user_data?.data?.email}`,
-        state: `${user_data?.data?.state}`,
-      });
-    }, []);
-  }
+  useEffect(() => {
+    setUser({
+      id: `${user_data?.data?.id}`,
+      role: `${user_data?.data?.role}`,
+      username: `${user_data?.data?.username}`,
+      firstname: `${user_data?.data?.firstName}`,
+      lastname: `${user_data?.data?.lastName}`,
+      email: `${user_data?.data?.email}`,
+      state: `${user_data?.data?.state}`,
+    });
+  }, []);
 
   const { data: loan, status: loan_status } = trpc.loans.loan.useQuery({
     id: id,
@@ -309,9 +305,14 @@ const Approve = () => {
 };
 
 const Page: NextPage = () => {
+  const { status, data } = useSession();
+
+  const email = `${data?.user?.email}`;
+  const check = email.split("@")[1];
+
   return (
     <Protected>
-      <Approve />
+      {check.length > 0 && <Approve email={email} status={status} />}
     </Protected>
   );
 };

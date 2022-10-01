@@ -5,12 +5,17 @@ import { IconEdit } from "@tabler/icons";
 import { Table, Badge, Group } from "@mantine/core";
 import { TitleText } from "../Text/TitleText";
 import { trpc } from "../../utils/trpc";
-import { useSession } from "next-auth/react";
 import { EmptyTable } from "./EmptyTable";
 
-export const MembersTable = ({ call }: { call: string }) => {
-  const { data } = useSession();
-
+export const MembersTable = ({
+  call,
+  status,
+  email,
+}: {
+  call: string;
+  status: string;
+  email: string;
+}) => {
   const logs = trpc.logs.logs.useQuery();
 
   const [user, setUser] = useState({
@@ -23,23 +28,21 @@ export const MembersTable = ({ call }: { call: string }) => {
     state: "",
   });
 
-  if (data?.user?.email) {
-    const user_data = trpc.users.user.useQuery({
-      email: `${data?.user?.email}`,
-    });
+  const user_data = trpc.users.user.useQuery({
+    email: `${email}`,
+  });
 
-    useEffect(() => {
-      setUser({
-        id: `${user_data?.data?.id}`,
-        role: `${user_data?.data?.role}`,
-        username: `${user_data?.data?.username}`,
-        firstname: `${user_data?.data?.firstName}`,
-        lastname: `${user_data?.data?.lastName}`,
-        email: `${user_data?.data?.email}`,
-        state: `${user_data?.data?.state}`,
-      });
-    }, []);
-  }
+  useEffect(() => {
+    setUser({
+      id: `${user_data?.data?.id}`,
+      role: `${user_data?.data?.role}`,
+      username: `${user_data?.data?.username}`,
+      firstname: `${user_data?.data?.firstName}`,
+      lastname: `${user_data?.data?.lastName}`,
+      email: `${user_data?.data?.email}`,
+      state: `${user_data?.data?.state}`,
+    });
+  }, []);
 
   const { data: members, fetchStatus } = trpc.loans.create_loan.useQuery();
 

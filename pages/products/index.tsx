@@ -1,11 +1,22 @@
 import React from "react";
-import { ProductsTable, Protected } from "../../components";
+import { EmptyTable, ProductsTable, Protected } from "../../components";
 import { NextPage } from "next";
+import { useSession } from "next-auth/react";
 
 const Page: NextPage = () => {
+  const { data, status } = useSession();
+
+  const email = `${data?.user?.email}`;
+  const check = email.split("@")[1];
+
+  const call = "products";
+
   return (
     <Protected>
-      <ProductsTable call="products" />
+      {check.length > 0 && (
+        <ProductsTable call={call} email={email} status={status} />
+      )}
+      {check === "" && <EmptyTable call={call} status={status} />}
     </Protected>
   );
 };

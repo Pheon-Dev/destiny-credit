@@ -62,7 +62,21 @@ const collateral_schema = z.object({
   value: z.string().min(2, { message: "Item Value is Missing" }),
 });
 
-const CreateLoan = () => {
+const CreateLoan = ({
+  email,
+  status,
+  firstname,
+  lastname,
+  phonenumber,
+  mid,
+}: {
+  firstname: string;
+  lastname: string;
+  phonenumber: string;
+  email: string;
+  status: string;
+  mid: string;
+}) => {
   const [active, setActive] = useState(0);
   const [open, setOpen] = useState(false);
   const [deleteModal, setDeleteModal] = useState(false);
@@ -90,30 +104,11 @@ const CreateLoan = () => {
   const [minRange, setMinRange] = useState(0);
 
   const router = useRouter();
-  const mid = router.query.create as string;
-
-  const member_search = trpc.transactions.transaction.useQuery({
-    id: mid.length === 10 ? mid : "",
-  });
-  const [firstname, setFirstname] = useState("");
-  const [middlename, setMiddlename] = useState("");
-  const [lastname, setLastname] = useState("");
-  const [phonenumber, setPhonenumber] = useState("");
-
-  if (member_search?.data) {
-    setFirstname(member_search?.data?.firstName);
-    setMiddlename(member_search?.data?.middleName);
-    setLastname(member_search?.data?.lastName);
-    setPhonenumber(member_search?.data?.msisdn);
-  }
-
   const member_info = trpc.members.maintain.useQuery({
-    firstName: firstname || "",
-    lastName: middlename + " " + lastname || "",
-    phoneNumber: phonenumber || "",
+    firstName: firstname,
+    lastName: lastname,
+    phoneNumber: phonenumber,
   });
-
-  const { status, data } = useSession();
 
   const [user, setUser] = useState({
     id: "",
@@ -125,23 +120,21 @@ const CreateLoan = () => {
     state: "",
   });
 
-  if (data?.user?.email) {
-    const user_data = trpc.users.user.useQuery({
-      email: `${data?.user?.email}`,
-    });
+  const user_data = trpc.users.user.useQuery({
+    email: `${email}`,
+  });
 
-    useEffect(() => {
-      setUser({
-        id: `${user_data?.data?.id}`,
-        role: `${user_data?.data?.role}`,
-        username: `${user_data?.data?.username}`,
-        firstname: `${user_data?.data?.firstName}`,
-        lastname: `${user_data?.data?.lastName}`,
-        email: `${user_data?.data?.email}`,
-        state: `${user_data?.data?.state}`,
-      });
-    }, []);
-  }
+  useEffect(() => {
+    setUser({
+      id: `${user_data?.data?.id}`,
+      role: `${user_data?.data?.role}`,
+      username: `${user_data?.data?.username}`,
+      firstname: `${user_data?.data?.firstName}`,
+      lastname: `${user_data?.data?.lastName}`,
+      email: `${user_data?.data?.email}`,
+      state: `${user_data?.data?.state}`,
+    });
+  }, []);
 
   const form = useForm({
     validate: zodResolver(loan_schema),
@@ -1905,12 +1898,42 @@ const CreateLoan = () => {
 };
 
 const Page: NextPage = () => {
-  try {
-    return <CreateLoan />;
-  } catch (error) {
-    console.log(error);
-    return <></>;
+  const { status, data } = useSession();
+  const router = useRouter();
+  const mid = router.query.create as string;
+
+  const member_search = trpc.transactions.transaction.useQuery({
+    id: mid.length === 10 ? mid : "",
+  });
+  const [firstname, setFirstname] = useState("");
+  const [middlename, setMiddlename] = useState("");
+  const [lastname, setLastname] = useState("");
+  const [phonenumber, setPhonenumber] = useState("");
+
+  if (member_search?.data) {
+    setFirstname(member_search?.data?.firstName);
+    setMiddlename(member_search?.data?.middleName);
+    setLastname(member_search?.data?.lastName);
+    setPhonenumber(member_search?.data?.msisdn);
   }
+
+  const email = `${data?.user?.email}`;
+  const check = email.split("@")[1];
+
+  return (
+    <Protected>
+      {check.length > 0 && (
+        <CreateLoan
+          email={email}
+          status={status}
+          firstname={firstname}
+          lastname={`${middlename} ${lastname}`}
+          phonenumber={phonenumber}
+          mid={mid}
+        />
+      )}
+    </Protected>
+  );
 };
 
 export default Page;

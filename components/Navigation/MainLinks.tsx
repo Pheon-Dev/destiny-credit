@@ -21,9 +21,17 @@ interface Data {
 }
 
 export const MainLinks = () => {
-  const router = useRouter();
+  const { data, status } = useSession();
 
-  const { data } = useSession();
+  const email = `${data?.user?.email}`;
+  const check = email.split("@")[1];
+
+    return (
+    <>{check.length > 0 && (<MainLinksComponent email={email} status={status} />)}</>
+    );
+  }
+const MainLinksComponent = ({email, status}: {email: string, status: string}) => {
+  const router = useRouter();
 
   const [user, setUser] = useState({
     id: "",
@@ -35,9 +43,8 @@ export const MainLinks = () => {
     state: "",
   });
 
-  if (data?.user?.email) {
     const user_data = trpc.users.user.useQuery({
-      email: `${data?.user?.email}`,
+      email: `${email}`,
     });
 
     useEffect(() => {
@@ -51,7 +58,6 @@ export const MainLinks = () => {
         state: `${user_data?.data?.state}`,
       });
     }, []);
-  }
 
   const LinkRouter = ({
     data,
