@@ -32,7 +32,7 @@ export const logsRouter = t.router({
     });
 
     const log = response.data;
-    let transactions = [{}];
+    let transactions: any = [];
     /* console.log("---------------  Two  -------------"); */
     log.data?.map(async (t: Logs) => {
       /* console.log("---------------  Three  -------------"); */

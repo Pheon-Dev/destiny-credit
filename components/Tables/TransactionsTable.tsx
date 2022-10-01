@@ -56,7 +56,7 @@ export const TransactionsTable = ({
       <th>Names</th>
       <th>Amount</th>
       <th>Phone</th>
-      {(call === "transactions" && <th>Date</th>) || <th>Description</th>}
+      {(call === "transactions" && <th>Time</th>) || <th>Description</th>}
       {/* <th>Status</th> */}
     </tr>
   );
@@ -132,8 +132,8 @@ export const TransactionsTable = ({
             <Switch
               label={
                 (fetchStatus === "fetching" && <Loader />) ||
-                (locale && "Y-D-M") ||
-                "Y-M-D"
+                (locale && "Y/D/M") ||
+                "Y/M/D"
               }
               checked={locale}
               onChange={(e) => {
@@ -172,7 +172,6 @@ export const TransactionsTable = ({
         </>
       )}
       <pre>{JSON.stringify(logs.data?.message, undefined, 2)}</pre>
-      <pre>{JSON.stringify(transactions, undefined, 2)}</pre>
     </>
   );
 };
@@ -209,10 +208,13 @@ const TransactionRow = ({
   });
 
   const date = (time: string) => {
+    const second = time.slice(12);
+    const minute = time.slice(10, 12);
+    const hour = time.slice(8, 10);
     const day = time.slice(6, 8);
     const month = time.slice(4, 6);
     const year = time.slice(0, 4);
-    const when = day + "-" + month + "-" + year;
+    const when = hour + ":" + minute;
     return when;
   };
 
@@ -309,7 +311,7 @@ const TransactionRow = ({
       {call === "transactions" && transaction.transTime.startsWith(time) && (
         <tr
           style={{
-            cursor: transaction.billRefNumber !== "" && "pointer" || "text",
+            cursor: (transaction.billRefNumber !== "" && "pointer") || "text",
           }}
           onClick={() => {
             transaction.billRefNumber !== "" && setOpen(true);
@@ -474,45 +476,43 @@ const TransactionRow = ({
             )}
           </Card.Section>
         </Card>
-        {transaction.billRefNumber !== "" && (
+        {transaction.state === "new" && (
           <>
-            {transaction.state !== "registered" && (
-              <Box m="md">
-                <Group position="center" m="md">
-                  <TitleText title="New Customer" />
-                </Group>
-                <Radio.Group
-                  value={registerMember}
-                  onChange={setRegisterMember}
-                  name="registrationFor"
-                  label="This is a transaction from an unregistered member ..."
-                  description={`Proceed to Register ${transaction.firstName} ${transaction.middleName} ${transaction.lastName}`}
-                  withAsterisk
+            <Box m="md">
+              <Group position="center" m="md">
+                <TitleText title="New Customer" />
+              </Group>
+              <Radio.Group
+                value={registerMember}
+                onChange={setRegisterMember}
+                name="registrationFor"
+                label="This is a transaction from an unregistered member ..."
+                description={`Proceed to Register ${transaction.firstName} ${transaction.middleName} ${transaction.lastName}`}
+                withAsterisk
+              >
+                <Grid grow>
+                  <Grid.Col span={4}>
+                    <Radio m="md" value="membership" label="Membership Fee" />
+                    <Radio m="md" value="processing" label="Processing Fee" />
+                    <Radio m="md" value="crb" label="CRB Fee" />
+                    <Radio m="md" value="all" label="all" />
+                  </Grid.Col>
+                </Grid>
+              </Radio.Group>
+              <Group position="center">
+                <Button
+                  variant="outline"
+                  onClick={() => {
+                    setOpen(false);
+                    handleState();
+                    /* router.push(`/members/register/${transaction.transID}`); */
+                  }}
+                  m="md"
                 >
-                  <Grid grow>
-                    <Grid.Col span={4}>
-                      <Radio m="md" value="membership" label="Membership Fee" />
-                      <Radio m="md" value="processing" label="Processing Fee" />
-                      <Radio m="md" value="crb" label="CRB Fee" />
-                      <Radio m="md" value="all" label="all" />
-                    </Grid.Col>
-                  </Grid>
-                </Radio.Group>
-                <Group position="center">
-                  <Button
-                    variant="outline"
-                    onClick={() => {
-                      setOpen(false);
-                      handleState();
-                      /* router.push(`/members/register/${transaction.transID}`); */
-                    }}
-                    m="md"
-                  >
-                    Register
-                  </Button>
-                </Group>
-              </Box>
-            )}
+                  Register
+                </Button>
+              </Group>
+            </Box>
           </>
         )}
         {transaction.state === "registered" && (

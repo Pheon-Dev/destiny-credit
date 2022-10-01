@@ -78,8 +78,8 @@ export const EmptyTable = ({
             <Row />
             <Skeleton height={16} radius="xl" />
           </Group>
-            ) ||
-            call === "create-loan" && (
+            )}
+            {call === "create-loan" && (
           <Group position="center" m="lg" style={{ position: "relative" }}>
             <Skeleton height={16} radius="xl" />
             <Row />
@@ -87,7 +87,8 @@ export const EmptyTable = ({
             <Row />
             <Skeleton height={16} radius="xl" />
           </Group>
-            ) || (
+            )}
+            {call !== "create-loan" && call !== "register" && (
           <Group position="center" m="lg" style={{ position: "relative" }}>
             <Skeleton height={16} radius="xl" />
             <Row />
