@@ -70,6 +70,24 @@ export const EmptyTable = ({
               <TitleText title="Loading Payments Made To This Loan" />
             )}
           </Group>
+            {call === "register" && (
+          <Group position="center" m="lg" style={{ position: "relative" }}>
+            <Skeleton height={16} radius="xl" />
+            <Row />
+            <Row />
+            <Row />
+            <Skeleton height={16} radius="xl" />
+          </Group>
+            ) ||
+            call === "create-loan" && (
+          <Group position="center" m="lg" style={{ position: "relative" }}>
+            <Skeleton height={16} radius="xl" />
+            <Row />
+            <Row />
+            <Row />
+            <Skeleton height={16} radius="xl" />
+          </Group>
+            ) || (
           <Group position="center" m="lg" style={{ position: "relative" }}>
             <Skeleton height={16} radius="xl" />
             <Row />
@@ -86,6 +104,7 @@ export const EmptyTable = ({
             <Row />
             <Skeleton height={16} radius="xl" />
           </Group>
+            )}
         </>
       )}
     </>

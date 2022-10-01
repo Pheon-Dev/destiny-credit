@@ -17,7 +17,6 @@ import type { Transaction } from "@prisma/client";
 import { useRouter } from "next/router";
 import { DatePicker } from "@mantine/dates";
 import dayjs from "dayjs";
-import { IconCheck, IconChecks } from "@tabler/icons";
 import { trpc } from "../../utils/trpc";
 
 export const TransactionsTable = ({
@@ -53,12 +52,12 @@ export const TransactionsTable = ({
 
   const Header = () => (
     <tr>
-      <th>ID</th>
+      <th>M-PESA</th>
       <th>Names</th>
       <th>Amount</th>
       <th>Phone</th>
-      <th>Type</th>
-      <th>Status</th>
+      {(call === "transactions" && <th>Date</th>) || <th>Description</th>}
+      {/* <th>Status</th> */}
     </tr>
   );
   const [value, setValue] = useState(new Date());
@@ -130,29 +129,17 @@ export const TransactionsTable = ({
             )}
             {call === "register" && <TitleText title="Registration List" />}
             {call === "maintain" && <TitleText title="Maintain a New Loan" />}
-            {fetchStatus === "fetching" && <Loader />}
-            {(fetchStatus === "paused" && (
-              <Switch
-                label={`${locale ? "YYYY/MM/DD" : "YYYY/DD/MM"}`}
-                checked={locale}
-                onChange={(e) => {
-                  setLocale(e.currentTarget.checked);
-                }}
-                onLabel="YDM"
-                offLabel="YMD"
-              />
-            )) ||
-              (fetchStatus === "idle" && (
-                <Switch
-                  label={`${locale ? "YYYY/MM/DD" : "YYYY/DD/MM"}`}
-                  checked={locale}
-                  onChange={(e) => {
-                    setLocale(e.currentTarget.checked);
-                  }}
-                  onLabel="YDM"
-                  offLabel="YMD"
-                />
-              ))}
+            <Switch
+              label={
+                (fetchStatus === "fetching" && <Loader />) ||
+                (locale && "Y-D-M") ||
+                "Y-M-D"
+              }
+              checked={locale}
+              onChange={(e) => {
+                setLocale(e.currentTarget.checked);
+              }}
+            />
             <DatePicker
               value={value}
               firstDayOfWeek="sunday"
@@ -207,9 +194,11 @@ const TransactionRow = ({
   const [registerMember, setRegisterMember] = useState("membership");
   const [updaterId, setUpdaterId] = useState("");
   const [handlerId, setHandlerId] = useState("");
+  const [description, setDescription] = useState("");
   const [open, setOpen] = useState(false);
   const router = useRouter();
   const utils = trpc.useContext();
+  const ref = transaction?.billRefNumber?.split(" ");
 
   const handle = trpc.transactions.state.useMutation({
     onSuccess: async () => {
@@ -218,6 +207,14 @@ const TransactionRow = ({
       });
     },
   });
+
+  const date = (time: string) => {
+    const day = time.slice(6, 8);
+    const month = time.slice(4, 6);
+    const year = time.slice(0, 4);
+    const when = day + "-" + month + "-" + year;
+    return when;
+  };
 
   const handleState = useCallback(() => {
     try {
@@ -265,25 +262,64 @@ const TransactionRow = ({
     if (subscribe) {
       setHandlerId(handler);
       setUpdaterId(updater);
+      if (ref[0]?.startsWith("M")) {
+        if (ref[1]?.startsWith("F")) {
+          setDescription("membership");
+        }
+        if (ref[0]?.startsWith("ME")) {
+          setDescription("membership");
+        }
+        if (ref[0]?.startsWith("MEM")) {
+          setDescription("membership");
+        }
+        if (ref[1]?.length === 0) {
+          setDescription("membership");
+        }
+        if (ref[0]?.length === 0) {
+          setDescription("");
+        }
+      }
+
+      if (ref[0]?.startsWith("P")) {
+        if (ref[1]?.startsWith("F")) {
+          setDescription("processing");
+        }
+        if (ref[0]?.startsWith("PR")) {
+          setDescription("processing");
+        }
+        if (ref[0]?.startsWith("PRO")) {
+          setDescription("processing");
+        }
+        if (ref[1]?.length === 0) {
+          setDescription("processing");
+        }
+        if (ref[0]?.length === 0) {
+          setDescription("");
+        }
+      }
     }
 
     return () => {
       subscribe = false;
     };
-  }, [open, handler, updater]);
+  }, [open, handler, updater, ref, description]);
 
   return (
     <>
       {call === "transactions" && transaction.transTime.startsWith(time) && (
         <tr
           style={{
-            cursor: "pointer",
+            cursor: transaction.billRefNumber !== "" && "pointer" || "text",
           }}
           onClick={() => {
-            setOpen(true);
+            transaction.billRefNumber !== "" && setOpen(true);
           }}
         >
-          <td>{transaction.transID}</td>
+          <td>
+            {transaction.transID.slice(0, 2) +
+              "..." +
+              transaction.transID.slice(7)}
+          </td>
           <td>
             {transaction.firstName +
               " " +
@@ -295,30 +331,14 @@ const TransactionRow = ({
             {`${transaction.transAmount}`.replace(/\B(?=(\d{3})+(?!\d))/g, ",")}
           </td>
           <td>{transaction.msisdn}</td>
-          {transaction.billRefNumber === "" ? (
-            <td>{transaction.transTime}</td>
-          ) : (
-            <td>{transaction.billRefNumber}</td>
-          )}
-          <td>
-            <Group position="center">
-              {transaction.state === "registered" && (
-                <IconChecks color="grey" size={20} />
-              )}
-              {(transaction.state === "new" && (
-                <IconCheck color="grey" size={20} />
-              )) ||
-                (!transaction.state && <IconCheck color="grey" size={20} />)}
-              {transaction.state === "handled" && (
-                <IconChecks color="blue" size={20} />
-              )}
-            </Group>
-          </td>
+          {(transaction.billRefNumber === "" && (
+            <td>{date(transaction.transTime)}</td>
+          )) || <td>{transaction.billRefNumber}</td>}
         </tr>
       )}
       {call === "register" &&
         transaction.transTime.startsWith(time) &&
-        transaction.billRefNumber.startsWith("M") && (
+        description === "membership" && (
           <tr
             style={{
               cursor: "pointer",
@@ -327,7 +347,11 @@ const TransactionRow = ({
               router.push(`/members/register/${transaction.transID}`);
             }}
           >
-            <td>{transaction.transID}</td>
+            <td>
+              {transaction.transID.slice(0, 2) +
+                "..." +
+                transaction.transID.slice(7)}
+            </td>
             <td>
               {transaction.firstName +
                 " " +
@@ -342,17 +366,14 @@ const TransactionRow = ({
               )}
             </td>
             <td>{transaction.msisdn}</td>
-            {transaction.billRefNumber === "" ? (
-              <td>{transaction.transTime}</td>
-            ) : (
-              <td>{transaction.billRefNumber}</td>
-            )}
-            <td>{transaction.state}</td>
+            {(transaction.billRefNumber === "" && (
+              <td>{date(transaction.transTime)}</td>
+            )) || <td>{transaction.billRefNumber}</td>}
           </tr>
         )}
       {call === "maintain" &&
         transaction.transTime.startsWith(time) &&
-        transaction.billRefNumber.startsWith("P") && (
+        description === "processing" && (
           <tr
             style={{
               cursor: "pointer",
@@ -361,7 +382,11 @@ const TransactionRow = ({
               router.push(`/loans/maintain/${transaction.transID}`);
             }}
           >
-            <td>{transaction.transID}</td>
+            <td>
+              {transaction.transID.slice(0, 2) +
+                "..." +
+                transaction.transID.slice(7)}
+            </td>
             <td>
               {transaction.firstName +
                 " " +
@@ -376,12 +401,9 @@ const TransactionRow = ({
               )}
             </td>
             <td>{transaction.msisdn}</td>
-            {transaction.billRefNumber === "" ? (
-              <td>{transaction.transTime}</td>
-            ) : (
-              <td>{transaction.billRefNumber}</td>
-            )}
-            <td>{transaction.state}</td>
+            {(transaction.billRefNumber === "" && (
+              <td>{date(transaction.transTime)}</td>
+            )) || <td>{transaction.billRefNumber}</td>}
           </tr>
         )}
       <Modal
