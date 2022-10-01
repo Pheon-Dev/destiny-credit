@@ -114,7 +114,7 @@ const Approve = ({ email, status }: { email: string; status: string }) => {
         autoClose: 8000,
       });
     }
-  }, [approve, id]);
+  }, [approve, id, user?.id]);
 
   return (
     <>

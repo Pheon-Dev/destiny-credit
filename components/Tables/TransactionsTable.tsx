@@ -257,6 +257,9 @@ const TransactionRow = ({
   }, [
     handle,
     transaction.id,
+    transaction.state,
+    registerMember,
+    payment,
     handler,
     updater,
     handlerId,
@@ -274,7 +277,7 @@ const TransactionRow = ({
     return () => {
       subscribe = false;
     };
-  }, [open]);
+  }, [open, handler, updater]);
 
   return (
     <>

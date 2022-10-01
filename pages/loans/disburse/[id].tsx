@@ -153,7 +153,7 @@ const Disburse = ({ email, status }: { email: string; status: string }) => {
         if (
           form.values.creditOfficerName &&
           form.values.creditOfficerId &&
-          user &&
+          user?.id &&
           disbursedOn
         ) {
           disburse.mutate({
@@ -185,7 +185,7 @@ const Disburse = ({ email, status }: { email: string; status: string }) => {
         autoClose: 8000,
       });
     }
-  }, [disburse, id, disbursedOn, form.values]);
+  }, [disburse, id, disbursedOn, form.values, user?.id]);
 
   return (
     <>

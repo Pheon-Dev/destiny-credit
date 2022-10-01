@@ -330,7 +330,7 @@ const CreateMember = ({ email, status }: { email: string; status: string }) => {
     try {
       try {
         if (
-          (user &&
+          (user?.id &&
             form.values.date &&
             form.values.branchName &&
             form.values.memberId &&
@@ -435,7 +435,7 @@ const CreateMember = ({ email, status }: { email: string; status: string }) => {
         autoClose: 5000,
       });
     }
-  }, [form.values, dash_today_date, dash_birth_date, member]);
+  }, [form.values, dash_today_date, dash_birth_date, member, user?.id]);
 
   return (
     <>

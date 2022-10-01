@@ -163,7 +163,7 @@ const PaymentsList = ({ email, status }: { email: string; status: string }) => {
 
     const handleState = useCallback(() => {
       try {
-        if (data[1]) {
+        if (data[1] && user?.id) {
           data[1].map((d) => {
             handle.mutate({
               id: d.value,

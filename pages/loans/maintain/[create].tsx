@@ -584,7 +584,7 @@ const CreateLoan = ({
     try {
       setOpen(false);
       if (
-        (user &&
+        (user?.id &&
           form.values.memberId &&
           form.values.tenure &&
           form.values.principal &&

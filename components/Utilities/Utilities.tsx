@@ -73,6 +73,7 @@ const UtilitiesComponent = ({
     let subscribe = true;
 
     if (subscribe) {
+      if (status === "unauthenticated") router.push("/auth/sign-in");
       setUser({
         id: `${user_data?.data?.id}`,
         role: `${user_data?.data?.role}`,
@@ -87,6 +88,7 @@ const UtilitiesComponent = ({
       subscribe = false;
     };
   }, [
+    status,
     user_data?.data?.id,
     user_data?.data?.role,
     user_data?.data?.username,
@@ -100,7 +102,7 @@ const UtilitiesComponent = ({
   const signout = trpc.users.signout.useMutation({
     onSuccess: async () => {
       await utils.users.users.invalidate();
-      return signOut();
+      signOut();
     },
   });
 
@@ -151,7 +153,7 @@ const UtilitiesComponent = ({
         });
       });
     }
-  }, [user?.id, router, signout]);
+  }, [user?.id, router, signout, user?.username]);
 
   return (
     <>
