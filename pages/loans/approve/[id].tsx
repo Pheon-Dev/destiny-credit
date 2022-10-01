@@ -45,16 +45,30 @@ const Approve = ({ email, status }: { email: string; status: string }) => {
   });
 
   useEffect(() => {
-    setUser({
-      id: `${user_data?.data?.id}`,
-      role: `${user_data?.data?.role}`,
-      username: `${user_data?.data?.username}`,
-      firstname: `${user_data?.data?.firstName}`,
-      lastname: `${user_data?.data?.lastName}`,
-      email: `${user_data?.data?.email}`,
-      state: `${user_data?.data?.state}`,
-    });
-  }, []);
+    let subscribe = true;
+    if (subscribe) {
+      setUser({
+        id: `${user_data?.data?.id}`,
+        role: `${user_data?.data?.role}`,
+        username: `${user_data?.data?.username}`,
+        firstname: `${user_data?.data?.firstName}`,
+        lastname: `${user_data?.data?.lastName}`,
+        email: `${user_data?.data?.email}`,
+        state: `${user_data?.data?.state}`,
+      });
+    }
+    return () => {
+      subscribe = false;
+    };
+  }, [
+    user_data?.data?.id,
+    user_data?.data?.role,
+    user_data?.data?.username,
+    user_data?.data?.firstName,
+    user_data?.data?.lastName,
+    user_data?.data?.email,
+    user_data?.data?.state,
+  ]);
 
   const { data: loan, status: loan_status } = trpc.loans.loan.useQuery({
     id: id,

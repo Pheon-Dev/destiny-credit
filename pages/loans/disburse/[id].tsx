@@ -53,16 +53,30 @@ const Disburse = ({ email, status }: { email: string; status: string }) => {
   });
 
   useEffect(() => {
-    setUser({
-      id: `${u_data?.data?.id}`,
-      role: `${u_data?.data?.role}`,
-      username: `${u_data?.data?.username}`,
-      firstname: `${u_data?.data?.firstName}`,
-      lastname: `${u_data?.data?.lastName}`,
-      email: `${u_data?.data?.email}`,
-      state: `${u_data?.data?.state}`,
-    });
-  }, []);
+    let subscribe = true;
+    if (subscribe) {
+      setUser({
+        id: `${u_data?.data?.id}`,
+        role: `${u_data?.data?.role}`,
+        username: `${u_data?.data?.username}`,
+        firstname: `${u_data?.data?.firstName}`,
+        lastname: `${u_data?.data?.lastName}`,
+        email: `${u_data?.data?.email}`,
+        state: `${u_data?.data?.state}`,
+      });
+    }
+    return () => {
+      subscribe = false;
+    };
+  }, [
+    u_data?.data?.id,
+    u_data?.data?.role,
+    u_data?.data?.username,
+    u_data?.data?.firstName,
+    u_data?.data?.lastName,
+    u_data?.data?.email,
+    u_data?.data?.state,
+  ]);
 
   const { data: users, status: users_status } = trpc.users.officers.useQuery();
   const users_data = users?.map((p) => p) || [];
