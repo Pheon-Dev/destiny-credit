@@ -33,6 +33,7 @@ export const logsRouter = t.router({
 
     const log = response.data;
     let transactions: any = [];
+    let new_transactions: any = [];
     /* console.log("---------------  Two  -------------"); */
     log.data?.map(async (t: Logs) => {
       /* console.log("---------------  Three  -------------"); */
@@ -190,6 +191,9 @@ export const logsRouter = t.router({
               },
             });
             /* console.log("---------------  Fifteen  -------------"); */
+        new_transactions.push({
+          new_transaction,
+        });
             return new_transaction;
           } catch (error) {
             /* console.log("---------------  Sixteen  -------------"); */
@@ -204,7 +208,8 @@ export const logsRouter = t.router({
     });
     /* console.log("---------------  Seventeen  -------------"); */
     return {
-      message: `${transactions.length} Total Results Found!`,
+      message: `${new_transactions.length} New Transactions of ${transactions.length} Total Results Found!`,
+      new: new_transactions.length,
       data: transactions,
       from: new_date,
       to: now_date,

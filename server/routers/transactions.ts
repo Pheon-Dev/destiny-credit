@@ -31,29 +31,6 @@ export const transactionsRouter = t.router({
 
       return transaction;
     }),
-  duplicate: t.procedure
-    .input(
-      z.object({
-        id: z.string(),
-      })
-    )
-    .query(async ({ input }) => {
-      if (input.id === "") return;
-      const transaction = await prisma.transaction.delete({
-        where: {
-          id: input.id,
-        },
-      });
-
-      if (!transaction) {
-        throw new TRPCError({
-          code: "NOT_FOUND",
-          message: `transactions.transaction not found`,
-        });
-      }
-
-      return transaction;
-    }),
   search: t.procedure
     .input(
       z.object({
@@ -80,7 +57,7 @@ export const transactionsRouter = t.router({
 
       return transaction;
     }),
-  create: t.procedure
+  payment: t.procedure
     .input(
       z.object({
         transactionType: z.string(),

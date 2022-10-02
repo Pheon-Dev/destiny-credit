@@ -18,6 +18,8 @@ import { useRouter } from "next/router";
 import { DatePicker } from "@mantine/dates";
 import dayjs from "dayjs";
 import { trpc } from "../../utils/trpc";
+import { showNotification } from "@mantine/notifications";
+import { IconCheck } from "@tabler/icons";
 
 export const TransactionsTable = ({
   call,
@@ -63,6 +65,17 @@ export const TransactionsTable = ({
   const [value, setValue] = useState(new Date());
 
   const new_date = value?.toLocaleDateString();
+
+  if (logs?.data?.new > 0) {
+    showNotification({
+      id: "new-transactions",
+      title: "New Transactions",
+      message: `${logs?.data?.new} New Transactions`,
+      icon: <IconCheck size={16} />,
+      color: "teal",
+      autoClose: 8000,
+    });
+  }
 
   useEffect(() => {
     let subscribe = true;
@@ -189,8 +202,6 @@ const TransactionRow = ({
   handler: string;
   updater: string;
 }) => {
-  const [payment, setPayment] = useState("loan");
-  const [registerMember, setRegisterMember] = useState("membership");
   const [updaterId, setUpdaterId] = useState("");
   const [handlerId, setHandlerId] = useState("");
   const [description, setDescription] = useState("");
@@ -198,6 +209,23 @@ const TransactionRow = ({
   const router = useRouter();
   const utils = trpc.useContext();
   const ref = transaction?.billRefNumber?.split(" ");
+  const [registerMember, setRegisterMember] = useState(
+    (ref[0]?.startsWith("ME") && "membership") ||
+      (ref[1] === "" && "membership") ||
+      (ref[0]?.startsWith("M") && "membership") ||
+      (ref[1]?.startsWith("F") && "membership") ||
+      (+transaction.transAmount > 700 && "mpc") ||
+      (+transaction.transAmount > 500 && "pc") ||
+      (+transaction.transAmount === 500 && "membership") ||
+      "membership"
+  );
+  const [payment, setPayment] = useState(
+    (ref[0]?.startsWith("PR") && "processing") ||
+      (ref[1] === "" && "processing") ||
+      (ref[0]?.startsWith("P") && "processing") ||
+      (ref[1]?.startsWith("F") && "processing") ||
+      "loan"
+  );
 
   const handle = trpc.transactions.state.useMutation({
     onSuccess: async () => {
@@ -304,7 +332,7 @@ const TransactionRow = ({
     return () => {
       subscribe = false;
     };
-  }, [open, handler, updater, ref, description]);
+  }, [open, handler, updater, ref, description, registerMember]);
 
   return (
     <>
@@ -492,10 +520,15 @@ const TransactionRow = ({
               >
                 <Grid grow>
                   <Grid.Col span={4}>
+                    <Radio m="md" value="crb" label="CRB Fee" />
                     <Radio m="md" value="membership" label="Membership Fee" />
                     <Radio m="md" value="processing" label="Processing Fee" />
-                    <Radio m="md" value="crb" label="CRB Fee" />
-                    <Radio m="md" value="all" label="all" />
+                    <Radio m="md" value="pc" label="Processing | CRB" />
+                    <Radio
+                      m="md"
+                      value="mpc"
+                      label="Membership | Processing | CRB"
+                    />
                   </Grid.Col>
                 </Grid>
               </Radio.Group>
@@ -528,12 +561,16 @@ const TransactionRow = ({
               description="NOTE: Don't forget to submit after selection, no changes will be made upon cancellation."
               withAsterisk
             >
-              <Radio value="processing" label="Processing Fee" />
-              <Radio value="crb" label="CRB Fee" />
-              <Radio value="loan" label="Loan" />
-              <Radio value="penalty" label="Penalty" />
-              <Radio value="pc" label="Processing & CRB" />
-              <Radio value="other" label="Others" />
+              <Grid grow>
+                <Grid.Col span={4}>
+                  <Radio m="md" value="crb" label="CRB Fee" />
+                  <Radio m="md" value="processing" label="Processing Fee" />
+                  <Radio m="md" value="pc" label="Processing | CRB" />
+                  <Radio m="md" value="loan" label="Loan" />
+                  <Radio m="md" value="penalty" label="Penalty" />
+                  <Radio m="md" value="other" label="Others" />
+                </Grid.Col>
+              </Grid>
             </Radio.Group>
             <Group position="center">
               <Button
