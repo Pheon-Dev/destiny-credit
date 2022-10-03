@@ -1,4 +1,3 @@
-import { useCallback } from "react";
 import { trpc } from "../../utils/trpc";
 
 export const handlePayment = ({
@@ -7,7 +6,7 @@ export const handlePayment = ({
   firstName,
   middleName,
   lastName,
-  msisdn
+  msisdn,
 }: {
   transID: string;
   amount: string;
@@ -23,7 +22,7 @@ export const handlePayment = ({
     middlename: middleName,
     lastname: lastName,
     phone: msisdn,
-  })
+  });
 
   const name = firstName + " " + middleName + " " + lastName;
 
@@ -58,9 +57,9 @@ export const handlePayment = ({
   const new_payment = trpc.loans.create_payment.useMutation({
     onSuccess: async () => {
       await utils.loans.payments.invalidate();
-    }
-  })
-  const addPayment = useCallback(() => {
+    },
+  });
+  const addPayment = () => {
     new_payment.mutate({
       amount: `${amount}`,
       outsArrears: `${payment.outsArrears}`,
@@ -77,11 +76,10 @@ export const handlePayment = ({
       loanId: `${loan?.id}`,
       mpesa: `${transID}`,
     });
+  };
 
-  }, [])
-
-  return addPayment
-}
+  return addPayment;
+};
 
 const renderPayment = (
   amount: number,
