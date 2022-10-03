@@ -82,24 +82,34 @@ export const loansRouter = t.router({
       })
     )
     .query(async ({ input }) => {
-      const payment = await prisma.loan.findFirst({
+      const loan = await prisma.loan.findFirst({
         where: {
           cleared: false,
           memberName: input.name,
           phone: input.phone,
         },
         include: {
-          member: {},
-          payment: { where: {} },
+          member: {
+            select: {
+              id: true,
+              firstName: true,
+              phoneNumber: true,
+              lastName: true,
+              memberId: true,
+              activeLoan: true,
+            }
+          },
+          payment: {},
         },
       });
-      if (!payment) {
+
+      if (!loan) {
         throw new TRPCError({
           code: "NOT_FOUND",
           message: `loans.payment not found`,
         });
       }
-      return payment;
+      return loan;
     }),
   create_payment: t.procedure
     .input(
