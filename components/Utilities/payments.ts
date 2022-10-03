@@ -31,9 +31,13 @@ export const handlePayment = ({
     phone: `${msisdn}`,
   });
 
+  const { data: payments } = trpc.loans.payments_list.useQuery({
+    id: `${loan?.id}`,
+  });
+
   let payment: any = [];
 
-  if (loan) {
+  if (loan && payments) {
     payment = renderPayment(
       +amount,
       +loan?.principal,
@@ -43,15 +47,15 @@ export const handlePayment = ({
       +loan?.sundays,
       +loan?.tenure,
       +loan?.cycle,
-      +loan?.payment[loan?.payment.length - 1]?.outsArrears,
-      +loan?.payment[loan?.payment.length - 1]?.paidArrears,
-      +loan?.payment[loan?.payment.length - 1]?.outsPenalty,
-      +loan?.payment[loan?.payment.length - 1]?.paidPenalty,
-      +loan?.payment[loan?.payment.length - 1]?.outsInterest,
-      +loan?.payment[loan?.payment.length - 1]?.paidInterest,
-      +loan?.payment[loan?.payment.length - 1]?.outsPrincipal,
-      +loan?.payment[loan?.payment.length - 1]?.paidPrincipal,
-      +loan?.payment[loan?.payment.length - 1]?.outsBalance
+      +payments[payments.length - 1]?.outsArrears,
+      +payments[payments.length - 1]?.paidArrears,
+      +payments[payments.length - 1]?.outsPenalty,
+      +payments[payments.length - 1]?.paidPenalty,
+      +payments[payments.length - 1]?.outsInterest,
+      +payments[payments.length - 1]?.paidInterest,
+      +payments[payments.length - 1]?.outsPrincipal,
+      +payments[payments.length - 1]?.paidPrincipal,
+      +payments[payments.length - 1]?.outsBalance
     );
   }
   const new_payment = trpc.loans.create_payment.useMutation({

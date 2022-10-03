@@ -69,10 +69,31 @@ export const loansRouter = t.router({
       if (!member) {
         throw new TRPCError({
           code: "NOT_FOUND",
-          message: `members.member not found`,
+          message: `loans.payments not found`,
         });
       }
       return member;
+    }),
+  payments_list: t.procedure
+    .input(
+      z.object({
+        id: z.string(),
+      })
+    )
+    .query(async ({ input }) => {
+      if (input.id === "") return;
+      const payments = await prisma.payment.findMany({
+        where: {
+          loanId: input.id,
+        },
+      });
+      if (!payments) {
+        throw new TRPCError({
+          code: "NOT_FOUND",
+          message: `loans.payments_list not found`,
+        });
+      }
+      return payments;
     }),
   payment: t.procedure
     .input(
@@ -88,19 +109,19 @@ export const loansRouter = t.router({
           memberName: input.name,
           phone: input.phone,
         },
-        include: {
-          member: {
-            select: {
-              id: true,
-              firstName: true,
-              phoneNumber: true,
-              lastName: true,
-              memberId: true,
-              activeLoan: true,
-            }
-          },
-          payment: {},
-        },
+        /* include: { */
+        /*   member: { */
+        /*     select: { */
+        /*       id: true, */
+        /*       firstName: true, */
+        /*       phoneNumber: true, */
+        /*       lastName: true, */
+        /*       memberId: true, */
+        /*       activeLoan: true, */
+        /*     } */
+        /*   }, */
+        /*   payment: {}, */
+        /* }, */
       });
 
       if (!loan) {
