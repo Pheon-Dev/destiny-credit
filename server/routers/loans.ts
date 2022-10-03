@@ -34,48 +34,64 @@ export const loansRouter = t.router({
     }
     return loans;
   }),
-  transactions: t.procedure
-    .input(
-      z.object({
-        firstName: z.string(),
-        middleName: z.string(),
-        lastName: z.string(),
-        phoneNumber: z.string(),
-      })
-    )
-    .query(async ({ input }) => {
-      if (isNaN(+input.phoneNumber)) return;
-      const transactions = await prisma.transaction.findMany({
-        where: {
-          firstName: input.firstName,
-          lastName: input.lastName,
-          middleName: input.middleName,
-          msisdn: input.phoneNumber,
-        },
-      orderBy: {
-        transTime: "desc",
-      },
-      });
-      if (!transactions) {
-        return;
-      }
-      return transactions;
-    }),
-  payment: t.procedure
+  payments: t.procedure
     .input(
       z.object({
         id: z.string(),
       })
     )
     .query(async ({ input }) => {
-      if (!input.id) return;
-      const payment = await prisma.payment.findMany({
+      if (input.id === "") return;
+      const member = await prisma.loan.findFirst({
         where: {
-          loanId: input.id,
+          id: input.id,
         },
-      orderBy: {
-        createdAt: "desc",
-      },
+        include: {
+          payment: {
+            where: {},
+            orderBy: {
+              createdAt: "desc",
+            },
+          },
+          member: {
+            select: {
+              id: true,
+              firstName: true,
+              phoneNumber: true,
+              lastName: true,
+              memberId: true,
+              membershipAmount: true,
+              mpesaCode: true,
+            }
+          },
+        },
+      });
+      if (!member) {
+        throw new TRPCError({
+          code: "NOT_FOUND",
+          message: `members.member not found`,
+        });
+      }
+      return member;
+    }),
+  payment: t.procedure
+    .input(
+      z.object({
+        name: z.string(),
+        phone: z.string(),
+      })
+    )
+    .query(async ({ input }) => {
+      const payment = await prisma.loan.findFirst({
+        where: {
+          cleared: false,
+          memberName: input.name,
+          phone: input.phone,
+        },
+        include: {
+          member: {},
+          payment: { where: {} },
+        },
       });
       if (!payment) {
         throw new TRPCError({
@@ -85,26 +101,51 @@ export const loansRouter = t.router({
       }
       return payment;
     }),
-  loan_payment: t.procedure
+  create_payment: t.procedure
     .input(
       z.object({
-        id: z.string(),
+        amount: z.string(),
+        outsArrears: z.string(),
+        paidArrears: z.string(),
+        outsPenalty: z.string(),
+        paidPenalty: z.string(),
+        outsInterest: z.string(),
+        paidInterest: z.string(),
+        outsPrincipal: z.string(),
+        paidPrincipal: z.string(),
+        outsBalance: z.string(),
+        currInstDate: z.string(),
+        nextInstDate: z.string(),
+        loanId: z.string(),
+        mpesa: z.string(),
       })
     )
-    .query(async ({ input }) => {
-      if (!input.id) return;
-      const loan = await prisma.loan.findFirst({
-        where: {
-          id: input.id,
+    .mutation(async ({ input }) => {
+      const payment = await prisma.payment.create({
+        data: {
+          amount: input.amount,
+          outsArrears: input.outsArrears,
+          paidArrears: input.paidArrears,
+          outsPenalty: input.outsPenalty,
+          paidPenalty: input.paidPenalty,
+          outsInterest: input.outsInterest,
+          paidInterest: input.paidInterest,
+          outsPrincipal: input.outsPrincipal,
+          paidPrincipal: input.paidPrincipal,
+          outsBalance: input.outsBalance,
+          currInstDate: input.currInstDate,
+          nextInstDate: input.nextInstDate,
+          loanId: input.loanId,
+          mpesa: input.mpesa,
         },
       });
-      if (!loan) {
+      if (!payment) {
         throw new TRPCError({
           code: "NOT_FOUND",
-          message: `loans.loan_payment not found`,
+          message: `loans.create_payment not found`,
         });
       }
-      return loan;
+      return payment;
     }),
   loan: t.procedure
     .input(
@@ -197,9 +238,9 @@ export const loansRouter = t.router({
         where: {
           memberId: input.id,
         },
-      orderBy: {
-        createdAt: "desc",
-      },
+        orderBy: {
+          createdAt: "desc",
+        },
       });
       if (!loan) {
         throw new TRPCError({

@@ -193,6 +193,7 @@ model Loan {
   disbursed        Boolean   @default(false)
   defaulted        Boolean?  @default(false)
   cleared          Boolean?  @default(false)
+  phone            String?
   principal        String
   interest         String
   installment      String
@@ -231,7 +232,7 @@ model Loan {
   updater          User?     @relation("UpdatedBy", fields: [updaterId], references: [id])
   updaterId        String?
 
-  @@index(fields: [id, memberId, productId])
+  @@index(fields: [id, memberId, productId, cleared])
 }
 
 model Payment {

@@ -1,7 +1,6 @@
 import axios from "axios";
 import { t } from "../trpc";
 import { prisma } from "../prisma";
-
 import { Fields, Logs } from "../../types";
 
 const LOGTAIL_API_TOKEN = process.env.NEXT_PUBLIC_LOGTAIL_API_TOKEN;
@@ -16,7 +15,6 @@ export const logsRouter = t.router({
     const new_date = date.toJSON();
 
     const now_date = n_date.toJSON();
-    /* console.log("---------------  One  -------------"); */
 
     const url = `https://logtail.com/api/v1/query?source_ids=158744&query=transID&from=${new_date}&to=${now_date}`;
 
@@ -33,10 +31,8 @@ export const logsRouter = t.router({
 
     const log = response.data;
     let transactions: any = [];
-    let new_transactions: any = [];
-    /* console.log("---------------  Two  -------------"); */
+
     log.data?.map(async (t: Logs) => {
-      /* console.log("---------------  Three  -------------"); */
       if (t?.message.match("INTERNAL_SERVER_ERROR"))
         return {
           data: t?.message.length,
@@ -44,9 +40,7 @@ export const logsRouter = t.router({
           from: new_date,
           to: now_date,
         };
-      /* console.log("---------------  Four  -------------"); */
       if (t?.message.startsWith("START")) {
-        /* console.log("---------------  Five  -------------"); */
         const data = t?.message.split("{")[1].split("}")[0];
         let transactionType = data
           .split(",")[0]
@@ -114,18 +108,6 @@ export const logsRouter = t.router({
           transaction,
         });
 
-        /* console.log("---------------  Six  -------------"); */
-        /* const member = await prisma.member.findFirst({ */
-        /*   where: { */
-        /*     firstName: transaction[0].firstName, */
-        /*     lastName: transaction[0].middleName + " " + transaction[0].lastName, */
-        /*   }, */
-        /* }); */
-        /* if (!member) state = "new"; */
-        /**/
-        /* if (member) state = "registered"; */
-
-        /* console.log("---------------  Seven  -------------"); */
         const search = await prisma.transaction.findMany({
           where: {
             transID: transaction[0].transID,
@@ -140,36 +122,25 @@ export const logsRouter = t.router({
           };
         }
 
-        /* console.log("---------------  Eight  -------------"); */
         if (search.length === 1) {
           return;
         }
 
         if (search) {
           try {
-            /* console.log("---------------  Nine  -------------"); */
             if (search.length > 1) {
-              /* console.log("---------------  Ten  -------------"); */
               const delete_duplicate = await prisma.transaction.delete({
                 where: {
                   id: search[0].id,
                 },
               });
 
-              /* console.log("---------------  Eleven  -------------"); */
               return delete_duplicate;
             }
 
-            /* console.log("---------------  Twelve  -------------"); */
             if (isNaN(+transaction[0].transAmount) === true) {
-              /* return console.log("---------------  Thirteen  -------------"); */
-                return
+              return;
             }
-
-            /* console.log( */
-            /*   "---------------  Fourteen  -------------", */
-            /*   isNaN(+transaction[0].transAmount) */
-            /* ); */
 
             const new_transaction = await prisma.transaction.create({
               data: {
@@ -190,13 +161,12 @@ export const logsRouter = t.router({
                 payment: "",
               },
             });
-            /* console.log("---------------  Fifteen  -------------"); */
-        new_transactions.push({
-          new_transaction,
-        });
-            return new_transaction;
+
+            return {
+              transaction: new_transaction,
+            }
+
           } catch (error) {
-            /* console.log("---------------  Sixteen  -------------"); */
             return {
               message: "Error Writing ...",
               from: new_date,
@@ -206,10 +176,8 @@ export const logsRouter = t.router({
         }
       }
     });
-    /* console.log("---------------  Seventeen  -------------"); */
     return {
-      message: `${new_transactions.length} New Transactions of ${transactions.length} Total Results Found!`,
-      new: new_transactions.length,
+      message: `${transactions.length} Total Results Found!`,
       data: transactions,
       from: new_date,
       to: now_date,

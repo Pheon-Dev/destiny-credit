@@ -31,6 +31,38 @@ export const transactionsRouter = t.router({
 
       return transaction;
     }),
+  member_transactions: t.procedure
+    .input(
+      z.object({
+        firstname: z.string(),
+        middlename: z.string(),
+        lastname: z.string(),
+        phone: z.string(),
+      })
+    )
+    .query(async ({ input }) => {
+      if (input.phone === "") return;
+      const transaction = await prisma.transaction.findMany({
+        where: {
+          firstName: input.firstname,
+          middleName: input.middlename,
+          lastName: input.lastname,
+          msisdn: input.phone,
+        },
+        orderBy: {
+          transTime: "desc",
+        },
+      });
+
+      if (!transaction) {
+        throw new TRPCError({
+          code: "NOT_FOUND",
+          message: `transactions.member_transactions not found`,
+        });
+      }
+
+      return transaction;
+    }),
   search: t.procedure
     .input(
       z.object({
@@ -52,56 +84,6 @@ export const transactionsRouter = t.router({
         throw new TRPCError({
           code: "NOT_FOUND",
           message: `transactions.transaction not found`,
-        });
-      }
-
-      return transaction;
-    }),
-  payment: t.procedure
-    .input(
-      z.object({
-        transactionType: z.string(),
-        transID: z.string(),
-        transTime: z.string(),
-        transAmount: z.string(),
-        businessShortCode: z.string(),
-        billRefNumber: z.string(),
-        invoiceNumber: z.string(),
-        orgAccountBalance: z.string(),
-        thirdPartyTransID: z.string(),
-        msisdn: z.string(),
-        firstName: z.string(),
-        middleName: z.string(),
-        lastName: z.string(),
-        state: z.string(),
-        payment: z.string(),
-        })
-    )
-    .query(async ({ input }) => {
-      const transaction = await prisma.transaction.create({
-        data: {
-          transactionType: input.transactionType,
-          transID: input.transID,
-          transTime: input.transTime,
-          transAmount: input.transAmount,
-          businessShortCode: input.businessShortCode,
-          billRefNumber: input.billRefNumber,
-          invoiceNumber: input.invoiceNumber,
-          orgAccountBalance: input.orgAccountBalance,
-          thirdPartyTransID: input.thirdPartyTransID,
-          msisdn: input.msisdn,
-          firstName: input.firstName,
-          middleName: input.middleName,
-          lastName: input.lastName,
-          state: input.state,
-          payment: input.payment,
-        },
-      });
-
-      if (!transaction) {
-        throw new TRPCError({
-          code: "NOT_FOUND",
-          message: `transactions.state not found`,
         });
       }
 

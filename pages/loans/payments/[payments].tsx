@@ -2,53 +2,14 @@ import React, { useState, useEffect, useCallback } from "react";
 import { useRouter } from "next/router";
 import { trpc } from "../../../utils/trpc";
 import { Protected, TitleText } from "../../../components";
-import { Group, Table } from "@mantine/core";
+import { Group, Skeleton, Table } from "@mantine/core";
 import { useSession } from "next-auth/react";
 import { NextPage } from "next";
 
 const PaymentsList = ({ email, status }: { email: string; status: string }) => {
-  const [user, setUser] = useState({
-    id: "",
-    role: "",
-    email: "",
-    username: "",
-    firstname: "",
-    lastname: "",
-    state: "",
-  });
-
-  const user_data = trpc.users.user.useQuery({
-    email: `${email}`,
-  });
-
-  useEffect(() => {
-    let subscribe = true;
-    if (subscribe) {
-      setUser({
-        id: `${user_data?.data?.id}`,
-        role: `${user_data?.data?.role}`,
-        username: `${user_data?.data?.username}`,
-        firstname: `${user_data?.data?.firstName}`,
-        lastname: `${user_data?.data?.lastName}`,
-        email: `${user_data?.data?.email}`,
-        state: `${user_data?.data?.state}`,
-      });
-    }
-    return () => {
-      subscribe = false;
-    };
-  }, [
-    user_data?.data?.id,
-    user_data?.data?.role,
-    user_data?.data?.username,
-    user_data?.data?.firstName,
-    user_data?.data?.lastName,
-    user_data?.data?.email,
-    user_data?.data?.state,
-  ]);
-
   const router = useRouter();
   const id = router.query.payments as string;
+
   const Header = () => (
     <tr>
       <th>Payment Date</th>
@@ -65,36 +26,13 @@ const PaymentsList = ({ email, status }: { email: string; status: string }) => {
       <th>M-PESA</th>
     </tr>
   );
-  const TransactionsHeader = () => (
-    <tr>
-      <th>ID</th>
-      <th>Names</th>
-      <th>Amount</th>
-      <th>Phone</th>
-      <th>Date</th>
-    </tr>
-  );
-  const { data: loan, fetchStatus: loan_status } =
-    trpc.loans.loan_payment.useQuery({ id: id });
-  const { data: member, fetchStatus: member_status } =
-    trpc.members.member.useQuery({ id: `${loan?.memberId}` });
-  const { data: payments, fetchStatus: payment_status } =
-    trpc.loans.payment.useQuery({ id: id });
 
-  const names = member?.lastName;
+  const Row = () => {
+    return <Skeleton height={8} radius="xl" />;
+  };
 
-  const firstname = member?.firstName;
-  const middlename = names?.split(" ")[0];
-  const lastname = names?.split(" ")[1];
-  const phonenumber = member?.phoneNumber;
-
-  const { data: transactions, fetchStatus: transactions_status } =
-    trpc.loans.transactions.useQuery({
-      firstName: `${firstname}`,
-      middleName: `${middlename}`,
-      lastName: `${lastname}`,
-      phoneNumber: `${phonenumber}`,
-    });
+  const { data: payments, fetchStatus } =
+    trpc.loans.payments.useQuery({ id: id });
 
   const date = (time: string) => {
     const second = time.slice(12);
@@ -108,70 +46,80 @@ const PaymentsList = ({ email, status }: { email: string; status: string }) => {
   };
   return (
     <>
+      {payments && (
+      <>
       <Group position="center" m="lg">
-        <TitleText title={`${loan?.memberName}`} />
+        <TitleText title={`${payments?.memberName}`} />
       </Group>
       <Table striped highlightOnHover horizontalSpacing="md">
         <thead>
             <Header />
         </thead>
         <tbody>
-          {transactions?.map((payment) => (
+          {payments?.payment?.map((payment) => (
             <tr key={payment?.id} style={{ cursor: "auto" }}>
-                  <td>{date(payment?.transTime)}</td>
+                  <td>{date(payment?.currInstDate)}</td>
                   <td>
-                    {`${payment.transAmount}`.replace(
+                    {`${payment.amount}`.replace(
                       /\B(?=(\d{3})+(?!\d))/g,
                       ","
                     )}
                   </td>
                   <td>
-                    {`${payment.transAmount}`.replace(
+                    {`${payment.outsArrears}`.replace(
                       /\B(?=(\d{3})+(?!\d))/g,
                       ","
                     )}
                   </td>
                   <td>
-                    {`${
-                      Number(loan?.principal) - +payment?.transAmount
-                    }`.replace(/\B(?=(\d{3})+(?!\d))/g, ",")}
+                    {`${payment.paidArrears}`.replace(
+                      /\B(?=(\d{3})+(?!\d))/g,
+                      ","
+                    )}
                   </td>
                   <td>
-                    {`${
-                      Number(loan?.principal) - +payment?.transAmount
-                    }`.replace(/\B(?=(\d{3})+(?!\d))/g, ",")}
+                    {`${payment.outsPenalty}`.replace(
+                      /\B(?=(\d{3})+(?!\d))/g,
+                      ","
+                    )}
                   </td>
                   <td>
-                    {`${
-                      Number(loan?.principal) - +payment?.transAmount
-                    }`.replace(/\B(?=(\d{3})+(?!\d))/g, ",")}
+                    {`${payment.paidPenalty}`.replace(
+                      /\B(?=(\d{3})+(?!\d))/g,
+                      ","
+                    )}
                   </td>
                   <td>
-                    {`${
-                      Number(loan?.principal) - +payment?.transAmount
-                    }`.replace(/\B(?=(\d{3})+(?!\d))/g, ",")}
+                    {`${payment.outsInterest}`.replace(
+                      /\B(?=(\d{3})+(?!\d))/g,
+                      ","
+                    )}
                   </td>
                   <td>
-                    {`${
-                      Number(loan?.principal) - +payment?.transAmount
-                    }`.replace(/\B(?=(\d{3})+(?!\d))/g, ",")}
+                    {`${payment.paidInterest}`.replace(
+                      /\B(?=(\d{3})+(?!\d))/g,
+                      ","
+                    )}
                   </td>
                   <td>
-                    {`${
-                      Number(loan?.principal) - +payment?.transAmount
-                    }`.replace(/\B(?=(\d{3})+(?!\d))/g, ",")}
+                    {`${payment.outsPrincipal}`.replace(
+                      /\B(?=(\d{3})+(?!\d))/g,
+                      ","
+                    )}
                   </td>
                   <td>
-                    {`${
-                      Number(loan?.principal) - +payment?.transAmount
-                    }`.replace(/\B(?=(\d{3})+(?!\d))/g, ",")}
+                    {`${payment.paidPrincipal}`.replace(
+                      /\B(?=(\d{3})+(?!\d))/g,
+                      ","
+                    )}
                   </td>
                   <td>
-                    {`${
-                      Number(loan?.principal) - +payment?.transAmount
-                    }`.replace(/\B(?=(\d{3})+(?!\d))/g, ",")}
+                    {`${payment.outsBalance}`.replace(
+                      /\B(?=(\d{3})+(?!\d))/g,
+                      ","
+                    )}
                   </td>
-                  <td>{payment.transID}</td>
+                  <td>{payment.mpesa}</td>
             </tr>
           ))}
         </tbody>
@@ -179,6 +127,32 @@ const PaymentsList = ({ email, status }: { email: string; status: string }) => {
           <Header />
         </tfoot>
       </Table>
+      </>
+                  )}
+      {!payments && (
+          <>
+          <Group position="center" m="lg">
+            <TitleText title="Loading Loan Payment Statement ..." />
+          </Group>
+                <Group position="center" m="lg" style={{ position: "relative" }}>
+                  <Skeleton height={16} radius="xl" />
+                  <Row />
+                  <Row />
+                  <Row />
+                  <Row />
+                  <Row />
+                  <Row />
+                  <Row />
+                  <Row />
+                  <Row />
+                  <Row />
+                  <Row />
+                  <Row />
+                  <Skeleton height={16} radius="xl" />
+                </Group>
+      </>
+                  )}
+      <pre>{JSON.stringify(payments, undefined, 2)}</pre>
     </>
   );
 };

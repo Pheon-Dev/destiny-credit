@@ -18,8 +18,6 @@ import { useRouter } from "next/router";
 import { DatePicker } from "@mantine/dates";
 import dayjs from "dayjs";
 import { trpc } from "../../utils/trpc";
-import { showNotification } from "@mantine/notifications";
-import { IconCheck } from "@tabler/icons";
 
 export const TransactionsTable = ({
   call,
@@ -66,16 +64,6 @@ export const TransactionsTable = ({
 
   const new_date = value?.toLocaleDateString();
 
-  if (logs?.data?.new > 0) {
-    showNotification({
-      id: "new-transactions",
-      title: "New Transactions",
-      message: `${logs?.data?.new} New Transactions`,
-      icon: <IconCheck size={16} />,
-      color: "teal",
-      autoClose: 8000,
-    });
-  }
 
   useEffect(() => {
     let subscribe = true;
@@ -211,20 +199,20 @@ const TransactionRow = ({
   const ref = transaction?.billRefNumber?.split(" ");
   const [registerMember, setRegisterMember] = useState(
     (ref[0]?.startsWith("ME") && "membership") ||
-      (ref[1] === "" && "membership") ||
-      (ref[0]?.startsWith("M") && "membership") ||
-      (ref[1]?.startsWith("F") && "membership") ||
-      (+transaction.transAmount > 700 && "mpc") ||
-      (+transaction.transAmount > 500 && "pc") ||
-      (+transaction.transAmount === 500 && "membership") ||
-      "membership"
+    (ref[1] === "" && "membership") ||
+    (ref[0]?.startsWith("M") && "membership") ||
+    (ref[1]?.startsWith("F") && "membership") ||
+    (+transaction.transAmount > 700 && "mpc") ||
+    (+transaction.transAmount > 500 && "pc") ||
+    (+transaction.transAmount === 500 && "membership") ||
+    "membership"
   );
-  const [payment, setPayment] = useState(
+  const [paymentState, setPaymentState] = useState(
     (ref[0]?.startsWith("PR") && "processing") ||
-      (ref[1] === "" && "processing") ||
-      (ref[0]?.startsWith("P") && "processing") ||
-      (ref[1]?.startsWith("F") && "processing") ||
-      "loan"
+    (ref[1] === "" && "processing") ||
+    (ref[0]?.startsWith("P") && "processing") ||
+    (ref[1]?.startsWith("F") && "processing") ||
+    "loan"
   );
 
   const handle = trpc.transactions.state.useMutation({
@@ -253,7 +241,7 @@ const TransactionRow = ({
       let paymentFor = "";
       if (transaction.state === "registered") {
         state = "handled";
-        paymentFor = payment;
+        paymentFor = paymentState;
       }
       if (transaction.state === "new") {
         state = "registered";
@@ -282,7 +270,7 @@ const TransactionRow = ({
     transaction.id,
     transaction.state,
     registerMember,
-    payment,
+    paymentState,
     handlerId,
     updaterId,
   ]);
@@ -554,8 +542,8 @@ const TransactionRow = ({
               <TitleText title="Payment" />
             </Group>
             <Radio.Group
-              value={payment}
-              onChange={setPayment}
+              value={paymentState}
+              onChange={setPaymentState}
               name="paymentFor"
               label="Please select an account to affirm this transaction ..."
               description="NOTE: Don't forget to submit after selection, no changes will be made upon cancellation."
