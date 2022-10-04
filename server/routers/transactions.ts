@@ -31,6 +31,37 @@ export const transactionsRouter = t.router({
 
       return transaction;
     }),
+  payments: t.procedure
+    .input(
+      z.object({
+        firstname: z.string(),
+        middlename: z.string(),
+        lastname: z.string(),
+        /* phone: z.string(), */
+      })
+    )
+    .query(async ({ input }) => {
+      const transaction = await prisma.transaction.findMany({
+        where: {
+          firstName: input.firstname,
+          middleName: input.middlename,
+          lastName: input.lastname,
+          /* msisdn: input.phone, */
+        },
+        orderBy: {
+          transTime: "desc",
+        },
+      });
+
+      if (!transaction) {
+        throw new TRPCError({
+          code: "NOT_FOUND",
+          message: `transactions.payments not found`,
+        });
+      }
+
+      return transaction;
+    }),
   member_transactions: t.procedure
     .input(
       z.object({
@@ -41,7 +72,6 @@ export const transactionsRouter = t.router({
       })
     )
     .query(async ({ input }) => {
-      if (input.phone === "") return;
       const transaction = await prisma.transaction.findMany({
         where: {
           firstName: input.firstname,
