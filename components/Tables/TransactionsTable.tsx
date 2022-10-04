@@ -52,18 +52,20 @@ export const TransactionsTable = ({
 
   const Header = () => (
     <tr>
-      <th>M-PESA</th>
+      <th>Time</th>
       <th>Names</th>
       <th>Amount</th>
       <th>Phone</th>
-      {(call === "transactions" && <th>Time</th>) || <th>Description</th>}
-      {/* <th>Status</th> */}
+      <th>
+        <Group position="center">
+          {(call === "transactions" && <>M-PESA</>) || <>Description</>}
+        </Group>
+      </th>
     </tr>
   );
   const [value, setValue] = useState(new Date());
 
   const new_date = value?.toLocaleDateString();
-
 
   useEffect(() => {
     let subscribe = true;
@@ -325,19 +327,8 @@ const TransactionRow = ({
   return (
     <>
       {call === "transactions" && transaction.transTime.startsWith(time) && (
-        <tr
-          style={{
-            cursor: (transaction.billRefNumber !== "" && "pointer") || "text",
-          }}
-          onClick={() => {
-            transaction.billRefNumber !== "" && setOpen(true);
-          }}
-        >
-          <td>
-            {transaction.transID.slice(0, 2) +
-              "..." +
-              transaction.transID.slice(7)}
-          </td>
+        <tr>
+          <td>{date(transaction.transTime)}</td>
           <td>
             {transaction.firstName +
               " " +
@@ -349,27 +340,32 @@ const TransactionRow = ({
             {`${transaction.transAmount}`.replace(/\B(?=(\d{3})+(?!\d))/g, ",")}
           </td>
           <td>{transaction.msisdn}</td>
-          {(transaction.billRefNumber === "" && (
-            <td>{date(transaction.transTime)}</td>
-          )) || <td>{transaction.billRefNumber}</td>}
+          <td>
+            <Group position="center">
+              {(transaction.billRefNumber === "" && (
+                <>{transaction.transID}</>
+              )) || (
+                  <Button
+                    variant="light"
+                    style={{
+                      height: "24px"
+                    }}
+                    onClick={() => {
+                      transaction.billRefNumber !== "" && setOpen(true);
+                    }}
+                  >
+                    {transaction.billRefNumber.split(" ")[0]}
+                  </Button>
+                )}
+            </Group>
+          </td>
         </tr>
       )}
       {call === "register" &&
         transaction.transTime.startsWith(time) &&
         description === "membership" && (
-          <tr
-            style={{
-              cursor: "pointer",
-            }}
-            onClick={() => {
-              router.push(`/members/register/${transaction.transID}`);
-            }}
-          >
-            <td>
-              {transaction.transID.slice(0, 2) +
-                "..." +
-                transaction.transID.slice(7)}
-            </td>
+          <tr>
+            <td>{date(transaction.transTime)}</td>
             <td>
               {transaction.firstName +
                 " " +
@@ -384,27 +380,32 @@ const TransactionRow = ({
               )}
             </td>
             <td>{transaction.msisdn}</td>
-            {(transaction.billRefNumber === "" && (
-              <td>{date(transaction.transTime)}</td>
-            )) || <td>{transaction.billRefNumber}</td>}
+            <td>
+              <Group position="center">
+                {(transaction.billRefNumber === "" && (
+                  <>{transaction.transID}</>
+                )) || (
+                    <Button
+                      variant="light"
+                      style={{
+                        height: "24px"
+                      }}
+                      onClick={() => {
+                        router.push(`/members/register/${transaction.transID}`);
+                      }}
+                    >
+                      {transaction.billRefNumber.split(" ")[0]}
+                    </Button>
+                  )}
+              </Group>
+            </td>
           </tr>
         )}
       {call === "maintain" &&
         transaction.transTime.startsWith(time) &&
         description === "processing" && (
-          <tr
-            style={{
-              cursor: "pointer",
-            }}
-            onClick={() => {
-              router.push(`/loans/maintain/${transaction.transID}`);
-            }}
-          >
-            <td>
-              {transaction.transID.slice(0, 2) +
-                "..." +
-                transaction.transID.slice(7)}
-            </td>
+          <tr>
+            <td>{date(transaction.transTime)}</td>
             <td>
               {transaction.firstName +
                 " " +
@@ -419,9 +420,25 @@ const TransactionRow = ({
               )}
             </td>
             <td>{transaction.msisdn}</td>
-            {(transaction.billRefNumber === "" && (
-              <td>{date(transaction.transTime)}</td>
-            )) || <td>{transaction.billRefNumber}</td>}
+            <td>
+              <Group position="center">
+                {(transaction.billRefNumber === "" && (
+                  <>{transaction.transID}</>
+                )) || (
+                    <Button
+                      variant="light"
+                      style={{
+                        height: "24px"
+                      }}
+                      onClick={() => {
+                        router.push(`/loans/maintain/${transaction.transID}`);
+                      }}
+                    >
+                      {transaction.billRefNumber.split(" ")[0]}
+                    </Button>
+                  )}
+              </Group>
+            </td>
           </tr>
         )}
       <Modal
