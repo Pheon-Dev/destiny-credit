@@ -18,7 +18,6 @@ import { useRouter } from "next/router";
 import { DatePicker } from "@mantine/dates";
 import dayjs from "dayjs";
 import { trpc } from "../../utils/trpc";
-import { LoanPayments } from "../Loan/LoanPayments";
 
 export const TransactionsTable = ({
   call,
@@ -174,7 +173,6 @@ export const TransactionsTable = ({
               <Header />
             </tfoot>
           </Table>
-          <LoanPayments />
         </>
       )}
       <pre>{JSON.stringify(logs.data?.message, undefined, 2)}</pre>

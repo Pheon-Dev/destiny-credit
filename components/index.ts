@@ -3,4 +3,3 @@ export { PaymentsTable, EmptyTable, PaymentTable, LoansTable, MembersTable, Tran
 export { TitleText } from "./Text/TitleText";
 export { Utilities } from "./Utilities/Utilities";
 export { Protected } from "./Protected/Protected";
-export { LoanPayments } from "./Loan/LoanPayments";
