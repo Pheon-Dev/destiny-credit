@@ -156,7 +156,7 @@ export const paymentsRouter = t.router({
         const curr_interest = interest / tenure;
         const curr_principal = installment - curr_interest;
 
-        const total_os_arrears: number = os_arrears + os_penalty + os_interest + os_principal + curr_interest + curr_principal;
+        const total_os_arrears: number = os_arrears + os_penalty + os_interest + os_principal;
         (total_os_arrears > 0 && (
           os_arrears = total_os_arrears - amount) ||
           (os_arrears = total_os_arrears)
@@ -169,7 +169,7 @@ export const paymentsRouter = t.router({
         (os_arrears < 0 && (os_arrears = 0) || (os_arrears = os_arrears));
         (pd_arrears < 0 && (pd_arrears = 0) || (pd_arrears = pd_arrears));
 
-        const total_os_penalties: number = os_penalty;
+        const total_os_penalties: number = 0;
         (total_os_penalties > 0 && (
           os_penalty = total_os_penalties - rem_amount) ||
           (os_penalty = total_os_penalties)
@@ -178,6 +178,9 @@ export const paymentsRouter = t.router({
           pd_penalty = total_os_penalties - rem_amount) ||
           (pd_penalty += total_os_penalties)
         );
+
+        (os_penalty < 0 && (os_penalty = 0) || (os_penalty = os_penalty));
+        (pd_penalty < 0 && (pd_penalty = 0) || (pd_penalty = pd_penalty));
 
         (os_penalty > 0 && (
           rem_amount = 0) ||
@@ -194,6 +197,9 @@ export const paymentsRouter = t.router({
           (pd_interest += total_os_interest)
         );
 
+        (os_interest < 0 && (os_interest = 0) || (os_interest = os_interest));
+        (pd_interest < 0 && (pd_interest = 0) || (pd_interest = pd_interest));
+
         (os_interest > 0 && (
           rem_amount = 0) ||
           (rem_amount -= total_os_interest)
@@ -209,11 +215,13 @@ export const paymentsRouter = t.router({
           (pd_principal += total_os_principal)
         );
 
+        (os_principal < 0 && (os_principal = 0) || (os_principal = os_principal));
+        (pd_principal < 0 && (pd_principal = 0) || (pd_principal = pd_principal));
+
         (os_principal > 0 && (
           rem_amount = 0) ||
           (rem_amount -= total_os_principal)
         );
-
 
         os_balance += (curr_interest - amount);
 
