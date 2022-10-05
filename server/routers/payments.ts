@@ -54,6 +54,15 @@ export const paymentsRouter = t.router({
         },
       });
 
+      const roundOff = (x: number) => {
+        const whole = +x.toString().split(".")[0]
+        const decimal = +x.toString().split(".")[1]
+
+        if (!decimal) return whole;
+        if (decimal > 0) return whole + 1
+        if (decimal > 0) return whole + 0
+      }
+
       const date = (time: string) => {
         const second = time.slice(12);
         const minute = time.slice(10, 12);
@@ -111,19 +120,19 @@ export const paymentsRouter = t.router({
         installment * (tenure - sundays);
 
       let payment: any = [];
-      let os_arrears = outsArrears;
-      let pd_arrears = paidArrears;
+      let os_arrears = +outsArrears;
+      let pd_arrears = +paidArrears;
 
-      let os_penalty = outsPenalty;
-      let pd_penalty = paidPenalty;
+      let os_penalty = +outsPenalty;
+      let pd_penalty = +paidPenalty;
 
-      let os_interest = outsInterest;
-      let pd_interest = paidInterest;
+      let os_interest = +outsInterest;
+      let pd_interest = +paidInterest;
 
-      let os_principal = outsPrincipal;
-      let pd_principal = paidPrincipal;
+      let os_principal = +outsPrincipal;
+      let pd_principal = +paidPrincipal;
 
-      let os_balance = outsBalance;
+      let os_balance = +outsBalance;
 
       transactions?.forEach(async (t) => {
         const id = t.id;
@@ -132,6 +141,8 @@ export const paymentsRouter = t.router({
         const time = date(t.transTime);
         const type = t.transactionType;
         const state = "four";
+
+        let rem_amount = amount;
 
         /* if (t.payment === "three") return await prisma.payment.deleteMany({ */
         /*   where: { */
@@ -145,19 +156,66 @@ export const paymentsRouter = t.router({
         const curr_interest = interest / tenure;
         const curr_principal = installment - curr_interest;
 
-        os_arrears = outsArrears;
-        pd_arrears = paidArrears;
+        const total_os_arrears: number = os_arrears + os_penalty + os_interest + os_principal + curr_interest + curr_principal;
+        (total_os_arrears > 0 && (
+          os_arrears = total_os_arrears - amount) ||
+          (os_arrears = total_os_arrears)
+        );
+        (os_arrears > 0 && (
+          pd_arrears += amount) ||
+          (pd_arrears += total_os_arrears)
+        );
 
-        os_penalty = outsPenalty;
-        pd_penalty = paidPenalty;
+        (os_arrears < 0 && (os_arrears = 0) || (os_arrears = os_arrears));
+        (pd_arrears < 0 && (pd_arrears = 0) || (pd_arrears = pd_arrears));
 
-        os_interest = outsInterest;
-        pd_interest = paidInterest;
+        const total_os_penalties: number = os_penalty;
+        (total_os_penalties > 0 && (
+          os_penalty = total_os_penalties - rem_amount) ||
+          (os_penalty = total_os_penalties)
+        );
+        (os_penalty > 0 && (
+          pd_penalty = total_os_penalties - rem_amount) ||
+          (pd_penalty += total_os_penalties)
+        );
 
-        os_principal = outsPrincipal;
-        pd_principal = paidPrincipal;
+        (os_penalty > 0 && (
+          rem_amount = 0) ||
+          (rem_amount -= total_os_penalties)
+        );
 
-        os_balance -= amount;
+        const total_os_interest: number = os_interest + curr_interest;
+        (os_penalty > 0 && (
+          os_interest = total_os_interest) ||
+          (os_interest = total_os_interest - rem_amount)
+        );
+        (os_interest > 0 && (
+          pd_interest += rem_amount) ||
+          (pd_interest += total_os_interest)
+        );
+
+        (os_interest > 0 && (
+          rem_amount = 0) ||
+          (rem_amount -= total_os_interest)
+        );
+
+        const total_os_principal: number = os_principal + curr_principal;
+        (os_interest > 0 && (
+          os_principal = total_os_principal) ||
+          (os_principal = total_os_principal - rem_amount)
+        );
+        (os_principal > 0 && (
+          pd_principal += rem_amount) ||
+          (pd_principal += total_os_principal)
+        );
+
+        (os_principal > 0 && (
+          rem_amount = 0) ||
+          (rem_amount -= total_os_principal)
+        );
+
+
+        os_balance += (curr_interest - amount);
 
         /* console.table({ status: "writing ..." }) */
 
@@ -192,15 +250,15 @@ export const paymentsRouter = t.router({
 
         payment.push({
           amount: amount,
-          outsArrears: os_arrears,
-          paidArrears: pd_arrears,
-          outsPenalty: os_penalty,
-          paidPenalty: pd_penalty,
-          outsInterest: os_interest,
-          paidInterest: pd_interest,
-          outsPrincipal: os_principal,
-          paidPrincipal: pd_principal,
-          outsBalance: os_balance,
+          outsArrears: roundOff(os_arrears),
+          paidArrears: roundOff(pd_arrears),
+          outsPenalty: roundOff(os_penalty),
+          paidPenalty: roundOff(pd_penalty),
+          outsInterest: roundOff(os_interest),
+          paidInterest: roundOff(pd_interest),
+          outsPrincipal: roundOff(os_principal),
+          paidPrincipal: roundOff(pd_principal),
+          outsBalance: roundOff(os_balance),
           currInstDate: time,
           id: id,
           mpesa: mpesa,
