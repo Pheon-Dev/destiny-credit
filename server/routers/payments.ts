@@ -50,6 +50,7 @@ export const paymentsRouter = t.router({
           /* msisdn: loan?.phone */
         }
       })
+
       const principal = (loan?.principal && loan?.principal || 0)
       const interest = (loan?.interest && loan?.interest || 0)
       const installment = (loan?.installment && loan?.installment || 0)
@@ -67,6 +68,7 @@ export const paymentsRouter = t.router({
       const outsPrincipal = (loan?.payment[loan?.payment.length - 1]?.outsPrincipal && loan?.payment[loan?.payment.length - 1]?.outsPrincipal || 0)
       const paidPrincipal = (loan?.payment[loan?.payment.length - 1]?.paidPrincipal && loan?.payment[loan?.payment.length - 1]?.paidPrincipal || 0)
       const outsBalance = (loan?.payment[loan?.payment.length - 1]?.outsBalance && loan?.payment[loan?.payment.length - 1]?.outsBalance || 0)
+      const currInstDate = (loan?.payment[loan?.payment.length - 1]?.currInstDate && loan?.payment[loan?.payment.length - 1]?.currInstDate || loan?.startDate)
 
       /* const payment = await prisma.payment.create({ */
       /*   data: { */
@@ -93,15 +95,28 @@ export const paymentsRouter = t.router({
       /*   }); */
       /* } */
 
-      /* return { */
-      /*   payment: payment, */
-      /*   transactions: transactions, */
-      /*   loan: loan */
-      /* } */
+      let payment: any = []
+      transactions.map((t) => {
+        payment.push({
+          amount: t.transAmount,
+          outsArrears: outsArrears,
+          paidArrears: +paidArrears,
+          outsPenalty: +outsPenalty,
+          paidPenalty: +paidPenalty,
+          outsInterest: +outsInterest,
+          paidInterest: +paidInterest,
+          outsPrincipal: +outsPrincipal,
+          paidPrincipal: +paidPrincipal,
+          outsBalance: +outsBalance,
+          currInstDate: currInstDate,
+          loanId: +loanId,
+          mpesa: t.transID,
+        })
+      })
 
       const data = {
         loan: loan,
-        transactions: transactions,
+        payment: payment,
       }
 
       return data;

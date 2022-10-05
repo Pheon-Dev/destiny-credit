@@ -239,16 +239,16 @@ model Payment {
   id            String   @id @default(uuid())
   createdAt     DateTime @default(now())
   updatedAt     DateTime @updatedAt
-  amount        Int @default(0)
-  outsArrears   Int @default(0)
-  paidArrears   Int @default(0)
-  outsPenalty   Int @default(0)
-  paidPenalty   Int @default(0)
-  outsInterest  Int @default(0)
-  paidInterest  Int @default(0)
-  outsPrincipal Int @default(0)
-  paidPrincipal Int @default(0)
-  outsBalance   Int @default(0)
+  amount        Int      @default(0)
+  outsArrears   Int      @default(0)
+  paidArrears   Int      @default(0)
+  outsPenalty   Int      @default(0)
+  paidPenalty   Int      @default(0)
+  outsInterest  Int      @default(0)
+  paidInterest  Int      @default(0)
+  outsPrincipal Int      @default(0)
+  paidPrincipal Int      @default(0)
+  outsBalance   Int      @default(0)
   firsInstDate  String
   currInstDate  String
   nextInstDate  String

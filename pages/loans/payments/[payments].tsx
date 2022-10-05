@@ -123,6 +123,72 @@ const PaymentsList = ({ email, status }: { email: string; status: string }) => {
                   <td>{payment.mpesa}</td>
                 </tr>
               ))}
+              {payment?.payment?.map((payment: any) => (
+                <tr key={payment?.id} style={{ cursor: "auto" }}>
+                  <td>{payment?.currInstDate}</td>
+                  <td>
+                    {`${payment.amount}`.replace(
+                      /\B(?=(\d{3})+(?!\d))/g,
+                      ","
+                    )}
+                  </td>
+                  <td>
+                    {`${payment.outsArrears}`.replace(
+                      /\B(?=(\d{3})+(?!\d))/g,
+                      ","
+                    )}
+                  </td>
+                  <td>
+                    {`${payment.paidArrears}`.replace(
+                      /\B(?=(\d{3})+(?!\d))/g,
+                      ","
+                    )}
+                  </td>
+                  <td>
+                    {`${payment.outsPenalty}`.replace(
+                      /\B(?=(\d{3})+(?!\d))/g,
+                      ","
+                    )}
+                  </td>
+                  <td>
+                    {`${payment.paidPenalty}`.replace(
+                      /\B(?=(\d{3})+(?!\d))/g,
+                      ","
+                    )}
+                  </td>
+                  <td>
+                    {`${payment.outsInterest}`.replace(
+                      /\B(?=(\d{3})+(?!\d))/g,
+                      ","
+                    )}
+                  </td>
+                  <td>
+                    {`${payment.paidInterest}`.replace(
+                      /\B(?=(\d{3})+(?!\d))/g,
+                      ","
+                    )}
+                  </td>
+                  <td>
+                    {`${payment.outsPrincipal}`.replace(
+                      /\B(?=(\d{3})+(?!\d))/g,
+                      ","
+                    )}
+                  </td>
+                  <td>
+                    {`${payment.paidPrincipal}`.replace(
+                      /\B(?=(\d{3})+(?!\d))/g,
+                      ","
+                    )}
+                  </td>
+                  <td>
+                    {`${payment.outsBalance}`.replace(
+                      /\B(?=(\d{3})+(?!\d))/g,
+                      ","
+                    )}
+                  </td>
+                  <td>{payment.mpesa}</td>
+                </tr>
+              ))}
             </tbody>
             <tfoot>
               <Header />
