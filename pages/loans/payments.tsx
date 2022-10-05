@@ -1,4 +1,4 @@
-import React from "react";
+import React, { Suspense } from "react";
 import { EmptyTable, PaymentsTable, Protected } from "../../components";
 import { NextPage } from "next";
 import { useSession } from "next-auth/react";
@@ -13,10 +13,12 @@ const Page: NextPage = () => {
 
   return (
     <Protected>
-      {check?.length > 0 && (
-        <PaymentsTable call={call} email={email} status={status} />
-      )}
-      {check === "" && <EmptyTable call={call} status={status} />}
+      <Suspense
+        fallback={check === "" && <EmptyTable call={call} status={status} />}>
+        {check?.length > 0 && (
+          <PaymentsTable call={call} email={email} status={status} />
+        )}
+      </Suspense>
     </Protected>
   );
 };

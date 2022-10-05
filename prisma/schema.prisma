@@ -239,6 +239,7 @@ model Payment {
   id            String   @id @default(uuid())
   createdAt     DateTime @default(now())
   updatedAt     DateTime @updatedAt
+  total         Int?     @default(0)
   amount        Int      @default(0)
   outsArrears   Int      @default(0)
   paidArrears   Int      @default(0)

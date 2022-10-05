@@ -112,6 +112,7 @@ const PaymentsRow = ({
   role: string;
 }) => {
   const router = useRouter();
+  trpc.payments.payment.useQuery({ id: loan.id });
   return (
     <>
       {call === "payments" && loan.disbursed && (
@@ -125,8 +126,8 @@ const PaymentsRow = ({
             {loan.cycle.toLowerCase() === "daily"
               ? "Days"
               : loan.cycle.toLowerCase() === "weekly"
-              ? "Weeks"
-              : "Months"}
+                ? "Weeks"
+                : "Months"}
           </td>
           <td>
             <Badge

@@ -18,6 +18,7 @@ import { useRouter } from "next/router";
 import { DatePicker } from "@mantine/dates";
 import dayjs from "dayjs";
 import { trpc } from "../../utils/trpc";
+import { IconCheck, IconChecks, IconClock } from "@tabler/icons";
 
 export const TransactionsTable = ({
   call,
@@ -52,10 +53,21 @@ export const TransactionsTable = ({
 
   const Header = () => (
     <tr>
-      <th>Time</th>
-      <th>Names</th>
-      <th>Amount</th>
-      <th>Phone</th>
+      <th>
+        <Group>
+          <IconClock size={16} />
+          <>Time</>
+        </Group>
+      </th>
+      <th>
+        Names
+      </th>
+      <th>
+        Amount
+      </th>
+      <th>
+        Phone
+      </th>
       <th>
         <Group position="center">
           {(call === "transactions" && <>M-PESA</>) || <>Description</>}
@@ -329,7 +341,15 @@ const TransactionRow = ({
     <>
       {call === "transactions" && transaction.transTime.startsWith(time) && (
         <tr>
-          <td>{date(transaction.transTime)}</td>
+          <td>
+            <Group>
+              {transaction.state === "new" && (
+                <IconChecks color="grey" size={16} />
+              )}
+              {transaction.state === "paid" && (
+                <IconChecks color="blue" size={16} />
+              )}
+              {date(transaction.transTime)}</Group></td>
           <td>
             {transaction.firstName +
               " " +
