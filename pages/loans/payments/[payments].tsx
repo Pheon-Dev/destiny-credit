@@ -1,4 +1,4 @@
-import React, { useState, useEffect, useCallback } from "react";
+import React, { useState, useEffect, useCallback, Suspense } from "react";
 import { useRouter } from "next/router";
 import { trpc } from "../../../utils/trpc";
 import { Protected, TitleText } from "../../../components";
@@ -23,7 +23,7 @@ const PaymentsList = ({ email, status }: { email: string; status: string }) => {
       <th>O|S Principal</th>
       <th>Paid Principal</th>
       <th>O|S Balance</th>
-      <th>M-PESA</th>
+      <th>M-PESA Code</th>
     </tr>
   );
 
@@ -31,22 +31,35 @@ const PaymentsList = ({ email, status }: { email: string; status: string }) => {
     return <Skeleton height={8} radius="xl" />;
   };
 
-  const { data: payment, fetchStatus } =
+  const { data: payment } =
     trpc.payments.payment.useQuery({ id: id });
 
-  const date = (time: string) => {
-    const second = time.slice(12);
-    const minute = time.slice(10, 12);
-    const hour = time.slice(8, 10);
-    const day = time.slice(6, 8);
-    const month = time.slice(4, 6);
-    const year = time.slice(0, 4);
-    const when = day + "-" + month + "-" + year;
-    return when;
-  };
-
   return (
-    <>
+    <Suspense
+      fallback={
+        <>
+          <Group position="center" m="lg">
+            <TitleText title="Loading payment Payment Statement ..." />
+          </Group>
+          <Group position="center" m="lg" style={{ position: "relative" }}>
+            <Skeleton height={16} radius="xl" />
+            <Row />
+            <Row />
+            <Row />
+            <Row />
+            <Row />
+            <Row />
+            <Row />
+            <Row />
+            <Row />
+            <Row />
+            <Row />
+            <Row />
+            <Skeleton height={16} radius="xl" />
+          </Group>
+        </>
+      }
+    >
       {payment && (
         <>
           <Group position="center" m="lg">
@@ -58,8 +71,8 @@ const PaymentsList = ({ email, status }: { email: string; status: string }) => {
             </thead>
             <tbody>
               {payment?.loan?.payment?.map((payment) => (
-                <tr key={payment?.id} style={{ cursor: "auto" }}>
-                  <td>{date(payment?.currInstDate)}</td>
+                <tr key={payment?.mpesa} style={{ cursor: "auto" }}>
+                  <td>{payment?.currInstDate}</td>
                   <td>
                     {`${payment.amount}`.replace(
                       /\B(?=(\d{3})+(?!\d))/g,
@@ -124,7 +137,7 @@ const PaymentsList = ({ email, status }: { email: string; status: string }) => {
                 </tr>
               ))}
               {payment?.payment?.map((payment: any) => (
-                <tr key={payment?.id} style={{ cursor: "auto" }}>
+                <tr key={payment?.mpesa} style={{ cursor: "auto" }}>
                   <td>{payment?.currInstDate}</td>
                   <td>
                     {`${payment.amount}`.replace(
@@ -196,31 +209,8 @@ const PaymentsList = ({ email, status }: { email: string; status: string }) => {
           </Table>
         </>
       )}
-      {!payment && (
-        <>
-          <Group position="center" m="lg">
-            <TitleText title="Loading payment Payment Statement ..." />
-          </Group>
-          <Group position="center" m="lg" style={{ position: "relative" }}>
-            <Skeleton height={16} radius="xl" />
-            <Row />
-            <Row />
-            <Row />
-            <Row />
-            <Row />
-            <Row />
-            <Row />
-            <Row />
-            <Row />
-            <Row />
-            <Row />
-            <Row />
-            <Skeleton height={16} radius="xl" />
-          </Group>
-        </>
-      )}
       <pre>{JSON.stringify(payment, undefined, 2)}</pre>
-    </>
+    </Suspense>
   );
 };
 

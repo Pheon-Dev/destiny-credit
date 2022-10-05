@@ -249,10 +249,10 @@ model Payment {
   outsPrincipal Int      @default(0)
   paidPrincipal Int      @default(0)
   outsBalance   Int      @default(0)
-  firsInstDate  String
   currInstDate  String
-  nextInstDate  String
+  nextInstDate  String?
   mpesa         String?
+  type          String?
   loan          Loan     @relation(fields: [loanId], references: [id])
   loanId        String
   handler       User?    @relation("HandledBy", fields: [handlerId], references: [id])
