@@ -6,6 +6,7 @@ import {
   loansRouter,
   usersRouter,
   logsRouter,
+  paymentsRouter,
 } from "./routers";
 
 export const appRouter = t.router({
@@ -15,6 +16,7 @@ export const appRouter = t.router({
   members: membersRouter,
   products: productsRouter,
   logs: logsRouter,
+  payments: paymentsRouter,
 });
 
 export type AppRouter = typeof appRouter;

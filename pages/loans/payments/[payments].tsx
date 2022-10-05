@@ -1,15 +1,12 @@
 import React, { useState, useEffect, useCallback } from "react";
 import { useRouter } from "next/router";
 import { trpc } from "../../../utils/trpc";
-import { renderPayment } from "../../../utils/Loan/payments";
 import { Protected, TitleText } from "../../../components";
 import { Group, Skeleton, Table } from "@mantine/core";
 import { useSession } from "next-auth/react";
 import { NextPage } from "next";
-import { Transaction } from "@prisma/client";
 
 const PaymentsList = ({ email, status }: { email: string; status: string }) => {
-  const [loanPayments, setLoanPayments] = useState([]);
   const router = useRouter();
   const id = router.query.payments as string;
 
@@ -34,8 +31,8 @@ const PaymentsList = ({ email, status }: { email: string; status: string }) => {
     return <Skeleton height={8} radius="xl" />;
   };
 
-  const { data: payments, fetchStatus } =
-    trpc.loans.payments.useQuery({ id: id });
+  const { data: payment, fetchStatus } =
+    trpc.payments.payment.useQuery({ id: id });
 
   const date = (time: string) => {
     const second = time.slice(12);
@@ -48,109 +45,19 @@ const PaymentsList = ({ email, status }: { email: string; status: string }) => {
     return when;
   };
 
-  /* const { data: active } = trpc.loans.active_loans.useQuery(); */
-
-  /* active?.map((loan) => { */
-  const firstname = `${payments?.memberName.split(" ")[0]}`;
-  const middlename = `${payments?.memberName.split(" ")[1]}`;
-  const lastname = `${payments?.memberName.split(" ")[2]}`;
-  /* const phone = `${payments?.phone}`; */
-
-  console.log(
-    {
-      firstname: firstname,
-      middlename: middlename,
-      lastname: lastname,
-      /* phone: phone, */
-    })
-  const { data: transactions } = trpc.transactions.payments.useQuery({
-    firstname: firstname,
-    middlename: middlename,
-    lastname: lastname,
-    /* phone: phone, */
-  });
-  /* console.log(phone) */
-  /* if (phone === "") return; */
-  /* if (phone === "null") return; */
-  /* if (phone === "undefined") return; */
-  /* if (firstname === "") return; */
-  /* if (firstname === "null") return; */
-  /* if (firstname === "undefined") return; */
-
-
-  /* console.log(firstname) */
-  /* console.log(transactions?.length) */
-
-  /* let pay: any = [] */
-  /**/
-  /* const name = firstname + " " + middlename + " " + lastname; */
-  /* const search = (name: string, phone: string) => { */
-  /*   return transactions?.find((transaction: Transaction) => { */
-  /*     const memberName = */
-  /*       transaction?.firstName + */
-  /*       " " + */
-  /*       transaction?.middleName + */
-  /*       " " + */
-  /*       transaction?.lastName; */
-  /**/
-  /*     if (name === memberName) return pay.push({ */
-  /*       transaction */
-  /*     }) */
-  /*   }); */
-  /* }; */
-
-  let pay: any = []
-  transactions?.map((transaction: Transaction) => {
-    pay.push({
-      payment:
-        renderPayment(
-          +transaction?.transAmount,
-          `${payments?.principal}`,
-          `${payments?.interest}`,
-          `${payments?.installment}`,
-          `${payments?.penalty}`,
-          `${payments?.sundays}`,
-          `${payments?.tenure}`,
-          `${payments?.cycle}`,
-          `${payments?.payment[payments?.payment.length - 1]?.outsArrears}`,
-          `${payments?.payment[payments?.payment.length - 1]?.paidArrears}`,
-          `${payments?.payment[payments?.payment.length - 1]?.outsPenalty}`,
-          `${payments?.payment[payments?.payment.length - 1]?.paidPenalty}`,
-          `${payments?.payment[payments?.payment.length - 1]?.outsInterest}`,
-          `${payments?.payment[payments?.payment.length - 1]?.paidInterest}`,
-          `${payments?.payment[payments?.payment.length - 1]?.outsPrincipal}`,
-          `${payments?.payment[payments?.payment.length - 1]?.paidPrincipal}`,
-          `${payments?.payment[payments?.payment.length - 1]?.outsBalance}`,
-          `${payments?.id}`,
-          transaction?.transID
-        )
-    })
-  })
-
-  /* useEffect(() => { */
-  /*   let subscribe = true */
-  /*   if (subscribe) { */
-  /*     search(name, phone) */
-  /* setLoanPayments(pay) */
-  /*   } */
-  /*   return () => { */
-  /*     subscribe = false */
-  /*   } */
-  /* }, [pay, loanPayments, name, phone]) */
-
   return (
     <>
-      {payments && (
+      {payment && (
         <>
           <Group position="center" m="lg">
-            <TitleText title={`${payments?.memberName}`} />
+            <TitleText title={`${payment?.loan.memberName}`} />
           </Group>
           <Table striped highlightOnHover horizontalSpacing="md">
             <thead>
               <Header />
             </thead>
             <tbody>
-              {payments?.payment?.map((payment) => (
+              {payment?.loan?.payment?.map((payment) => (
                 <tr key={payment?.id} style={{ cursor: "auto" }}>
                   <td>{date(payment?.currInstDate)}</td>
                   <td>
@@ -223,10 +130,10 @@ const PaymentsList = ({ email, status }: { email: string; status: string }) => {
           </Table>
         </>
       )}
-      {!payments && (
+      {!payment && (
         <>
           <Group position="center" m="lg">
-            <TitleText title="Loading Loan Payment Statement ..." />
+            <TitleText title="Loading payment Payment Statement ..." />
           </Group>
           <Group position="center" m="lg" style={{ position: "relative" }}>
             <Skeleton height={16} radius="xl" />
@@ -246,7 +153,7 @@ const PaymentsList = ({ email, status }: { email: string; status: string }) => {
           </Group>
         </>
       )}
-      <pre>{JSON.stringify(pay, undefined, 2)}</pre>
+      <pre>{JSON.stringify(payment, undefined, 2)}</pre>
     </>
   );
 };
