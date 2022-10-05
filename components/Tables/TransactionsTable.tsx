@@ -212,7 +212,7 @@ const TransactionRow = ({
   const router = useRouter();
   const utils = trpc.useContext();
   const ref = transaction?.billRefNumber?.split(" ");
-  const [registerMember, setRegisterMember] = useState(
+  const [paymentState, setPaymentState] = useState(
     (ref[0]?.startsWith("ME") && "membership") ||
     (ref[1] === "" && "membership") ||
     (ref[0]?.startsWith("M") && "membership") ||
@@ -220,9 +220,6 @@ const TransactionRow = ({
     (+transaction.transAmount > 700 && "mpc") ||
     (+transaction.transAmount > 500 && "pc") ||
     (+transaction.transAmount === 500 && "membership") ||
-    "membership"
-  );
-  const [paymentState, setPaymentState] = useState(
     (ref[0]?.startsWith("PR") && "processing") ||
     (ref[1] === "" && "processing") ||
     (ref[0]?.startsWith("P") && "processing") ||
@@ -235,6 +232,7 @@ const TransactionRow = ({
       await utils.transactions.transaction.invalidate({
         id: transaction.id || "",
       });
+      if (paymentState === "membership") router.push(`/members/register/${transaction.transID}`)
     },
   });
 
@@ -254,17 +252,11 @@ const TransactionRow = ({
       if (transaction.state === "handled") return;
       let state = "";
       let paymentFor = "";
-      if (transaction.state === "registered") {
+      if (transaction.state === "new") {
         state = "handled";
         paymentFor = paymentState;
       }
-      if (transaction.state === "new") {
-        state = "registered";
-        paymentFor = registerMember;
-      }
       if (transaction.id) {
-        console.log(state);
-        console.log(paymentFor);
         handle.mutate({
           id: transaction.id,
           handlerId: `${handlerId}`,
@@ -284,7 +276,6 @@ const TransactionRow = ({
     handle,
     transaction.id,
     transaction.state,
-    registerMember,
     paymentState,
     handlerId,
     updaterId,
@@ -335,21 +326,39 @@ const TransactionRow = ({
     return () => {
       subscribe = false;
     };
-  }, [open, handler, updater, ref, description, registerMember]);
+  }, [open, handler, updater, ref, description]);
 
   return (
     <>
       {call === "transactions" && transaction.transTime.startsWith(time) && (
         <tr>
           <td>
-            <Group>
-              {transaction.state === "new" && (
-                <IconChecks color="grey" size={16} />
+            {transaction.billRefNumber !== "" && (
+              <Group>
+                {transaction.state === "new" && (
+                  <IconCheck color="grey" size={16} />
+                )}
+                {transaction.state === "handled" && (
+                  <IconChecks color="grey" size={16} />
+                )}
+                {transaction.state === "paid" && (
+                  <IconChecks color="blue" size={16} />
+                )}
+                {date(transaction.transTime)}
+              </Group>
+            ) ||
+              (
+                <Group>
+                  {transaction.state === "new" && (
+                    <IconChecks color="grey" size={16} />
+                  )}
+                  {transaction.state === "paid" && (
+                    <IconChecks color="blue" size={16} />
+                  )}
+                  {date(transaction.transTime)}
+                </Group>
               )}
-              {transaction.state === "paid" && (
-                <IconChecks color="blue" size={16} />
-              )}
-              {date(transaction.transTime)}</Group></td>
+          </td>
           <td>
             {transaction.firstName +
               " " +
@@ -531,50 +540,6 @@ const TransactionRow = ({
           </Card.Section>
         </Card>
         {transaction.state === "new" && (
-          <>
-            <Box m="md">
-              <Group position="center" m="md">
-                <TitleText title="New Customer" />
-              </Group>
-              <Radio.Group
-                value={registerMember}
-                onChange={setRegisterMember}
-                name="registrationFor"
-                label="This is a transaction from an unregistered member ..."
-                description={`Proceed to Register ${transaction.firstName} ${transaction.middleName} ${transaction.lastName}`}
-                withAsterisk
-              >
-                <Grid grow>
-                  <Grid.Col span={4}>
-                    <Radio m="md" value="crb" label="CRB Fee" />
-                    <Radio m="md" value="membership" label="Membership Fee" />
-                    <Radio m="md" value="processing" label="Processing Fee" />
-                    <Radio m="md" value="pc" label="Processing | CRB" />
-                    <Radio
-                      m="md"
-                      value="mpc"
-                      label="Membership | Processing | CRB"
-                    />
-                  </Grid.Col>
-                </Grid>
-              </Radio.Group>
-              <Group position="center">
-                <Button
-                  variant="outline"
-                  onClick={() => {
-                    setOpen(false);
-                    handleState();
-                    /* router.push(`/members/register/${transaction.transID}`); */
-                  }}
-                  m="md"
-                >
-                  Register
-                </Button>
-              </Group>
-            </Box>
-          </>
-        )}
-        {transaction.state === "registered" && (
           <Box m="md">
             <Group position="center" m="md">
               <TitleText title="Payment" />
@@ -589,9 +554,11 @@ const TransactionRow = ({
             >
               <Grid grow>
                 <Grid.Col span={4}>
+                  <Radio m="md" value="membership" label="Membership Fee" />
                   <Radio m="md" value="crb" label="CRB Fee" />
                   <Radio m="md" value="processing" label="Processing Fee" />
                   <Radio m="md" value="pc" label="Processing | CRB" />
+                  <Radio m="md" value="mpc" label="Membership | Processing | CRB" />
                   <Radio m="md" value="loan" label="Loan" />
                   <Radio m="md" value="penalty" label="Penalty" />
                   <Radio m="md" value="other" label="Others" />

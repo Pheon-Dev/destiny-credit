@@ -1,12 +1,11 @@
-import React, { useState, useEffect, useCallback, Suspense } from "react";
+import React, { Suspense } from "react";
 import { useRouter } from "next/router";
 import { trpc } from "../../../utils/trpc";
 import { Protected, TitleText } from "../../../components";
 import { Group, Skeleton, Table } from "@mantine/core";
-import { useSession } from "next-auth/react";
 import { NextPage } from "next";
 
-const PaymentsList = ({ email, status }: { email: string; status: string }) => {
+const PaymentsList = () => {
   const router = useRouter();
   const id = router.query.payments as string;
 
@@ -282,14 +281,9 @@ const PaymentsList = ({ email, status }: { email: string; status: string }) => {
 };
 
 const Page: NextPage = () => {
-  const { status, data } = useSession();
-
-  const email = `${data?.user?.email}`;
-  const check = email.split("@")[1];
-
   return (
     <Protected>
-      {check?.length > 0 && <PaymentsList email={email} status={status} />}
+      <PaymentsList />
     </Protected>
   );
 };
