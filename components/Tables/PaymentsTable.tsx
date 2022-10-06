@@ -112,7 +112,7 @@ const PaymentsRow = ({
   role: string;
 }) => {
   const router = useRouter();
-  /* trpc.payments.payment.useQuery({ id: loan.id }); */
+  /* const {data: payments} = trpc.payments.payment.useQuery({ id: loan.id }); */
   return (
     <>
       {call === "payments" && loan.disbursed && (
