@@ -4,7 +4,7 @@ import { trpc } from "../../../utils/trpc";
 import { Protected, TitleText } from "../../../components";
 import { Button, Group, Loader, Skeleton, Table, TransferList, TransferListData, useMantineColorScheme } from "@mantine/core";
 import { NextPage } from "next";
-import { IconReload } from "@tabler/icons";
+import { IconLoader2 } from "@tabler/icons";
 import { Transaction } from "@prisma/client";
 import { useSession } from "next-auth/react";
 
@@ -196,7 +196,7 @@ const PaymentsList = ({ email, status }: { email: string; status: string }) => {
           <Group position="apart" m="lg">
             <TitleText title={`${payment?.loan.memberName}`} />
             {payments?.fetchStatus === "fetching" && (<Loader />) || (
-              <IconReload onClick={() => payments?.refetch()} />
+              <IconLoader2 onClick={() => payments?.refetch()} />
             )}
           </Group>
           <Table striped highlightOnHover horizontalSpacing="md">
@@ -272,72 +272,6 @@ const PaymentsList = ({ email, status }: { email: string; status: string }) => {
                 </tr>
               ))}
 
-              {/* {payment?.payment?.map((payment: any) => ( */}
-              {/*   <tr key={payment?.mpesa} style={{ cursor: "auto" }}> */}
-              {/*     <td>{payment?.currInstDate}</td> */}
-              {/*     <td> */}
-              {/*       {`${payment.amount}`.replace( */}
-              {/*         /\B(?=(\d{3})+(?!\d))/g, */}
-              {/*         "," */}
-              {/*       )} */}
-              {/*     </td> */}
-              {/*     <td> */}
-              {/*       {`${payment.outsArrears}`.replace( */}
-              {/*         /\B(?=(\d{3})+(?!\d))/g, */}
-              {/*         "," */}
-              {/*       )} */}
-              {/*     </td> */}
-              {/*     <td> */}
-              {/*       {`${payment.paidArrears}`.replace( */}
-              {/*         /\B(?=(\d{3})+(?!\d))/g, */}
-              {/*         "," */}
-              {/*       )} */}
-              {/*     </td> */}
-              {/*     <td> */}
-              {/*       {`${payment.outsPenalty}`.replace( */}
-              {/*         /\B(?=(\d{3})+(?!\d))/g, */}
-              {/*         "," */}
-              {/*       )} */}
-              {/*     </td> */}
-              {/*     <td> */}
-              {/*       {`${payment.paidPenalty}`.replace( */}
-              {/*         /\B(?=(\d{3})+(?!\d))/g, */}
-              {/*         "," */}
-              {/*       )} */}
-              {/*     </td> */}
-              {/*     <td> */}
-              {/*       {`${payment.outsInterest}`.replace( */}
-              {/*         /\B(?=(\d{3})+(?!\d))/g, */}
-              {/*         "," */}
-              {/*       )} */}
-              {/*     </td> */}
-              {/*     <td> */}
-              {/*       {`${payment.paidInterest}`.replace( */}
-              {/*         /\B(?=(\d{3})+(?!\d))/g, */}
-              {/*         "," */}
-              {/*       )} */}
-              {/*     </td> */}
-              {/*     <td> */}
-              {/*       {`${payment.outsPrincipal}`.replace( */}
-              {/*         /\B(?=(\d{3})+(?!\d))/g, */}
-              {/*         "," */}
-              {/*       )} */}
-              {/*     </td> */}
-              {/*     <td> */}
-              {/*       {`${payment.paidPrincipal}`.replace( */}
-              {/*         /\B(?=(\d{3})+(?!\d))/g, */}
-              {/*         "," */}
-              {/*       )} */}
-              {/*     </td> */}
-              {/*     <td> */}
-              {/*       {`${payment.outsBalance}`.replace( */}
-              {/*         /\B(?=(\d{3})+(?!\d))/g, */}
-              {/*         "," */}
-              {/*       )} */}
-              {/*     </td> */}
-              {/*     <td>{payment.mpesa}</td> */}
-              {/*   </tr> */}
-              {/* ))} */}
 
               {payment.loan.payment.length > 0 && (
 
