@@ -83,6 +83,8 @@ const App = (props: AppProps & { colorScheme: ColorScheme }) => {
           searchPlaceholder="Search..."
           shortcut="shift + S"
           nothingFoundMessage="Nothing found..."
+          limit={10}
+          highlightQuery
         >
           <ColorSchemeProvider
             colorScheme={colorScheme}
