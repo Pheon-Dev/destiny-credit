@@ -1,12 +1,54 @@
-import React, { Suspense } from "react";
+import React, { Suspense, useCallback, useEffect, useState } from "react";
 import { useRouter } from "next/router";
 import { trpc } from "../../../utils/trpc";
 import { Protected, TitleText } from "../../../components";
-import { Button, Group, Loader, Skeleton, Table } from "@mantine/core";
+import { Button, Group, Loader, Skeleton, Table, TransferList, TransferListData } from "@mantine/core";
 import { NextPage } from "next";
 import { IconReload } from "@tabler/icons";
+import { Transaction } from "@prisma/client";
+import { useSession } from "next-auth/react";
 
-const PaymentsList = () => {
+const PaymentsList = ({ email, status }: { email: string; status: string }) => {
+  const [user, setUser] = useState({
+    id: "",
+    role: "",
+    email: "",
+    username: "",
+    firstname: "",
+    lastname: "",
+    state: "",
+  });
+
+  const user_data = trpc.users.user.useQuery({
+    email: `${email}`,
+  });
+
+  useEffect(() => {
+    let subscribe = true;
+    if (subscribe) {
+      setUser({
+        id: `${user_data?.data?.id}`,
+        role: `${user_data?.data?.role}`,
+        username: `${user_data?.data?.username}`,
+        firstname: `${user_data?.data?.firstName}`,
+        lastname: `${user_data?.data?.lastName}`,
+        email: `${user_data?.data?.email}`,
+        state: `${user_data?.data?.state}`,
+      });
+    }
+    return () => {
+      subscribe = false;
+    };
+  }, [
+    user_data?.data?.id,
+    user_data?.data?.role,
+    user_data?.data?.username,
+    user_data?.data?.firstName,
+    user_data?.data?.lastName,
+    user_data?.data?.email,
+    user_data?.data?.state,
+  ]);
+
   const router = useRouter();
   const id = router.query.payments as string;
 
@@ -31,11 +73,97 @@ const PaymentsList = () => {
     return <Skeleton height={8} radius="xl" />;
   };
 
-  const data = trpc.payments.payment.useQuery({ id: id });
+  const payments = trpc.payments.payment.useQuery({ id: id });
 
-  const payment = data?.data
+  const payment = payments?.data
 
+  const transactions = payment?.transactions
+
+  let paid: any = [];
+  let recent: any = [];
+
+  const date = (time: string) => {
+    const day = time.slice(6, 8);
+    const month = time.slice(4, 6);
+    const year = time.slice(0, 4);
+
+    const d = new Date()
+    d.setDate(+day)
+    d.setMonth(+month)
+    d.setFullYear(+year)
+    /* return d.toDateString().slice(0, 11) + '"' + year.slice(2) */
+    return d.toDateString()
+  };
+
+  transactions?.map(
+    (t: Transaction) =>
+      (t.state === "new" &&
+        recent.push({
+          value: `${t.id}`,
+          label: `[${t.transID.slice(0, 2) + "..." + t.transID.slice(7)}] :
+          ${`${t.transAmount} /=`.replace(/\B(?=(\d{3})+(?!\d))/g, "")}
+          on ${date(`${t.transTime}`)}
+          ${t.billRefNumber === "" ? "via Till" : "via Pay Bill"}
+          `,
+        })) ||
+      (t.state === "handled" &&
+        paid.push({
+          value: `${t.id}`,
+          label: `[${t.transID.slice(0, 2) + "..." + t.transID.slice(7)}] :
+          ${`${t.transAmount} /=`.replace(/\B(?=(\d{3})+(?!\d))/g, "")}
+          on ${date(`${t.transTime}`)}
+          ${t.billRefNumber === "" ? "via Till" : "via Pay Bill"}
+          `,
+        })) ||
+      (t.state === "paid" &&
+        paid.push({
+          value: `${t.id}`,
+          label: `[${t.transID.slice(0, 2) + "..." + t.transID.slice(7)}] :
+          ${`${t.transAmount} /=`.replace(/\B(?=(\d{3})+(?!\d))/g, "")}
+          on ${date(`${t.transTime}`)}
+          ${t.billRefNumber === "" ? "via Till" : "via Pay Bill"}
+          `,
+        })) ||
+      (!t.state &&
+        recent.push({
+          value: `${t.id}`,
+          label: `[${t.transID.slice(0, 2) + "..." + t.transID.slice(7)}] :
+          ${`${t.transAmount} /=`.replace(/\B(?=(\d{3})+(?!\d))/g, "")}
+          on ${date(`${t.transTime}`)}
+          ${t.billRefNumber === "" ? "via Till" : "via Pay Bill"}
+          `,
+        }))
+  );
   /* console.table({ ...data }) */
+  const initialValues: TransferListData = [recent, paid];
+
+  const [data, setData] = useState<TransferListData>(initialValues);
+
+  const utils = trpc.useContext();
+  const handle = trpc.transactions.state.useMutation({
+    onSuccess: async () => {
+      await utils.transactions.transactions.invalidate();
+    },
+  });
+
+  const handleState = useCallback(() => {
+    try {
+      if (data[1] && user?.id) {
+        data[1].map((d) => {
+          handle.mutate({
+            id: d.value,
+            handlerId: `${user?.id}`,
+            updaterId: `${user?.id}`,
+            payment: `loan`,
+            state: `paid`,
+          });
+          /* console.log(d) */
+        });
+      }
+    } catch (error) {
+      console.log("Error Handling State!");
+    }
+  }, [handle, data]);
 
   return (
     <Suspense
@@ -67,8 +195,8 @@ const PaymentsList = () => {
         <>
           <Group position="apart" m="lg">
             <TitleText title={`${payment?.loan.memberName}`} />
-            {data?.fetchStatus === "fetching" && (<Loader />) || (
-              <IconReload onClick={() => data?.refetch()} />
+            {payments?.fetchStatus === "fetching" && (<Loader />) || (
+              <IconReload onClick={() => payments?.refetch()} />
             )}
           </Group>
           <Table striped highlightOnHover horizontalSpacing="md">
@@ -285,15 +413,41 @@ const PaymentsList = () => {
           </Table>
         </>
       )}
+      <Group position="center" m="lg">
+        <TitleText title={`M-PESA Payments`} />
+      </Group>
+      <Group position="center" m="lg">
+        <TransferList
+          value={data}
+          onChange={setData}
+          listHeight={300}
+          searchPlaceholder="Search..."
+          nothingFound="Nothing here"
+          titles={["Recent", "Paid"]}
+          breakpoint="sm"
+        />
+      </Group>
+      <Group position="center" m="lg">
+        {data[0].length > 0 && (
+          <Button variant="gradient" onClick={handleState}>
+            Handle
+          </Button>
+        )}
+      </Group>
       <pre>{JSON.stringify(payment, undefined, 2)}</pre>
     </Suspense>
   );
 };
 
 const Page: NextPage = () => {
+  const { status, data } = useSession();
+
+  const email = `${data?.user?.email}`;
+  const check = email.split("@")[1];
+
   return (
     <Protected>
-      <PaymentsList />
+      {check?.length > 0 && <PaymentsList email={email} status={status} />}
     </Protected>
   );
 };
