@@ -1,7 +1,7 @@
 import axios from "axios";
 import { t } from "../trpc";
 import { prisma } from "../prisma";
-import { Fields, Logs } from "../../types";
+import { Fields, Logs } from "../../../types";
 
 const LOGTAIL_API_TOKEN = process.env.NEXT_PUBLIC_LOGTAIL_API_TOKEN;
 

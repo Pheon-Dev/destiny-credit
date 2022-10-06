@@ -1,6 +1,6 @@
 import type { NextApiRequest, NextApiResponse } from "next";
 import formidable from "formidable";
-import { Fields } from "../../types";
+import { Fields } from "../../../types";
 
 export default async function confirm(
   req: NextApiRequest,

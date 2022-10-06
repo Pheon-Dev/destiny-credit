@@ -1,5 +1,5 @@
 import { Text } from "@mantine/core";
-import { Title } from "../../types";
+import { Title } from "../../../types";
 
 export const TitleText = ({ title }: Title) => {
   return (
