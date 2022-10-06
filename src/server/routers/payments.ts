@@ -20,7 +20,7 @@ export const paymentsRouter = t.router({
           payment: {
             where: {},
             orderBy: {
-              createdAt: "asc",
+              outsBalance: "desc",
             },
           },
           member: {
