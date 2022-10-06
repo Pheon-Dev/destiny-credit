@@ -2,8 +2,9 @@ import React, { Suspense } from "react";
 import { useRouter } from "next/router";
 import { trpc } from "../../../utils/trpc";
 import { Protected, TitleText } from "../../../components";
-import { Group, Skeleton, Table } from "@mantine/core";
+import { Button, Group, Loader, Skeleton, Table } from "@mantine/core";
 import { NextPage } from "next";
+import { IconReload } from "@tabler/icons";
 
 const PaymentsList = () => {
   const router = useRouter();
@@ -30,8 +31,11 @@ const PaymentsList = () => {
     return <Skeleton height={8} radius="xl" />;
   };
 
-  const { data: payment } =
-    trpc.payments.payment.useQuery({ id: id });
+  const data = trpc.payments.payment.useQuery({ id: id });
+
+  const payment = data?.data
+
+  /* console.table({ ...data }) */
 
   return (
     <Suspense
@@ -61,14 +65,18 @@ const PaymentsList = () => {
     >
       {payment && (
         <>
-          <Group position="center" m="lg">
+          <Group position="apart" m="lg">
             <TitleText title={`${payment?.loan.memberName}`} />
+            {data?.fetchStatus === "fetching" && (<Loader />) || (
+              <IconReload onClick={() => data?.refetch()} />
+            )}
           </Group>
           <Table striped highlightOnHover horizontalSpacing="md">
             <thead>
               <Header />
             </thead>
             <tbody>
+
               {payment?.loan?.payment?.map((payment) => (
                 <tr key={payment?.mpesa} style={{ cursor: "auto" }}>
                   <td>{payment?.currInstDate}</td>
@@ -135,6 +143,7 @@ const PaymentsList = () => {
                   <td>{payment.mpesa}</td>
                 </tr>
               ))}
+
               {/* {payment?.payment?.map((payment: any) => ( */}
               {/*   <tr key={payment?.mpesa} style={{ cursor: "auto" }}> */}
               {/*     <td>{payment?.currInstDate}</td> */}
@@ -201,6 +210,7 @@ const PaymentsList = () => {
               {/*     <td>{payment.mpesa}</td> */}
               {/*   </tr> */}
               {/* ))} */}
+
               {payment.loan.payment.length > 0 && (
 
                 <tr style={{ backgroundColor: "grey", color: "white" }}>

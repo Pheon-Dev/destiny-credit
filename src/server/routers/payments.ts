@@ -144,6 +144,21 @@ export const paymentsRouter = t.router({
         const type = t.transactionType;
         const state = "paid";
 
+        let start = 0;
+        let current = t.transTime;
+
+        if (loan?.startDate) {
+          const start_day = loan?.startDate?.split("-")[0]
+          const start_month = loan?.startDate?.split("-")[1]
+          const start_year = loan?.startDate?.split("-")[2]
+
+          /* const str = "2022" + "10" + "01" + "000000" */
+          const str = start_year + start_month + start_day + "000000"
+          start = +str
+        }
+
+        if (+current < +start) return;
+
         let rem_amount = amount;
 
         const curr_interest = interest / tenure;
@@ -295,7 +310,6 @@ export const paymentsRouter = t.router({
           id: id,
           mpesa: mpesa,
           type: type,
-          /* new: add.mpesa, */
           state: t.state,
         });
 
