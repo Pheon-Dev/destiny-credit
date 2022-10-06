@@ -33,6 +33,8 @@ import type { SpotlightAction } from '@mantine/spotlight';
 import {
   IconHome, IconDashboard, IconFileText, IconSearch,
 } from "@tabler/icons";
+import { Member } from "@prisma/client";
+import { useRouter } from "next/router";
 
 
 const App = (props: AppProps & { colorScheme: ColorScheme }) => {
@@ -42,6 +44,7 @@ const App = (props: AppProps & { colorScheme: ColorScheme }) => {
   const [colorScheme, setColorScheme] = useState<ColorScheme>(
     props.colorScheme
   );
+  const router = useRouter();
 
   const toggleColorScheme = (value?: ColorScheme) => {
     const nextColorScheme =
@@ -54,26 +57,16 @@ const App = (props: AppProps & { colorScheme: ColorScheme }) => {
 
   const { data: members } = trpc.members.members.useQuery();
 
-  const actions: SpotlightAction[] = [
-    {
-      title: 'Home',
-      description: 'Get to home page',
-      onTrigger: () => console.log('Home'),
-      icon: <IconHome size={18} />,
-    },
-    {
-      title: 'Dashboard',
-      description: 'Get full information about current system status',
-      onTrigger: () => console.log('Dashboard'),
-      icon: <IconDashboard size={18} />,
-    },
-    {
-      title: 'Documentation',
-      description: 'Visit documentation to lean more about all features',
-      onTrigger: () => console.log('Documentation'),
+  let actions: SpotlightAction[] = []
+
+  members?.map((m) => (
+    actions.push({
+      title: `${m.firstName} ${m.lastName}`,
+      description: `${m.memberId} Phone: ${m.phoneNumber}; ID: ${m.idPass} `,
+      onTrigger: () => router.push(`/members/details/${m.id}`),
       icon: <IconFileText size={18} />,
-    },
-  ];
+    })
+  ))
 
   const AppContent = () => {
     const { status, data } = useSession();
@@ -88,7 +81,7 @@ const App = (props: AppProps & { colorScheme: ColorScheme }) => {
           actions={actions}
           searchIcon={<IconSearch size={18} />}
           searchPlaceholder="Search..."
-          shortcut="mod + shift + 1"
+          shortcut="shift + S"
           nothingFoundMessage="Nothing found..."
         >
           <ColorSchemeProvider

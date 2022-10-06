@@ -104,7 +104,7 @@ const CreateLoan = ({
   const [minRange, setMinRange] = useState(0);
 
   const router = useRouter();
-  const member_info = trpc.members.maintain.useQuery({
+  const member_info = trpc.members.search.useQuery({
     firstName: firstname,
     lastName: lastname,
     phoneNumber: phonenumber,
@@ -198,23 +198,21 @@ const CreateLoan = ({
 
   const utils = trpc.useContext();
 
-  const { data: loans } = trpc.loans.member.useQuery({ id: id || "" });
-  const loans_data = loans?.map((l: Loan) => l) || [];
-  const loanLen = loans_data?.length + 1;
+  const { data: loans } = trpc.loans.member.useQuery({ id: id });
+  let loanLen = 0;
+  if (loans) loanLen = loans?.length + 1;
 
   const { data: members } = trpc.members.members.useQuery();
-  const members_data = members?.map((m: Member) => m) || [];
 
   const { data: products, status: products_status } =
     trpc.products.products.useQuery();
-  const products_data = products?.map((p: Product) => p) || [];
 
   const product = trpc.products.product.useQuery({
-    productName: form.values.product || "",
+    productName: form.values.product,
   });
 
   const { data: member, status: member_status } = trpc.members.member.useQuery({
-    id: id || "",
+    id: id,
   });
 
   const nextStep = () => {
@@ -373,8 +371,8 @@ const CreateLoan = ({
       cycle === "monthly"
         ? date.getDate() + 30
         : cycle === "weekly"
-        ? date.getDate() + 7
-        : date.getDate() + 2
+          ? date.getDate() + 7
+          : date.getDate() + 2
     );
     date.setDate(date.getDay() === 0 ? date.getDate() + 1 : date.getDate() + 0);
 
@@ -404,46 +402,44 @@ const CreateLoan = ({
     form.setFieldValue("disbursed", false);
     form.setFieldValue(
       "interest",
-      `${
-        cycle.toLowerCase() === "daily"
-          ? renderDailyInterestAmount(
-              +intRate,
-              +form.values.principal,
-              +form.values.tenure
-            )
-          : cycle.toLowerCase() === "weekly"
+      `${cycle.toLowerCase() === "daily"
+        ? renderDailyInterestAmount(
+          +intRate,
+          +form.values.principal,
+          +form.values.tenure
+        )
+        : cycle.toLowerCase() === "weekly"
           ? renderWeeklyInterestAmount(
-              +intRate,
-              +form.values.principal,
-              +form.values.tenure
-            )
+            +intRate,
+            +form.values.principal,
+            +form.values.tenure
+          )
           : renderMonthlyInterestAmount(
-              +intRate,
-              +form.values.principal,
-              +form.values.tenure
-            )
+            +intRate,
+            +form.values.principal,
+            +form.values.tenure
+          )
       }`
     );
     form.setFieldValue(
       "installment",
-      `${
-        cycle.toLowerCase() === "daily"
-          ? renderDailyInstallmentAmount(
-              +intRate,
-              +form.values.principal,
-              +form.values.tenure
-            )
-          : cycle.toLowerCase() === "weekly"
+      `${cycle.toLowerCase() === "daily"
+        ? renderDailyInstallmentAmount(
+          +intRate,
+          +form.values.principal,
+          +form.values.tenure
+        )
+        : cycle.toLowerCase() === "weekly"
           ? renderWeeklyInstallmentAmount(
-              +intRate,
-              +form.values.principal,
-              +form.values.tenure
-            )
+            +intRate,
+            +form.values.principal,
+            +form.values.tenure
+          )
           : renderMonthlyInstallmentAmount(
-              +intRate,
-              +form.values.principal,
-              +form.values.tenure
-            )
+            +intRate,
+            +form.values.principal,
+            +form.values.tenure
+          )
       }`
     );
     form.setFieldValue(
@@ -465,10 +461,9 @@ const CreateLoan = ({
       form.setFieldValue("tenure", "");
       form.setFieldError(
         "tenure",
-        `Principal Exceeds Maximum Tenure Range of ${maxTenure} ${
-          cycle.toLowerCase() === "daily"
-            ? "days"
-            : cycle.toLowerCase() === "weekly"
+        `Principal Exceeds Maximum Tenure Range of ${maxTenure} ${cycle.toLowerCase() === "daily"
+          ? "days"
+          : cycle.toLowerCase() === "weekly"
             ? "weeks"
             : "months"
         } ...`
@@ -477,13 +472,12 @@ const CreateLoan = ({
         id: "range-status",
         color: "red",
         title: "Maximum Tenure Range",
-        message: `Principal Exceeds Maximum Tenure Range of ${maxTenure} ${
-          cycle.toLowerCase() === "daily"
-            ? "days"
-            : cycle.toLowerCase() === "weekly"
+        message: `Principal Exceeds Maximum Tenure Range of ${maxTenure} ${cycle.toLowerCase() === "daily"
+          ? "days"
+          : cycle.toLowerCase() === "weekly"
             ? "weeks"
             : "months"
-        } ...`,
+          } ...`,
         icon: <IconInfoCircle size={24} />,
       });
     }
@@ -929,10 +923,10 @@ const CreateLoan = ({
       tenure === 7
         ? multiplier
         : tenure === 14
-        ? multiplier * 2
-        : tenure === 21
-        ? multiplier * 3
-        : tenure;
+          ? multiplier * 2
+          : tenure === 21
+            ? multiplier * 3
+            : tenure;
 
     return roundOff(((rate * principal) / 3000) * tenure);
   };
@@ -1000,21 +994,21 @@ const CreateLoan = ({
       cycle.toLowerCase() === "daily"
         ? renderDailyInstallmentAmount(interest_rate, principal, tenure)
         : cycle.toLowerCase() === "weekly"
-        ? renderWeeklyInstallmentAmount(interest_rate, principal, tenure)
-        : renderMonthlyInstallmentAmount(interest_rate, principal, tenure);
+          ? renderWeeklyInstallmentAmount(interest_rate, principal, tenure)
+          : renderMonthlyInstallmentAmount(interest_rate, principal, tenure);
     return roundOff((penalty_rate / 100) * +installment);
   };
 
-  const product_data = products_data?.map((_: Product) => [
+  const product_data = products?.map((_) => [
     { key: _.id, value: `${_.id}`, label: `${_.productName}` },
   ]);
 
-  const guarantor_data = members_data?.map((_: Member) => [
+  const guarantor_data = members?.map((_) => [
     { key: _.id, value: `${_.id}`, label: `${_.firstName} ${_.lastName}` },
   ]);
 
   const findGuarantor = (name: string) => {
-    return members_data?.find((e: Member) => {
+    return members?.find((e) => {
       if (e.firstName + " " + e.lastName === name) {
         guarantor_form.setFieldValue("guarantorPhone", `${e.phoneNumber}`);
         guarantor_form.setFieldValue("guarantorID", `${e.idPass}`);
@@ -1349,8 +1343,8 @@ const CreateLoan = ({
                     {cycle.toLowerCase() === "daily"
                       ? "Days"
                       : cycle.toLowerCase() === "weeks"
-                      ? "Weeks"
-                      : "Months"}
+                        ? "Weeks"
+                        : "Months"}
                   </Text>
                 </Grid.Col>
               </Grid>
@@ -1580,19 +1574,18 @@ const CreateLoan = ({
                     <TextInput
                       mt="md"
                       type="number"
-                      label={`Enter Tenure : ${form.values.tenure} ${
-                        cycle.toLowerCase() === "daily"
-                          ? +form.values.tenure === 1
-                            ? "Day"
-                            : "Days"
-                          : cycle.toLowerCase() === "weekly"
+                      label={`Enter Tenure : ${form.values.tenure} ${cycle.toLowerCase() === "daily"
+                        ? +form.values.tenure === 1
+                          ? "Day"
+                          : "Days"
+                        : cycle.toLowerCase() === "weekly"
                           ? +form.values.tenure === 1
                             ? "Week"
                             : "Weeks"
                           : +form.values.tenure === 1
-                          ? "Month"
-                          : "Months"
-                      }`}
+                            ? "Month"
+                            : "Months"
+                        }`}
                       placeholder="Enter Tenure ..."
                       {...form.getInputProps("tenure")}
                       disabled={product?.status === "success" ? false : true}

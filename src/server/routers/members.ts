@@ -7,10 +7,16 @@ export const membersRouter = t.router({
   members: t.procedure.query(async () => {
     const members = await prisma.member.findMany({
       where: {},
-      include: {
-        loans: true,
-        collaterals: true,
-        guarantor: true,
+      select: {
+        id: true,
+        memberId: true,
+        firstName: true,
+        lastName: true,
+        phoneNumber: true,
+        idPass: true,
+        date: true,
+        group: true,
+        groupId: true,
       },
       orderBy: {
         createdAt: "desc",
@@ -36,6 +42,16 @@ export const membersRouter = t.router({
         where: {
           id: input.id,
         },
+        include: {
+          loans: {
+            include: {
+              payment: true,
+            }
+          },
+          collaterals: {},
+          guarantor: {},
+          group: {},
+        },
       });
       if (!member) {
         throw new TRPCError({
@@ -45,7 +61,7 @@ export const membersRouter = t.router({
       }
       return member;
     }),
-  maintain: t.procedure
+  search: t.procedure
     .input(
       z.object({
         firstName: z.string(),

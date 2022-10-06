@@ -219,15 +219,14 @@ const UtilitiesComponent = ({
               <Group position="apart">
                 <Group position="center" mt="md" mb="xs">
                   <TitleText
-                    title={`${
-                      user?.role === "MD"
+                    title={`${user?.role === "MD"
                         ? "Managing Director"
                         : user?.role === "CO"
-                        ? "Credit Officer"
-                        : user?.role === "CA"
-                        ? "Credit Admin"
-                        : "Auditor"
-                    }`}
+                          ? "Credit Officer"
+                          : user?.role === "CA"
+                            ? "Credit Admin"
+                            : "Auditor"
+                      }`}
                   />
                 </Group>
               </Group>
@@ -357,11 +356,10 @@ const StyledTabs = (props: TabsProps) => {
             theme.colorScheme === "dark"
               ? theme.colors.dark[0]
               : theme.colors.gray[9],
-          border: `1px solid ${
-            theme.colorScheme === "dark"
+          border: `1px solid ${theme.colorScheme === "dark"
               ? theme.colors.dark[6]
               : theme.colors.gray[4]
-          }`,
+            }`,
           borderColor: theme.colors.blue[9],
           padding: `${theme.spacing.xs} px ${theme.spacing.md} px`,
           cursor: "pointer",

@@ -2,7 +2,7 @@ import React, { Suspense, useCallback, useEffect, useState } from "react";
 import { useRouter } from "next/router";
 import { trpc } from "../../../utils/trpc";
 import { Protected, TitleText } from "../../../components";
-import { Button, Group, Loader, Skeleton, Table, TransferList, TransferListData } from "@mantine/core";
+import { Button, Group, Loader, Skeleton, Table, TransferList, TransferListData, useMantineColorScheme } from "@mantine/core";
 import { NextPage } from "next";
 import { IconReload } from "@tabler/icons";
 import { Transaction } from "@prisma/client";
