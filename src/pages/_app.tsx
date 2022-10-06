@@ -22,11 +22,18 @@ import {
   Burger,
   Text,
   useMantineTheme,
+  Button,
 } from "@mantine/core";
 import { TitleText, MainLinks, Utilities } from "../components";
 import { trpc } from "../utils/trpc";
 import { unstable_getServerSession } from "next-auth";
 import authOptions from "./api/auth/[...nextauth]";
+import { SpotlightProvider } from '@mantine/spotlight';
+import type { SpotlightAction } from '@mantine/spotlight';
+import {
+  IconHome, IconDashboard, IconFileText, IconSearch,
+} from "@tabler/icons";
+
 
 const App = (props: AppProps & { colorScheme: ColorScheme }) => {
   const theme = useMantineTheme();
@@ -45,6 +52,29 @@ const App = (props: AppProps & { colorScheme: ColorScheme }) => {
     });
   };
 
+  const { data: members } = trpc.members.members.useQuery();
+
+  const actions: SpotlightAction[] = [
+    {
+      title: 'Home',
+      description: 'Get to home page',
+      onTrigger: () => console.log('Home'),
+      icon: <IconHome size={18} />,
+    },
+    {
+      title: 'Dashboard',
+      description: 'Get full information about current system status',
+      onTrigger: () => console.log('Dashboard'),
+      icon: <IconDashboard size={18} />,
+    },
+    {
+      title: 'Documentation',
+      description: 'Visit documentation to lean more about all features',
+      onTrigger: () => console.log('Documentation'),
+      icon: <IconFileText size={18} />,
+    },
+  ];
+
   const AppContent = () => {
     const { status, data } = useSession();
 
@@ -54,76 +84,84 @@ const App = (props: AppProps & { colorScheme: ColorScheme }) => {
         withNormalizeCSS
         theme={{ colorScheme, loader: "dots" }}
       >
-        <ColorSchemeProvider
-          colorScheme={colorScheme}
-          toggleColorScheme={toggleColorScheme}
+        <SpotlightProvider
+          actions={actions}
+          searchIcon={<IconSearch size={18} />}
+          searchPlaceholder="Search..."
+          shortcut="mod + shift + 1"
+          nothingFoundMessage="Nothing found..."
         >
-          <NotificationsProvider>
-            <AppShell
-              navbarOffsetBreakpoint="sm"
-              asideOffsetBreakpoint="sm"
-              navbar={
-                <>
-                  {status === "authenticated" && (
-                    <Navbar
-                      p="xs"
-                      hiddenBreakpoint="sm"
-                      hidden={!opened}
-                      // height={500}
-                      /* width={{ base: 200 }} */
-                      width={{ lg: 200, sm: 180 }}
-                    >
-                      <Navbar.Section
-                        grow
-                        component={ScrollArea}
-                        mx="-xs"
-                        px="xs"
-                        mt="xs"
+          <ColorSchemeProvider
+            colorScheme={colorScheme}
+            toggleColorScheme={toggleColorScheme}
+          >
+            <NotificationsProvider>
+              <AppShell
+                navbarOffsetBreakpoint="sm"
+                asideOffsetBreakpoint="sm"
+                navbar={
+                  <>
+                    {status === "authenticated" && (
+                      <Navbar
+                        p="xs"
+                        hiddenBreakpoint="sm"
+                        hidden={!opened}
+                        // height={500}
+                        /* width={{ base: 200 }} */
+                        width={{ lg: 200, sm: 180 }}
                       >
-                        <MainLinks />
-                      </Navbar.Section>
-                    </Navbar>
-                  )}
-                </>
-              }
-              // aside={
-              //   <MediaQuery smallerThan="sm" styles={{ display: "none" }}>
-              //     <Aside
-              //       p="md"
-              //       hiddenBreakpoint="sm"
-              //       width={{ sm: 200, lg: 300 }}
-              //     >
-              //       <Text>App SideBar</Text>
-              //     </Aside>
-              //   </MediaQuery>
-              // }
-              // footer={
-              //   <Footer height={60} p="md">
-              //     App Footer
-              //   </Footer>
-              // }
-              header={
-                <Header height={70}>
-                  <Group sx={{ height: "100%" }} px={20} position="apart">
-                    <MediaQuery largerThan="sm" styles={{ display: "none" }}>
-                      <Burger
-                        opened={opened}
-                        onClick={() => setOpened((prev) => !prev)}
-                        size="sm"
-                        color={theme.colors.gray[6]}
-                        mr="xl"
-                      />
-                    </MediaQuery>
-                    <TitleText title="DESTINY CREDIT LTD" />
-                    <Utilities />
-                  </Group>
-                </Header>
-              }
-            >
-              <Component {...pageProps} />
-            </AppShell>
-          </NotificationsProvider>
-        </ColorSchemeProvider>
+                        <Navbar.Section
+                          grow
+                          component={ScrollArea}
+                          mx="-xs"
+                          px="xs"
+                          mt="xs"
+                        >
+                          <MainLinks />
+                        </Navbar.Section>
+                      </Navbar>
+                    )}
+                  </>
+                }
+                // aside={
+                //   <MediaQuery smallerThan="sm" styles={{ display: "none" }}>
+                //     <Aside
+                //       p="md"
+                //       hiddenBreakpoint="sm"
+                //       width={{ sm: 200, lg: 300 }}
+                //     >
+                //       <Text>App SideBar</Text>
+                //     </Aside>
+                //   </MediaQuery>
+                // }
+                // footer={
+                //   <Footer height={60} p="md">
+                //     App Footer
+                //   </Footer>
+                // }
+                header={
+                  <Header height={70}>
+                    <Group sx={{ height: "100%" }} px={20} position="apart">
+                      <MediaQuery largerThan="sm" styles={{ display: "none" }}>
+                        <Burger
+                          opened={opened}
+                          onClick={() => setOpened((prev) => !prev)}
+                          size="sm"
+                          color={theme.colors.gray[6]}
+                          mr="xl"
+                        />
+                      </MediaQuery>
+                      <TitleText title="DESTINY CREDIT LTD" />
+                      <Utilities />
+                    </Group>
+                  </Header>
+                }
+              >
+                <Component {...pageProps} />
+              </AppShell>
+            </NotificationsProvider>
+          </ColorSchemeProvider>
+        </SpotlightProvider>
       </MantineProvider>
     );
   };

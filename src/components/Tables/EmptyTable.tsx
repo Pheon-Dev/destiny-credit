@@ -1,6 +1,7 @@
 import React from "react";
 import { TitleText } from "../../components";
 import { Group, Skeleton } from "@mantine/core";
+import { IconPlugX, IconWifiOff, IconWorldOff } from "@tabler/icons";
 
 export const EmptyTable = ({
   call,
@@ -12,8 +13,21 @@ export const EmptyTable = ({
   const Row = () => {
     return <Skeleton height={8} radius="xl" />;
   };
+
   return (
     <>
+      {status === "paused" && (
+        <>
+          <Group position="center" m="xl">
+            <IconPlugX size={36} color="red" />
+            <IconWorldOff size={60} color="red" />
+            <IconWifiOff size={36} color="red" />
+          </Group>
+          <Group position="center" m="xl">
+            <TitleText title="Please Make Sure You Have an Internet Connection ..." />
+          </Group>
+        </>
+      )}
       {status === "idle" && (
         <>
           <Group position="center" m="xl">
@@ -70,42 +84,42 @@ export const EmptyTable = ({
               <TitleText title="Loading Payments Made To This Loan" />
             )}
           </Group>
-            {call === "register" && (
-          <Group position="center" m="lg" style={{ position: "relative" }}>
-            <Skeleton height={16} radius="xl" />
-            <Row />
-            <Row />
-            <Row />
-            <Skeleton height={16} radius="xl" />
-          </Group>
-            )}
-            {call === "create-loan" && (
-          <Group position="center" m="lg" style={{ position: "relative" }}>
-            <Skeleton height={16} radius="xl" />
-            <Row />
-            <Row />
-            <Row />
-            <Skeleton height={16} radius="xl" />
-          </Group>
-            )}
-            {call !== "create-loan" && call !== "register" && (
-          <Group position="center" m="lg" style={{ position: "relative" }}>
-            <Skeleton height={16} radius="xl" />
-            <Row />
-            <Row />
-            <Row />
-            <Row />
-            <Row />
-            <Row />
-            <Row />
-            <Row />
-            <Row />
-            <Row />
-            <Row />
-            <Row />
-            <Skeleton height={16} radius="xl" />
-          </Group>
-            )}
+          {call === "register" && (
+            <Group position="center" m="lg" style={{ position: "relative" }}>
+              <Skeleton height={16} radius="xl" />
+              <Row />
+              <Row />
+              <Row />
+              <Skeleton height={16} radius="xl" />
+            </Group>
+          )}
+          {call === "create-loan" && (
+            <Group position="center" m="lg" style={{ position: "relative" }}>
+              <Skeleton height={16} radius="xl" />
+              <Row />
+              <Row />
+              <Row />
+              <Skeleton height={16} radius="xl" />
+            </Group>
+          )}
+          {call !== "create-loan" && call !== "register" && (
+            <Group position="center" m="lg" style={{ position: "relative" }}>
+              <Skeleton height={16} radius="xl" />
+              <Row />
+              <Row />
+              <Row />
+              <Row />
+              <Row />
+              <Row />
+              <Row />
+              <Row />
+              <Row />
+              <Row />
+              <Row />
+              <Row />
+              <Skeleton height={16} radius="xl" />
+            </Group>
+          )}
         </>
       )}
     </>

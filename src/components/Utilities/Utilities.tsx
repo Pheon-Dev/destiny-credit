@@ -29,6 +29,7 @@ import { IconSun, IconMoonStars } from "@tabler/icons";
 import { trpc } from "../../utils/trpc";
 import { useCallback, useEffect, useState } from "react";
 import { TitleText } from "../Text/TitleText";
+import { openSpotlight } from '@mantine/spotlight';
 
 export const Utilities = () => {
   const { status, data } = useSession();
@@ -187,8 +188,7 @@ const UtilitiesComponent = ({
                   <Tooltip color="blue" withArrow label="Search">
                     <Tabs.Tab
                       value="search"
-                      disabled
-                      /* onClick={() => setOpen((prev) => !prev)} */
+                      onClick={() => openSpotlight()}
                       icon={<IconSearch style={{ padding: 2 }} />}
                     />
                   </Tooltip>
