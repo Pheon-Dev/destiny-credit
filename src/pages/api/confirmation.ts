@@ -13,9 +13,9 @@ export default async function confirm(
     });
     let result: Array<Fields> = [];
 
-    const data = await new Promise(function (resolve, reject) {
+    const data = await new Promise(function(resolve, reject) {
       const form = new formidable.IncomingForm({ keepExtensions: true });
-      form.parse(req, function (err: any, fields: any, files: any) {
+      form.parse(req, function(err: any, fields: any, files: any) {
         if (err) return reject(err);
         resolve({ fields, files });
         // res.json({ files, fields });

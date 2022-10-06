@@ -42,14 +42,14 @@ export const trpc = createTRPCNext<AppRouter, SSRContext>({
               // If you're using Node 18, omit the "connection" header
               const {
                 // eslint-disable-next-line @typescript-eslint/no-unused-vars
-                connection: _connection,
+                /* connection: _connection, */
                 ...headers
               } = ctx.req.headers;
               return {
                 ...headers,
                 // Optional: inform server that it's an SSR request
                 'x-ssr': '1',
-                /* 'Content-Type': 'application/json', */
+                'Content-Type': 'application/json',
               };
             }
             return {};
