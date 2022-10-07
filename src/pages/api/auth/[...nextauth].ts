@@ -28,6 +28,7 @@ const authOptions: NextAuthOptions = {
         });
 
         if (user) {
+          if (user?.state === "online") throw new Error(`You Are Currently Signed In in Another Device, Sign Out First Before Trying Again Later!`);
           if (user?.password === password) return user;
         }
 

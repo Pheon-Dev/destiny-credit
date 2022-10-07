@@ -55,13 +55,13 @@ export const paymentsRouter = t.router({
       });
 
       const roundOff = (x: number) => {
-        const whole = +x.toString().split(".")[0]
-        const decimal = +x.toString().split(".")[1]
+        const whole = +x.toString().split(".")[0];
+        const decimal = +x.toString().split(".")[1];
 
-        if (decimal > 0) return whole + 1
+        if (decimal > 0) return whole + 1;
         if (!decimal) return whole;
-        return whole
-      }
+        return whole;
+      };
 
       const date = (time: string) => {
         const second = time.slice(12);
@@ -148,13 +148,13 @@ export const paymentsRouter = t.router({
         let current = t.transTime;
 
         if (loan?.startDate) {
-          const start_day = loan?.startDate?.split("-")[0]
-          const start_month = loan?.startDate?.split("-")[1]
-          const start_year = loan?.startDate?.split("-")[2]
+          const start_day = loan?.startDate?.split("-")[0];
+          const start_month = loan?.startDate?.split("-")[1];
+          const start_year = loan?.startDate?.split("-")[2];
 
           /* const str = "2022" + "10" + "01" + "000000" */
-          const str = start_year + start_month + start_day + "000000"
-          start = +str
+          const str = start_year + start_month + start_day + "000000";
+          start = +str;
         }
 
         if (+current < +start) return;
@@ -164,137 +164,119 @@ export const paymentsRouter = t.router({
         const curr_interest = interest / tenure;
         const curr_principal = installment - curr_interest;
 
-        const total_os_arrears: number = os_arrears + os_penalty + os_interest + os_principal;
-        (total_os_arrears > 0 && (
-          os_arrears = total_os_arrears - amount) ||
-          (os_arrears = total_os_arrears)
-        );
-        (os_arrears > 0 && (
-          pd_arrears += amount) ||
-          (pd_arrears += total_os_arrears)
-        );
+        const total_os_arrears: number =
+          os_arrears + os_penalty + os_interest + os_principal;
+        (total_os_arrears > 0 && (os_arrears = total_os_arrears - amount)) ||
+          (os_arrears = total_os_arrears);
+        (os_arrears > 0 && (pd_arrears += amount)) ||
+          (pd_arrears += total_os_arrears);
 
-        (os_arrears < 0 && (os_arrears = 0) || (os_arrears = os_arrears));
-        (pd_arrears < 0 && (pd_arrears = 0) || (pd_arrears = pd_arrears));
+        (os_arrears < 0 && (os_arrears = 0)) || (os_arrears = os_arrears);
+        (pd_arrears < 0 && (pd_arrears = 0)) || (pd_arrears = pd_arrears);
 
         const total_os_penalties: number = 0;
-        (total_os_penalties > 0 && (
-          os_penalty = total_os_penalties - rem_amount) ||
-          (os_penalty = total_os_penalties)
-        );
-        (os_penalty > 0 && (
-          pd_penalty = total_os_penalties - rem_amount) ||
-          (pd_penalty += total_os_penalties)
-        );
+        (total_os_penalties > 0 &&
+          (os_penalty = total_os_penalties - rem_amount)) ||
+          (os_penalty = total_os_penalties);
+        (os_penalty > 0 && (pd_penalty = total_os_penalties - rem_amount)) ||
+          (pd_penalty += total_os_penalties);
 
-        (os_penalty < 0 && (os_penalty = 0) || (os_penalty = os_penalty));
-        (pd_penalty < 0 && (pd_penalty = 0) || (pd_penalty = pd_penalty));
+        (os_penalty < 0 && (os_penalty = 0)) || (os_penalty = os_penalty);
+        (pd_penalty < 0 && (pd_penalty = 0)) || (pd_penalty = pd_penalty);
 
-        (os_penalty > 0 && (
-          rem_amount = 0) ||
-          (rem_amount -= total_os_penalties)
-        );
+        (os_penalty > 0 && (rem_amount = 0)) ||
+          (rem_amount -= total_os_penalties);
 
         const total_os_interest: number = os_interest + curr_interest;
-        (os_penalty > 0 && (
-          os_interest = total_os_interest) ||
-          (os_interest = total_os_interest - rem_amount)
-        );
-        (os_interest > 0 && (
-          pd_interest += rem_amount) ||
-          (pd_interest += total_os_interest)
-        );
+        (os_penalty > 0 && (os_interest = total_os_interest)) ||
+          (os_interest = total_os_interest - rem_amount);
+        (os_interest > 0 && (pd_interest += rem_amount)) ||
+          (pd_interest += total_os_interest);
 
-        (os_interest < 0 && (os_interest = 0) || (os_interest = os_interest));
-        (pd_interest < 0 && (pd_interest = 0) || (pd_interest = pd_interest));
+        (os_interest < 0 && (os_interest = 0)) || (os_interest = os_interest);
+        (pd_interest < 0 && (pd_interest = 0)) || (pd_interest = pd_interest);
 
-        (os_interest > 0 && (
-          rem_amount = 0) ||
-          (rem_amount -= total_os_interest)
-        );
+        (os_interest > 0 && (rem_amount = 0)) ||
+          (rem_amount -= total_os_interest);
 
         const total_os_principal: number = os_principal + curr_principal;
-        (os_interest > 0 && (
-          os_principal = total_os_principal) ||
-          (os_principal = total_os_principal - rem_amount)
-        );
-        (os_principal > 0 && (
-          pd_principal += rem_amount) ||
-          (pd_principal += total_os_principal)
-        );
+        (os_interest > 0 && (os_principal = total_os_principal)) ||
+          (os_principal = total_os_principal - rem_amount);
+        (os_principal > 0 && (pd_principal += rem_amount)) ||
+          (pd_principal += total_os_principal);
 
-        (os_principal < 0 && (os_principal = 0) || (os_principal = os_principal));
-        (pd_principal < 0 && (pd_principal = 0) || (pd_principal = pd_principal));
+        (os_principal < 0 && (os_principal = 0)) ||
+          (os_principal = os_principal);
+        (pd_principal < 0 && (pd_principal = 0)) ||
+          (pd_principal = pd_principal);
 
-        (os_principal > 0 && (
-          rem_amount = 0) ||
-          (rem_amount -= total_os_principal)
-        );
+        (os_principal > 0 && (rem_amount = 0)) ||
+          (rem_amount -= total_os_principal);
 
-        os_balance += (curr_interest - amount);
+        os_balance += curr_interest - amount;
 
-        total_amount += amount
+        total_amount += amount;
 
-        /* if (t.state === "paid") { */
-        /*   await prisma.transaction.update({ */
-        /*     where: { */
-        /*       id: t.id, */
-        /*     }, */
-        /*     data: { */
-        /*       state: "new", */
-        /*     }, */
-        /*   }); */
-        /*   return await prisma.payment.deleteMany({ */
-        /*     where: { */
-        /*       loanId: input.id */
-        /*     } */
-        /*   }) */
-        /* }; */
+        if (t.state === "paid") {
+          await prisma.transaction.update({
+            where: {
+              id: t.id,
+            },
+            data: {
+              state: "new",
+            },
+          });
+          return await prisma.payment.deleteMany({
+            where: {
+              loanId: input.id,
+            },
+          });
+        }
 
         if (loan.cleared) return;
         if (t.state === "paid") return;
         if (t.payment === "membership") return;
         if (t.state === "handled") return;
 
-        const add = await prisma.payment.create({
-          data: {
-            amount: amount,
-            total: total_amount,
-            outsArrears: roundOff(os_arrears),
-            paidArrears: roundOff(pd_arrears),
-            outsPenalty: roundOff(os_penalty),
-            paidPenalty: roundOff(pd_penalty),
-            outsInterest: roundOff(os_interest),
-            paidInterest: roundOff(pd_interest),
-            outsPrincipal: roundOff(os_principal),
-            paidPrincipal: roundOff(pd_principal),
-            outsBalance: roundOff(os_balance),
-            currInstDate: time,
-            mpesa: mpesa,
-            type: type,
-            loanId: input.id,
-          },
-        });
-        if (add) {
-          await prisma.transaction.update({
-            where: {
-              id: t.id,
-            },
+        if (os_balance === 0) {
+          const add = await prisma.payment.create({
             data: {
-              state: state,
+              amount: amount,
+              total: total_amount,
+              outsArrears: roundOff(os_arrears),
+              paidArrears: roundOff(pd_arrears),
+              outsPenalty: roundOff(os_penalty),
+              paidPenalty: roundOff(pd_penalty),
+              outsInterest: roundOff(os_interest),
+              paidInterest: roundOff(pd_interest),
+              outsPrincipal: roundOff(os_principal),
+              paidPrincipal: roundOff(pd_principal),
+              outsBalance: roundOff(os_balance),
+              currInstDate: time,
+              mpesa: mpesa,
+              type: type,
+              loanId: input.id,
             },
           });
-        };
-        os_balance === 0 &&
-          (await prisma.loan.update({
+          if (add) {
+            await prisma.transaction.update({
+              where: {
+                id: t.id,
+              },
+              data: {
+                state: state,
+              },
+            });
+          }
+          await prisma.loan.update({
             where: {
               id: input.id,
             },
             data: {
               cleared: true,
             },
-          }));
-
+          });
+        }
 
         payment.push({
           amount: amount,

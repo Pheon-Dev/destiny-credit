@@ -95,7 +95,7 @@ const PaymentsList = ({ email, status }: { email: string; status: string }) => {
     return d.toDateString()
   };
 
-  console.table({...transactions})
+  console.table({ ...transactions })
 
   transactions?.map(
     (t: Transaction) =>
@@ -207,7 +207,7 @@ const PaymentsList = ({ email, status }: { email: string; status: string }) => {
             </thead>
             <tbody>
 
-              {payment?.loan?.payment?.map((payment) => (
+              {payment?.loan?.cleared && (payment?.loan?.payment?.map((payment) => (
                 <tr key={payment?.mpesa} style={{ cursor: "auto" }}>
                   <td>{payment?.currInstDate}</td>
                   <td>
@@ -272,8 +272,73 @@ const PaymentsList = ({ email, status }: { email: string; status: string }) => {
                   </td>
                   <td>{payment.mpesa}</td>
                 </tr>
-              ))}
-
+              )))}
+              {!payment?.loan?.cleared && (payment?.payment?.map((payment: any) => (
+                <tr key={payment?.mpesa} style={{ cursor: "auto" }}>
+                  <td>{payment?.currInstDate}</td>
+                  <td>
+                    {`${payment.amount}`.replace(
+                      /\B(?=(\d{3})+(?!\d))/g,
+                      ","
+                    )}
+                  </td>
+                  <td>
+                    {`${payment.outsArrears}`.replace(
+                      /\B(?=(\d{3})+(?!\d))/g,
+                      ","
+                    )}
+                  </td>
+                  <td>
+                    {`${payment.paidArrears}`.replace(
+                      /\B(?=(\d{3})+(?!\d))/g,
+                      ","
+                    )}
+                  </td>
+                  <td>
+                    {`${payment.outsPenalty}`.replace(
+                      /\B(?=(\d{3})+(?!\d))/g,
+                      ","
+                    )}
+                  </td>
+                  <td>
+                    {`${payment.paidPenalty}`.replace(
+                      /\B(?=(\d{3})+(?!\d))/g,
+                      ","
+                    )}
+                  </td>
+                  <td>
+                    {`${payment.outsInterest}`.replace(
+                      /\B(?=(\d{3})+(?!\d))/g,
+                      ","
+                    )}
+                  </td>
+                  <td>
+                    {`${payment.paidInterest}`.replace(
+                      /\B(?=(\d{3})+(?!\d))/g,
+                      ","
+                    )}
+                  </td>
+                  <td>
+                    {`${payment.outsPrincipal}`.replace(
+                      /\B(?=(\d{3})+(?!\d))/g,
+                      ","
+                    )}
+                  </td>
+                  <td>
+                    {`${payment.paidPrincipal}`.replace(
+                      /\B(?=(\d{3})+(?!\d))/g,
+                      ","
+                    )}
+                  </td>
+                  <td>
+                    {`${payment.outsBalance}`.replace(
+                      /\B(?=(\d{3})+(?!\d))/g,
+                      ","
+                    )}
+                  </td>
+                  <td>{payment.mpesa}</td>
+                </tr>
+              )))}
 
               {payment.loan.payment.length > 0 && (
 
@@ -349,28 +414,28 @@ const PaymentsList = ({ email, status }: { email: string; status: string }) => {
           </Table>
         </>
       )}
-      <Group position="center" m="lg">
-        <TitleText title={`M-PESA Payments`} />
-      </Group>
-      <Group position="center" m="lg">
-        <TransferList
-          value={data}
-          onChange={setData}
-          listHeight={300}
-          searchPlaceholder="Search..."
-          nothingFound="Nothing here"
-          titles={["Recent", "Paid"]}
-          breakpoint="sm"
-        />
-      </Group>
-      <Group position="center" m="lg">
-        {data[0].length > 0 && (
-          <Button variant="gradient" onClick={handleState}>
-            Handle
-          </Button>
-        )}
-      </Group>
-      <pre>{JSON.stringify(payment, undefined, 2)}</pre>
+      {/* <Group position="center" m="lg"> */}
+      {/*   <TitleText title={`M-PESA Payments`} /> */}
+      {/* </Group> */}
+      {/* <Group position="center" m="lg"> */}
+      {/*   <TransferList */}
+      {/*     value={data} */}
+      {/*     onChange={setData} */}
+      {/*     listHeight={300} */}
+      {/*     searchPlaceholder="Search..." */}
+      {/*     nothingFound="Nothing here" */}
+      {/*     titles={["Recent", "Paid"]} */}
+      {/*     breakpoint="sm" */}
+      {/*   /> */}
+      {/* </Group> */}
+      {/* <Group position="center" m="lg"> */}
+      {/*   {data[0].length > 0 && ( */}
+      {/*     <Button variant="gradient" onClick={handleState}> */}
+      {/*       Handle */}
+      {/*     </Button> */}
+      {/*   )} */}
+      {/* </Group> */}
+      {/* <pre>{JSON.stringify(payment, undefined, 2)}</pre> */}
     </Suspense>
   );
 };
