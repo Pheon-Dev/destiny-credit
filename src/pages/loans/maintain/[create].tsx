@@ -65,15 +65,11 @@ const collateral_schema = z.object({
 const CreateLoan = ({
   email,
   status,
-  firstname,
-  lastname,
-  phonenumber,
+  member_id,
   mid,
 }: {
-  firstname: string;
-  lastname: string;
-  phonenumber: string;
   email: string;
+  member_id: string;
   status: string;
   mid: string;
 }) => {
@@ -104,12 +100,6 @@ const CreateLoan = ({
   const [minRange, setMinRange] = useState(0);
 
   const router = useRouter();
-  const member_info = trpc.members.search.useQuery({
-    firstName: firstname,
-    lastName: lastname,
-    phoneNumber: phonenumber,
-  });
-
   const [user, setUser] = useState({
     id: "",
     role: "",
@@ -208,11 +198,11 @@ const CreateLoan = ({
     trpc.products.products.useQuery();
 
   const product = trpc.products.product.useQuery({
-    productName: form.values.product,
+    id: form.values.product ?? "",
   });
 
   const { data: member, status: member_status } = trpc.members.member.useQuery({
-    id: id,
+    id: id || "",
   });
 
   const nextStep = () => {
@@ -505,7 +495,7 @@ const CreateLoan = ({
 
     if (subscribe) {
       if (mid.length > 10) setId(mid);
-      if (mid.length < 11) setId(`${member_info?.data?.id}`);
+      if (mid.length < 11) setId(`${member_id}`);
       form.setFieldValue("memberId", `${id}`);
 
       if (member) {
@@ -530,31 +520,30 @@ const CreateLoan = ({
       subscribe = false;
     };
   }, [
-    member_info?.data?.id,
+    member_id,
     member?.firstName,
     member?.lastName,
     product?.data?.interestRate,
     product?.data?.penaltyRate,
+    product?.data?.repaymentCycle,
+    product?.data?.processingFee,
+    product?.data?.productName,
+    product?.data?.gracePeriod,
+    product?.data?.maximumTenure,
+    product?.data?.minimumRange,
+    product?.data?.maximumRange,
     router,
     mid,
     id,
-    proName,
     checked,
     loanLen,
     memberCode,
     sundays,
-    intRate,
     payoffAmount,
-    grace,
     loanRef,
     startDate,
-    cycle,
-    penRate,
-    proRate,
-    maxTenure,
-    minRange,
-    maxRange,
     form.values.tenure,
+    form.values.product,
   ]);
 
   const maintain_member = trpc.members.maintain_member.useMutation();
@@ -636,7 +625,7 @@ const CreateLoan = ({
           processingFee: form.values.processingFee,
           sundays: form.values.sundays,
           memberName: form.values.member,
-          productName: form.values.product,
+          productName: form.values.productName,
           interest: form.values.interest,
           cycle: form.values.cycle,
           startDate: form.values.startDate,
@@ -752,7 +741,7 @@ const CreateLoan = ({
         processingFee: form.values.processingFee,
         sundays: form.values.sundays,
         memberName: form.values.member,
-        productName: form.values.product,
+        productName: form.values.productName,
         interest: form.values.interest,
         cycle: form.values.cycle,
         startDate: form.values.startDate,
@@ -790,6 +779,14 @@ const CreateLoan = ({
   const maintain_collateral = trpc.members.maintain_collateral.useMutation({
     onSuccess: async (input) => {
       await utils.members.collateral.invalidate({ id: input.id || "" });
+      updateNotification({
+        id: "collateral-status",
+        color: "teal",
+        title: "Collaterals",
+        message: `${maintain_collateral.data?.item} @ ${maintain_collateral.data?.value} Added Successfully as Collateral!`,
+        icon: <IconCheck size={16} />,
+        autoClose: 8000,
+      });
     },
   });
 
@@ -1003,10 +1000,24 @@ const CreateLoan = ({
     { key: _.id, value: `${_.id}`, label: `${_.productName}` },
   ]);
 
+  let select_product: any = []
+  let select_guarantor: any = []
+
+  products?.map((_) => [
+    select_product.push({
+      key: _.id, value: `${_.id}`, label: `${_.productName}`
+    })
+  ]);
+
   const guarantor_data = members?.map((_) => [
     { key: _.id, value: `${_.id}`, label: `${_.firstName} ${_.lastName}` },
   ]);
 
+  members?.map((_) => [
+    select_guarantor.push({
+      key: _.id, value: `${_.id}`, label: `${_.firstName} ${_.lastName}`
+    })
+  ]);
   const findGuarantor = (name: string) => {
     return members?.find((e) => {
       if (e.firstName + " " + e.lastName === name) {
@@ -1015,6 +1026,7 @@ const CreateLoan = ({
       }
     });
   };
+
 
   const handleGuarantor = () => {
     if (
@@ -1095,7 +1107,6 @@ const CreateLoan = ({
     form.values.tenure,
     form.values.member,
     changeGuarantor,
-    guarantor,
   ]);
 
   const Review = () => {
@@ -1549,7 +1560,7 @@ const CreateLoan = ({
                       mt="md"
                       label="Select Product"
                       placeholder="Select Product ..."
-                      data={product_data?.map((p) => p[0].label)}
+                      data={select_product}
                       {...form.getInputProps("product")}
                       disabled={products_status === "success" ? false : true}
                       required
@@ -1611,7 +1622,7 @@ const CreateLoan = ({
                       label="Enter Guarantor Names"
                       placeholder="Enter Guarantor Names ..."
                       /* limit={6} */ // Default 5
-                      data={guarantor_data?.map((p) => p[0].label)}
+                      data={select_guarantor.map((m: any) => m.label)}
                       {...guarantor_form.getInputProps("guarantorName")}
                       required
                     />
@@ -1926,6 +1937,19 @@ const Page: NextPage = () => {
     setPhonenumber(member_search?.data?.msisdn);
   }
 
+  const member_info = trpc.members.search.useQuery({
+    firstName: firstname,
+    lastName: lastname,
+    phoneNumber: phonenumber,
+  });
+
+  let member_id = ""
+
+  if (member_info?.data) {
+    member_id = member_info?.data?.id
+  }
+
+
   const email = `${data?.user?.email}`;
   const check = email.split("@")[1];
 
@@ -1935,9 +1959,7 @@ const Page: NextPage = () => {
         <CreateLoan
           email={email}
           status={status}
-          firstname={firstname}
-          lastname={`${middlename} ${lastname}`}
-          phonenumber={phonenumber}
+          member_id={member_id}
           mid={mid}
         />
       )}

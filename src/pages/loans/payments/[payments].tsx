@@ -95,6 +95,8 @@ const PaymentsList = ({ email, status }: { email: string; status: string }) => {
     return d.toDateString()
   };
 
+  console.table({...transactions})
+
   transactions?.map(
     (t: Transaction) =>
       (t.state === "new" &&

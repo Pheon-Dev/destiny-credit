@@ -339,7 +339,7 @@ const TransactionRow = ({
                   <IconCheck color="grey" size={16} />
                 )}
                 {transaction.state === "handled" && (
-                  <IconChecks color="grey" size={16} />
+                  <IconChecks color="blue" size={16} />
                 )}
                 {transaction.state === "paid" && (
                   <IconChecks color="blue" size={16} />

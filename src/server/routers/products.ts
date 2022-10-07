@@ -22,14 +22,14 @@ export const productsRouter = t.router({
   product: t.procedure
     .input(
       z.object({
-        productName: z.string(),
+        id: z.string(),
       })
     )
     .query(async ({ input }) => {
-      if (!input.productName) return 
+      if (input.id === "") return
       const product = await prisma.product.findFirst({
         where: {
-          productName: input.productName,
+          id: input.id,
         },
       });
       return product;

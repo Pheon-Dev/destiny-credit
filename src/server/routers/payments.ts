@@ -253,6 +253,8 @@ export const paymentsRouter = t.router({
 
         if (loan.cleared) return;
         if (t.state === "paid") return;
+        if (t.payment === "membership") return;
+        if (t.state === "handled") return;
 
         const add = await prisma.payment.create({
           data: {

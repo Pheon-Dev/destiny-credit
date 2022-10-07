@@ -26,11 +26,11 @@ export const MainLinks = () => {
   const email = `${data?.user?.email}`;
   const check = email.split("@")[1];
 
-    return (
+  return (
     <>{check?.length > 0 && (<MainLinksComponent email={email} status={status} />)}</>
-    );
-  }
-const MainLinksComponent = ({email, status}: {email: string, status: string}) => {
+  );
+}
+const MainLinksComponent = ({ email, status }: { email: string, status: string }) => {
   const router = useRouter();
 
   const [user, setUser] = useState({
@@ -43,9 +43,9 @@ const MainLinksComponent = ({email, status}: {email: string, status: string}) =>
     state: "",
   });
 
-    const user_data = trpc.users.user.useQuery({
-      email: `${email}`,
-    });
+  const user_data = trpc.users.user.useQuery({
+    email: `${email}`,
+  });
 
   useEffect(() => {
     let subscribe = true;

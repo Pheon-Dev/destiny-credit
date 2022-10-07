@@ -116,7 +116,7 @@ export const loansRouter = t.router({
   member: t.procedure
     .input(
       z.object({
-        id: z.string(),
+        id: z.string().nullish(),
       })
     )
     .query(async ({ input }) => {
