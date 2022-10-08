@@ -7,7 +7,7 @@ export const EmptyTable = ({
   call,
   status,
 }: {
-  status: string;
+  status?: string;
   call: string;
 }) => {
   const Row = () => {

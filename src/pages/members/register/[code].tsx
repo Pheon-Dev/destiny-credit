@@ -284,6 +284,16 @@ const CreateMember = ({ email, status }: { email: string; status: string }) => {
     },
   });
 
+  const utils = trpc.useContext()
+
+  const handle = trpc.transactions.state.useMutation({
+    onSuccess: async () => {
+      await utils.transactions.transaction.invalidate({
+        id: id || "",
+      });
+    },
+  });
+
   const clear = () => {
     form.setFieldValue("date", "");
     form.setFieldValue("branchName", "");
@@ -413,6 +423,13 @@ const CreateMember = ({ email, status }: { email: string; status: string }) => {
             numberKin: form.values.numberKin.toUpperCase(),
             maintained: false,
             registrarId: `${user?.id}`,
+          });
+          handle.mutate({
+            id: id,
+            handlerId: `${user?.id}`,
+            updaterId: `${user?.id}`,
+            payment: `membership`,
+            state: `handled`,
           });
         }
       } catch (error) {

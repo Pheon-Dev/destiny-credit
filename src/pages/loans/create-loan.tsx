@@ -1,4 +1,4 @@
-import React from "react";
+import React, { Suspense } from "react";
 import {
   EmptyTable,
   MembersTable,
@@ -13,20 +13,24 @@ const Page: NextPage = () => {
   const { data, status } = useSession();
 
   const email = `${data?.user?.email}`;
-  const check = email.split("@")[1];
 
   const call = "maintain";
 
   return (
     <Protected>
-      {check?.length > 0 && (
-        <>
-          <TransactionsTable call={call} email={email} status={status} />
-          <Divider variant="dotted" mt="xl" />
-          <MembersTable call="create-loan" email={email} status={status} />
-        </>
-      )}
-      {check === "" && <EmptyTable call={call} status={status} />}
+      <Suspense fallback={
+        <EmptyTable call={call} />
+      }>
+        <TransactionsTable call={call} />
+
+      </Suspense>
+      <Divider variant="dotted" mt="xl" />
+      <Suspense fallback={
+        <EmptyTable call="create-loan" />
+      }>
+        <MembersTable call="create-loan" email={email} status={status} />
+      </Suspense>
+
     </Protected>
   );
 };

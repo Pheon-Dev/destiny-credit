@@ -22,31 +22,13 @@ import { IconCheck, IconChecks, IconClock } from "@tabler/icons";
 
 export const TransactionsTable = ({
   call,
-  status,
-  email,
 }: {
   call: string;
-  status: string;
-  email: string;
 }) => {
   const [time, setTime] = useState("");
   const [locale, setLocale] = useState(false);
 
   const logs = trpc.logs.logs.useQuery();
-
-  const [user, setUser] = useState({
-    id: "",
-    role: "",
-    email: "",
-    username: "",
-    firstname: "",
-    lastname: "",
-    state: "",
-  });
-
-  const user_data = trpc.users.user.useQuery({
-    email: `${email}`,
-  });
 
   const { data: transactions, fetchStatus } =
     trpc.transactions.transactions.useQuery();
@@ -98,27 +80,12 @@ export const TransactionsTable = ({
         if (locale) setTime(`${dd}${mm}${yy}`);
         if (!locale) setTime(`${dd}${yy}${mm}`);
       }
-      setUser({
-        id: `${user_data?.data?.id}`,
-        role: `${user_data?.data?.role}`,
-        username: `${user_data?.data?.username}`,
-        firstname: `${user_data?.data?.firstName}`,
-        lastname: `${user_data?.data?.lastName}`,
-        email: `${user_data?.data?.email}`,
-        state: `${user_data?.data?.state}`,
-      });
+
     }
     return () => {
       subscribe = false;
     };
   }, [
-    user_data?.data?.id,
-    user_data?.data?.role,
-    user_data?.data?.username,
-    user_data?.data?.firstName,
-    user_data?.data?.lastName,
-    user_data?.data?.email,
-    user_data?.data?.state,
     new_date,
     time,
     value,
@@ -128,7 +95,6 @@ export const TransactionsTable = ({
 
   return (
     <>
-      {status === "loading" && <EmptyTable call={call} status={fetchStatus} />}
       {!transactions && <EmptyTable call={call} status={fetchStatus} />}
       {transactions && (
         <>
@@ -169,8 +135,6 @@ export const TransactionsTable = ({
                   transaction={transaction}
                   call={call}
                   time={time}
-                  handler={`${user?.id}`}
-                  updater={`${user?.id}`}
                 />
               ))}
             </tbody>
@@ -189,21 +153,13 @@ const TransactionRow = ({
   transaction,
   call,
   time,
-  handler,
-  updater,
 }: {
   transaction: Transaction;
   call: string;
   time: string;
-  handler: string;
-  updater: string;
 }) => {
-  const [updaterId, setUpdaterId] = useState("");
-  const [handlerId, setHandlerId] = useState("");
   const [open, setOpen] = useState(false);
   const router = useRouter();
-  const utils = trpc.useContext();
-  const ref = transaction?.billRefNumber?.split(" ");
 
   const memb_regexp = /m(e)(mb(er(ship)))/g
   const proc_regexp = /p(r)(c(es(s(ing))))/g
@@ -221,65 +177,24 @@ const TransactionRow = ({
     proc_matches[0] === "processing" && ("processing") || "loan"
   )
 
-  const handle = trpc.transactions.state.useMutation({
-    onSuccess: async () => {
-      await utils.transactions.transaction.invalidate({
-        id: transaction.id || "",
-      });
-      if (payment === "membership")
-        router.push(`/members/register/${transaction.transID}`);
-    },
-  });
-
   const date = (time: string) => {
-    const second = time.slice(12);
     const minute = time.slice(10, 12);
     const hour = time.slice(8, 10);
-    const day = time.slice(6, 8);
-    const month = time.slice(4, 6);
-    const year = time.slice(0, 4);
     const when = hour + ":" + minute;
     return when;
   };
 
   const handleState = useCallback(() => {
     try {
-      if (transaction.id) {
-        handle.mutate({
-          id: transaction.id,
-          handlerId: `${handlerId}`,
-          updaterId: `${updaterId}`,
-          payment: `${payment}`,
-          state: `${transaction?.state}`,
-        });
-      }
-      if (handle.error) {
-        throw new Error("Error Handling State");
-      }
-      return;
+      if (payment === "membership")
+        return router.push(`/members/register/${transaction.transID}`);
     } catch (error) {
       return;
     }
   }, [
-    handle,
-    transaction.id,
-    transaction.state,
+    transaction.transID,
     payment,
-    handlerId,
-    updaterId,
   ]);
-
-  useEffect(() => {
-    let subscribe = true;
-    if (subscribe) {
-      setHandlerId(handler);
-      setUpdaterId(updater);
-    }
-
-    return () => {
-      subscribe = false;
-    };
-  }, [open, handler, updater, ref]);
 
   return (
     <>
@@ -346,82 +261,90 @@ const TransactionRow = ({
       {call === "register" &&
         transaction.transTime.startsWith(time) &&
         payment === "membership" && (
-          <tr>
-            <td>{date(transaction.transTime)}</td>
-            <td>
-              {transaction.firstName +
-                " " +
-                transaction.middleName +
-                " " +
-                transaction.lastName}
-            </td>
-            <td>
-              {`${transaction.transAmount}`.replace(
-                /\B(?=(\d{3})+(?!\d))/g,
-                ","
-              )}
-            </td>
-            <td>{transaction.msisdn}</td>
-            <td>
-              <Group position="center">
-                {(transaction.billRefNumber === "" && (
-                  <>{transaction.transID}</>
-                )) || (
-                    <Button
-                      variant="light"
-                      style={{
-                        height: "24px",
-                      }}
-                      onClick={() => {
-                        router.push(`/members/register/${transaction.transID}`);
-                      }}
-                    >
-                      {transaction.billRefNumber.split(" ")[0]}
-                    </Button>
+          <>
+            {transaction.payment !== "" && (
+              <tr>
+                <td>{date(transaction.transTime)}</td>
+                <td>
+                  {transaction.firstName +
+                    " " +
+                    transaction.middleName +
+                    " " +
+                    transaction.lastName}
+                </td>
+                <td>
+                  {`${transaction.transAmount}`.replace(
+                    /\B(?=(\d{3})+(?!\d))/g,
+                    ","
                   )}
-              </Group>
-            </td>
-          </tr>
+                </td>
+                <td>{transaction.msisdn}</td>
+                <td>
+                  <Group position="center">
+                    {(transaction.billRefNumber === "" && (
+                      <>{transaction.transID}</>
+                    )) || (
+                        <Button
+                          variant="light"
+                          style={{
+                            height: "24px",
+                          }}
+                          onClick={() => {
+                            router.push(`/members/register/${transaction.transID}`);
+                          }}
+                        >
+                          {transaction.billRefNumber.split(" ")[0]}
+                        </Button>
+                      )}
+                  </Group>
+                </td>
+              </tr>
+            )}
+          </>
         )}
       {call === "maintain" &&
         transaction.transTime.startsWith(time) &&
         payment === "processing" && (
-          <tr>
-            <td>{date(transaction.transTime)}</td>
-            <td>
-              {transaction.firstName +
-                " " +
-                transaction.middleName +
-                " " +
-                transaction.lastName}
-            </td>
-            <td>
-              {`${transaction.transAmount}`.replace(
-                /\B(?=(\d{3})+(?!\d))/g,
-                ","
-              )}
-            </td>
-            <td>{transaction.msisdn}</td>
-            <td>
-              <Group position="center">
-                {(transaction.billRefNumber === "" && (
-                  <>{transaction.transID}</>
-                )) || (
-                    <Button
-                      variant="light"
-                      style={{
-                        height: "24px",
-                      }}
-                      onClick={() => {
-                        router.push(`/loans/maintain/${transaction.transID}`);
-                      }}
-                    >
-                      {transaction.billRefNumber.split(" ")[0]}
-                    </Button>
+          <>
+            {transaction.payment === "" && (
+              <tr>
+                <td>{date(transaction.transTime)}</td>
+                <td>
+                  {transaction.firstName +
+                    " " +
+                    transaction.middleName +
+                    " " +
+                    transaction.lastName}
+                </td>
+                <td>
+                  {`${transaction.transAmount}`.replace(
+                    /\B(?=(\d{3})+(?!\d))/g,
+                    ","
                   )}
-              </Group>
-            </td>
-          </tr>
+                </td>
+                <td>{transaction.msisdn}</td>
+                <td>
+                  <Group position="center">
+                    {(transaction.billRefNumber === "" && (
+                      <>{transaction.transID}</>
+                    )) || (
+                        <Button
+                          variant="light"
+                          style={{
+                            height: "24px",
+                          }}
+                          onClick={() => {
+                            router.push(`/loans/maintain/${transaction.transID}`);
+                          }}
+                        >
+                          {transaction.billRefNumber.split(" ")[0]}
+                        </Button>
+                      )}
+                  </Group>
+                </td>
+              </tr>
+            )}
+          </>
         )}
       <Modal
         padding="md"
@@ -480,14 +403,28 @@ const TransactionRow = ({
               </Grid.Col>
             </Grid>
             {transaction?.billRefNumber !== "" && (
-              <Grid grow>
-                <Grid.Col mt="xs" span={4}>
-                  <Text weight={500}>Description</Text>
-                </Grid.Col>
-                <Grid.Col mt="xs" span={4}>
-                  <Text>{transaction?.billRefNumber}</Text>
-                </Grid.Col>
-              </Grid>
+              <>
+                <Grid grow>
+                  <Grid.Col mt="xs" span={4}>
+                    <Text weight={500}>Description</Text>
+                  </Grid.Col>
+                  <Grid.Col mt="xs" span={4}>
+                    <Text>{transaction?.billRefNumber}</Text>
+                  </Grid.Col>
+                </Grid>
+                {transaction?.payment !== "" && (
+                  <>
+                    <Grid grow>
+                      <Grid.Col mt="xs" span={4}>
+                        <Text weight={500}>Paid for</Text>
+                      </Grid.Col>
+                      <Grid.Col mt="xs" span={4}>
+                        <Text>{transaction?.payment}</Text>
+                      </Grid.Col>
+                    </Grid>
+                  </>
+                )}
+              </>
             )}
           </Card.Section>
         </Card>

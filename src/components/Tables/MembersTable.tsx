@@ -13,7 +13,7 @@ export const MembersTable = ({
   email,
 }: {
   call: string;
-  status: string;
+  status?: string;
   email: string;
 }) => {
   const logs = trpc.logs.logs.useQuery();
