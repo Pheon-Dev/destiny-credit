@@ -160,6 +160,28 @@ export const paymentsRouter = t.router({
           start = +str;
         }
 
+        if (loan.cleared === true) {
+          return notification.push({
+            id: "cleared",
+            title: `${loan?.loanRef} Loan`,
+            color: "green",
+            disallowClose: true,
+            message: `This Loan Was Successfully Cleared!`,
+          });
+        }
+
+        if (t.state === "handled") {
+          return notification.push({
+            id: "handled",
+            title: `${loan?.loanRef} Loan`,
+            color: "blue",
+            disallowClose: true,
+            message: `${t.transID}: M-PESA Payment of KSHs. ${t.transAmount
+              } via ${(t.billRefNumber === "" && "Till") || "Pay Bill"
+              } is already paid for ${t?.payment}`,
+          });
+        }
+
         if (+current < +start) {
           return (
             (t.state === "new" &&
@@ -171,37 +193,10 @@ export const paymentsRouter = t.router({
                 message: `${t.transID}: M-PESA Payment of KSHs. ${t.transAmount
                   } via ${(t.billRefNumber === "" && "Till") || "Pay Bill"
                   } is before first installement date of ${loan?.startDate}`,
-              })) ||
-            (t.payment !== "loan" &&
-              notification.push({
-                id: "paid",
-                title: `${loan?.loanRef} Loan`,
-                color: "blue",
-                disallowClose: true,
-                message: `${t.transID}: M-PESA Payment of KSHs. ${t.transAmount
-                  } via ${(t.billRefNumber === "" && "Till") || "Pay Bill"
-                  } is already paid for ${t?.payment}`,
-              })) ||
-            (t.state === "handled" &&
-              notification.push({
-                id: "handled",
-                title: `${loan?.loanRef} Loan`,
-                color: "blue",
-                disallowClose: true,
-                message: `${t.transID}: M-PESA Payment of KSHs. ${t.transAmount
-                  } via ${(t.billRefNumber === "" && "Till") || "Pay Bill"
-                  } is already paid for ${t?.payment}`,
-              })) ||
-            (loan.cleared === true &&
-              notification.push({
-                id: "cleared",
-                title: `${loan?.loanRef} Loan`,
-                color: "green",
-                disallowClose: true,
-                message: `This Loan Was Successfully Cleared!`,
               }))
           );
         }
+
 
         let rem_amount = amount;
 
@@ -261,13 +256,14 @@ export const paymentsRouter = t.router({
 
         total_amount += amount;
 
-        /* if (t.state === "loan") { */
+        /* if (t.payment === "new") { */
         /*   await prisma.transaction.update({ */
         /*     where: { */
         /*       id: t.id, */
         /*     }, */
         /*     data: { */
         /*       state: "new", */
+        /*       payment: "", */
         /*     }, */
         /*   }); */
         /*   return await prisma.payment.deleteMany({ */

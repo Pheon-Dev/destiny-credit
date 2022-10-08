@@ -2,7 +2,16 @@ import React, { Suspense, useCallback, useEffect, useState } from "react";
 import { useRouter } from "next/router";
 import { trpc } from "../../../utils/trpc";
 import { Protected, TitleText } from "../../../components";
-import { Button, Group, Loader, Skeleton, Table, TransferList, TransferListData, useMantineColorScheme } from "@mantine/core";
+import {
+  Button,
+  Group,
+  Loader,
+  Skeleton,
+  Table,
+  TransferList,
+  TransferListData,
+  useMantineColorScheme,
+} from "@mantine/core";
 import { NextPage } from "next";
 import { IconLoader2 } from "@tabler/icons";
 import { Transaction } from "@prisma/client";
@@ -77,11 +86,11 @@ const PaymentsList = ({ email, status }: { email: string; status: string }) => {
 
   const payments = trpc.payments.payment.useQuery({ id: id });
 
-  const payment = payments?.data
+  const payment = payments?.data;
 
-  const transactions = payment?.transactions
+  const transactions = payment?.transactions;
 
-  const notification = payment?.notification
+  const notification = payment?.notification;
 
   let loan: Array<State> = [];
   let recent: Array<State> = [];
@@ -91,12 +100,12 @@ const PaymentsList = ({ email, status }: { email: string; status: string }) => {
     const month = time.slice(4, 6);
     const year = time.slice(0, 4);
 
-    const d = new Date()
-    d.setDate(+day)
-    d.setMonth(+month)
-    d.setFullYear(+year)
-    /* return d.toDateString().slice(0, 11) + '"' + year.slice(2) */
-    return d.toDateString()
+    const d = new Date();
+    d.setDate(+day);
+    d.setMonth(+month);
+    d.setFullYear(+year);
+
+    return d.toDateString();
   };
 
   transactions?.map(
@@ -121,7 +130,7 @@ const PaymentsList = ({ email, status }: { email: string; status: string }) => {
           `,
         }))
   );
-  /* console.table({ ...data }) */
+
   const initialValues: TransferListData = [recent, loan];
 
   const [data, setData] = useState<TransferListData>(initialValues);
@@ -144,7 +153,6 @@ const PaymentsList = ({ email, status }: { email: string; status: string }) => {
             payment: `loan`,
             state: `loan`,
           });
-          /* console.log(d) */
         });
       }
     } catch (error) {
@@ -152,7 +160,47 @@ const PaymentsList = ({ email, status }: { email: string; status: string }) => {
     }
   }, [handle, data]);
 
-  console.table({ ...payment })
+  if (notification) {
+    <>
+      {notification?.map((_) =>
+        showNotification({
+          id: _.id,
+          color: _.color,
+          title: _.title,
+          message: _.message,
+          loading: _.loading,
+          autoClose: _.autoClose,
+        })
+      )}
+    </>;
+  }
+
+  if (!transactions) {
+    router.replace(router.asPath);
+    return (
+      <>
+        <Group position="center" m="lg">
+          <TitleText title="Loading payment Payment Statement ..." />
+        </Group>
+        <Group position="center" m="lg" style={{ position: "relative" }}>
+          <Skeleton height={16} radius="xl" />
+          <Row />
+          <Row />
+          <Row />
+          <Row />
+          <Row />
+          <Row />
+          <Row />
+          <Row />
+          <Row />
+          <Row />
+          <Row />
+          <Row />
+          <Skeleton height={16} radius="xl" />
+        </Group>
+      </>
+    );
+  }
 
   return (
     <Suspense
@@ -184,7 +232,7 @@ const PaymentsList = ({ email, status }: { email: string; status: string }) => {
         <>
           <Group position="apart" m="lg">
             <TitleText title={`${payment?.loan.memberName}`} />
-            {payments?.fetchStatus === "fetching" && (<Loader />) || (
+            {(payments?.fetchStatus === "fetching" && <Loader />) || (
               <IconLoader2 onClick={() => payments?.refetch()} />
             )}
           </Group>
@@ -193,75 +241,8 @@ const PaymentsList = ({ email, status }: { email: string; status: string }) => {
               <Header />
             </thead>
             <tbody>
-
-              {payment?.loan?.cleared && (payment?.loan?.payment?.map((payment) => (
-                <tr key={payment?.mpesa} style={{ cursor: "auto" }}>
-                  <td>{payment?.currInstDate}</td>
-                  <td>
-                    {`${payment.amount}`.replace(
-                      /\B(?=(\d{3})+(?!\d))/g,
-                      ","
-                    )}
-                  </td>
-                  <td>
-                    {`${payment.outsArrears}`.replace(
-                      /\B(?=(\d{3})+(?!\d))/g,
-                      ","
-                    )}
-                  </td>
-                  <td>
-                    {`${payment.paidArrears}`.replace(
-                      /\B(?=(\d{3})+(?!\d))/g,
-                      ","
-                    )}
-                  </td>
-                  <td>
-                    {`${payment.outsPenalty}`.replace(
-                      /\B(?=(\d{3})+(?!\d))/g,
-                      ","
-                    )}
-                  </td>
-                  <td>
-                    {`${payment.paidPenalty}`.replace(
-                      /\B(?=(\d{3})+(?!\d))/g,
-                      ","
-                    )}
-                  </td>
-                  <td>
-                    {`${payment.outsInterest}`.replace(
-                      /\B(?=(\d{3})+(?!\d))/g,
-                      ","
-                    )}
-                  </td>
-                  <td>
-                    {`${payment.paidInterest}`.replace(
-                      /\B(?=(\d{3})+(?!\d))/g,
-                      ","
-                    )}
-                  </td>
-                  <td>
-                    {`${payment.outsPrincipal}`.replace(
-                      /\B(?=(\d{3})+(?!\d))/g,
-                      ","
-                    )}
-                  </td>
-                  <td>
-                    {`${payment.paidPrincipal}`.replace(
-                      /\B(?=(\d{3})+(?!\d))/g,
-                      ","
-                    )}
-                  </td>
-                  <td>
-                    {`${payment.outsBalance}`.replace(
-                      /\B(?=(\d{3})+(?!\d))/g,
-                      ","
-                    )}
-                  </td>
-                  <td>{payment.mpesa}</td>
-                </tr>
-              )))}
-              {!payment?.loan?.cleared && (<>
-                {payment?.payment?.map((payment: Payment) => (
+              {payment?.loan?.cleared &&
+                payment?.loan?.payment?.map((payment) => (
                   <tr key={payment?.mpesa} style={{ cursor: "auto" }}>
                     <td>{payment?.currInstDate}</td>
                     <td>
@@ -326,76 +307,140 @@ const PaymentsList = ({ email, status }: { email: string; status: string }) => {
                     </td>
                     <td>{payment.mpesa}</td>
                   </tr>
-                )
-                )
-                }
-              </>
-              )
-              }
+                ))}
+              {!payment?.loan?.cleared && (
+                <>
+                  {payment?.payment?.map((payment: Payment) => (
+                    <tr key={payment?.mpesa} style={{ cursor: "auto" }}>
+                      <td>{payment?.currInstDate}</td>
+                      <td>
+                        {`${payment.amount}`.replace(
+                          /\B(?=(\d{3})+(?!\d))/g,
+                          ","
+                        )}
+                      </td>
+                      <td>
+                        {`${payment.outsArrears}`.replace(
+                          /\B(?=(\d{3})+(?!\d))/g,
+                          ","
+                        )}
+                      </td>
+                      <td>
+                        {`${payment.paidArrears}`.replace(
+                          /\B(?=(\d{3})+(?!\d))/g,
+                          ","
+                        )}
+                      </td>
+                      <td>
+                        {`${payment.outsPenalty}`.replace(
+                          /\B(?=(\d{3})+(?!\d))/g,
+                          ","
+                        )}
+                      </td>
+                      <td>
+                        {`${payment.paidPenalty}`.replace(
+                          /\B(?=(\d{3})+(?!\d))/g,
+                          ","
+                        )}
+                      </td>
+                      <td>
+                        {`${payment.outsInterest}`.replace(
+                          /\B(?=(\d{3})+(?!\d))/g,
+                          ","
+                        )}
+                      </td>
+                      <td>
+                        {`${payment.paidInterest}`.replace(
+                          /\B(?=(\d{3})+(?!\d))/g,
+                          ","
+                        )}
+                      </td>
+                      <td>
+                        {`${payment.outsPrincipal}`.replace(
+                          /\B(?=(\d{3})+(?!\d))/g,
+                          ","
+                        )}
+                      </td>
+                      <td>
+                        {`${payment.paidPrincipal}`.replace(
+                          /\B(?=(\d{3})+(?!\d))/g,
+                          ","
+                        )}
+                      </td>
+                      <td>
+                        {`${payment.outsBalance}`.replace(
+                          /\B(?=(\d{3})+(?!\d))/g,
+                          ","
+                        )}
+                      </td>
+                      <td>{payment.mpesa}</td>
+                    </tr>
+                  ))}
+                </>
+              )}
 
               {payment.loan.payment.length > 0 && (
-
                 <tr style={{ backgroundColor: "grey", color: "white" }}>
                   <td>TOTAL</td>
                   <td>
-                    {`${payment.loan.payment[payment.loan.payment.length - 1]?.total}`.replace(
-                      /\B(?=(\d{3})+(?!\d))/g,
-                      ","
-                    )}
+                    {`${
+                      payment.loan.payment[payment.loan.payment.length - 1]
+                        ?.total
+                    }`.replace(/\B(?=(\d{3})+(?!\d))/g, ",")}
                   </td>
                   <td>
-                    {`${payment.loan.payment[payment.loan.payment.length - 1]?.outsArrears}`.replace(
-                      /\B(?=(\d{3})+(?!\d))/g,
-                      ","
-                    )}
+                    {`${
+                      payment.loan.payment[payment.loan.payment.length - 1]
+                        ?.outsArrears
+                    }`.replace(/\B(?=(\d{3})+(?!\d))/g, ",")}
                   </td>
                   <td>
-                    {`${payment.loan.payment[payment.loan.payment.length - 1]?.paidArrears}`.replace(
-                      /\B(?=(\d{3})+(?!\d))/g,
-                      ","
-                    )}
+                    {`${
+                      payment.loan.payment[payment.loan.payment.length - 1]
+                        ?.paidArrears
+                    }`.replace(/\B(?=(\d{3})+(?!\d))/g, ",")}
                   </td>
                   <td>
-                    {`${payment.loan.payment[payment.loan.payment.length - 1]?.outsPenalty}`.replace(
-                      /\B(?=(\d{3})+(?!\d))/g,
-                      ","
-                    )}
+                    {`${
+                      payment.loan.payment[payment.loan.payment.length - 1]
+                        ?.outsPenalty
+                    }`.replace(/\B(?=(\d{3})+(?!\d))/g, ",")}
                   </td>
                   <td>
-                    {`${payment.loan.payment[payment.loan.payment.length - 1]?.paidPenalty}`.replace(
-                      /\B(?=(\d{3})+(?!\d))/g,
-                      ","
-                    )}
+                    {`${
+                      payment.loan.payment[payment.loan.payment.length - 1]
+                        ?.paidPenalty
+                    }`.replace(/\B(?=(\d{3})+(?!\d))/g, ",")}
                   </td>
                   <td>
-                    {`${payment.loan.payment[payment.loan.payment.length - 1]?.outsInterest}`.replace(
-                      /\B(?=(\d{3})+(?!\d))/g,
-                      ","
-                    )}
+                    {`${
+                      payment.loan.payment[payment.loan.payment.length - 1]
+                        ?.outsInterest
+                    }`.replace(/\B(?=(\d{3})+(?!\d))/g, ",")}
                   </td>
                   <td>
-                    {`${payment.loan.payment[payment.loan.payment.length - 1]?.paidInterest}`.replace(
-                      /\B(?=(\d{3})+(?!\d))/g,
-                      ","
-                    )}
+                    {`${
+                      payment.loan.payment[payment.loan.payment.length - 1]
+                        ?.paidInterest
+                    }`.replace(/\B(?=(\d{3})+(?!\d))/g, ",")}
                   </td>
                   <td>
-                    {`${payment.loan.payment[payment.loan.payment.length - 1]?.outsPrincipal}`.replace(
-                      /\B(?=(\d{3})+(?!\d))/g,
-                      ","
-                    )}
+                    {`${
+                      payment.loan.payment[payment.loan.payment.length - 1]
+                        ?.outsPrincipal
+                    }`.replace(/\B(?=(\d{3})+(?!\d))/g, ",")}
                   </td>
                   <td>
-                    {`${payment.loan.payment[payment.loan.payment.length - 1]?.paidPrincipal}`.replace(
-                      /\B(?=(\d{3})+(?!\d))/g,
-                      ","
-                    )}
+                    {`${
+                      payment.loan.payment[payment.loan.payment.length - 1]
+                        ?.paidPrincipal
+                    }`.replace(/\B(?=(\d{3})+(?!\d))/g, ",")}
                   </td>
                   <td>
-                    {`${payment.loan.payment[payment.loan.payment.length - 1]?.outsBalance}`.replace(
-                      /\B(?=(\d{3})+(?!\d))/g,
-                      ","
-                    )}
+                    {`${
+                      payment.loan.payment[payment.loan.payment.length - 1]
+                        ?.outsBalance
+                    }`.replace(/\B(?=(\d{3})+(?!\d))/g, ",")}
                   </td>
                   <td>TOTAL</td>
                 </tr>
@@ -428,20 +473,6 @@ const PaymentsList = ({ email, status }: { email: string; status: string }) => {
           </Button>
         )}
       </Group>
-      {<>{
-        notification?.map((_) => (
-          showNotification({
-            id: _.id,
-            color: _.color,
-            title: _.title,
-            message: _.message,
-            loading: _.loading,
-            autoClose: _.autoClose,
-          })
-
-        ))
-      }</>
-      }
       <pre>{JSON.stringify(payment, undefined, 2)}</pre>
     </Suspense>
   );
