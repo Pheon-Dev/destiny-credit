@@ -83,7 +83,7 @@ const PaymentsList = ({ email, status }: { email: string; status: string }) => {
 
   const notification = payment?.notification
 
-  let paid: Array<State> = [];
+  let loan: Array<State> = [];
   let recent: Array<State> = [];
 
   const date = (time: string) => {
@@ -111,35 +111,18 @@ const PaymentsList = ({ email, status }: { email: string; status: string }) => {
           `,
         })) ||
       (t.state === "handled" &&
-        paid.push({
+        loan.push({
           value: `${t.id}`,
           label: `[${t.transID.slice(0, 2) + "..." + t.transID.slice(7)}] :
           ${`${t.transAmount} /=`.replace(/\B(?=(\d{3})+(?!\d))/g, "")}
           on ${date(`${t.transTime}`)}
           ${t.billRefNumber === "" ? "via Till" : "via Pay Bill"}
-          `,
-        })) ||
-      (t.state === "paid" &&
-        paid.push({
-          value: `${t.id}`,
-          label: `[${t.transID.slice(0, 2) + "..." + t.transID.slice(7)}] :
-          ${`${t.transAmount} /=`.replace(/\B(?=(\d{3})+(?!\d))/g, "")}
-          on ${date(`${t.transTime}`)}
-          ${t.billRefNumber === "" ? "via Till" : "via Pay Bill"}
-          `,
-        })) ||
-      (!t.state &&
-        recent.push({
-          value: `${t.id}`,
-          label: `[${t.transID.slice(0, 2) + "..." + t.transID.slice(7)}] :
-          ${`${t.transAmount} /=`.replace(/\B(?=(\d{3})+(?!\d))/g, "")}
-          on ${date(`${t.transTime}`)}
-          ${t.billRefNumber === "" ? "via Till" : "via Pay Bill"}
+          for ${`${t.payment}`}
           `,
         }))
   );
   /* console.table({ ...data }) */
-  const initialValues: TransferListData = [recent, paid];
+  const initialValues: TransferListData = [recent, loan];
 
   const [data, setData] = useState<TransferListData>(initialValues);
 
@@ -159,7 +142,7 @@ const PaymentsList = ({ email, status }: { email: string; status: string }) => {
             handlerId: `${user?.id}`,
             updaterId: `${user?.id}`,
             payment: `loan`,
-            state: `paid`,
+            state: `loan`,
           });
           /* console.log(d) */
         });
@@ -447,7 +430,6 @@ const PaymentsList = ({ email, status }: { email: string; status: string }) => {
       </Group>
       {<>{
         notification?.map((_) => (
-
           showNotification({
             id: _.id,
             color: _.color,

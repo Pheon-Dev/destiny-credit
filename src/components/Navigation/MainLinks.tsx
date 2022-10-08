@@ -12,13 +12,8 @@ import { Protected } from "../Protected/Protected";
 import { useRouter } from "next/router";
 import { useSession } from "next-auth/react";
 import { trpc } from "../../utils/trpc";
+import { Data } from "../../../types";
 import Link from "next/link";
-
-interface Data {
-  id: number;
-  name: string;
-  url: string;
-}
 
 export const MainLinks = () => {
   const { data, status } = useSession();
@@ -81,7 +76,7 @@ const MainLinksComponent = ({ email, status }: { email: string, status: string }
   }: {
     data: Data[];
     title: string;
-    icon: any;
+    icon: React.ReactNode;
     open: boolean;
   }) => {
     return (

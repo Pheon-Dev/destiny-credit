@@ -145,7 +145,8 @@ export const paymentsRouter = t.router({
         const mpesa = t.transID;
         const time = date(t.transTime);
         const type = t.transactionType;
-        const state = "paid";
+        const state = "handled";
+        const payment_state = "loan";
 
         let start = 0;
         let current = t.transTime;
@@ -155,17 +156,52 @@ export const paymentsRouter = t.router({
           const start_month = loan?.startDate?.split("-")[1];
           const start_year = loan?.startDate?.split("-")[2];
 
-          /* const str = "2022" + "10" + "01" + "000000" */
           const str = start_year + start_month + start_day + "000000";
           start = +str;
         }
 
-        if (+current < +start) return notification.push({
-          id: "payment-status",
-          title: "Payment State",
-          color: "red",
-          message: `Payment is before first installement date of ${loan?.startDate} ...`,
-        });
+        if (+current < +start) {
+          return (
+            (t.state === "new" &&
+              notification.push({
+                id: "new",
+                title: `${loan?.loanRef} Loan`,
+                color: "red",
+                disallowClose: true,
+                message: `${t.transID}: M-PESA Payment of KSHs. ${t.transAmount
+                  } via ${(t.billRefNumber === "" && "Till") || "Pay Bill"
+                  } is before first installement date of ${loan?.startDate}`,
+              })) ||
+            (t.payment !== "loan" &&
+              notification.push({
+                id: "paid",
+                title: `${loan?.loanRef} Loan`,
+                color: "blue",
+                disallowClose: true,
+                message: `${t.transID}: M-PESA Payment of KSHs. ${t.transAmount
+                  } via ${(t.billRefNumber === "" && "Till") || "Pay Bill"
+                  } is already paid for ${t?.payment}`,
+              })) ||
+            (t.state === "handled" &&
+              notification.push({
+                id: "handled",
+                title: `${loan?.loanRef} Loan`,
+                color: "blue",
+                disallowClose: true,
+                message: `${t.transID}: M-PESA Payment of KSHs. ${t.transAmount
+                  } via ${(t.billRefNumber === "" && "Till") || "Pay Bill"
+                  } is already paid for ${t?.payment}`,
+              })) ||
+            (loan.cleared === true &&
+              notification.push({
+                id: "cleared",
+                title: `${loan?.loanRef} Loan`,
+                color: "green",
+                disallowClose: true,
+                message: `This Loan Was Successfully Cleared!`,
+              }))
+          );
+        }
 
         let rem_amount = amount;
 
@@ -225,7 +261,7 @@ export const paymentsRouter = t.router({
 
         total_amount += amount;
 
-        /* if (t.state === "paid") { */
+        /* if (t.state === "loan") { */
         /*   await prisma.transaction.update({ */
         /*     where: { */
         /*       id: t.id, */
@@ -240,11 +276,6 @@ export const paymentsRouter = t.router({
         /*     }, */
         /*   }); */
         /* } */
-
-        if (loan.cleared === true) return;
-        if (t.state === "paid") return;
-        if (t.payment === "membership") return;
-        if (t.state === "handled") return;
 
         if (os_balance === 0) {
           const add = await prisma.payment.create({
@@ -273,6 +304,7 @@ export const paymentsRouter = t.router({
               },
               data: {
                 state: state,
+                payment: payment_state,
               },
             });
           }
@@ -302,7 +334,8 @@ export const paymentsRouter = t.router({
           id: id,
           mpesa: mpesa,
           type: type,
-          state: `${t.state}`,
+          state: (t.state === "new" && "new") || "handled",
+          payment: payment_state,
         });
 
         return payment;

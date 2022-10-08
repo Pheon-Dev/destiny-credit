@@ -59,15 +59,9 @@ export const TransactionsTable = ({
           <>Time</>
         </Group>
       </th>
-      <th>
-        Names
-      </th>
-      <th>
-        Amount
-      </th>
-      <th>
-        Phone
-      </th>
+      <th>Names</th>
+      <th>Amount</th>
+      <th>Phone</th>
       <th>
         <Group position="center">
           {(call === "transactions" && <>M-PESA</>) || <>Description</>}
@@ -78,7 +72,6 @@ export const TransactionsTable = ({
   const [value, setValue] = useState(new Date());
 
   const new_date = value?.toLocaleDateString();
-
 
   useEffect(() => {
     let subscribe = true;
@@ -207,32 +200,34 @@ const TransactionRow = ({
 }) => {
   const [updaterId, setUpdaterId] = useState("");
   const [handlerId, setHandlerId] = useState("");
-  const [description, setDescription] = useState("");
   const [open, setOpen] = useState(false);
   const router = useRouter();
   const utils = trpc.useContext();
   const ref = transaction?.billRefNumber?.split(" ");
-  const [paymentState, setPaymentState] = useState(
-    (ref[0]?.startsWith("ME") && "membership") ||
-    (ref[1] === "" && "membership") ||
-    (ref[0]?.startsWith("M") && "membership") ||
-    (ref[1]?.startsWith("F") && "membership") ||
-    (+transaction.transAmount > 700 && "mpc") ||
-    (+transaction.transAmount > 500 && "pc") ||
-    (+transaction.transAmount === 500 && "membership") ||
-    (ref[0]?.startsWith("PR") && "processing") ||
-    (ref[1] === "" && "processing") ||
-    (ref[0]?.startsWith("P") && "processing") ||
-    (ref[1]?.startsWith("F") && "processing") ||
-    "loan"
-  );
+
+  const memb_regexp = /m(e)(mb(er(ship)))/g
+  const proc_regexp = /p(r)(c(es(s(ing))))/g
+  const loan_regexp = /l(o(an))/g
+
+  const str = transaction.billRefNumber.toLowerCase()
+
+  const memb_matches = str["match"](memb_regexp) || ""
+  const proc_matches = str["match"](proc_regexp) || ""
+  const loan_matches = str["match"](loan_regexp) || ""
+
+  const [payment, setPayment] = useState(
+    memb_matches[0] === "membership" && ("membership") ||
+    loan_matches[0] === "loan" && ("loan") ||
+    proc_matches[0] === "processing" && ("processing") || "loan"
+  )
 
   const handle = trpc.transactions.state.useMutation({
     onSuccess: async () => {
       await utils.transactions.transaction.invalidate({
         id: transaction.id || "",
       });
-      if (paymentState === "membership") router.push(`/members/register/${transaction.transID}`)
+      if (payment === "membership")
+        router.push(`/members/register/${transaction.transID}`);
     },
   });
 
@@ -249,20 +244,13 @@ const TransactionRow = ({
 
   const handleState = useCallback(() => {
     try {
-      if (transaction.state === "handled") return;
-      let state = "";
-      let paymentFor = "";
-      if (transaction.state === "new") {
-        state = "handled";
-        paymentFor = paymentState;
-      }
       if (transaction.id) {
         handle.mutate({
           id: transaction.id,
           handlerId: `${handlerId}`,
           updaterId: `${updaterId}`,
-          payment: `${paymentFor}`,
-          state: `${state}`,
+          payment: `${payment}`,
+          state: `${transaction?.state}`,
         });
       }
       if (handle.error) {
@@ -276,7 +264,7 @@ const TransactionRow = ({
     handle,
     transaction.id,
     transaction.state,
-    paymentState,
+    payment,
     handlerId,
     updaterId,
   ]);
@@ -286,75 +274,39 @@ const TransactionRow = ({
     if (subscribe) {
       setHandlerId(handler);
       setUpdaterId(updater);
-      if (ref[0]?.startsWith("M")) {
-        if (ref[1]?.startsWith("F")) {
-          setDescription("membership");
-        }
-        if (ref[0]?.startsWith("ME")) {
-          setDescription("membership");
-        }
-        if (ref[0]?.startsWith("MEM")) {
-          setDescription("membership");
-        }
-        if (ref[1]?.length === 0) {
-          setDescription("membership");
-        }
-        if (ref[0]?.length === 0) {
-          setDescription("");
-        }
-      }
-
-      if (ref[0]?.startsWith("P")) {
-        if (ref[1]?.startsWith("F")) {
-          setDescription("processing");
-        }
-        if (ref[0]?.startsWith("PR")) {
-          setDescription("processing");
-        }
-        if (ref[0]?.startsWith("PRO")) {
-          setDescription("processing");
-        }
-        if (ref[1]?.length === 0) {
-          setDescription("processing");
-        }
-        if (ref[0]?.length === 0) {
-          setDescription("");
-        }
-      }
     }
 
     return () => {
       subscribe = false;
     };
-  }, [open, handler, updater, ref, description]);
+  }, [open, handler, updater, ref]);
 
   return (
     <>
       {call === "transactions" && transaction.transTime.startsWith(time) && (
         <tr>
           <td>
-            {transaction.billRefNumber !== "" && (
+            {(transaction.billRefNumber !== "" && (
               <Group>
-                {transaction.state === "new" && (
+                {(transaction.payment === "" && (
                   <IconCheck color="grey" size={16} />
-                )}
-                {transaction.state === "handled" && (
-                  <IconChecks color="blue" size={16} />
-                )}
-                {transaction.state === "paid" && (
-                  <IconChecks color="blue" size={16} />
-                )}
+                )) ||
+                  (transaction.payment !== "loan" && (
+                    <IconChecks color="blue" size={16} />
+                  )) ||
+                  (transaction.state === "handled" && (
+                    <IconChecks color="blue" size={16} />
+                  ))}
                 {date(transaction.transTime)}
               </Group>
-            ) ||
-              (
+            )) || (
                 <Group>
-                  {transaction.state === "new" && (
+                  {(transaction.state === "new" && (
                     <IconChecks color="grey" size={16} />
-                  )}
-                  {transaction.state === "paid" && (
-                    <IconChecks color="blue" size={16} />
-                  )}
+                  )) ||
+                    (transaction.state === "handled" && (
+                      <IconChecks color="blue" size={16} />
+                    ))}
                   {date(transaction.transTime)}
                 </Group>
               )}
@@ -378,7 +330,7 @@ const TransactionRow = ({
                   <Button
                     variant="light"
                     style={{
-                      height: "24px"
+                      height: "24px",
                     }}
                     onClick={() => {
                       transaction.billRefNumber !== "" && setOpen(true);
@@ -393,7 +345,7 @@ const TransactionRow = ({
       )}
       {call === "register" &&
         transaction.transTime.startsWith(time) &&
-        description === "membership" && (
+        payment === "membership" && (
           <tr>
             <td>{date(transaction.transTime)}</td>
             <td>
@@ -418,7 +370,7 @@ const TransactionRow = ({
                     <Button
                       variant="light"
                       style={{
-                        height: "24px"
+                        height: "24px",
                       }}
                       onClick={() => {
                         router.push(`/members/register/${transaction.transID}`);
@@ -433,7 +385,7 @@ const TransactionRow = ({
         )}
       {call === "maintain" &&
         transaction.transTime.startsWith(time) &&
-        description === "processing" && (
+        payment === "processing" && (
           <tr>
             <td>{date(transaction.transTime)}</td>
             <td>
@@ -458,7 +410,7 @@ const TransactionRow = ({
                     <Button
                       variant="light"
                       style={{
-                        height: "24px"
+                        height: "24px",
                       }}
                       onClick={() => {
                         router.push(`/loans/maintain/${transaction.transID}`);
@@ -539,14 +491,14 @@ const TransactionRow = ({
             )}
           </Card.Section>
         </Card>
-        {transaction.state === "new" && (
+        {transaction?.payment === "" && (
           <Box m="md">
             <Group position="center" m="md">
               <TitleText title="Payment" />
             </Group>
             <Radio.Group
-              value={paymentState}
-              onChange={setPaymentState}
+              value={payment}
+              onChange={setPayment}
               name="paymentFor"
               label="Please select an account to affirm this transaction ..."
               description="NOTE: Don't forget to submit after selection, no changes will be made upon cancellation."
@@ -558,7 +510,11 @@ const TransactionRow = ({
                   <Radio m="md" value="crb" label="CRB Fee" />
                   <Radio m="md" value="processing" label="Processing Fee" />
                   <Radio m="md" value="pc" label="Processing | CRB" />
-                  <Radio m="md" value="mpc" label="Membership | Processing | CRB" />
+                  <Radio
+                    m="md"
+                    value="mpc"
+                    label="Membership | Processing | CRB"
+                  />
                   <Radio m="md" value="loan" label="Loan" />
                   <Radio m="md" value="penalty" label="Penalty" />
                   <Radio m="md" value="other" label="Others" />

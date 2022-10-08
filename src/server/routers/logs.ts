@@ -1,7 +1,7 @@
 import axios from "axios";
 import { t } from "../trpc";
 import { prisma } from "../prisma";
-import { Fields, Logs } from "../../../types";
+import { Fields, Logs, TransactionsLog } from "../../../types";
 
 const LOGTAIL_API_TOKEN = process.env.NEXT_PUBLIC_LOGTAIL_API_TOKEN;
 
@@ -30,7 +30,7 @@ export const logsRouter = t.router({
     });
 
     const log = response.data;
-    let transactions: any = [];
+    let transactions: Array<TransactionsLog> = [];
 
     log.data?.map(async (t: Logs) => {
       if (t?.message.match("INTERNAL_SERVER_ERROR"))
@@ -164,8 +164,7 @@ export const logsRouter = t.router({
 
             return {
               transaction: new_transaction,
-            }
-
+            };
           } catch (error) {
             return {
               message: "Error Writing ...",

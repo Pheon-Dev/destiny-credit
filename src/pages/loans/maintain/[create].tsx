@@ -1,4 +1,5 @@
 import React, { useCallback, useEffect, useState } from "react";
+import { Selection } from "../../../../types";
 import { Protected, TitleText } from "../../../components";
 import { NextPage } from "next";
 import { z } from "zod";
@@ -996,21 +997,13 @@ const CreateLoan = ({
     return roundOff((penalty_rate / 100) * +installment);
   };
 
-  const product_data = products?.map((_) => [
-    { key: _.id, value: `${_.id}`, label: `${_.productName}` },
-  ]);
-
-  let select_product: any = []
-  let select_guarantor: any = []
+  let select_product: Array<Selection> = []
+  let select_guarantor:  Array<Selection> = []
 
   products?.map((_) => [
     select_product.push({
       key: _.id, value: `${_.id}`, label: `${_.productName}`
     })
-  ]);
-
-  const guarantor_data = members?.map((_) => [
-    { key: _.id, value: `${_.id}`, label: `${_.firstName} ${_.lastName}` },
   ]);
 
   members?.map((_) => [
@@ -1622,7 +1615,7 @@ const CreateLoan = ({
                       label="Enter Guarantor Names"
                       placeholder="Enter Guarantor Names ..."
                       /* limit={6} */ // Default 5
-                      data={select_guarantor.map((m: any) => m.label)}
+                      data={select_guarantor.map((m) => m.label)}
                       {...guarantor_form.getInputProps("guarantorName")}
                       required
                     />

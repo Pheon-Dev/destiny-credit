@@ -1,6 +1,6 @@
 import { SelectItemProps } from "@mantine/core";
 
-export interface Video {
+export export interface Video {
   caption: string;
   video: {
     asset: {
@@ -84,25 +84,18 @@ export interface Title {
   title: string;
 }
 
-export type Data = {
-  data: {};
-};
-
-type Links = {
-  title: string;
-  data: {};
-};
-
-type Chevs = {
-  expand: boolean;
-};
-
 export interface MainLinkProps {
   icon: React.ReactNode;
   right?: React.ReactNode;
   color: string;
   label: string;
-  data?: any;
+  data?: Data;
+}
+
+export interface Data {
+  id: number;
+  name: string;
+  url: string;
 }
 
 export interface Members {
@@ -198,7 +191,7 @@ export interface MemberProps extends SelectItemProps {
   group: boolean;
 }
 
-interface Products {
+export interface Products {
   createdAt?: Date;
   updatedAt?: Date;
   id?: string;
@@ -218,7 +211,7 @@ interface Products {
   approved: boolean;
 }
 
-interface Guarantors {
+export interface Guarantors {
   id?: string;
   createdAt?: Date;
   updatedAt?: Date;
@@ -232,7 +225,7 @@ interface Guarantors {
   updaterId?: string;
 }
 
-interface Loans {
+export interface Loans {
   id?: string;
   createdAt?: Date;
   updatedAt?: Date;
@@ -276,7 +269,7 @@ interface Loans {
   updaterId?: string;
 }
 
-interface Collaterals {
+export interface Collaterals {
   id?: string;
   createdAt?: Date;
   updatedAt?: Date;
@@ -288,36 +281,53 @@ interface Collaterals {
   updaterId?: string;
 }
 
-interface State {
+export interface Selection {
+  key: string;
   value: string;
   label: string;
 }
 
-interface Notifications {
+export interface State {
+  value: string;
+  label: string;
+}
+
+export interface Notifications {
   id: string;
   title: string;
   message: string;
   icon?: React.ReactNode;
   loading?: boolean;
   color?: string;
-  autoClose?: number;
+  radius?: MantineNumberSize;
+  className?: string;
+  style?: React.CSSProperties;
+  autoClose?: boolean | number;
+  disallowClose?: boolean;
+  onClose?(props: NotificationProps): void;
+  onOpen?(props: NotificationProps): void;
 }
 
-interface Payment {
-  amount: number,
-  total: number,
-  outsArrears: number,
-  paidArrears: number,
-  outsPenalty: number,
-  paidPenalty: number,
-  outsInterest: number,
-  paidInterest: number,
-  outsPrincipal: number,
-  paidPrincipal: number,
-  outsBalance: number,
-  currInstDate: string,
-  id: string,
-  mpesa: string,
-  type: string,
-  state: string,
+export interface TransactionsLog {
+  transaction: Array<Fields>;
+}
+
+export interface Payment {
+  amount: number;
+  total: number;
+  outsArrears: number;
+  paidArrears: number;
+  outsPenalty: number;
+  paidPenalty: number;
+  outsInterest: number;
+  paidInterest: number;
+  outsPrincipal: number;
+  paidPrincipal: number;
+  outsBalance: number;
+  currInstDate: string;
+  id: string;
+  mpesa: string;
+  type: string;
+  state: "new" | "handled";
+  payment?: "loan" | "membership" | "processing" | "crb" | "penalty" | "other" | "mpc" | "pc" | "mp";
 }
