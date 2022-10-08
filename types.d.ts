@@ -252,7 +252,7 @@ interface Loans {
   memberName: string;
   processingFee: string;
   loanRef: string;
-  disbursedOn?:string;
+  disbursedOn?: string;
   startDate?: string;
   paymentCounter?: string;
   paymentCount?: string;
@@ -286,4 +286,38 @@ interface Collaterals {
   memberId: string;
   updater?: string;
   updaterId?: string;
+}
+
+interface State {
+  value: string;
+  label: string;
+}
+
+interface Notifications {
+  id: string;
+  title: string;
+  message: string;
+  icon?: React.ReactNode;
+  loading?: boolean;
+  color?: string;
+  autoClose?: number;
+}
+
+interface Payment {
+  amount: number,
+  total: number,
+  outsArrears: number,
+  paidArrears: number,
+  outsPenalty: number,
+  paidPenalty: number,
+  outsInterest: number,
+  paidInterest: number,
+  outsPrincipal: number,
+  paidPrincipal: number,
+  outsBalance: number,
+  currInstDate: string,
+  id: string,
+  mpesa: string,
+  type: string,
+  state: string,
 }

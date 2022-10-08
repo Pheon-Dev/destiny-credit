@@ -2,6 +2,7 @@ import { TRPCError } from "@trpc/server";
 import { z } from "zod";
 import { t } from "../trpc";
 import { prisma } from "../prisma";
+import { Notifications, Payment } from "../../../types";
 
 export const paymentsRouter = t.router({
   payment: t.procedure
@@ -44,10 +45,10 @@ export const paymentsRouter = t.router({
       }
       const transactions = await prisma.transaction.findMany({
         where: {
-          firstName: loan?.memberName.split(" ")[0],
-          middleName: loan?.memberName.split(" ")[1],
-          lastName: loan?.memberName.split(" ")[2],
-          /* msisdn: loan?.phone */
+          firstName: loan?.member?.firstName,
+          middleName: loan?.member?.lastName.split(" ")[0],
+          lastName: loan?.member?.lastName.split(" ")[1],
+          msisdn: loan?.member?.phoneNumber,
         },
         orderBy: {
           createdAt: "asc",
@@ -119,7 +120,9 @@ export const paymentsRouter = t.router({
           loan?.payment[loan?.payment.length - 1]?.outsBalance) ||
         installment * (tenure - sundays);
 
-      let payment: any = [];
+      let payment: Array<Payment> = [];
+      let notification: Array<Notifications> = [];
+
       let os_arrears = +outsArrears;
       let pd_arrears = +paidArrears;
 
@@ -157,7 +160,12 @@ export const paymentsRouter = t.router({
           start = +str;
         }
 
-        if (+current < +start) return;
+        if (+current < +start) return notification.push({
+          id: "payment-status",
+          title: "Payment State",
+          color: "red",
+          message: `Payment is before first installement date of ${loan?.startDate} ...`,
+        });
 
         let rem_amount = amount;
 
@@ -217,23 +225,23 @@ export const paymentsRouter = t.router({
 
         total_amount += amount;
 
-        if (t.state === "paid") {
-          await prisma.transaction.update({
-            where: {
-              id: t.id,
-            },
-            data: {
-              state: "new",
-            },
-          });
-          return await prisma.payment.deleteMany({
-            where: {
-              loanId: input.id,
-            },
-          });
-        }
+        /* if (t.state === "paid") { */
+        /*   await prisma.transaction.update({ */
+        /*     where: { */
+        /*       id: t.id, */
+        /*     }, */
+        /*     data: { */
+        /*       state: "new", */
+        /*     }, */
+        /*   }); */
+        /*   return await prisma.payment.deleteMany({ */
+        /*     where: { */
+        /*       loanId: input.id, */
+        /*     }, */
+        /*   }); */
+        /* } */
 
-        if (loan.cleared) return;
+        if (loan.cleared === true) return;
         if (t.state === "paid") return;
         if (t.payment === "membership") return;
         if (t.state === "handled") return;
@@ -294,7 +302,7 @@ export const paymentsRouter = t.router({
           id: id,
           mpesa: mpesa,
           type: type,
-          state: t.state,
+          state: `${t.state}`,
         });
 
         return payment;
@@ -304,6 +312,7 @@ export const paymentsRouter = t.router({
         loan: loan,
         payment: payment,
         transactions: transactions,
+        notification: notification,
       };
 
       return data;

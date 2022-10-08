@@ -7,6 +7,8 @@ import { NextPage } from "next";
 import { IconLoader2 } from "@tabler/icons";
 import { Transaction } from "@prisma/client";
 import { useSession } from "next-auth/react";
+import { State, Payment } from "../../../../types";
+import { showNotification } from "@mantine/notifications";
 
 const PaymentsList = ({ email, status }: { email: string; status: string }) => {
   const [user, setUser] = useState({
@@ -79,8 +81,10 @@ const PaymentsList = ({ email, status }: { email: string; status: string }) => {
 
   const transactions = payment?.transactions
 
-  let paid: any = [];
-  let recent: any = [];
+  const notification = payment?.notification
+
+  let paid: Array<State> = [];
+  let recent: Array<State> = [];
 
   const date = (time: string) => {
     const day = time.slice(6, 8);
@@ -94,8 +98,6 @@ const PaymentsList = ({ email, status }: { email: string; status: string }) => {
     /* return d.toDateString().slice(0, 11) + '"' + year.slice(2) */
     return d.toDateString()
   };
-
-  console.table({ ...transactions })
 
   transactions?.map(
     (t: Transaction) =>
@@ -166,6 +168,8 @@ const PaymentsList = ({ email, status }: { email: string; status: string }) => {
       console.log("Error Handling State!");
     }
   }, [handle, data]);
+
+  console.table({ ...payment })
 
   return (
     <Suspense
@@ -273,72 +277,78 @@ const PaymentsList = ({ email, status }: { email: string; status: string }) => {
                   <td>{payment.mpesa}</td>
                 </tr>
               )))}
-              {!payment?.loan?.cleared && (payment?.payment?.map((payment: any) => (
-                <tr key={payment?.mpesa} style={{ cursor: "auto" }}>
-                  <td>{payment?.currInstDate}</td>
-                  <td>
-                    {`${payment.amount}`.replace(
-                      /\B(?=(\d{3})+(?!\d))/g,
-                      ","
-                    )}
-                  </td>
-                  <td>
-                    {`${payment.outsArrears}`.replace(
-                      /\B(?=(\d{3})+(?!\d))/g,
-                      ","
-                    )}
-                  </td>
-                  <td>
-                    {`${payment.paidArrears}`.replace(
-                      /\B(?=(\d{3})+(?!\d))/g,
-                      ","
-                    )}
-                  </td>
-                  <td>
-                    {`${payment.outsPenalty}`.replace(
-                      /\B(?=(\d{3})+(?!\d))/g,
-                      ","
-                    )}
-                  </td>
-                  <td>
-                    {`${payment.paidPenalty}`.replace(
-                      /\B(?=(\d{3})+(?!\d))/g,
-                      ","
-                    )}
-                  </td>
-                  <td>
-                    {`${payment.outsInterest}`.replace(
-                      /\B(?=(\d{3})+(?!\d))/g,
-                      ","
-                    )}
-                  </td>
-                  <td>
-                    {`${payment.paidInterest}`.replace(
-                      /\B(?=(\d{3})+(?!\d))/g,
-                      ","
-                    )}
-                  </td>
-                  <td>
-                    {`${payment.outsPrincipal}`.replace(
-                      /\B(?=(\d{3})+(?!\d))/g,
-                      ","
-                    )}
-                  </td>
-                  <td>
-                    {`${payment.paidPrincipal}`.replace(
-                      /\B(?=(\d{3})+(?!\d))/g,
-                      ","
-                    )}
-                  </td>
-                  <td>
-                    {`${payment.outsBalance}`.replace(
-                      /\B(?=(\d{3})+(?!\d))/g,
-                      ","
-                    )}
-                  </td>
-                  <td>{payment.mpesa}</td>
-                </tr>
-              )))}
+              {!payment?.loan?.cleared && (<>
+                {payment?.payment?.map((payment: Payment) => (
+                  <tr key={payment?.mpesa} style={{ cursor: "auto" }}>
+                    <td>{payment?.currInstDate}</td>
+                    <td>
+                      {`${payment.amount}`.replace(
+                        /\B(?=(\d{3})+(?!\d))/g,
+                        ","
+                      )}
+                    </td>
+                    <td>
+                      {`${payment.outsArrears}`.replace(
+                        /\B(?=(\d{3})+(?!\d))/g,
+                        ","
+                      )}
+                    </td>
+                    <td>
+                      {`${payment.paidArrears}`.replace(
+                        /\B(?=(\d{3})+(?!\d))/g,
+                        ","
+                      )}
+                    </td>
+                    <td>
+                      {`${payment.outsPenalty}`.replace(
+                        /\B(?=(\d{3})+(?!\d))/g,
+                        ","
+                      )}
+                    </td>
+                    <td>
+                      {`${payment.paidPenalty}`.replace(
+                        /\B(?=(\d{3})+(?!\d))/g,
+                        ","
+                      )}
+                    </td>
+                    <td>
+                      {`${payment.outsInterest}`.replace(
+                        /\B(?=(\d{3})+(?!\d))/g,
+                        ","
+                      )}
+                    </td>
+                    <td>
+                      {`${payment.paidInterest}`.replace(
+                        /\B(?=(\d{3})+(?!\d))/g,
+                        ","
+                      )}
+                    </td>
+                    <td>
+                      {`${payment.outsPrincipal}`.replace(
+                        /\B(?=(\d{3})+(?!\d))/g,
+                        ","
+                      )}
+                    </td>
+                    <td>
+                      {`${payment.paidPrincipal}`.replace(
+                        /\B(?=(\d{3})+(?!\d))/g,
+                        ","
+                      )}
+                    </td>
+                    <td>
+                      {`${payment.outsBalance}`.replace(
+                        /\B(?=(\d{3})+(?!\d))/g,
+                        ","
+                      )}
+                    </td>
+                    <td>{payment.mpesa}</td>
+                  </tr>
+                )
+                )
+                }
+              </>
+              )
+              }
 
               {payment.loan.payment.length > 0 && (
 
@@ -414,28 +424,43 @@ const PaymentsList = ({ email, status }: { email: string; status: string }) => {
           </Table>
         </>
       )}
-      {/* <Group position="center" m="lg"> */}
-      {/*   <TitleText title={`M-PESA Payments`} /> */}
-      {/* </Group> */}
-      {/* <Group position="center" m="lg"> */}
-      {/*   <TransferList */}
-      {/*     value={data} */}
-      {/*     onChange={setData} */}
-      {/*     listHeight={300} */}
-      {/*     searchPlaceholder="Search..." */}
-      {/*     nothingFound="Nothing here" */}
-      {/*     titles={["Recent", "Paid"]} */}
-      {/*     breakpoint="sm" */}
-      {/*   /> */}
-      {/* </Group> */}
-      {/* <Group position="center" m="lg"> */}
-      {/*   {data[0].length > 0 && ( */}
-      {/*     <Button variant="gradient" onClick={handleState}> */}
-      {/*       Handle */}
-      {/*     </Button> */}
-      {/*   )} */}
-      {/* </Group> */}
-      {/* <pre>{JSON.stringify(payment, undefined, 2)}</pre> */}
+      <Group position="center" m="lg">
+        <TitleText title={`M-PESA Payments`} />
+      </Group>
+      <Group position="center" m="lg">
+        <TransferList
+          value={data}
+          onChange={setData}
+          listHeight={300}
+          searchPlaceholder="Search..."
+          nothingFound="Nothing here"
+          titles={["Recent", "Paid"]}
+          breakpoint="sm"
+        />
+      </Group>
+      <Group position="center" m="lg">
+        {data[0].length > 0 && (
+          <Button variant="gradient" onClick={handleState}>
+            Handle
+          </Button>
+        )}
+      </Group>
+      {<>{
+        notification?.map((_) => (
+
+          showNotification({
+            id: _.id,
+            color: _.color,
+            title: _.title,
+            message: _.message,
+            loading: _.loading,
+            autoClose: _.autoClose,
+          })
+
+        ))
+      }</>
+      }
+      <pre>{JSON.stringify(payment, undefined, 2)}</pre>
     </Suspense>
   );
 };
