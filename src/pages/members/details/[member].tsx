@@ -26,10 +26,13 @@ const Page: NextPage = () => {
   const firstname = member?.firstName;
   const middlename = member?.lastName.split(" ")[0];
   const lastname = member?.lastName.split(" ")[1];
+  const phone = member?.phoneNumber;
+
   const { data: transactions } = trpc.transactions.payments.useQuery({
     firstname: `${firstname}`,
     middlename: `${middlename}`,
     lastname: `${lastname}`,
+    phone: `${phone}`,
   });
 
   const TransactionsTable = () => {

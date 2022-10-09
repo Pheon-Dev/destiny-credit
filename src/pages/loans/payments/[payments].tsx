@@ -151,7 +151,7 @@ const PaymentsList = ({ email, status }: { email: string; status: string }) => {
             handlerId: `${user?.id}`,
             updaterId: `${user?.id}`,
             payment: `loan`,
-            state: `loan`,
+            state: `handled`,
           });
         });
       }
@@ -162,13 +162,14 @@ const PaymentsList = ({ email, status }: { email: string; status: string }) => {
 
   if (notification) {
     <>
-      {notification?.map((_) =>
+      {notification?.forEach((_) =>
         showNotification({
           id: _.id,
           color: _.color,
           title: _.title,
           message: _.message,
           loading: _.loading,
+          disallowClose: _.disallowClose,
           autoClose: _.autoClose,
         })
       )}
@@ -383,64 +384,54 @@ const PaymentsList = ({ email, status }: { email: string; status: string }) => {
                 <tr style={{ backgroundColor: "grey", color: "white" }}>
                   <td>TOTAL</td>
                   <td>
-                    {`${
-                      payment.loan.payment[payment.loan.payment.length - 1]
-                        ?.total
-                    }`.replace(/\B(?=(\d{3})+(?!\d))/g, ",")}
+                    {`${payment.loan.payment[payment.loan.payment.length - 1]
+                      ?.total
+                      }`.replace(/\B(?=(\d{3})+(?!\d))/g, ",")}
                   </td>
                   <td>
-                    {`${
-                      payment.loan.payment[payment.loan.payment.length - 1]
-                        ?.outsArrears
-                    }`.replace(/\B(?=(\d{3})+(?!\d))/g, ",")}
+                    {`${payment.loan.payment[payment.loan.payment.length - 1]
+                      ?.outsArrears
+                      }`.replace(/\B(?=(\d{3})+(?!\d))/g, ",")}
                   </td>
                   <td>
-                    {`${
-                      payment.loan.payment[payment.loan.payment.length - 1]
-                        ?.paidArrears
-                    }`.replace(/\B(?=(\d{3})+(?!\d))/g, ",")}
+                    {`${payment.loan.payment[payment.loan.payment.length - 1]
+                      ?.paidArrears
+                      }`.replace(/\B(?=(\d{3})+(?!\d))/g, ",")}
                   </td>
                   <td>
-                    {`${
-                      payment.loan.payment[payment.loan.payment.length - 1]
-                        ?.outsPenalty
-                    }`.replace(/\B(?=(\d{3})+(?!\d))/g, ",")}
+                    {`${payment.loan.payment[payment.loan.payment.length - 1]
+                      ?.outsPenalty
+                      }`.replace(/\B(?=(\d{3})+(?!\d))/g, ",")}
                   </td>
                   <td>
-                    {`${
-                      payment.loan.payment[payment.loan.payment.length - 1]
-                        ?.paidPenalty
-                    }`.replace(/\B(?=(\d{3})+(?!\d))/g, ",")}
+                    {`${payment.loan.payment[payment.loan.payment.length - 1]
+                      ?.paidPenalty
+                      }`.replace(/\B(?=(\d{3})+(?!\d))/g, ",")}
                   </td>
                   <td>
-                    {`${
-                      payment.loan.payment[payment.loan.payment.length - 1]
-                        ?.outsInterest
-                    }`.replace(/\B(?=(\d{3})+(?!\d))/g, ",")}
+                    {`${payment.loan.payment[payment.loan.payment.length - 1]
+                      ?.outsInterest
+                      }`.replace(/\B(?=(\d{3})+(?!\d))/g, ",")}
                   </td>
                   <td>
-                    {`${
-                      payment.loan.payment[payment.loan.payment.length - 1]
-                        ?.paidInterest
-                    }`.replace(/\B(?=(\d{3})+(?!\d))/g, ",")}
+                    {`${payment.loan.payment[payment.loan.payment.length - 1]
+                      ?.paidInterest
+                      }`.replace(/\B(?=(\d{3})+(?!\d))/g, ",")}
                   </td>
                   <td>
-                    {`${
-                      payment.loan.payment[payment.loan.payment.length - 1]
-                        ?.outsPrincipal
-                    }`.replace(/\B(?=(\d{3})+(?!\d))/g, ",")}
+                    {`${payment.loan.payment[payment.loan.payment.length - 1]
+                      ?.outsPrincipal
+                      }`.replace(/\B(?=(\d{3})+(?!\d))/g, ",")}
                   </td>
                   <td>
-                    {`${
-                      payment.loan.payment[payment.loan.payment.length - 1]
-                        ?.paidPrincipal
-                    }`.replace(/\B(?=(\d{3})+(?!\d))/g, ",")}
+                    {`${payment.loan.payment[payment.loan.payment.length - 1]
+                      ?.paidPrincipal
+                      }`.replace(/\B(?=(\d{3})+(?!\d))/g, ",")}
                   </td>
                   <td>
-                    {`${
-                      payment.loan.payment[payment.loan.payment.length - 1]
-                        ?.outsBalance
-                    }`.replace(/\B(?=(\d{3})+(?!\d))/g, ",")}
+                    {`${payment.loan.payment[payment.loan.payment.length - 1]
+                      ?.outsBalance
+                      }`.replace(/\B(?=(\d{3})+(?!\d))/g, ",")}
                   </td>
                   <td>TOTAL</td>
                 </tr>
@@ -469,7 +460,7 @@ const PaymentsList = ({ email, status }: { email: string; status: string }) => {
       <Group position="center" m="lg">
         {data[0].length > 0 && (
           <Button variant="gradient" onClick={handleState}>
-            Handle
+            Save Changes
           </Button>
         )}
       </Group>

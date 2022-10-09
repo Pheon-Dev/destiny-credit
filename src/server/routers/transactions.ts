@@ -37,7 +37,7 @@ export const transactionsRouter = t.router({
         firstname: z.string(),
         middlename: z.string(),
         lastname: z.string(),
-        /* phone: z.string(), */
+        phone: z.string(),
       })
     )
     .query(async ({ input }) => {
@@ -46,7 +46,7 @@ export const transactionsRouter = t.router({
           firstName: input.firstname,
           middleName: input.middlename,
           lastName: input.lastname,
-          /* msisdn: input.phone, */
+          msisdn: input.phone,
         },
         orderBy: {
           transTime: "desc",

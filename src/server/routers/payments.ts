@@ -162,21 +162,23 @@ export const paymentsRouter = t.router({
 
         if (loan.cleared === true) {
           return notification.push({
-            id: "cleared",
-            title: `${loan?.loanRef} Loan`,
+            id: `${t.id}`,
+            title: `Transaction ${t.transID}`,
             color: "green",
             disallowClose: true,
+            autoClose: false,
             message: `This Loan Was Successfully Cleared!`,
           });
         }
 
         if (t.state === "handled") {
           return notification.push({
-            id: "handled",
-            title: `${loan?.loanRef} Loan`,
+            id: `${t.id}`,
+            title: `Transaction ${t.transID}`,
             color: "blue",
             disallowClose: true,
-            message: `${t.transID}: M-PESA Payment of KSHs. ${t.transAmount
+            autoClose: 10000,
+            message: `M-PESA Payment of KSHs. ${t.transAmount
               } via ${(t.billRefNumber === "" && "Till") || "Pay Bill"
               } is already paid for ${t?.payment}`,
           });
@@ -184,19 +186,19 @@ export const paymentsRouter = t.router({
 
         if (+current < +start) {
           return (
-            (t.state === "new" &&
-              notification.push({
-                id: "new",
-                title: `${loan?.loanRef} Loan`,
-                color: "red",
-                disallowClose: true,
-                message: `${t.transID}: M-PESA Payment of KSHs. ${t.transAmount
-                  } via ${(t.billRefNumber === "" && "Till") || "Pay Bill"
-                  } is before first installement date of ${loan?.startDate}`,
-              }))
+            t.state === "new" &&
+            notification.push({
+              id: `${t.id}`,
+              title: `Transaction ${t.transID}`,
+              color: "orange",
+              disallowClose: true,
+              autoClose: 20000,
+              message: `M-PESA Payment of KSHs. ${t.transAmount
+                } via ${(t.billRefNumber === "" && "Till") || "Pay Bill"
+                } is before first installement date of ${loan?.startDate}`,
+            })
           );
         }
-
 
         let rem_amount = amount;
 
