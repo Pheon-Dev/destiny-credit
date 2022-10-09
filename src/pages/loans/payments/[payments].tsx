@@ -10,10 +10,9 @@ import {
   Table,
   TransferList,
   TransferListData,
-  useMantineColorScheme,
 } from "@mantine/core";
 import { NextPage } from "next";
-import { IconLoader2 } from "@tabler/icons";
+import { IconLoader } from "@tabler/icons";
 import { Transaction } from "@prisma/client";
 import { useSession } from "next-auth/react";
 import { State, Payment } from "../../../../types";
@@ -234,7 +233,7 @@ const PaymentsList = ({ email, status }: { email: string; status: string }) => {
           <Group position="apart" m="lg">
             <TitleText title={`${payment?.loan.memberName}`} />
             {(payments?.fetchStatus === "fetching" && <Loader />) || (
-              <IconLoader2 onClick={() => payments?.refetch()} />
+              <IconLoader onClick={() => payments?.refetch()} />
             )}
           </Group>
           <Table striped highlightOnHover horizontalSpacing="md">
