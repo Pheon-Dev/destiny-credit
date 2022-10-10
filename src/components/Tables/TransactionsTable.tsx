@@ -90,7 +90,6 @@ export const TransactionsTable = ({
     time,
     value,
     locale,
-    fetchStatus,
   ]);
 
   return (
