@@ -28,6 +28,7 @@ export const TransactionsTable = ({
   const [time, setTime] = useState("");
   const [locale, setLocale] = useState(false);
 
+  const router = useRouter();
   const logs = trpc.logs.logs.useQuery();
 
   const { data: transactions, fetchStatus } =
@@ -58,6 +59,9 @@ export const TransactionsTable = ({
   useEffect(() => {
     let subscribe = true;
     if (subscribe) {
+      setInterval(() => {
+        router.replace(router.asPath)
+      }, 800000)
       let yy = new_date?.split("/")[2];
       let mm =
         +new_date?.split("/")[1] < 10
@@ -90,6 +94,7 @@ export const TransactionsTable = ({
     time,
     value,
     locale,
+    logs.data?.message,
   ]);
 
   return (

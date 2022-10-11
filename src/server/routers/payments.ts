@@ -65,9 +65,6 @@ export const paymentsRouter = t.router({
       };
 
       const date = (time: string) => {
-        const second = time.slice(12);
-        const minute = time.slice(10, 12);
-        const hour = time.slice(8, 10);
         const day = time.slice(6, 8);
         const month = time.slice(4, 6);
         const year = time.slice(0, 4);
