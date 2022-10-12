@@ -176,7 +176,7 @@ export const logsRouter = t.router({
       }
     });
     return {
-      message: `${transactions.length} Recent M-PESA Transactions from: ${new_date.split("T")[0]} to ${now_date.split("T")[0]}!`,
+      message: `${transactions.length} Recent M-PESA Transactions from: ${new_date.split("T")[0]} to ${now_date.split("T")[0]}`,
       data: transactions,
       from: new_date,
       to: now_date,

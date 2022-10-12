@@ -27,6 +27,7 @@ const PaymentsList = ({ email, status }: { email: string; status: string }) => {
     firstname: "",
     lastname: "",
     state: "",
+
   });
 
   const user_data = trpc.users.user.useQuery({

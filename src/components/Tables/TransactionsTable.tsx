@@ -59,9 +59,9 @@ export const TransactionsTable = ({
   useEffect(() => {
     let subscribe = true;
     if (subscribe) {
-      setInterval(() => {
-        router.replace(router.asPath)
-      }, 800000)
+      /* setInterval(() => { */
+      /*   router.replace(router.asPath) */
+      /* }, 800000) */
       let yy = new_date?.split("/")[2];
       let mm =
         +new_date?.split("/")[1] < 10
