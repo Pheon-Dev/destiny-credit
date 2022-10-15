@@ -166,7 +166,7 @@ const TransactionRow = ({
   const router = useRouter();
 
   const memb_regexp = /m(e)(mb(er(ship)))/g
-  const proc_regexp = /p(r)(c(es(s(ing))))/g
+  const proc_regexp = /p(ro)(c(es(s(ing))))/g
   const loan_regexp = /l(o(an))/g
 
   const str = transaction.billRefNumber.toLowerCase()

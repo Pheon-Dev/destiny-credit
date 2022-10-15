@@ -85,11 +85,8 @@ const PaymentsList = ({ email, status }: { email: string; status: string }) => {
   };
 
   const payments = trpc.payments.payment.useQuery({ id: id });
-
   const payment = payments?.data;
-
   const transactions = payment?.transactions;
-
   const notification = payment?.notification;
 
   let loan: Array<State> = [];
