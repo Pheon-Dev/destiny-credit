@@ -1,4 +1,4 @@
-import React, { useCallback, useEffect, useMemo, useState } from "react";
+import React, { useCallback, useEffect, useState } from "react";
 import { TitleText, EmptyTable } from "../../components";
 import {
   Table,
@@ -12,19 +12,24 @@ import {
   Box,
   Button,
   Loader,
+  TextInput,
+  Select,
+  Autocomplete,
 } from "@mantine/core";
 import type { Transaction } from "@prisma/client";
 import { useRouter } from "next/router";
 import { DatePicker } from "@mantine/dates";
 import dayjs from "dayjs";
 import { trpc } from "../../utils/trpc";
+import { z } from "zod";
+import { useForm, zodResolver } from "@mantine/form";
 import { IconCheck, IconChecks, IconClock } from "@tabler/icons";
+import { Transactions } from "../../../types";
 
-export const TransactionsTable = ({
-  call,
-}: {
-  call: string;
-}) => {
+const schema = z.object({
+  id: z.string().min(1, { message: "" }),
+});
+export const TransactionsTable = ({ call }: { call: string }) => {
   const [time, setTime] = useState("");
   const [locale, setLocale] = useState(false);
 
@@ -34,7 +39,12 @@ export const TransactionsTable = ({
   const { data: transactions, fetchStatus } =
     trpc.transactions.transactions.useQuery();
 
-   useMemo(() => {}, [transactions, logs]) 
+  const form = useForm({
+    validate: zodResolver(schema),
+    initialValues: {
+      id: "",
+    },
+  });
 
   const Header = () => (
     <tr>
@@ -86,19 +96,20 @@ export const TransactionsTable = ({
         if (locale) setTime(`${dd}${mm}${yy}`);
         if (!locale) setTime(`${dd}${yy}${mm}`);
       }
-
     }
     return () => {
       subscribe = false;
     };
-  }, [
-    new_date,
-    time,
-    value,
-    locale,
-    logs.data?.message,
-  ]);
+  }, [new_date, time, value, locale, logs.data?.message]);
 
+  let select_member: Array<any> = [];
+  transactions?.map((_) => [
+    select_member.push({
+      key: _.transTime,
+      value: `${_.transID}`,
+      label: `${_.transID}: ${_.firstName} ${_.middleName} ${_.lastName}`,
+    }),
+  ]);
   return (
     <>
       {!transactions && <EmptyTable call={call} status={fetchStatus} />}
@@ -151,6 +162,24 @@ export const TransactionsTable = ({
         </>
       )}
       <pre>{JSON.stringify(logs.data?.message, undefined, 2)}</pre>
+      <Grid grow>
+        <Grid.Col span={4}>
+          <Autocomplete
+            mt="md"
+            label="Enter Member Names"
+            placeholder="Enter Member Names ..."
+            limit={6} // Default 5
+            data={select_member.map((m) => m.label)}
+            {...form.getInputProps("id")}
+            required
+          />
+          <Button variant="light" onClick={() => {
+            router.push(`/members/register/${form.values.id.split(":")[0]}`);
+          }}>
+            Add
+          </Button>
+        </Grid.Col>
+      </Grid>
     </>
   );
 };
@@ -167,21 +196,22 @@ const TransactionRow = ({
   const [open, setOpen] = useState(false);
   const router = useRouter();
 
-  const memb_regexp = /m(e)(mb(er(ship)))/g
-  const proc_regexp = /p(ro)(c(es(s(ing))))/g
-  const loan_regexp = /l(o(an))/g
+  const memb_regexp = /m(e)(mb(er(ship)))/g;
+  const proc_regexp = /p(ro)(c(es(s(ing))))/g;
+  const loan_regexp = /l(o(an))/g;
 
-  const str = transaction.billRefNumber.toLowerCase()
+  const str = transaction.billRefNumber.toLowerCase();
 
-  const memb_matches = str["match"](memb_regexp) || ""
-  const proc_matches = str["match"](proc_regexp) || ""
-  const loan_matches = str["match"](loan_regexp) || ""
+  const memb_matches = str["match"](memb_regexp) || "";
+  const proc_matches = str["match"](proc_regexp) || "";
+  const loan_matches = str["match"](loan_regexp) || "";
 
   const [payment, setPayment] = useState(
-    memb_matches[0] === "membership" && ("membership") ||
-    loan_matches[0] === "loan" && ("loan") ||
-    proc_matches[0] === "processing" && ("processing") || "loan"
-  )
+    (memb_matches[0] === "membership" && "membership") ||
+    (loan_matches[0] === "loan" && "loan") ||
+    (proc_matches[0] === "processing" && "processing") ||
+    "loan"
+  );
 
   const date = (time: string) => {
     const minute = time.slice(10, 12);
@@ -197,10 +227,7 @@ const TransactionRow = ({
     } catch (error) {
       return;
     }
-  }, [
-    transaction.transID,
-    payment,
-  ]);
+  }, [transaction.transID, payment]);
 
   return (
     <>
@@ -296,7 +323,9 @@ const TransactionRow = ({
                             height: "24px",
                           }}
                           onClick={() => {
-                            router.push(`/members/register/${transaction.transID}`);
+                            router.push(
+                              `/members/register/${transaction.transID}`
+                            );
                           }}
                         >
                           {transaction.billRefNumber.split(" ")[0]}

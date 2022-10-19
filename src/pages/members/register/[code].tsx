@@ -188,9 +188,12 @@ const CreateMember = ({ email, status }: { email: string; status: string }) => {
         "lastName",
         `${transaction?.middleName} ${transaction?.lastName}`
       );
-      form.setFieldValue("mpesaCode", `${transaction?.transID}`);
       form.setFieldValue("phoneNumber", `${transaction?.msisdn}`);
-      form.setFieldValue("membershipAmount", `${transaction?.transAmount}`);
+
+      form.setFieldValue("mpesaCode", "INACCESSIBLE");
+      form.setFieldValue("membershipAmount", "500");
+      /* form.setFieldValue("mpesaCode", `${transaction?.transID}`); */
+      /* form.setFieldValue("membershipAmount", `${transaction?.transAmount}`); */
     }
     return () => {
       subscribe = false;
@@ -428,8 +431,10 @@ const CreateMember = ({ email, status }: { email: string; status: string }) => {
             id: id,
             handlerId: `${user?.id}`,
             updaterId: `${user?.id}`,
-            payment: `membership`,
-            state: `handled`,
+            /* payment: `membership`, */
+            /* state: `handled`, */
+            payment: `${transaction?.payment}`,
+            state: `${transaction?.state}`,
           });
         }
       } catch (error) {
@@ -452,7 +457,7 @@ const CreateMember = ({ email, status }: { email: string; status: string }) => {
         autoClose: 5000,
       });
     }
-  }, [form.values, dash_today_date, dash_birth_date, member, user?.id]);
+  }, [form.values, dash_today_date, dash_birth_date, member, user?.id, transaction?.state, transaction?.payment]);
 
   return (
     <>
