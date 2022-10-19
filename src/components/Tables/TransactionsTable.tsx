@@ -1,4 +1,4 @@
-import React, { useCallback, useEffect, useState } from "react";
+import React, { useCallback, useEffect, useMemo, useState } from "react";
 import { TitleText, EmptyTable } from "../../components";
 import {
   Table,
@@ -33,6 +33,8 @@ export const TransactionsTable = ({
 
   const { data: transactions, fetchStatus } =
     trpc.transactions.transactions.useQuery();
+
+   useMemo(() => {}, [transactions, logs]) 
 
   const Header = () => (
     <tr>

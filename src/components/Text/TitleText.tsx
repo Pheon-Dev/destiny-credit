@@ -5,9 +5,7 @@ export const TitleText = ({ title }: Title) => {
   return (
     <Text
       component="span"
-      align="center"
-      variant="gradient"
-      gradient={{
+      align="center" variant="gradient" gradient={{
         from: "indigo",
         to: "cyan",
         deg: 45,

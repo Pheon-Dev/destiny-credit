@@ -155,7 +155,7 @@ const PaymentsList = ({ email, status }: { email: string; status: string }) => {
     } catch (error) {
       console.log("Error Handling State!");
     }
-  }, [handle, data]);
+  }, [handle, data, user?.id]);
 
   if (notification) {
     <>
@@ -166,7 +166,7 @@ const PaymentsList = ({ email, status }: { email: string; status: string }) => {
           title: _.title,
           message: _.message,
           loading: _.loading,
-          disallowClose: _.disallowClose,
+          disallowClose: !_.disallowClose,
           autoClose: _.autoClose,
         })
       )}

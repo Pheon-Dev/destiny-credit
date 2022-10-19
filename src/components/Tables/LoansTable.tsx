@@ -70,6 +70,7 @@ export const LoansTable = ({
       {user?.role !== "CO" && <th>Action</th>}
     </tr>
   );
+
   return (
     <>
       {!loans && <EmptyTable call="all-loans" status={fetchStatus} />}

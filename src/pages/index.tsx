@@ -1,6 +1,6 @@
 import React, { Suspense } from "react";
 import { TransactionsTable, Protected, EmptyTable } from "../components";
-import { NextPage } from "next";
+import type { NextPage } from 'next'
 
 const Page: NextPage = () => {
   const call = "transactions";
