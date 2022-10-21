@@ -72,14 +72,10 @@ export const paymentsRouter = t.router({
         return when;
       };
 
-      const principal = (+loan?.principal && +loan?.principal) || 0;
       const interest = (+loan?.interest && +loan?.interest) || 0;
       const installment = (+loan?.installment && +loan?.installment) || 0;
-      const penalty = (+loan?.penalty && +loan?.penalty) || 0;
       const sundays = (+loan?.sundays && +loan?.sundays) || 0;
       const tenure = (+loan?.tenure && +loan?.tenure) || 0;
-      const cycle = (+loan?.cycle && +loan?.cycle) || "";
-      const loanId = (loan?.id && loan?.id) || "";
       const outsArrears =
         (loan?.payment[loan?.payment.length - 1]?.outsArrears &&
           loan?.payment[loan?.payment.length - 1]?.outsArrears) ||

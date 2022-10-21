@@ -1,30 +1,10 @@
-import React, { useCallback, useEffect, useState } from "react";
-import { Selection } from "../../../../types";
-import { Protected, TitleText } from "../../../components";
-import { NextPage } from "next";
-import { z } from "zod";
-import { v4 as uuidV4 } from "uuid";
-import { useForm, zodResolver } from "@mantine/form";
 import {
-  Group,
-  Stepper,
-  Button,
-  Text,
-  TextInput,
-  Card,
-  Box,
-  Grid,
-  Select,
-  Menu,
-  ActionIcon,
-  Switch,
-  Autocomplete,
-  Tooltip,
-  Modal,
-  LoadingOverlay,
+  ActionIcon, Autocomplete, Box, Button, Card, Grid, Group, LoadingOverlay, Menu, Modal, Select, Stepper, Switch, Text,
+  TextInput, Tooltip
 } from "@mantine/core";
-import { useRouter } from "next/router";
+import { useForm, zodResolver } from "@mantine/form";
 import { showNotification, updateNotification } from "@mantine/notifications";
+import type { Collateral } from "@prisma/client";
 import {
   IconCheck,
   IconDots,
@@ -34,11 +14,17 @@ import {
   IconMinus,
   IconPlus,
   IconTrash,
-  IconX,
+  IconX
 } from "@tabler/icons";
-import { trpc } from "../../../utils/trpc";
-import type { Collateral, Loan, Member, Product } from "@prisma/client";
+import { NextPage } from "next";
 import { useSession } from "next-auth/react";
+import { useRouter } from "next/router";
+import React, { useCallback, useEffect, useState } from "react";
+import { v4 as uuidV4 } from "uuid";
+import { z } from "zod";
+import { Selection } from "../../../../types";
+import { Protected, TitleText } from "../../../components";
+import { trpc } from "../../../utils/trpc";
 
 const loan_schema = z.object({
   member: z.string().min(2, { message: "User Name Missing" }),
@@ -998,7 +984,7 @@ const CreateLoan = ({
   };
 
   let select_product: Array<Selection> = []
-  let select_guarantor:  Array<Selection> = []
+  let select_guarantor: Array<Selection> = []
 
   products?.map((_) => [
     select_product.push({

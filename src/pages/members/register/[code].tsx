@@ -1,23 +1,18 @@
-import React, { useState, useEffect, useCallback } from "react";
-import { z } from "zod";
-import { useSession } from "next-auth/react";
-import { useForm, zodResolver } from "@mantine/form";
-import { IconAlertCircle, IconCalendar, IconCheck, IconX } from "@tabler/icons";
-import { DatePicker } from "@mantine/dates";
 import {
-  LoadingOverlay,
-  TextInput,
-  Grid,
   Button,
-  Divider,
-  Group,
-  Select,
+  Divider, Grid, Group, LoadingOverlay, Select, TextInput
 } from "@mantine/core";
-import { Protected, TitleText } from "../../../components";
-import { useRouter } from "next/router";
+import { DatePicker } from "@mantine/dates";
+import { useForm, zodResolver } from "@mantine/form";
 import { showNotification, updateNotification } from "@mantine/notifications";
-import { trpc } from "../../../utils/trpc";
+import { IconAlertCircle, IconCalendar, IconCheck, IconX } from "@tabler/icons";
 import dayjs from "dayjs";
+import { useSession } from "next-auth/react";
+import { useRouter } from "next/router";
+import React, { useCallback, useEffect, useState } from "react";
+import { z } from "zod";
+import { Protected, TitleText } from "../../../components";
+import { trpc } from "../../../utils/trpc";
 
 const schema = z.object({
   date: z.date({ required_error: "Select Todays' Date" }),
@@ -70,7 +65,7 @@ const schema = z.object({
   numberKin: z.string().min(2, { message: "Enter  Phone # (kin)" }),
 });
 
-const CreateMember = ({ email, status }: { email: string; status: string }) => {
+const CreateMember = ({ email }: { email: string; status: string }) => {
   const router = useRouter();
   const id = router.query.code as string;
 
@@ -117,7 +112,6 @@ const CreateMember = ({ email, status }: { email: string; status: string }) => {
   const {
     data: members,
     status: members_status,
-    refetch,
   } = trpc.members.members.useQuery();
 
   const { data: transaction, status: transaction_status } =
