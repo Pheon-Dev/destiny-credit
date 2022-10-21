@@ -1,8 +1,8 @@
 import { TRPCError } from "@trpc/server";
 import { z } from "zod";
-import { t } from "../trpc";
-import { prisma } from "../prisma";
 import { Notifications, Payment } from "../../../types";
+import { prisma } from "../prisma";
+import { t } from "../trpc";
 
 export const paymentsRouter = t.router({
   payment: t.procedure

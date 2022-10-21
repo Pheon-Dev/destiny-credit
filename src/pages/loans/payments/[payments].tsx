@@ -27,7 +27,6 @@ const PaymentsList = ({ email, status }: { email: string; status: string }) => {
     firstname: "",
     lastname: "",
     state: "",
-
   });
 
   const user_data = trpc.users.user.useQuery({
@@ -204,8 +203,8 @@ const PaymentsList = ({ email, status }: { email: string; status: string }) => {
     <Suspense
       fallback={
         <>
-          <Group position="center" m="lg">
-            <TitleText title="Loading payment Payment Statement ..." />
+          <Group position='center' m="lg">
+            <TitleText title='Loading payment Payment Statement ...' />
           </Group>
           <Group position="center" m="lg" style={{ position: "relative" }}>
             <Skeleton height={16} radius="xl" />
