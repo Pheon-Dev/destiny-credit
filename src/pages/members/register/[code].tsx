@@ -184,7 +184,7 @@ const CreateMember = ({ email }: { email: string; status: string }) => {
       );
       form.setFieldValue("phoneNumber", `${transaction?.msisdn}`);
 
-      form.setFieldValue("membershipAmount", "500");
+      /* form.setFieldValue("membershipAmount", "500"); */
       form.setFieldValue("mpesaCode", `${transaction?.transID}`);
       form.setFieldValue("membershipAmount", `${transaction?.transAmount}`);
     }
