@@ -91,8 +91,8 @@ export const TransactionsTable = ({ call }: { call: string }) => {
   }, [new_date, time, value, locale, logs.data?.message]);
 
   let select_member: Array<any> = [];
-  transactions?.map((_) => [
-    select_member.push({
+  transactions?.map((_) => _.billRefNumber !== "" && _.state === "new" && [
+  select_member.push({
       key: _.transTime,
       value: `${_.transID}`,
       label: `${_.transID}: ${_.firstName} ${_.middleName} ${_.lastName} ${_.transTime} ${_.billRefNumber}`,
@@ -156,12 +156,12 @@ export const TransactionsTable = ({ call }: { call: string }) => {
             mt="md"
             label="Enter Member Names"
             placeholder="Enter Member Names ..."
-            limit={6} // Default 5
+            limit={8} // Default 5
             data={select_member.map((m) => m.label)}
             {...form.getInputProps("id")}
             required
           />
-          <Button variant="light" onClick={() => {
+          <Button variant="light" m="xl" onClick={() => {
             router.push(`/members/register/${form.values.id.split(":")[0]}`);
           }}>
             Add
@@ -280,8 +280,10 @@ const TransactionRow = ({
         </tr>
       )}
       {call === "register" &&
-        transaction.transTime.startsWith(time) &&
-        payment === "membership" && (
+        /* transaction.transTime.startsWith(time) && */
+        transaction.state === "new" &&
+        payment === "membership" &&
+        (
           <>
             {transaction.payment !== "" && (
               <tr>

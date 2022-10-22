@@ -1,7 +1,7 @@
 import React, { useState, useEffect, useCallback } from "react";
 import type { Member } from "@prisma/client";
 import { useRouter } from "next/router";
-import { IconEdit } from "@tabler/icons";
+import { IconInfoCircle  } from "@tabler/icons";
 import { Table, Badge, Group } from "@mantine/core";
 import { TitleText } from "../Text/TitleText";
 import { trpc } from "../../utils/trpc";
@@ -69,7 +69,7 @@ export const MembersTable = ({
       <th>ID</th>
       <th>Date</th>
       <th>Status</th>
-      {user?.role !== "CO" && <th>Action</th>}
+      {user?.role !== "CO" && <th>Info</th>}
     </tr>
   );
 
@@ -174,7 +174,7 @@ const MemberRow = ({
                 router.push(`/members/details/${member.id}`);
               }}
             >
-              <IconEdit size={24} />
+              <IconInfoCircle size={24} />
             </td>
           )}
         </tr>
@@ -207,7 +207,7 @@ const MemberRow = ({
                 router.push(`/members/details/${member.id}`);
               }}
             >
-              <IconEdit size={24} />
+              <IconInfoCircle size={24} />
             </td>
           )}
         </tr>

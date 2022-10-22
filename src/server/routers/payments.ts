@@ -1,6 +1,6 @@
 import { TRPCError } from "@trpc/server";
 import { z } from "zod";
-import { Notifications, Payment } from "../../../types";
+import { Notifications, Payment, Transactions } from "../../../types";
 import { prisma } from "../prisma";
 import { t } from "../trpc";
 
