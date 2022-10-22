@@ -1,7 +1,3 @@
-import React, { Suspense, useCallback, useEffect, useState } from "react";
-import { useRouter } from "next/router";
-import { trpc } from "../../../utils/trpc";
-import { Protected, TitleText } from "../../../components";
 import {
   Button,
   Group,
@@ -9,16 +5,20 @@ import {
   Skeleton,
   Table,
   TransferList,
-  TransferListData,
+  TransferListData
 } from "@mantine/core";
-import { NextPage } from "next";
-import { IconLoader } from "@tabler/icons";
-import { Transaction } from "@prisma/client";
-import { useSession } from "next-auth/react";
-import { State, Payment } from "../../../../types";
 import { showNotification } from "@mantine/notifications";
+import { Transaction } from "@prisma/client";
+import { IconLoader } from "@tabler/icons";
+import { NextPage } from "next";
+import { useSession } from "next-auth/react";
+import { useRouter } from "next/router";
+import { Suspense, useCallback, useEffect, useState } from "react";
+import { Payment, State } from "../../../../types";
+import { Protected, TitleText } from "../../../components";
+import { trpc } from "../../../utils/trpc";
 
-const PaymentsList = ({ email, status }: { email: string; status: string }) => {
+const PaymentsList = ({ email }: { email: string; status: string }) => {
   const [user, setUser] = useState({
     id: "",
     role: "",

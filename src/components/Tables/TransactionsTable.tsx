@@ -1,30 +1,18 @@
-import React, { useCallback, useEffect, useState } from "react";
-import { TitleText, EmptyTable } from "../../components";
 import {
-  Table,
-  Group,
-  Switch,
-  Modal,
-  Card,
-  Grid,
-  Text,
-  Radio,
-  Box,
-  Button,
-  Loader,
-  TextInput,
-  Select,
-  Autocomplete,
+  Autocomplete, Box,
+  Button, Card,
+  Grid, Group, Loader, Modal, Radio, Switch, Table, Text
 } from "@mantine/core";
-import type { Transaction } from "@prisma/client";
-import { useRouter } from "next/router";
 import { DatePicker } from "@mantine/dates";
-import dayjs from "dayjs";
-import { trpc } from "../../utils/trpc";
-import { z } from "zod";
 import { useForm, zodResolver } from "@mantine/form";
+import type { Transaction } from "@prisma/client";
 import { IconCheck, IconChecks, IconClock } from "@tabler/icons";
-import { Transactions } from "../../../types";
+import dayjs from "dayjs";
+import { useRouter } from "next/router";
+import { useCallback, useEffect, useState } from "react";
+import { z } from "zod";
+import { EmptyTable, TitleText } from "../../components";
+import { trpc } from "../../utils/trpc";
 
 const schema = z.object({
   id: z.string().min(1, { message: "" }),
@@ -107,7 +95,7 @@ export const TransactionsTable = ({ call }: { call: string }) => {
     select_member.push({
       key: _.transTime,
       value: `${_.transID}`,
-      label: `${_.transID}: ${_.firstName} ${_.middleName} ${_.lastName}`,
+      label: `${_.transID}: ${_.firstName} ${_.middleName} ${_.lastName} ${_.transTime} ${_.billRefNumber}`,
     }),
   ]);
   return (
