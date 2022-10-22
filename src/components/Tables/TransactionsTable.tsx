@@ -19,7 +19,7 @@ const schema = z.object({
 });
 export const TransactionsTable = ({ call }: { call: string }) => {
   const [time, setTime] = useState("");
-  const [locale, setLocale] = useState(false);
+  const [locale, setLocale] = useState(true);
 
   const router = useRouter();
   const logs = trpc.logs.logs.useQuery();
