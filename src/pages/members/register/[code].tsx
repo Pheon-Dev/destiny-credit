@@ -185,8 +185,8 @@ const CreateMember = ({ email }: { email: string; status: string }) => {
       form.setFieldValue("phoneNumber", `${transaction?.msisdn}`);
 
       form.setFieldValue("membershipAmount", "500");
-      /* form.setFieldValue("mpesaCode", `${transaction?.transID}`); */
-      /* form.setFieldValue("membershipAmount", `${transaction?.transAmount}`); */
+      form.setFieldValue("mpesaCode", `${transaction?.transID}`);
+      form.setFieldValue("membershipAmount", `${transaction?.transAmount}`);
     }
     return () => {
       subscribe = false;
@@ -424,10 +424,10 @@ const CreateMember = ({ email }: { email: string; status: string }) => {
             id: id,
             handlerId: `${user?.id}`,
             updaterId: `${user?.id}`,
-            /* payment: `membership`, */
-            /* state: `handled`, */
-            payment: `${transaction?.payment}`,
-            state: `${transaction?.state}`,
+            payment: `membership`,
+            state: `handled`,
+            /* payment: `${transaction?.payment}`, */
+            /* state: `${transaction?.state}`, */
           });
         }
       } catch (error) {
