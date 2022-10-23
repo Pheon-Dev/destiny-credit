@@ -28,7 +28,11 @@ const authOptions: NextAuthOptions = {
         });
 
         if (user) {
-          if (user?.state === "online") throw new Error(`You Are Currently Signed In in Another Device, Sign Out First Before Trying Again Later!`);
+          if (user?.state === "online") return await prisma.user.update({
+            where: { id: user?.id },
+            data: { state: "offline" },
+          });
+
           if (user?.password === password) return user;
         }
 

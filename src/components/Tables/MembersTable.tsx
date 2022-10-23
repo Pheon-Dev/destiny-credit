@@ -1,7 +1,7 @@
 import React, { useState, useEffect, useCallback } from "react";
 import type { Member } from "@prisma/client";
 import { useRouter } from "next/router";
-import { IconInfoCircle  } from "@tabler/icons";
+import { IconInfoCircle } from "@tabler/icons";
 import { Table, Badge, Group } from "@mantine/core";
 import { TitleText } from "../Text/TitleText";
 import { trpc } from "../../utils/trpc";
@@ -10,12 +10,11 @@ import { EmptyTable } from "./EmptyTable";
 export const MembersTable = ({
   call,
   status,
-  email,
-}: {
-  call: string;
-  status?: string;
-  email: string;
-}) => {
+  email, }: {
+    call: string;
+    status?: string;
+    email: string;
+  }) => {
   const logs = trpc.logs.logs.useQuery();
 
   const [user, setUser] = useState({
