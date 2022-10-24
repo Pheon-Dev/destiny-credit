@@ -1,49 +1,31 @@
-import { GetServerSidePropsContext } from "next";
-import React, { useState } from "react";
-import type { AppProps } from "next/app";
-import { getCookie, setCookie } from "cookies-next";
-import Head from "next/head";
 import { NotificationsProvider } from "@mantine/notifications";
-import { SessionProvider } from "next-auth/react";
-import { useSession } from "next-auth/react";
+import { getCookie, setCookie } from "cookies-next";
+import { GetServerSidePropsContext } from "next";
+import { SessionProvider, useSession } from "next-auth/react";
+import type { AppProps } from "next/app";
+import Head from "next/head";
+import { useState } from "react";
 
 import {
-  MantineProvider,
-  ColorScheme,
-  ColorSchemeProvider,
-  Navbar,
-  Group,
-  AppShell,
-  Header,
-  Footer,
-  Aside,
-  ScrollArea,
-  MediaQuery,
-  Burger,
-  Text,
-  useMantineTheme,
-  Button,
+  AppShell, Burger, ColorScheme,
+  ColorSchemeProvider, Group, Header, MantineProvider, MediaQuery, Navbar, ScrollArea, useMantineTheme
 } from "@mantine/core";
-import { TitleText, MainLinks, Utilities } from "../components";
-import { trpc } from "../utils/trpc";
-import { unstable_getServerSession } from "next-auth";
-import authOptions from "./api/auth/[...nextauth]";
-import { SpotlightProvider } from '@mantine/spotlight';
 import type { SpotlightAction } from '@mantine/spotlight';
-import {
-  IconHome, IconDashboard, IconFileText, IconSearch,
-} from "@tabler/icons";
-import { Member } from "@prisma/client";
+import { SpotlightProvider } from '@mantine/spotlight';
+import { IconFileText, IconSearch } from "@tabler/icons";
+import { unstable_getServerSession } from "next-auth";
 import { useRouter } from "next/router";
+import { MainLinks, TitleText, Utilities } from "../components";
+import { trpc } from "../utils/trpc";
+import authOptions from "./api/auth/[...nextauth]";
 
 
 const App = (props: AppProps & { colorScheme: ColorScheme }) => {
   const theme = useMantineTheme();
   const [opened, setOpened] = useState(false);
   const { Component, pageProps } = props;
-  const [colorScheme, setColorScheme] = useState<ColorScheme>(
-    props.colorScheme
-  );
+  /* const [colorScheme, setColorScheme] = useState<ColorScheme>(props.colorScheme); */
+  const [colorScheme, setColorScheme] = useState<ColorScheme>("dark");
   const router = useRouter();
 
   const toggleColorScheme = (value?: ColorScheme) => {
@@ -69,7 +51,7 @@ const App = (props: AppProps & { colorScheme: ColorScheme }) => {
   ))
 
   const AppContent = () => {
-    const { status, data } = useSession();
+    const { status } = useSession();
 
     return (
       <MantineProvider
