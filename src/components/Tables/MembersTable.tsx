@@ -1,21 +1,19 @@
-import React, { useState, useEffect, useCallback } from "react";
+import { Badge, Group, Table } from "@mantine/core";
 import type { Member } from "@prisma/client";
-import { useRouter } from "next/router";
 import { IconInfoCircle } from "@tabler/icons";
-import { Table, Badge, Group } from "@mantine/core";
-import { TitleText } from "../Text/TitleText";
+import { useRouter } from "next/router";
+import { useEffect, useState } from "react";
 import { trpc } from "../../utils/trpc";
+import { TitleText } from "../Text/TitleText";
 import { EmptyTable } from "./EmptyTable";
 
 export const MembersTable = ({
   call,
-  status,
   email, }: {
     call: string;
     status?: string;
     email: string;
   }) => {
-  const logs = trpc.logs.logs.useQuery();
 
   const [user, setUser] = useState({
     id: "",
@@ -121,14 +119,6 @@ const MemberRow = ({
       await utils.members.members.invalidate();
     },
   });
-  const deleteMember = useCallback(
-    (id: string) => {
-      deleteMemberById.mutate({
-        id: id,
-      });
-    },
-    [deleteMemberById]
-  );
 
   return (
     <>

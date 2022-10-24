@@ -1,23 +1,12 @@
-import React, { useEffect, useState } from "react";
-import { Badge, Group, LoadingOverlay, Table, Tabs, Text } from "@mantine/core";
-import { useRouter } from "next/router";
-import { NextPage } from "next";
-import { trpc } from "../../../utils/trpc";
-import { IconCash, IconClock, IconDeviceMobileMessage, IconEdit, IconUser } from "@tabler/icons";
-import { useSession } from "next-auth/react";
-import { TitleText } from "../../../components";
+import { Group, LoadingOverlay, Table, Tabs } from "@mantine/core";
 import { Transaction } from "@prisma/client";
+import { IconCash, IconDeviceMobileMessage, IconUser } from "@tabler/icons";
+import { NextPage } from "next";
+import { useRouter } from "next/router";
+import { TitleText } from "../../../components";
+import { trpc } from "../../../utils/trpc";
 
 const Page: NextPage = () => {
-  const { data } = useSession();
-
-  const email = `${data?.user?.email}`;
-  const check = email.split("@")[1];
-
-  const user_data = trpc.users.user.useQuery({
-    email: `${email}`,
-  });
-
   const router = useRouter();
   const id = router.query.member as string;
 
@@ -91,12 +80,8 @@ const Page: NextPage = () => {
   }) => {
 
     const date = (time: string) => {
-      const second = time.slice(12);
       const minute = time.slice(10, 12);
       const hour = time.slice(8, 10);
-      const day = time.slice(6, 8);
-      const month = time.slice(4, 6);
-      const year = time.slice(0, 4);
       const when = hour + ":" + minute;
       return when;
     };
