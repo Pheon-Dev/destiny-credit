@@ -30,19 +30,11 @@ const Page: NextPage = () => {
         <th>
           <>Time</>
         </th>
+        <th>Names</th>
+        <th>Amount</th>
+        <th>Phone</th>
         <th>
-          Names
-        </th>
-        <th>
-          Amount
-        </th>
-        <th>
-          Phone
-        </th>
-        <th>
-          <Group position="center">
-            Code
-          </Group>
+          <Group position="center">Code</Group>
         </th>
       </tr>
     );
@@ -57,10 +49,7 @@ const Page: NextPage = () => {
               </thead>
               <tbody>
                 {transactions?.map((transaction, index) => (
-                  <TransactionRow
-                    key={index}
-                    transaction={transaction}
-                  />
+                  <TransactionRow key={index} transaction={transaction} />
                 ))}
               </tbody>
               <tfoot>
@@ -73,12 +62,7 @@ const Page: NextPage = () => {
     );
   };
 
-  const TransactionRow = ({
-    transaction,
-  }: {
-    transaction: Transaction;
-  }) => {
-
+  const TransactionRow = ({ transaction }: { transaction: Transaction }) => {
     const date = (time: string) => {
       const minute = time.slice(10, 12);
       const hour = time.slice(8, 10);
@@ -89,9 +73,7 @@ const Page: NextPage = () => {
       <>
         <tr>
           <td>
-            <Group>
-              {date(transaction.transTime)}
-            </Group>
+            <Group>{date(transaction.transTime)}</Group>
           </td>
           <td>
             {transaction.firstName +
@@ -113,6 +95,23 @@ const Page: NextPage = () => {
       </>
     );
   };
+
+  const MemberDetails = () => {
+    return (
+      <>
+        <pre>{JSON.stringify(member, undefined, 2)}</pre>
+      </>
+    );
+  };
+
+  const MemberLoans = () => {
+    return (
+      <>
+        <pre>{JSON.stringify(member?.loans, undefined, 2)}</pre>
+      </>
+    );
+  };
+
   return (
     <>
       {member && (
@@ -137,7 +136,7 @@ const Page: NextPage = () => {
               <TitleText title="Member Details" />
             </Group>
             <Group position="center">
-              <pre>{JSON.stringify(member, undefined, 2)}</pre>
+              <MemberDetails />
             </Group>
           </Tabs.Panel>
 
@@ -146,7 +145,7 @@ const Page: NextPage = () => {
               <TitleText title="Member Loans" />
             </Group>
             <Group position="center">
-              <pre>{JSON.stringify(member?.loans, undefined, 2)}</pre>
+              <MemberLoans />
             </Group>
           </Tabs.Panel>
 
