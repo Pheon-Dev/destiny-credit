@@ -1,7 +1,16 @@
 import {
-  Autocomplete, Box,
-  Button, Card,
-  Grid, Group, Loader, Modal, Radio, Switch, Table, Text
+  Autocomplete,
+  Box,
+  Button,
+  Card,
+  Grid,
+  Group,
+  Loader,
+  Modal,
+  Radio,
+  Switch,
+  Table,
+  Text,
 } from "@mantine/core";
 import { DatePicker } from "@mantine/dates";
 import { useForm, zodResolver } from "@mantine/form";
@@ -54,7 +63,7 @@ export const TransactionsTable = ({ call }: { call: string }) => {
   );
   const [value, setValue] = useState(new Date());
 
-  const new_date = value?.toLocaleDateString();
+  const new_date: string = value?.toLocaleDateString();
 
   useEffect(() => {
     let subscribe = true;
@@ -62,27 +71,27 @@ export const TransactionsTable = ({ call }: { call: string }) => {
       /* setInterval(() => { */
       /*   router.replace(router.asPath) */
       /* }, 800000) */
-      let yy = new_date?.split("/")[2];
-      let mm =
-        +new_date?.split("/")[1] < 10
-          ? `0${+new_date?.split("/")[1]}`
-          : `${new_date?.split("/")[1]}`;
-      let dd =
-        +new_date?.split("/")[0] < 10
-          ? `0${+new_date?.split("/")[0]}`
-          : `${new_date?.split("/")[0]}`;
+      if (new_date?.split("/")[2]) {
+        let d: string | undefined = new_date?.split("/")[0];
+        let m: string | undefined = new_date?.split("/")[1];
+        let y: string | undefined = new_date?.split("/")[2];
 
-      if (+yy > 31) {
-        if (locale) setTime(`${yy}${mm}${dd}`);
-        if (!locale) setTime(`${yy}${dd}${mm}`);
-      }
-      if (+mm > 31) {
-        if (locale) setTime(`${mm}${yy}${dd}`);
-        if (!locale) setTime(`${mm}${dd}${yy}`);
-      }
-      if (+dd > 31) {
-        if (locale) setTime(`${dd}${mm}${yy}`);
-        if (!locale) setTime(`${dd}${yy}${mm}`);
+        let dd = !d ? "" : +d < 10 ? `0${+d}` : `${+d}`;
+        let mm = !m ? "" : +m < 10 ? `0${+m}` : `${+m}`;
+        let yy = !y ? "" : y;
+
+        if (+yy > 31) {
+          if (locale) setTime(`${yy}${mm}${dd}`);
+          if (!locale) setTime(`${yy}${dd}${mm}`);
+        }
+        if (+mm > 31) {
+          if (locale) setTime(`${mm}${yy}${dd}`);
+          if (!locale) setTime(`${mm}${dd}${yy}`);
+        }
+        if (+dd > 31) {
+          if (locale) setTime(`${dd}${mm}${yy}`);
+          if (!locale) setTime(`${dd}${yy}${mm}`);
+        }
       }
     }
     return () => {
@@ -91,13 +100,17 @@ export const TransactionsTable = ({ call }: { call: string }) => {
   }, [new_date, time, value, locale, logs.data?.message]);
 
   let select_member: Array<any> = [];
-  transactions?.map((_) => _.billRefNumber !== "" && _.state === "new" && [
-  select_member.push({
-      key: _.transTime,
-      value: `${_.transID}`,
-      label: `${_.transID}: ${_.firstName} ${_.middleName} ${_.lastName} ${_.transTime} ${_.billRefNumber}`,
-    }),
-  ]);
+  transactions?.map(
+    (_) =>
+      _.billRefNumber !== "" &&
+      _.state === "new" && [
+        select_member.push({
+          key: _.transTime,
+          value: `${_.transID}`,
+          label: `${_.transID}: ${_.firstName} ${_.middleName} ${_.lastName} ${_.transTime} ${_.billRefNumber}`,
+        }),
+      ]
+  );
   return (
     <>
       {!transactions && <EmptyTable call={call} status={fetchStatus} />}
@@ -161,9 +174,13 @@ export const TransactionsTable = ({ call }: { call: string }) => {
             {...form.getInputProps("id")}
             required
           />
-          <Button variant="light" m="xl" onClick={() => {
-            router.push(`/members/register/${form.values.id.split(":")[0]}`);
-          }}>
+          <Button
+            variant="light"
+            m="xl"
+            onClick={() => {
+              router.push(`/members/register/${form.values.id.split(":")[0]}`);
+            }}
+          >
             Add
           </Button>
         </Grid.Col>
@@ -282,8 +299,7 @@ const TransactionRow = ({
       {call === "register" &&
         /* transaction.transTime.startsWith(time) && */
         transaction.state === "new" &&
-        payment === "membership" &&
-        (
+        payment === "membership" && (
           <>
             {transaction.payment !== "" && (
               <tr>
