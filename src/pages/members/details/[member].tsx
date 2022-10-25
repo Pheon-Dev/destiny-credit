@@ -1,10 +1,16 @@
-import { Group, LoadingOverlay, Table, Tabs } from "@mantine/core";
+import { Button, Divider, Grid, Group, LoadingOverlay, Modal, Select, Table, Tabs, TextInput } from "@mantine/core";
 import { Transaction } from "@prisma/client";
-import { IconCash, IconDeviceMobileMessage, IconUser } from "@tabler/icons";
+import { IconCalendar, IconCash, IconDeviceMobileMessage, IconEdit, IconUser } from "@tabler/icons";
 import { NextPage } from "next";
 import { useRouter } from "next/router";
+import { useEffect, useState } from "react";
 import { TitleText } from "../../../components";
 import { trpc } from "../../../utils/trpc";
+import { useForm, zodResolver } from "@mantine/form";
+import { z } from "zod";
+import { DatePicker } from "@mantine/dates";
+import dayjs from "dayjs";
+import { showNotification } from "@mantine/notifications";
 
 const Page: NextPage = () => {
   const router = useRouter();
@@ -97,11 +103,13 @@ const Page: NextPage = () => {
   };
 
   const MemberDetails = () => {
+
     return (
       <>
         <pre>{JSON.stringify(member, undefined, 2)}</pre>
       </>
     );
+
   };
 
   const MemberLoans = () => {
