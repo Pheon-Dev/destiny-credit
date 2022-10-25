@@ -148,7 +148,10 @@ const Page: NextPage = (props): JSX.Element => {
   useEffect(() => {
     let subscribe = true;
     if (subscribe) {
-      form.setFieldValue("username", `${name !== "undefined" ? name : "DCredit"}${usercode}`);
+      form.setFieldValue(
+        "username",
+        `${name !== "undefined" ? name : "DCredit"}${usercode}`
+      );
 
       if (form.values.password.length > 7 && form.values.confirm.length > 7) {
         if (form.values.password !== form.values.confirm) {
@@ -165,8 +168,11 @@ const Page: NextPage = (props): JSX.Element => {
       let counter = 0;
       let nums = 0;
       while (counter < form.values.password.length) {
-        if (!isNaN(+form.values.password[counter])) {
-          nums += 1;
+        let f = form.values.password[counter];
+        if (f) {
+          if (!isNaN(+f)) {
+            nums += 1;
+          }
         }
         counter++;
       }
