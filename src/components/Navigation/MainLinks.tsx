@@ -22,7 +22,7 @@ export const MainLinks = () => {
   const check = email.split("@")[1];
 
   return (
-    <>{check?.length > 0 && (<MainLinksComponent email={email} status={status} />)}</>
+    <>{check && (<MainLinksComponent email={email} status={status} />)}</>
   );
 }
 const MainLinksComponent = ({ email, status }: { email: string, status: string }) => {
