@@ -19,7 +19,7 @@ import {
 import { NextPage } from "next";
 import { useSession } from "next-auth/react";
 import { useRouter } from "next/router";
-import React, { useCallback, useEffect, useState } from "react";
+import { useCallback, useEffect, useState } from "react";
 import { v4 as uuidV4 } from "uuid";
 import { z } from "zod";
 import { Selection } from "../../../../types";
@@ -890,11 +890,14 @@ const CreateLoan = ({
   }, [collateralId, delete_collateral]);
 
   const roundOff = (value: number) => {
-    return (
-      +value.toString().split(".")[1] > 0
-        ? +value.toString().split(".")[0] + 1
-        : +value.toString().split(".")[0] + 0
-    ).toString();
+    let v = value?.toString().split(".")[0]
+    let w = value?.toString().split(".")[1]
+    if (v && w)
+      return (
+        +w > 0
+          ? +v + 1
+          : +v + 0
+      ).toString();
   };
 
   const renderDailyInterestAmount = (
@@ -922,7 +925,8 @@ const CreateLoan = ({
   ) => {
     let principalAmount = renderDailyInterestAmount(rate, principal, tenure);
 
-    return roundOff((+principalAmount + principal) / (tenure - sundays));
+    if (principalAmount)
+      return roundOff((+principalAmount + principal) / (tenure - sundays));
   };
 
   const renderWeeklyInterestAmount = (
@@ -940,7 +944,8 @@ const CreateLoan = ({
   ) => {
     let principalAmount = renderWeeklyInterestAmount(rate, principal, tenure);
 
-    return roundOff((+principalAmount + principal) / tenure);
+    if (principalAmount)
+      return roundOff((+principalAmount + principal) / tenure);
   };
 
   const renderMonthlyInterestAmount = (
@@ -958,13 +963,15 @@ const CreateLoan = ({
   ) => {
     let principalAmount = renderMonthlyInterestAmount(rate, principal, tenure);
 
-    return roundOff((+principalAmount + principal) / tenure);
+    if (principalAmount)
+      return roundOff((+principalAmount + principal) / tenure);
   };
 
   const renderProcessingFeeAmount = (rate: number, principal: number) => {
     let proc_fee = roundOff((rate / 100) * principal);
 
-    return +proc_fee < 301 ? 300 : proc_fee;
+    if (proc_fee)
+      return +proc_fee < 301 ? 300 : proc_fee;
   };
 
   const renderPenaltyAmount = (
@@ -980,7 +987,8 @@ const CreateLoan = ({
         : cycle.toLowerCase() === "weekly"
           ? renderWeeklyInstallmentAmount(interest_rate, principal, tenure)
           : renderMonthlyInstallmentAmount(interest_rate, principal, tenure);
-    return roundOff((penalty_rate / 100) * +installment);
+    if (installment)
+      return roundOff((penalty_rate / 100) * +installment);
   };
 
   let select_product: Array<Selection> = []
@@ -1934,7 +1942,7 @@ const Page: NextPage = () => {
 
   return (
     <Protected>
-      {check?.length > 0 && (
+      {check && (
         <CreateLoan
           email={email}
           status={status}

@@ -15,7 +15,7 @@ const Page: NextPage = () => {
     <Protected>
       <Suspense
         fallback={check === "" && <EmptyTable call={call} status={status} />}>
-        {check?.length > 0 && (
+      {check && (
           <PaymentsTable call={call} email={email} status={status} />
         )}
       </Suspense>

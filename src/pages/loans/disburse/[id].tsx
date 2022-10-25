@@ -390,7 +390,7 @@ const Disburse = ({ email, status }: { email: string; status: string }) => {
                 <Grid.Col mt="xs" span={4}>
                   <Select
                     placeholder="Select Officer ..."
-                    data={user_data?.map((p) => p[0].label)}
+                    data={user_data?.map((p) => p[0]?.label)}
                     {...form.getInputProps("creditOfficerName")}
                     disabled={!users}
                     required
@@ -437,7 +437,7 @@ const Page: NextPage = () => {
 
   return (
     <Protected>
-      {check?.length > 0 && <Disburse email={email} status={status} />}
+      {check && <Disburse email={email} status={status} />}
     </Protected>
   );
 };

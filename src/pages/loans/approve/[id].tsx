@@ -189,8 +189,8 @@ const Approve = ({ email, status }: { email: string; status: string }) => {
                     {loan.cycle.toLowerCase() === "daily"
                       ? "Days"
                       : loan.cycle.toLowerCase() === "weeks"
-                      ? "Weeks"
-                      : "Months"}
+                        ? "Weeks"
+                        : "Months"}
                   </Text>
                 </Grid.Col>
               </Grid>
@@ -326,7 +326,7 @@ const Page: NextPage = () => {
 
   return (
     <Protected>
-      {check?.length > 0 && <Approve email={email} status={status} />}
+      {check && <Approve email={email} status={status} />}
     </Protected>
   );
 };

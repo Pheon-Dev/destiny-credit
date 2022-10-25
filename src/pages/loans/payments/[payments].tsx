@@ -473,7 +473,7 @@ const Page: NextPage = () => {
 
   return (
     <Protected>
-      {check?.length > 0 && <PaymentsList email={email} status={status} />}
+      {check && <PaymentsList email={email} status={status} />}
     </Protected>
   );
 };

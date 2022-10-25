@@ -1,6 +1,5 @@
 import React, { useCallback, useState } from "react";
 import { trpc } from "../../utils/trpc";
-import type { Product } from "@prisma/client";
 import { z } from "zod";
 import { useForm, zodResolver } from "@mantine/form";
 import { IconAlertCircle, IconCheck, IconX } from "@tabler/icons";
@@ -340,8 +339,8 @@ const CreateProduct = () => {
                   form.values.repaymentCycle === "daily"
                     ? "Days"
                     : form.values.repaymentCycle === "weekly"
-                    ? "Weeks"
-                    : "Months"
+                      ? "Weeks"
+                      : "Months"
                 }
               />
             </Group>
