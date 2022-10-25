@@ -41,76 +41,96 @@ export const logsRouter = t.router({
           to: now_date,
         };
       if (t?.message.startsWith("START")) {
-        const data = t?.message.split("{")[1].split("}")[0];
+        const d = t?.message?.split("{")[1];
+        const data = t?.message?.split("{")[1]?.split("}")[0];
         let transactionType = data
-          .split(",")[0]
-          .split(":")[1]
-          .trim()
+          ?.split(",")[0]
+          ?.split(":")[1]
+          ?.trim()
           .split("'")[1];
-        let transID = data.split(",")[1].split(":")[1].trim().split("'")[1];
-        let transTime = data.split(",")[2].split(":")[1].trim().split("'")[1];
+        let transID = data?.split(",")[1]?.split(":")[1]?.trim().split("'")[1];
+        let transTime = data
+          ?.split(",")[2]
+          ?.split(":")[1]
+          ?.trim()
+          .split("'")[1];
         let transAmount = data
-          .split(",")[3]
-          .split(":")[1]
-          .trim()
-          .split("'")[1]
-          .split(".")[0];
+          ?.split(",")[3]
+          ?.split(":")[1]
+          ?.trim()
+          ?.split("'")[1]
+          ?.split(".")[0];
         let businessShortCode = data
-          .split(",")[4]
-          .split(":")[1]
-          .trim()
+          ?.split(",")[4]
+          ?.split(":")[1]
+          ?.trim()
           .split("'")[1];
         let billRefNumber = data
-          .split(",")[5]
-          .split(":")[1]
-          .trim()
+          ?.split(",")[5]
+          ?.split(":")[1]
+          ?.trim()
           .split("'")[1];
         let invoiceNumber = data
-          .split(",")[6]
-          .split(":")[1]
-          .trim()
+          ?.split(",")[6]
+          ?.split(":")[1]
+          ?.trim()
           .split("'")[1];
         let orgAccountBalance = data
-          .split(",")[7]
-          .split(":")[1]
-          .trim()
-          .split("'")[1]
-          .split(".")[0];
+          ?.split(",")[7]
+          ?.split(":")[1]
+          ?.trim()
+          ?.split("'")[1]
+          ?.split(".")[0];
         let thirdPartyTransID = data
-          .split(",")[8]
-          .split(":")[1]
-          .trim()
+          ?.split(",")[8]
+          ?.split(":")[1]
+          ?.trim()
           .split("'")[1];
-        let msisdn = data.split(",")[9].split(":")[1].trim().split("'")[1];
-        let firstName = data.split(",")[10].split(":")[1].trim().split("'")[1];
-        let middleName = data.split(",")[11].split(":")[1].trim().split("'")[1];
-        let lastName = data.split(",")[12].split(":")[1].trim().split("'")[1];
+        let msisdn = data?.split(",")[9]?.split(":")[1]?.trim().split("'")[1];
+        let firstName = data
+          ?.split(",")[10]
+          ?.split(":")[1]
+          ?.trim()
+          .split("'")[1];
+        let middleName = data
+          ?.split(",")[11]
+          ?.split(":")[1]
+          ?.trim()
+          .split("'")[1];
+        let lastName = data
+          ?.split(",")[12]
+          ?.split(":")[1]
+          ?.trim()
+          .split("'")[1];
         let state = "new";
 
         let transaction: Array<Fields> = [];
         transaction.push({
-          transactionType: transactionType.toUpperCase(),
-          transID: transID,
-          transTime: transTime,
-          transAmount: transAmount,
-          businessShortCode: businessShortCode,
-          billRefNumber: billRefNumber.toUpperCase(),
-          invoiceNumber: invoiceNumber,
-          orgAccountBalance: orgAccountBalance,
-          thirdPartyTransID: thirdPartyTransID,
-          msisdn: msisdn,
-          firstName: firstName.toUpperCase(),
-          middleName: middleName.toUpperCase(),
-          lastName: lastName.toUpperCase(),
+          transactionType:
+            (transactionType && transactionType?.toUpperCase()) || "",
+          transID: (transID && transID) || "",
+          transTime: (transTime && transTime) || "",
+          transAmount: (transAmount && transAmount) || "",
+          businessShortCode: (businessShortCode && businessShortCode) || "",
+          billRefNumber: (billRefNumber && billRefNumber.toUpperCase()) || "",
+          invoiceNumber: (invoiceNumber && invoiceNumber) || "",
+          orgAccountBalance: (orgAccountBalance && orgAccountBalance) || "",
+          thirdPartyTransID: (thirdPartyTransID && thirdPartyTransID) || "",
+          msisdn: (msisdn && msisdn) || "",
+          firstName: (firstName && firstName.toUpperCase()) || "",
+          middleName: (middleName && middleName.toUpperCase()) || "",
+          lastName: (lastName && lastName.toUpperCase()) || "",
         });
 
         transactions.push({
           transaction,
         });
 
+        if (transaction[0]?.transID === "") return console.log("Empty ID");
+
         const search = await prisma.transaction.findMany({
           where: {
-            transID: transaction[0].transID,
+            transID: transaction[0]?.transID,
           },
         });
 
@@ -131,32 +151,70 @@ export const logsRouter = t.router({
             if (search.length > 1) {
               const delete_duplicate = await prisma.transaction.delete({
                 where: {
-                  id: search[0].id,
+                  id: search[0]?.id,
                 },
               });
 
               return delete_duplicate;
             }
 
-            if (isNaN(+transaction[0].transAmount) === true) {
-              return;
+            if (transaction[0]?.transAmount === "")
+              return console.log("Empty ID");
+            let t = transaction[0]?.transAmount;
+            if (t) {
+              if (t === "") {
+                return;
+              }
+              if (isNaN(+t) === true) {
+                return;
+              }
             }
 
             const new_transaction = await prisma.transaction.create({
               data: {
-                transactionType: transaction[0]?.transactionType,
-                transID: transaction[0]?.transID,
-                transTime: transaction[0]?.transTime,
-                transAmount: transaction[0]?.transAmount,
-                businessShortCode: transaction[0]?.businessShortCode,
-                billRefNumber: transaction[0]?.billRefNumber,
-                invoiceNumber: transaction[0]?.invoiceNumber,
-                orgAccountBalance: transaction[0]?.orgAccountBalance,
-                thirdPartyTransID: transaction[0]?.thirdPartyTransID,
-                msisdn: transaction[0]?.msisdn,
-                firstName: transaction[0]?.firstName,
-                middleName: transaction[0]?.middleName,
-                lastName: transaction[0]?.lastName,
+                transactionType:
+                  (transaction[0]?.transactionType &&
+                    transaction[0]?.transactionType) ||
+                  "",
+                transID:
+                  (transaction[0]?.transID && transaction[0]?.transID) || "",
+                transTime:
+                  (transaction[0]?.transTime && transaction[0]?.transTime) ||
+                  "",
+                transAmount:
+                  (transaction[0]?.transAmount &&
+                    transaction[0]?.transAmount) ||
+                  "",
+                businessShortCode:
+                  (transaction[0]?.businessShortCode &&
+                    transaction[0]?.businessShortCode) ||
+                  "",
+                billRefNumber:
+                  (transaction[0]?.billRefNumber &&
+                    transaction[0]?.billRefNumber) ||
+                  "",
+                invoiceNumber:
+                  (transaction[0]?.invoiceNumber &&
+                    transaction[0]?.invoiceNumber) ||
+                  "",
+                orgAccountBalance:
+                  (transaction[0]?.orgAccountBalance &&
+                    transaction[0]?.orgAccountBalance) ||
+                  "",
+                thirdPartyTransID:
+                  (transaction[0]?.thirdPartyTransID &&
+                    transaction[0]?.thirdPartyTransID) ||
+                  "",
+                msisdn:
+                  (transaction[0]?.msisdn && transaction[0]?.msisdn) || "",
+                firstName:
+                  (transaction[0]?.firstName && transaction[0]?.firstName) ||
+                  "",
+                middleName:
+                  (transaction[0]?.middleName && transaction[0]?.middleName) ||
+                  "",
+                lastName:
+                  (transaction[0]?.lastName && transaction[0]?.lastName) || "",
                 state: state,
                 payment: "",
               },
@@ -176,7 +234,8 @@ export const logsRouter = t.router({
       }
     });
     return {
-      message: `${transactions.length} Recent M-PESA Transactions from: ${new_date.split("T")[0]} to ${now_date.split("T")[0]}`,
+      message: `${transactions.length} Recent M-PESA Transactions from: ${new_date.split("T")[0]
+        } to ${now_date.split("T")[0]}`,
       data: transactions,
       from: new_date,
       to: now_date,

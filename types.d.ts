@@ -315,15 +315,15 @@ export interface TransactionsLog {
 export interface Payment {
   amount: number;
   total: number;
-  outsArrears: number;
-  paidArrears: number;
-  outsPenalty: number;
-  paidPenalty: number;
-  outsInterest: number;
-  paidInterest: number;
-  outsPrincipal: number;
-  paidPrincipal: number;
-  outsBalance: number;
+  outsArrears?: number;
+  paidArrears?: number;
+  outsPenalty?: number;
+  paidPenalty?: number;
+  outsInterest?: number;
+  paidInterest?: number;
+  outsPrincipal?: number;
+  paidPrincipal?: number;
+  outsBalance?: number;
   currInstDate: string;
   id: string;
   mpesa: string;

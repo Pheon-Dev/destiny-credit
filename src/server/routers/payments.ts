@@ -55,13 +55,11 @@ export const paymentsRouter = t.router({
         },
       });
 
-      const roundOff = (x: number) => {
-        const whole = +x.toString().split(".")[0];
-        const decimal = +x.toString().split(".")[1];
-
-        if (decimal > 0) return whole + 1;
-        if (!decimal) return whole;
-        return whole;
+      const roundOff = (value: number) => {
+        let v = value?.toString().split(".")[0]
+        let w = value?.toString().split(".")[1]
+        if (v && w)
+          return +w > 0 ? +v + 1 : +v + 0
       };
 
       const date = (time: string) => {
@@ -149,7 +147,9 @@ export const paymentsRouter = t.router({
           const start_month = loan?.startDate?.split("-")[1];
           const start_year = loan?.startDate?.split("-")[2];
 
-          const str = start_year + start_month + start_day + "000000";
+          const year = start_year && start_year || ""
+          const month = start_month && start_month || ""
+          const str = year + month + start_day + "000000";
           start = +str;
         }
 
