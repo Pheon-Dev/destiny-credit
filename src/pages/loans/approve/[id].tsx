@@ -1,18 +1,6 @@
-import React, { useState, useEffect, useCallback } from "react";
-import { NextPage } from "next";
-import { Protected } from "../../../components";
 import {
-  Group,
-  Button,
-  Text,
-  Card,
-  Grid,
-  Menu,
-  ActionIcon,
-  LoadingOverlay,
-  Divider,
+  ActionIcon, Button, Card, Divider, Grid, Group, LoadingOverlay, Menu, Text
 } from "@mantine/core";
-import { useRouter } from "next/router";
 import { showNotification, updateNotification } from "@mantine/notifications";
 import {
   IconCheck,
@@ -20,15 +8,18 @@ import {
   IconEye,
   IconFileZip,
   IconTrash,
-  IconX,
+  IconX
 } from "@tabler/icons";
-import { trpc } from "../../../utils/trpc";
+import { NextPage } from "next";
 import { useSession } from "next-auth/react";
+import { useRouter } from "next/router";
+import { useCallback, useEffect, useState } from "react";
+import { Protected } from "../../../components";
+import { trpc } from "../../../utils/trpc";
 
-const Approve = ({ email, status }: { email: string; status: string }) => {
+const Approve = ({ email }: { email: string; status: string }) => {
   const router = useRouter();
   const id = router.query.id as string;
-  const utils = trpc.useContext();
 
   const [user, setUser] = useState({
     id: "",

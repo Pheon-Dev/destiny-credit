@@ -1,24 +1,14 @@
-import React, { useCallback, useEffect, useState } from "react";
-import { NextPage } from "next";
-import { z } from "zod";
-import { useForm, zodResolver } from "@mantine/form";
 import {
-  TextInput,
-  Text,
-  Card,
-  PasswordInput,
-  Button,
-  Box,
-  Group,
-  Select,
-  LoadingOverlay,
+  Box, Button, Card, Group, LoadingOverlay, PasswordInput, Select, Text, TextInput
 } from "@mantine/core";
-import { useRouter } from "next/router";
+import { useForm, zodResolver } from "@mantine/form";
 import { showNotification, updateNotification } from "@mantine/notifications";
 import { IconAlertCircle, IconCheck, IconX } from "@tabler/icons";
+import { NextPage } from "next";
+import { useRouter } from "next/router";
+import React, { useCallback, useEffect } from "react";
+import { z } from "zod";
 import { trpc } from "../../utils/trpc";
-
-/* const USERS = ["CO", "CA", "MD", "AU"] as const; */
 
 const schema = z.object({
   username: z.string().min(2, { message: "User Name Missing" }),
@@ -30,7 +20,7 @@ const schema = z.object({
   confirm: z.string().min(8, { message: "Confirmation Password Missing" }),
 });
 
-const Page: NextPage = (props): JSX.Element => {
+const Page: NextPage = (): JSX.Element => {
   const router = useRouter();
 
   const {

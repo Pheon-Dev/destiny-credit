@@ -1,13 +1,13 @@
-import React, { Suspense } from "react";
+import { Divider } from "@mantine/core";
+import { NextPage } from "next";
+import { useSession } from "next-auth/react";
+import { Suspense } from "react";
 import {
   EmptyTable,
   MembersTable,
   Protected,
-  TransactionsTable,
+  TransactionsTable
 } from "../../components";
-import { Divider } from "@mantine/core";
-import { useSession } from "next-auth/react";
-import { NextPage } from "next";
 
 const Page: NextPage = () => {
   const { data, status } = useSession();

@@ -1,7 +1,7 @@
-import React, { Suspense } from "react";
-import { EmptyTable, PaymentsTable, Protected } from "../../components";
 import { NextPage } from "next";
 import { useSession } from "next-auth/react";
+import { Suspense } from "react";
+import { EmptyTable, PaymentsTable, Protected } from "../../components";
 
 const Page: NextPage = () => {
   const { data, status } = useSession();
@@ -15,7 +15,7 @@ const Page: NextPage = () => {
     <Protected>
       <Suspense
         fallback={check === "" && <EmptyTable call={call} status={status} />}>
-      {check && (
+        {check && (
           <PaymentsTable call={call} email={email} status={status} />
         )}
       </Suspense>

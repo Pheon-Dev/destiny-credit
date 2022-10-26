@@ -1,29 +1,22 @@
-import React, { useEffect, useState } from "react";
-import { signIn, useSession } from "next-auth/react";
-import { NextPage } from "next";
-import { z } from "zod";
-import { useForm, zodResolver } from "@mantine/form";
 import {
-  TextInput,
-  Card,
-  PasswordInput,
-  Button,
-  Box,
-  Group,
-  Text,
-  LoadingOverlay,
+  Box, Button, Card, Group, LoadingOverlay, PasswordInput, Text, TextInput
 } from "@mantine/core";
-import { useRouter } from "next/router";
+import { useForm, zodResolver } from "@mantine/form";
 import { showNotification, updateNotification } from "@mantine/notifications";
 import { IconCheck, IconX } from "@tabler/icons";
+import { NextPage } from "next";
+import { signIn, useSession } from "next-auth/react";
+import { useRouter } from "next/router";
+import { useEffect, useState } from "react";
+import { z } from "zod";
 
 const schema = z.object({
   username: z.string().min(2, { message: "User Name Missing" }),
   password: z.string().min(2, { message: "Password Missing" }),
 });
 
-const Page: NextPage = (props): JSX.Element => {
-  const { status, data } = useSession();
+const Page: NextPage = (): JSX.Element => {
+  const { status } = useSession();
   const [visible, setVisible] = useState(false);
   const [loading, setLoading] = useState(false);
   const router = useRouter();

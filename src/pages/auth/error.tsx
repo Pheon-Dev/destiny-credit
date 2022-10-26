@@ -1,17 +1,16 @@
 import { Box, Button, Card, Group } from "@mantine/core";
 import { useSession } from "next-auth/react";
 import { useRouter } from "next/router";
-import React, { useEffect } from "react";
+import { useEffect } from "react";
 import { TitleText } from "../../components";
 
 const ErrorPage = () => {
-  const { status, data } = useSession();
+  const { status } = useSession();
   const router = useRouter();
 
   useEffect(() => {
     let sub = true;
     if (sub) {
-      /* if (status === "unauthenticated") router.push("/auth/sign-in"); */
       if (status === "authenticated") router.push("/");
     }
     return () => {
@@ -34,7 +33,7 @@ const ErrorPage = () => {
           <Box p="lg">
             <form>
               <Group m="md" position="center">
-              <TitleText title="Sign In Error" />
+                <TitleText title="Sign In Error" />
               </Group>
               <Group mt="xl">
                 <Button
@@ -47,7 +46,7 @@ const ErrorPage = () => {
                     router.push("/auth/sign-in");
                   }}
                 >
-                Sign In
+                  Sign In
                 </Button>
               </Group>
             </form>

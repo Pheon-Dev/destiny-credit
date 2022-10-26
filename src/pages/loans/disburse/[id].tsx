@@ -1,21 +1,7 @@
-import React, { useState, useEffect, useCallback } from "react";
-import { z } from "zod";
-import { useForm, zodResolver } from "@mantine/form";
-import { NextPage } from "next";
-import { Protected, TitleText } from "../../../components";
 import {
-  Group,
-  Button,
-  Text,
-  Card,
-  Grid,
-  Menu,
-  ActionIcon,
-  LoadingOverlay,
-  Divider,
-  Select,
+  ActionIcon, Button, Card, Divider, Grid, Group, LoadingOverlay, Menu, Select, Text
 } from "@mantine/core";
-import { useRouter } from "next/router";
+import { useForm, zodResolver } from "@mantine/form";
 import { showNotification, updateNotification } from "@mantine/notifications";
 import {
   IconCheck,
@@ -23,20 +9,24 @@ import {
   IconEye,
   IconFileZip,
   IconTrash,
-  IconX,
+  IconX
 } from "@tabler/icons";
-import { trpc } from "../../../utils/trpc";
+import { NextPage } from "next";
 import { useSession } from "next-auth/react";
+import { useRouter } from "next/router";
+import React, { useCallback, useEffect, useState } from "react";
+import { z } from "zod";
+import { Protected, TitleText } from "../../../components";
+import { trpc } from "../../../utils/trpc";
 
 const schema = z.object({
   creditOfficerId: z.string().min(2, { message: "Officer not Selected" }),
   creditOfficerName: z.string().min(2, { message: "Officer not Selected" }),
 });
 
-const Disburse = ({ email, status }: { email: string; status: string }) => {
+const Disburse = ({ email }: { email: string; status: string }) => {
   const router = useRouter();
   const id = router.query.id as string;
-  const utils = trpc.useContext();
 
   const [user, setUser] = useState({
     id: "",
@@ -78,7 +68,7 @@ const Disburse = ({ email, status }: { email: string; status: string }) => {
     u_data?.data?.state,
   ]);
 
-  const { data: users, status: users_status } = trpc.users.officers.useQuery();
+  const { data: users } = trpc.users.officers.useQuery();
   const users_data = users?.map((p) => p) || [];
   const user_data = users_data?.map((_) => [
     { key: _?.id, value: `${_?.id}`, label: `${_?.username}` },
@@ -260,8 +250,8 @@ const Disburse = ({ email, status }: { email: string; status: string }) => {
                     {loan.cycle.toLowerCase() === "daily"
                       ? "Days"
                       : loan.cycle.toLowerCase() === "weeks"
-                      ? "Weeks"
-                      : "Months"}
+                        ? "Weeks"
+                        : "Months"}
                   </Text>
                 </Grid.Col>
               </Grid>

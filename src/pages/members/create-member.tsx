@@ -1,6 +1,6 @@
-import React, { Suspense } from "react";
-import { TransactionsTable, Protected, EmptyTable } from "../../components";
 import { NextPage } from "next";
+import { Suspense } from "react";
+import { EmptyTable, Protected, TransactionsTable } from "../../components";
 
 const Page: NextPage = () => {
   const call = "register";

@@ -9,7 +9,7 @@ import { IconAlertCircle, IconCalendar, IconCheck, IconX } from "@tabler/icons";
 import dayjs from "dayjs";
 import { useSession } from "next-auth/react";
 import { useRouter } from "next/router";
-import React, { useCallback, useEffect, useState } from "react";
+import { useCallback, useEffect, useState } from "react";
 import { z } from "zod";
 import { Protected, TitleText } from "../../../components";
 import { trpc } from "../../../utils/trpc";

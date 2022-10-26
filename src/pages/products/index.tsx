@@ -1,7 +1,6 @@
-import React from "react";
-import { EmptyTable, ProductsTable, Protected } from "../../components";
 import { NextPage } from "next";
 import { useSession } from "next-auth/react";
+import { EmptyTable, ProductsTable, Protected } from "../../components";
 
 const Page: NextPage = () => {
   const { data, status } = useSession();
