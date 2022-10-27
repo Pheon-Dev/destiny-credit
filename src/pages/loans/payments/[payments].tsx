@@ -5,7 +5,7 @@ import {
   Skeleton,
   Table,
   TransferList,
-  TransferListData
+  TransferListData,
 } from "@mantine/core";
 import { showNotification } from "@mantine/notifications";
 import { Transaction } from "@prisma/client";
@@ -203,8 +203,8 @@ const PaymentsList = ({ email }: { email: string; status: string }) => {
     <Suspense
       fallback={
         <>
-          <Group position='center' m="lg">
-            <TitleText title='Loading payment Payment Statement ...' />
+          <Group position="center" m="lg">
+            <TitleText title="Loading payment Payment Statement ..." />
           </Group>
           <Group position="center" m="lg" style={{ position: "relative" }}>
             <Skeleton height={16} radius="xl" />
@@ -380,54 +380,64 @@ const PaymentsList = ({ email }: { email: string; status: string }) => {
                 <tr style={{ backgroundColor: "grey", color: "white" }}>
                   <td>TOTAL</td>
                   <td>
-                    {`${payment.loan.payment[payment.loan.payment.length - 1]
-                      ?.total
-                      }`.replace(/\B(?=(\d{3})+(?!\d))/g, ",")}
+                    {`${
+                      payment.loan.payment[payment.loan.payment.length - 1]
+                        ?.total
+                    }`.replace(/\B(?=(\d{3})+(?!\d))/g, ",")}
                   </td>
                   <td>
-                    {`${payment.loan.payment[payment.loan.payment.length - 1]
-                      ?.outsArrears
-                      }`.replace(/\B(?=(\d{3})+(?!\d))/g, ",")}
+                    {`${
+                      payment.loan.payment[payment.loan.payment.length - 1]
+                        ?.outsArrears
+                    }`.replace(/\B(?=(\d{3})+(?!\d))/g, ",")}
                   </td>
                   <td>
-                    {`${payment.loan.payment[payment.loan.payment.length - 1]
-                      ?.paidArrears
-                      }`.replace(/\B(?=(\d{3})+(?!\d))/g, ",")}
+                    {`${
+                      payment.loan.payment[payment.loan.payment.length - 1]
+                        ?.paidArrears
+                    }`.replace(/\B(?=(\d{3})+(?!\d))/g, ",")}
                   </td>
                   <td>
-                    {`${payment.loan.payment[payment.loan.payment.length - 1]
-                      ?.outsPenalty
-                      }`.replace(/\B(?=(\d{3})+(?!\d))/g, ",")}
+                    {`${
+                      payment.loan.payment[payment.loan.payment.length - 1]
+                        ?.outsPenalty
+                    }`.replace(/\B(?=(\d{3})+(?!\d))/g, ",")}
                   </td>
                   <td>
-                    {`${payment.loan.payment[payment.loan.payment.length - 1]
-                      ?.paidPenalty
-                      }`.replace(/\B(?=(\d{3})+(?!\d))/g, ",")}
+                    {`${
+                      payment.loan.payment[payment.loan.payment.length - 1]
+                        ?.paidPenalty
+                    }`.replace(/\B(?=(\d{3})+(?!\d))/g, ",")}
                   </td>
                   <td>
-                    {`${payment.loan.payment[payment.loan.payment.length - 1]
-                      ?.outsInterest
-                      }`.replace(/\B(?=(\d{3})+(?!\d))/g, ",")}
+                    {`${
+                      payment.loan.payment[payment.loan.payment.length - 1]
+                        ?.outsInterest
+                    }`.replace(/\B(?=(\d{3})+(?!\d))/g, ",")}
                   </td>
                   <td>
-                    {`${payment.loan.payment[payment.loan.payment.length - 1]
-                      ?.paidInterest
-                      }`.replace(/\B(?=(\d{3})+(?!\d))/g, ",")}
+                    {`${
+                      payment.loan.payment[payment.loan.payment.length - 1]
+                        ?.paidInterest
+                    }`.replace(/\B(?=(\d{3})+(?!\d))/g, ",")}
                   </td>
                   <td>
-                    {`${payment.loan.payment[payment.loan.payment.length - 1]
-                      ?.outsPrincipal
-                      }`.replace(/\B(?=(\d{3})+(?!\d))/g, ",")}
+                    {`${
+                      payment.loan.payment[payment.loan.payment.length - 1]
+                        ?.outsPrincipal
+                    }`.replace(/\B(?=(\d{3})+(?!\d))/g, ",")}
                   </td>
                   <td>
-                    {`${payment.loan.payment[payment.loan.payment.length - 1]
-                      ?.paidPrincipal
-                      }`.replace(/\B(?=(\d{3})+(?!\d))/g, ",")}
+                    {`${
+                      payment.loan.payment[payment.loan.payment.length - 1]
+                        ?.paidPrincipal
+                    }`.replace(/\B(?=(\d{3})+(?!\d))/g, ",")}
                   </td>
                   <td>
-                    {`${payment.loan.payment[payment.loan.payment.length - 1]
-                      ?.outsBalance
-                      }`.replace(/\B(?=(\d{3})+(?!\d))/g, ",")}
+                    {`${
+                      payment.loan.payment[payment.loan.payment.length - 1]
+                        ?.outsBalance
+                    }`.replace(/\B(?=(\d{3})+(?!\d))/g, ",")}
                   </td>
                   <td>TOTAL</td>
                 </tr>

@@ -14,8 +14,7 @@ import type { SpotlightAction } from '@mantine/spotlight';
 import { SpotlightProvider } from '@mantine/spotlight';
 import { IconFileText, IconSearch } from "@tabler/icons";
 import { unstable_getServerSession } from "next-auth";
-import { useRouter } from "next/router";
-import { MainLinks, TitleText, Utilities } from "../components";
+import { useRouter } from "next/router"; import { MainLinks, TitleText, Utilities } from "../components";
 import { trpc } from "../utils/trpc";
 import authOptions from "./api/auth/[...nextauth]";
 

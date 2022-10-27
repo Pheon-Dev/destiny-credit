@@ -220,12 +220,12 @@ const UtilitiesComponent = ({
                 <Group position="center" mt="md" mb="xs">
                   <TitleText
                     title={`${user?.role === "MD"
-                        ? "Managing Director"
-                        : user?.role === "CO"
-                          ? "Credit Officer"
-                          : user?.role === "CA"
-                            ? "Credit Admin"
-                            : "Auditor"
+                      ? "Managing Director"
+                      : user?.role === "CO"
+                        ? "Credit Officer"
+                        : user?.role === "CA"
+                          ? "Credit Admin"
+                          : "Auditor"
                       }`}
                   />
                 </Group>
@@ -281,24 +281,29 @@ const UtilitiesComponent = ({
             }
           >
             {users &&
-              users?.map((user) => (
-                <List.Item
-                  value={user?.id}
-                  key={user?.id}
-                  icon={
-                    user?.state === "online" && (
-                      <ThemeIcon color="green" size={12} radius="xl">
-                        <></>
-                      </ThemeIcon>
-                    )
-                  }
-                >
-                  <Group position="center">
-                    <Text>
-                      {user?.firstName} {user?.lastName}
-                    </Text>
-                  </Group>
-                </List.Item>
+              users?.map((_) => (
+                <span key={_?.id}>
+                  {user?.id !== _?.id && (
+
+                    <List.Item
+                      value={_?.id}
+                      key={_?.id}
+                      icon={
+                        _?.state === "online" && (
+                          <ThemeIcon color="green" size={12} radius="xl">
+                            <></>
+                          </ThemeIcon>
+                        )
+                      }
+                    >
+                      <Group position="center">
+                        <Text>
+                          {_?.username} : {_?.firstName} {_?.lastName}
+                        </Text>
+                      </Group>
+                    </List.Item>
+                  )}
+                </span>
               ))}
           </List>
           <Card shadow="sm" p="lg" radius="md" withBorder>
@@ -357,8 +362,8 @@ const StyledTabs = (props: TabsProps) => {
               ? theme.colors.dark[0]
               : theme.colors.gray[9],
           border: `1px solid ${theme.colorScheme === "dark"
-              ? theme.colors.dark[6]
-              : theme.colors.gray[4]
+            ? theme.colors.dark[6]
+            : theme.colors.gray[4]
             }`,
           borderColor: theme.colors.blue[9],
           padding: `${theme.spacing.xs} px ${theme.spacing.md} px`,

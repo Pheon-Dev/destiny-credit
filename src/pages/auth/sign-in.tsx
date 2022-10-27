@@ -77,7 +77,7 @@ const Page: NextPage = (): JSX.Element => {
       updateNotification({
         id: "sing-in-status",
         title: "Sign In Error!",
-        message: `Please Try Signing In Again!`,
+        message: `${error} : Please Try Signing In Again!`,
         icon: <IconX size={16} />,
         color: "red",
         autoClose: 4000,

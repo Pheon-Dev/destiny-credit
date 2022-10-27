@@ -9,12 +9,12 @@ import { EmptyTable } from "./EmptyTable";
 
 export const MembersTable = ({
   call,
-  email, }: {
-    call: string;
-    status?: string;
-    email: string;
-  }) => {
-
+  email,
+}: {
+  call: string;
+  status?: string;
+  email: string;
+}) => {
   const [user, setUser] = useState({
     id: "",
     role: "",
@@ -180,14 +180,7 @@ const MemberRow = ({
               style={{ cursor: "pointer" }}
               onClick={() => router.push(`/loans/maintain/${member.id}`)}
               variant="gradient"
-              gradient={{
-                from: "indigo",
-                to: "cyan",
-              }}
-            >
-              Maintain
-            </Badge>
-          </td>
+              gradient={{ from: "indigo", to: "cyan", }} > Maintain </Badge> </td>
           {role !== "CO" && (
             <td
               style={{ cursor: "pointer" }}
