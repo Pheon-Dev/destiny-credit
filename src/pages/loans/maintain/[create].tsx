@@ -1,11 +1,32 @@
-import {
-  ActionIcon, Autocomplete, Box, Button, Card, Grid, Group, LoadingOverlay, Menu, Modal, Select, Stepper, Switch, Text,
-  TextInput, Tooltip
-} from "@mantine/core";
+import React, { useCallback, useEffect, useState } from "react";
+import { Selection } from "../../../../types";
+import { Protected, TitleText } from "../../../components";
+import { NextPage } from "next";
+import { z } from "zod";
+import { v4 as uuidV4 } from "uuid";
 import { useForm, zodResolver } from "@mantine/form";
-import { showNotification, updateNotification } from "@mantine/notifications";
-import type { Collateral } from "@prisma/client";
 import {
+  Group,
+  Stepper,
+  Button,
+  Text,
+  TextInput,
+  Card,
+  Box,
+  Grid,
+  Select,
+  Menu,
+  ActionIcon,
+  Switch,
+  Autocomplete,
+  Tooltip,
+  Modal,
+  LoadingOverlay,
+} from "@mantine/core";
+import { useRouter } from "next/router";
+import { showNotification, updateNotification } from "@mantine/notifications";
+import {
+  IconCalendar,
   IconCheck,
   IconDots,
   IconEye,
@@ -14,19 +35,16 @@ import {
   IconMinus,
   IconPlus,
   IconTrash,
-  IconX
+  IconX,
 } from "@tabler/icons";
-import { NextPage } from "next";
-import { useSession } from "next-auth/react";
-import { useRouter } from "next/router";
-import { useCallback, useEffect, useState } from "react";
-import { v4 as uuidV4 } from "uuid";
-import { z } from "zod";
-import { Selection } from "../../../../types";
-import { Protected, TitleText } from "../../../components";
 import { trpc } from "../../../utils/trpc";
+import type { Collateral } from "@prisma/client";
+import { useSession } from "next-auth/react";
+import { DatePicker } from "@mantine/dates";
+import dayjs from "dayjs";
 
 const loan_schema = z.object({
+  startDate: z.date({ required_error: "Select First Installment Date" }),
   member: z.string().min(2, { message: "User Name Missing" }),
   product: z.string().min(2, { message: "Product is Missing" }),
   principal: z.string().min(2, { message: "Principal Amount is Missing" }),
@@ -64,7 +82,7 @@ const CreateLoan = ({
   const [open, setOpen] = useState(false);
   const [deleteModal, setDeleteModal] = useState(false);
   const [collateralId, setCollateralId] = useState("");
-  const [startDate, setStartDate] = useState("");
+  const [startsOn, setStartsOn] = useState("");
   const [id, setId] = useState("");
   const [loanRef, setLoanRef] = useState("");
   const [sundays, setSundays] = useState(0);
@@ -343,26 +361,33 @@ const CreateLoan = ({
         : memberCode + `-00${loanLen}`
     );
 
+  };
+
+  const fillForm = () => {
     const date = new Date();
     date.setDate(
-      cycle === "monthly"
+      cycle === "MONTHLY"
         ? date.getDate() + 30
-        : cycle === "weekly"
+        : cycle === "WEEKLY"
           ? date.getDate() + 7
           : date.getDate() + 2
     );
     date.setDate(date.getDay() === 0 ? date.getDate() + 1 : date.getDate() + 0);
 
-    const startsOn =
+    const starts =
       date.toLocaleDateString().split("/")[0] +
       "-" +
       date.toLocaleDateString().split("/")[1] +
       "-" +
       date.toLocaleDateString().split("/")[2];
-    setStartDate(startsOn);
-  };
 
-  const fillForm = () => {
+      const change = form.values.startDate
+      /* console.log(change) */
+    setStartsOn(change !== "" && change || starts);
+    /* form.values.startDate === "" && ( */
+        /* form.setFieldValue("startDate", `${startsOn}`) */
+    /* ) */
+
     form.setFieldValue("memberId", `${id}`);
     form.setFieldValue("member", `${member?.firstName} ${member?.lastName}`);
     form.setFieldValue("productId", `${product?.data?.id}`);
@@ -372,7 +397,7 @@ const CreateLoan = ({
     form.setFieldValue("sundays", `${sundays}`);
     form.setFieldValue("grace", `${grace}`);
     form.setFieldValue("loanRef", `${loanRef}`);
-    form.setFieldValue("startDate", `${startDate}`);
+    /* form.setFieldValue("startDate", `${startDate}`); */
     form.setFieldValue("cycle", `${cycle}`);
     form.setFieldValue("maintained", true);
     form.setFieldValue("approved", false);
@@ -501,8 +526,8 @@ const CreateLoan = ({
       }
       fillForm();
       calcuDates(cycle.toLowerCase(), +form.values.tenure);
-    }
 
+    }
     return () => {
       subscribe = false;
     };
@@ -523,12 +548,14 @@ const CreateLoan = ({
     mid,
     id,
     checked,
+    startsOn,
+    cycle,
     loanLen,
     memberCode,
     sundays,
     payoffAmount,
     loanRef,
-    startDate,
+    form.values.startDate,
     form.values.tenure,
     form.values.product,
   ]);
@@ -652,7 +679,7 @@ const CreateLoan = ({
         setOpen(false);
         setDeleteModal(false);
         setCollateralId("");
-        setStartDate("");
+        /* setStartDate(""); */
         setLoanRef("");
         setSundays(0);
         setChangeGuarantor(false);
@@ -890,14 +917,9 @@ const CreateLoan = ({
   }, [collateralId, delete_collateral]);
 
   const roundOff = (value: number) => {
-    let v = value?.toString().split(".")[0]
-    let w = value?.toString().split(".")[1]
-    if (v && w)
-      return (
-        +w > 0
-          ? +v + 1
-          : +v + 0
-      ).toString();
+    const a = Number(value.toString().split(".")[0])
+    const b = Number(value.toString().split(".")[1])
+    return b > 0 && a + 1 || a
   };
 
   const renderDailyInterestAmount = (
@@ -925,8 +947,7 @@ const CreateLoan = ({
   ) => {
     let principalAmount = renderDailyInterestAmount(rate, principal, tenure);
 
-    if (principalAmount)
-      return roundOff((+principalAmount + principal) / (tenure - sundays));
+    return roundOff((principalAmount + principal) / (tenure - sundays));
   };
 
   const renderWeeklyInterestAmount = (
@@ -944,8 +965,7 @@ const CreateLoan = ({
   ) => {
     let principalAmount = renderWeeklyInterestAmount(rate, principal, tenure);
 
-    if (principalAmount)
-      return roundOff((+principalAmount + principal) / tenure);
+    return roundOff((+principalAmount + principal) / tenure);
   };
 
   const renderMonthlyInterestAmount = (
@@ -963,15 +983,13 @@ const CreateLoan = ({
   ) => {
     let principalAmount = renderMonthlyInterestAmount(rate, principal, tenure);
 
-    if (principalAmount)
-      return roundOff((+principalAmount + principal) / tenure);
+    return roundOff((+principalAmount + principal) / tenure);
   };
 
   const renderProcessingFeeAmount = (rate: number, principal: number) => {
     let proc_fee = roundOff((rate / 100) * principal);
 
-    if (proc_fee)
-      return +proc_fee < 301 ? 300 : proc_fee;
+    return +proc_fee < 301 ? 300 : proc_fee;
   };
 
   const renderPenaltyAmount = (
@@ -987,8 +1005,7 @@ const CreateLoan = ({
         : cycle.toLowerCase() === "weekly"
           ? renderWeeklyInstallmentAmount(interest_rate, principal, tenure)
           : renderMonthlyInstallmentAmount(interest_rate, principal, tenure);
-    if (installment)
-      return roundOff((penalty_rate / 100) * +installment);
+    return roundOff((penalty_rate / 100) * +installment);
   };
 
   let select_product: Array<Selection> = []
@@ -1247,18 +1264,6 @@ const CreateLoan = ({
               <Text weight={500}>{grace} Day</Text>
             </Group>
           ) : null}
-          {cycle.toLowerCase() === "daily" && (
-            <Group position="apart" mt="md" mb="xs">
-              <Text weight={500}>First Installment Date</Text>
-              <Text weight={500}>{startDate}</Text>
-              {/* <DatePicker */}
-              {/*   value={startDate} */}
-              {/*   onChange={setStartDate} */}
-              {/*   placeholder={`${startDate}`} */}
-              {/*   inputFormat="DD-MM-YYYY" */}
-              {/* /> */}
-            </Group>
-          )}
         </Card>
       </>
     );
@@ -1590,6 +1595,22 @@ const CreateLoan = ({
                       required
                     />
                   </Grid.Col>
+                  {form.values.tenure && (
+                    <Grid.Col span={4}>
+                      <DatePicker
+                        mt="md"
+                        label="First Installment Date"
+                        placeholder={startsOn}
+                        icon={<IconCalendar size={16} />}
+                        dropdownType="modal"
+                        firstDayOfWeek="sunday"
+                        minDate={dayjs(new Date()).toDate()}
+                        inputFormat="DD-MM-YYYY"
+                        {...form.getInputProps("startDate")}
+                        required
+                      />
+                    </Grid.Col>
+                  )}
                 </Grid>
               </form>
             </Box>
