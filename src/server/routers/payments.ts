@@ -12,7 +12,8 @@ export const paymentsRouter = t.router({
       })
     )
     .query(async ({ input }) => {
-      if (input.id === "") return;
+      if (!input.id) return;
+
       const loan = await prisma.loan.findFirst({
         where: {
           id: input.id,

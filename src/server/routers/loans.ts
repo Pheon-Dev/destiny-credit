@@ -42,6 +42,7 @@ export const loansRouter = t.router({
     )
     .query(async ({ input }) => {
       if (!input.id) return;
+
       const loan = await prisma.loan.findFirst({
         where: {
           id: input.id,
@@ -64,6 +65,8 @@ export const loansRouter = t.router({
       })
     )
     .mutation(async ({ input }) => {
+      if (!input.id) return;
+
       const loan = await prisma.loan.updateMany({
         where: {
           id: input.id,
@@ -93,6 +96,8 @@ export const loansRouter = t.router({
       })
     )
     .mutation(async ({ input }) => {
+      if (!input.id) return;
+
       const loan = await prisma.loan.updateMany({
         where: {
           id: input.id,
@@ -116,11 +121,12 @@ export const loansRouter = t.router({
   member: t.procedure
     .input(
       z.object({
-        id: z.string().nullish(),
+        id: z.string(),
       })
     )
     .query(async ({ input }) => {
       if (!input.id) return;
+
       const loan = await prisma.loan.findMany({
         where: {
           memberId: input.id,

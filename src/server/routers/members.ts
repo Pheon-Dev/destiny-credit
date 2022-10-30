@@ -37,7 +37,8 @@ export const membersRouter = t.router({
       })
     )
     .query(async ({ input }) => {
-      if (input.id === "") return;
+      if (!input.id) return;
+
       const member = await prisma.member.findFirst({
         where: {
           id: input.id,
@@ -70,7 +71,8 @@ export const membersRouter = t.router({
       })
     )
     .query(async ({ input }) => {
-      if (input.firstName === "") return;
+      if (!input.firstName) return;
+
       const member = await prisma.member.findFirst({
         where: {
           firstName: input.firstName,
@@ -132,6 +134,8 @@ export const membersRouter = t.router({
       })
     )
     .mutation(async ({ input }) => {
+      if (!input.firstName) return;
+
       const member = await prisma.member.create({
         data: {
           date: input.date,
@@ -192,7 +196,8 @@ export const membersRouter = t.router({
       })
     )
     .query(async ({ input }) => {
-      if (input.id === "") return;
+      if (!input.id) return;
+
       const collateral = await prisma.collateral.findMany({
         where: {
           memberId: input.id,
@@ -210,6 +215,8 @@ export const membersRouter = t.router({
       })
     )
     .mutation(async ({ input }) => {
+      if (!input.id) return;
+
       const collateral = await prisma.collateral.deleteMany({
         where: { id: input.id },
       });
@@ -228,6 +235,8 @@ export const membersRouter = t.router({
       })
     )
     .mutation(async ({ input }) => {
+      if (!input.id) return;
+
       return await prisma.member.deleteMany({
         where: {
           id: input.id,
@@ -241,7 +250,8 @@ export const membersRouter = t.router({
       })
     )
     .query(async ({ input }) => {
-      if (input.id === "") return;
+      if (!input.id) return;
+
       const guarantor = await prisma.guarantor.findFirst({
         where: {
           memberId: input.id,
@@ -278,6 +288,8 @@ export const membersRouter = t.router({
       })
     )
     .mutation(async ({ input }) => {
+      if (!input.id) return;
+
       const member = await prisma.member.update({
         where: {
           id: input.id,
@@ -305,6 +317,8 @@ export const membersRouter = t.router({
       })
     )
     .mutation(async ({ input }) => {
+      if (!input.item) return;
+
       const collateral = await prisma.collateral.create({
         data: {
           item: input.item,
@@ -334,6 +348,8 @@ export const membersRouter = t.router({
       })
     )
     .mutation(async ({ input }) => {
+      if (!input.id) return;
+
       await prisma.guarantor.deleteMany({
         where: {
           memberId: input.memberId,
@@ -385,6 +401,8 @@ export const membersRouter = t.router({
       })
     )
     .mutation(async ({ input }) => {
+      if (!input.memberId) return;
+
       const loan = await prisma.loan.create({
         data: {
           memberId: input.memberId,

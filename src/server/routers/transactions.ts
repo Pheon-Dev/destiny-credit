@@ -11,8 +11,9 @@ export const transactionsRouter = t.router({
       })
     )
     .query(async ({ input }) => {
-      if (input.id === "") return;
+      if (!input.id) return;
       if (input.id.length !== 10) return;
+
       const transaction = await prisma.transaction.findFirst({
         where: {
           transID: input.id,
@@ -41,6 +42,8 @@ export const transactionsRouter = t.router({
       })
     )
     .query(async ({ input }) => {
+      if (!input.firstname) return;
+
       const transaction = await prisma.transaction.findMany({
         where: {
           firstName: input.firstname,
@@ -72,6 +75,8 @@ export const transactionsRouter = t.router({
       })
     )
     .query(async ({ input }) => {
+      if (!input.firstname) return;
+
       const transaction = await prisma.transaction.findMany({
         where: {
           firstName: input.firstname,
@@ -100,7 +105,8 @@ export const transactionsRouter = t.router({
       })
     )
     .query(async ({ input }) => {
-      if (input.id === "") return;
+      if (!input.id) return;
+
       const transaction = await prisma.transaction.findMany({
         where: {
           transID: input.id,
@@ -130,6 +136,8 @@ export const transactionsRouter = t.router({
       })
     )
     .mutation(async ({ input }) => {
+      if (!input.id) return;
+
       const transaction = await prisma.transaction.updateMany({
         where: {
           id: input.id,

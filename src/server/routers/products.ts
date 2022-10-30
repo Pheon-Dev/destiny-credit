@@ -26,7 +26,8 @@ export const productsRouter = t.router({
       })
     )
     .query(async ({ input }) => {
-      if (input.id === "") return
+      if (!input.id) return;
+
       const product = await prisma.product.findFirst({
         where: {
           id: input.id,
@@ -54,6 +55,8 @@ export const productsRouter = t.router({
       })
     )
     .mutation(async ({ input }) => {
+      if (!input.productId) return;
+
       const product = await prisma.product.create({
         data: {
           productId: input.productId,

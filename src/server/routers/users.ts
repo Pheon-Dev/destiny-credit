@@ -57,7 +57,8 @@ export const usersRouter = t.router({
       })
     )
     .query(async ({ input }) => {
-      if (input.id === "") return;
+      if (!input.id) return;
+
       const user = await prisma.user.findFirst({
         where: {
           id: input.id,
@@ -87,9 +88,8 @@ export const usersRouter = t.router({
       })
     )
     .query(async ({ input }) => {
-      if (input.email === "undefined")
-        return await prisma.user.findFirst({ where: {} });
-      if (input.email === "") return await prisma.user.findFirst({ where: {} });
+      if (!input.email) return;
+
       const user = await prisma.user.findFirst({
         where: {
           email: input.email,
@@ -124,6 +124,8 @@ export const usersRouter = t.router({
       })
     )
     .mutation(async ({ input }) => {
+      if (!input.id) return;
+
       const user = await prisma.user.updateMany({
         where: {
           id: input.id,
@@ -153,6 +155,8 @@ export const usersRouter = t.router({
       })
     )
     .mutation(async ({ input }) => {
+      if (!input.username) return;
+
       const user = await prisma.user.create({
         data: {
           username: input.username,

@@ -191,11 +191,14 @@ const CreateLoan = ({
     },
   });
 
+  const mem = trpc.members.member.useQuery({
+    id: id,
+  });
+  const member = mem?.data
+
   const utils = trpc.useContext();
 
-  const { data: loans } = trpc.loans.member.useQuery({ id: id });
-  let loanLen = 0;
-  if (loans) loanLen = loans?.length + 1;
+  const loanLen = member && member?.loans?.length + 1 || 0;
 
   const { data: members } = trpc.members.members.useQuery();
 
@@ -203,11 +206,7 @@ const CreateLoan = ({
     trpc.products.products.useQuery();
 
   const product = trpc.products.product.useQuery({
-    id: form.values.product ?? "",
-  });
-
-  const { data: member, status: member_status } = trpc.members.member.useQuery({
-    id: id || "",
+    id: form.values.product,
   });
 
   const nextStep = () => {
@@ -794,7 +793,7 @@ const CreateLoan = ({
 
   const maintain_collateral = trpc.members.maintain_collateral.useMutation({
     onSuccess: async (input) => {
-      await utils.members.collateral.invalidate({ id: input.id || "" });
+      input?.id && await utils.members.collateral.invalidate({ id: input?.id });
       updateNotification({
         id: "collateral-status",
         color: "teal",
@@ -806,8 +805,12 @@ const CreateLoan = ({
     },
   });
 
-  const collaterals = trpc.members.collateral.useQuery({ id: id || "" });
-  const { data: guarantor } = trpc.members.guarantor.useQuery({ id: id || "" });
+  /* const collaterals = trpc.members.collateral.useQuery({ id: id }); */
+  /* const { data: guarantor } = trpc.members.guarantor.useQuery({ id: id }); */
+
+  const collaterals = member?.collaterals
+  const guarantor = member?.guarantor
+
 
   const delete_collateral = trpc.members.collateral_delete.useMutation({
     onSuccess: async () => {
@@ -1078,22 +1081,22 @@ const CreateLoan = ({
     }
 
     if (guarantor && !changeGuarantor) {
-      /* guarantor?.map((_: Guarantor) => { */
-      findGuarantor(guarantor.guarantorName);
-      guarantor_form.setFieldValue(
-        "guarantorPhone",
-        `${guarantor.guarantorPhone}`
-      );
-      guarantor_form.setFieldValue("guarantorID", `${guarantor.guarantorID}`);
-      guarantor_form.setFieldValue(
-        "guarantorRelationship",
-        `${guarantor.guarantorRelationship}`
-      );
-      guarantor_form.setFieldValue(
-        "guarantorName",
-        `${guarantor.guarantorName}`
-      );
-      /* }); */
+      guarantor?.map((_) => {
+        findGuarantor(_.guarantorName);
+        guarantor_form.setFieldValue(
+          "guarantorPhone",
+          `${_.guarantorPhone}`
+        );
+        guarantor_form.setFieldValue("guarantorID", `${_.guarantorID}`);
+        guarantor_form.setFieldValue(
+          "guarantorRelationship",
+          `${_.guarantorRelationship}`
+        );
+        guarantor_form.setFieldValue(
+          "guarantorName",
+          `${_.guarantorName}`
+        );
+      });
     }
   };
 
@@ -1471,7 +1474,7 @@ const CreateLoan = ({
                 </Group>
               </Card.Section>
               {collaterals &&
-                collaterals.data?.map((collateral: Collateral) => (
+                collaterals?.map((collateral: Collateral) => (
                   <Grid key={collateral.id} grow>
                     <Grid.Col mt="md" span={4}>
                       <Text>{collateral.item}</Text>
@@ -1522,7 +1525,7 @@ const CreateLoan = ({
         position: "relative",
       }}
     >
-      <LoadingOverlay overlayBlur={2} visible={member_status === "loading"} />
+      <LoadingOverlay overlayBlur={2} visible={mem.status === "loading"} />
       <Protected>
         <Stepper
           mt="lg"
@@ -1545,7 +1548,7 @@ const CreateLoan = ({
                       label="Member"
                       placeholder="Member ..."
                       {...form.getInputProps("member")}
-                      disabled={member_status === "success" ? false : true}
+                      disabled={mem.status === "success" ? false : true}
                       required
                     />
                   </Grid.Col>
@@ -1703,7 +1706,7 @@ const CreateLoan = ({
                   </Group>
                 </Card.Section>
                 {collaterals &&
-                  collaterals.data?.map(
+                  collaterals?.map(
                     (collateral: Collateral, index: number) => (
                       <div key={collateral.id}>
                         <Card.Section withBorder inheritPadding py="xs">
@@ -1928,6 +1931,11 @@ const CreateLoan = ({
 };
 
 const Page: NextPage = () => {
+  const [firstname, setFirstname] = useState("");
+  const [middlename, setMiddlename] = useState("");
+  const [lastname, setLastname] = useState("");
+  const [phonenumber, setPhonenumber] = useState("");
+
   const { status, data } = useSession();
   const router = useRouter();
   const mid = router.query.create as string;
@@ -1935,10 +1943,6 @@ const Page: NextPage = () => {
   const member_search = trpc.transactions.transaction.useQuery({
     id: mid.length === 10 ? mid : "",
   });
-  const [firstname, setFirstname] = useState("");
-  const [middlename, setMiddlename] = useState("");
-  const [lastname, setLastname] = useState("");
-  const [phonenumber, setPhonenumber] = useState("");
 
   if (member_search?.data) {
     setFirstname(member_search?.data?.firstName);
