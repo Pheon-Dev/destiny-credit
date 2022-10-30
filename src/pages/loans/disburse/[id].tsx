@@ -1,9 +1,11 @@
 import {
   ActionIcon, Button, Card, Divider, Grid, Group, LoadingOverlay, Menu, Select, Text
 } from "@mantine/core";
+import { DatePicker } from "@mantine/dates";
 import { useForm, zodResolver } from "@mantine/form";
 import { showNotification, updateNotification } from "@mantine/notifications";
 import {
+  IconCalendar,
   IconCheck,
   IconDots,
   IconEye,
@@ -11,6 +13,7 @@ import {
   IconTrash,
   IconX
 } from "@tabler/icons";
+import dayjs from "dayjs";
 import { NextPage } from "next";
 import { useSession } from "next-auth/react";
 import { useRouter } from "next/router";
@@ -20,11 +23,13 @@ import { Protected, TitleText } from "../../../components";
 import { trpc } from "../../../utils/trpc";
 
 const schema = z.object({
+  disbursementDate: z.date({ required_error: "Select First Installment Date" }),
   creditOfficerId: z.string().min(2, { message: "Officer not Selected" }),
   creditOfficerName: z.string().min(2, { message: "Officer not Selected" }),
 });
 
 const Disburse = ({ email }: { email: string; status: string }) => {
+  const [disbursedOn, setDisbursedOn] = useState("");
   const router = useRouter();
   const id = router.query.id as string;
 
@@ -92,6 +97,7 @@ const Disburse = ({ email }: { email: string; status: string }) => {
   const form = useForm({
     validate: zodResolver(schema),
     initialValues: {
+      disbursementDate: `${disbursedOn}`,
       creditOfficerId: "",
       creditOfficerName: "",
     },
@@ -123,19 +129,23 @@ const Disburse = ({ email }: { email: string; status: string }) => {
     let sub = true;
     if (sub) {
       findOfficer(form.values.creditOfficerName);
+      const date = new Date();
+
+      const change = !form.values.disbursementDate && date || new Date(form.values.disbursementDate)
+
+      const local_date = change.toLocaleDateString()
+
+      const dash_date =
+        local_date.split("/")[0] + "-" +
+        local_date.split("/")[1] + "-" +
+        local_date.split("/")[2]
+
+      setDisbursedOn(dash_date)
     }
     return () => {
       sub = false;
     };
-  }, [form.values.creditOfficerName]);
-
-  const date = new Date();
-  const disbursedOn =
-    date.toLocaleDateString().split("/")[0] +
-    "-" +
-    date.toLocaleDateString().split("/")[1] +
-    "-" +
-    date.toLocaleDateString().split("/")[2];
+  }, [form.values.creditOfficerName, disbursedOn, form.values.disbursementDate]);
 
   const handleSubmit = useCallback(() => {
     try {
@@ -368,8 +378,21 @@ const Disburse = ({ email }: { email: string; status: string }) => {
                 <Grid.Col mt="xs" span={4}>
                   <Text weight={500}>Disbursement Date</Text>
                 </Grid.Col>
-                <Grid.Col mt="xs" span={4} offset={4}>
-                  <Text>{disbursedOn}</Text>
+                {/* <Grid.Col mt="xs" span={4} offset={4}> */}
+                {/*   <Text>{disbursedOn}</Text> */}
+                {/* </Grid.Col> */}
+                <Grid.Col span={4}>
+                  <DatePicker
+                    placeholder={disbursedOn}
+                    defaultValue={disbursedOn}
+                    icon={<IconCalendar size={16} />}
+                    dropdownType="modal"
+                    firstDayOfWeek="sunday"
+                    maxDate={dayjs(new Date()).toDate()}
+                    inputFormat="DD-MM-YYYY"
+                    {...form.getInputProps("disbursementDate")}
+                    required
+                  />
                 </Grid.Col>
               </Grid>
               <Divider variant="dotted" my="xl" />

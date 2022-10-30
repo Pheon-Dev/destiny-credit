@@ -38,7 +38,7 @@ import {
   IconX,
 } from "@tabler/icons";
 import { trpc } from "../../../utils/trpc";
-import type { Collateral } from "@prisma/client";
+import type { Collateral, Guarantor, Member } from "@prisma/client";
 import { useSession } from "next-auth/react";
 import { DatePicker } from "@mantine/dates";
 import dayjs from "dayjs";
@@ -117,7 +117,7 @@ const CreateLoan = ({
 
   const user_data = trpc.users.user.useQuery({
     email: `${email}`,
-  });
+  }) ?? [];
 
   useEffect(() => {
     let subscribe = true;
@@ -156,7 +156,7 @@ const CreateLoan = ({
       productName: "",
       principal: "",
       cycle: "",
-      startDate: "",
+      startDate: `${startsOn}`,
       loanRef: "",
       tenure: "",
       interest: "",
@@ -191,9 +191,8 @@ const CreateLoan = ({
     },
   });
 
-  const mem = trpc.members.member.useQuery({
-    id: id,
-  });
+  const mem = trpc.members.member.useQuery({ id }) ?? [];
+
   const member = mem?.data
 
   const utils = trpc.useContext();
@@ -207,7 +206,7 @@ const CreateLoan = ({
 
   const product = trpc.products.product.useQuery({
     id: form.values.product,
-  });
+  }) ?? [];
 
   const nextStep = () => {
     if (form.values.principal.length > 0 && +form.values.principal < minRange) {
@@ -363,32 +362,6 @@ const CreateLoan = ({
   };
 
   const fillForm = () => {
-    const date = new Date();
-    date.setDate(
-      cycle === "MONTHLY"
-        ? date.getDate() + 30
-        : cycle === "WEEKLY"
-          ? date.getDate() + 7
-          : date.getDate() + 2
-    );
-    date.setDate(date.getDay() === 0 ? date.getDate() + 1 : date.getDate() + 0);
-
-    const starts =
-      date.toLocaleDateString().split("/")[0] +
-      "-" +
-      date.toLocaleDateString().split("/")[1] +
-      "-" +
-      date.toLocaleDateString().split("/")[2];
-
-    let change = new Date(form.values.startDate)
-    let local_date = change.toLocaleDateString()
-    const dash_date =
-      local_date.split("/")[0] + "-" +
-      local_date.split("/")[1] + "-" +
-      local_date.split("/")[2]
-
-    setStartsOn(form.values.startDate && dash_date || starts)
-
     form.setFieldValue("memberId", `${id}`);
     form.setFieldValue("member", `${member?.firstName} ${member?.lastName}`);
     form.setFieldValue("productId", `${product?.data?.id}`);
@@ -398,7 +371,6 @@ const CreateLoan = ({
     form.setFieldValue("sundays", `${sundays}`);
     form.setFieldValue("grace", `${grace}`);
     form.setFieldValue("loanRef", `${loanRef}`);
-    form.setFieldValue("startDate", `${startsOn}`);
     form.setFieldValue("cycle", `${cycle}`);
     form.setFieldValue("maintained", true);
     form.setFieldValue("approved", false);
@@ -528,6 +500,26 @@ const CreateLoan = ({
       fillForm();
       calcuDates(cycle.toLowerCase(), +form.values.tenure);
 
+      const date = new Date();
+      date.setDate(
+        cycle === "MONTHLY"
+          ? date.getDate() + 30
+          : cycle === "WEEKLY"
+            ? date.getDate() + 7
+            : date.getDate() + 2
+      );
+      date.setDate(date.getDay() === 0 ? date.getDate() + 1 : date.getDate() + 0);
+
+      const change = !form.values.startDate && date || new Date(form.values.startDate)
+
+      const local_date = change.toLocaleDateString()
+
+      const dash_date =
+        local_date.split("/")[0] + "-" +
+        local_date.split("/")[1] + "-" +
+        local_date.split("/")[2]
+
+      setStartsOn(dash_date)
     }
     return () => {
       subscribe = false;
@@ -598,7 +590,7 @@ const CreateLoan = ({
           form.values.guarantorId &&
           form.values.productName &&
           form.values.cycle &&
-          form.values.startDate &&
+          startsOn &&
           form.values.loanRef &&
           guarantor_form.values.guarantorPhone &&
           guarantor_form.values.guarantorRelationship &&
@@ -634,7 +626,7 @@ const CreateLoan = ({
           disbursed: form.values.disbursed,
           grace: form.values.grace,
           installment: form.values.installment,
-          productId: form.values.productId,
+          productId: form.values.product,
           payoff: form.values.payoff,
           penalty: form.values.penalty,
           processingFee: form.values.processingFee,
@@ -643,7 +635,7 @@ const CreateLoan = ({
           productName: form.values.productName,
           interest: form.values.interest,
           cycle: form.values.cycle,
-          startDate: form.values.startDate,
+          startDate: startsOn,
           loanRef: form.values.loanRef,
           maintainerId: `${user?.id}`,
         });
@@ -680,7 +672,7 @@ const CreateLoan = ({
         setOpen(false);
         setDeleteModal(false);
         setCollateralId("");
-        /* setStartDate(""); */
+        setStartsOn("");
         setLoanRef("");
         setSundays(0);
         setChangeGuarantor(false);
@@ -750,7 +742,7 @@ const CreateLoan = ({
         disbursed: form.values.disbursed,
         grace: form.values.grace,
         installment: form.values.installment,
-        productId: form.values.productId,
+        productId: form.values.product,
         payoff: form.values.payoff,
         penalty: form.values.penalty,
         processingFee: form.values.processingFee,
@@ -759,7 +751,7 @@ const CreateLoan = ({
         productName: form.values.productName,
         interest: form.values.interest,
         cycle: form.values.cycle,
-        startDate: form.values.startDate,
+        startDate: startsOn,
         loanRef: form.values.loanRef,
       });
       return updateNotification({
@@ -793,20 +785,11 @@ const CreateLoan = ({
 
   const maintain_collateral = trpc.members.maintain_collateral.useMutation({
     onSuccess: async (input) => {
-      input?.id && await utils.members.collateral.invalidate({ id: input?.id });
-      updateNotification({
-        id: "collateral-status",
-        color: "teal",
-        title: "Collaterals",
-        message: `${maintain_collateral.data?.item} @ ${maintain_collateral.data?.value} Added Successfully as Collateral!`,
-        icon: <IconCheck size={16} />,
-        autoClose: 8000,
-      });
+      collateral_form.setFieldValue("item", "");
+      collateral_form.setFieldValue("value", "");
+      return input?.id && await utils.members.collateral.invalidate({ id: input?.id });
     },
   });
-
-  /* const collaterals = trpc.members.collateral.useQuery({ id: id }); */
-  /* const { data: guarantor } = trpc.members.guarantor.useQuery({ id: id }); */
 
   const collaterals = member?.collaterals
   const guarantor = member?.guarantor
@@ -840,19 +823,6 @@ const CreateLoan = ({
           updaterId: `${user?.id}`,
         });
 
-        collateral_form.setFieldValue("item", "");
-        collateral_form.setFieldValue("value", "");
-        if (maintain_collateral.status === "success") {
-          return updateNotification({
-            id: "collateral-status",
-            color: "teal",
-            title: "Collaterals",
-            message: `${maintain_collateral.data?.item} @ ${maintain_collateral.data?.value} Added Successfully as Collateral!`,
-            icon: <IconCheck size={16} />,
-            autoClose: 8000,
-          });
-        }
-
         if (maintain_collateral.status === "error") {
           collateral_form.setFieldValue("item", "");
           collateral_form.setFieldValue("value", "");
@@ -865,6 +835,14 @@ const CreateLoan = ({
             autoClose: 4000,
           });
         }
+        updateNotification({
+          id: "collateral-status",
+          color: "teal",
+          title: "Collaterals",
+          message: `${collateral_form.values.item} @ ${collateral_form.values.value} Added Successfully as Collateral!`,
+          icon: <IconCheck size={16} />,
+          autoClose: 8000,
+        });
       }
       if (
         !form.values.memberId.length ||
@@ -1081,7 +1059,7 @@ const CreateLoan = ({
     }
 
     if (guarantor && !changeGuarantor) {
-      guarantor?.map((_) => {
+      guarantor?.map((_: Guarantor) => {
         findGuarantor(_.guarantorName);
         guarantor_form.setFieldValue(
           "guarantorPhone",
@@ -1269,6 +1247,10 @@ const CreateLoan = ({
               <Text weight={500}>{grace} Day</Text>
             </Group>
           ) : null}
+          <Group position="apart" mt="md" mb="xs">
+            <Text weight={500}>First Installment</Text>
+            <Text weight={500}>{startsOn}</Text>
+          </Group>
         </Card>
       </>
     );
@@ -1313,7 +1295,7 @@ const CreateLoan = ({
                   <Text weight={500}>Loan Product</Text>
                 </Grid.Col>
                 <Grid.Col mt="xs" span={4}>
-                  <Text>{form.values.product}</Text>
+                  <Text>{product.data?.productName}</Text>
                 </Grid.Col>
               </Grid>
               <Grid grow>
@@ -1431,6 +1413,14 @@ const CreateLoan = ({
                   </Grid.Col>
                 </Grid>
               )}
+              <Grid grow>
+                <Grid.Col mt="xs" span={4}>
+                  <Text weight={500}>First Installment</Text>
+                </Grid.Col>
+                <Grid.Col mt="xs" span={4}>
+                  <Text weight={500}>{startsOn}</Text>
+                </Grid.Col>
+              </Grid>
               <Card.Section withBorder inheritPadding mt="md" py="xs">
                 <Group position="apart">
                   <TitleText title={`Guarantor`} />
@@ -1606,6 +1596,7 @@ const CreateLoan = ({
                         mt="md"
                         label="First Installment Date"
                         placeholder={startsOn}
+                        defaultValue={startsOn}
                         icon={<IconCalendar size={16} />}
                         dropdownType="modal"
                         firstDayOfWeek="sunday"
@@ -1942,7 +1933,7 @@ const Page: NextPage = () => {
 
   const member_search = trpc.transactions.transaction.useQuery({
     id: mid.length === 10 ? mid : "",
-  });
+  }) ?? [];
 
   if (member_search?.data) {
     setFirstname(member_search?.data?.firstName);
@@ -1955,7 +1946,7 @@ const Page: NextPage = () => {
     firstName: firstname,
     lastName: lastname,
     phoneNumber: phonenumber,
-  });
+  }) ?? [];
 
   let member_id = ""
 

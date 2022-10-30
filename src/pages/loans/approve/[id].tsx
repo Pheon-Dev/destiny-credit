@@ -260,6 +260,16 @@ const Approve = ({ email }: { email: string; status: string }) => {
                   </Grid.Col>
                 </Grid>
               )}
+              <Grid grow>
+                <Grid.Col mt="xs" span={4}>
+                  <Text weight={500}>First Installment</Text>
+                </Grid.Col>
+                <Grid.Col mt="xs" span={4}>
+                  <Text>
+                    {loan?.startDate}
+                  </Text>
+                </Grid.Col>
+              </Grid>
               <Divider variant="dotted" m="md" />
               <Grid grow>
                 <Grid.Col mt="xs" span={4}>
