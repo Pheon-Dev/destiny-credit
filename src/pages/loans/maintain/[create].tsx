@@ -381,12 +381,14 @@ const CreateLoan = ({
       "-" +
       date.toLocaleDateString().split("/")[2];
 
-      const change = form.values.startDate
-      /* console.log(change) */
-    setStartsOn(change !== "" && change || starts);
-    /* form.values.startDate === "" && ( */
-        /* form.setFieldValue("startDate", `${startsOn}`) */
-    /* ) */
+    let change = new Date(form.values.startDate)
+    let local_date = change.toLocaleDateString()
+    const dash_date =
+      local_date.split("/")[0] + "-" +
+      local_date.split("/")[1] + "-" +
+      local_date.split("/")[2]
+
+    setStartsOn(form.values.startDate && dash_date || starts)
 
     form.setFieldValue("memberId", `${id}`);
     form.setFieldValue("member", `${member?.firstName} ${member?.lastName}`);
@@ -397,7 +399,7 @@ const CreateLoan = ({
     form.setFieldValue("sundays", `${sundays}`);
     form.setFieldValue("grace", `${grace}`);
     form.setFieldValue("loanRef", `${loanRef}`);
-    /* form.setFieldValue("startDate", `${startDate}`); */
+    form.setFieldValue("startDate", `${startsOn}`);
     form.setFieldValue("cycle", `${cycle}`);
     form.setFieldValue("maintained", true);
     form.setFieldValue("approved", false);
