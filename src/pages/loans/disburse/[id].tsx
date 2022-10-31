@@ -30,6 +30,10 @@ const schema = z.object({
 
 const Disburse = ({ email }: { email: string; status: string }) => {
   const [disbursedOn, setDisbursedOn] = useState("");
+
+  /* TODO: Click Button Once & Navigate Safe Guard */
+  /* const [clicked, setClicked] = useState(false); */
+
   const router = useRouter();
   const id = router.query.id as string;
 

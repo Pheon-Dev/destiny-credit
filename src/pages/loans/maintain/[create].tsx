@@ -191,6 +191,7 @@ const CreateLoan = ({
     },
   });
 
+  /* FIXME: Returning undefined */
   const mem = trpc.members.member.useQuery({ id }) ?? [];
 
   const member = mem?.data
