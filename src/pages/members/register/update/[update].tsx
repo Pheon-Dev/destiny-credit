@@ -15,12 +15,12 @@ import { Protected, TitleText } from "../../../../components";
 import { trpc } from "../../../../utils/trpc";
 
 const schema = z.object({
-  date: z.date({ required_error: "Select Todays' Date" }),
+  /* date: z.date({ required_error: "Select Todays' Date" }), */
   branchName: z.string().min(2, { message: "Enter Branch Name" }),
   memberId: z.string().min(2, { message: "Enter Member ID" }),
   firstName: z.string().min(2, { message: "Enter First Name" }),
   lastName: z.string().min(2, { message: "Enter Last Name" }),
-  dob: z.date({ required_error: "Select Date of Birth" }),
+  /* dob: z.date({ required_error: "Select Date of Birth" }), */
   idPass: z.string().min(2, { message: "Enter ID | Passport #" }),
   kraPin: z.string().min(2, { message: "Enter KRA PIN" }),
   phoneNumber: z.string().min(2, { message: "Enter Phone Number" }),
@@ -203,7 +203,14 @@ const CreateMember = ({ email }: { email: string; status: string }) => {
   useEffect(() => {
     let subscribe = true;
     if (subscribe) {
+      form.values.date === member?.date &&
+        (age_result = +member?.age) ||
+        form.values.dob === member?.dob &&
+        (age_result = +member?.age) ||
+        (age_result = age_result);
+
       form.setFieldValue("age", `${age_result}`);
+
       if (form.values.age === `${age_result}`) {
         const interval = setInterval(() => {
           form.setFieldValue("age", `${age_result}`);
@@ -214,65 +221,24 @@ const CreateMember = ({ email }: { email: string; status: string }) => {
           clearInterval(interval);
         };
       }
+
     }
     return () => (subscribe = false);
-  }, [age_result, form.values.age]);
+  }, [age_result, form.values.age, form.values.date, form.values.dob, member?.age, member?.dob, member?.date]);
 
-  const update = trpc.members.register.useMutation({
+  const update = trpc.members.update.useMutation({
     onSuccess: () => {
       updateNotification({
         id: "submit",
         color: "teal",
         title: `${form.values.firstName} ${form.values.lastName}`,
-        message: "Member Registered Successfully!",
+        message: "Member Details Updated Successfully!",
         icon: <IconCheck size={16} />,
         autoClose: 5000,
       });
-      clear();
-      return router.push("/members");
+      return router.push(`/members/details/${id}`);
     },
   });
-
-  const clear = () => {
-    form.setFieldValue("date", "");
-    form.setFieldValue("branchName", "");
-    form.setFieldValue("memberId", "");
-    form.setFieldValue("firstName", "");
-    form.setFieldValue("lastName", "");
-    form.setFieldValue("dob", "");
-    form.setFieldValue("idPass", "");
-    form.setFieldValue("kraPin", "");
-    form.setFieldValue("phoneNumber", "");
-    form.setFieldValue("gender", "");
-    form.setFieldValue("age", "");
-    form.setFieldValue("religion", "");
-    form.setFieldValue("maritalStatus", "");
-    form.setFieldValue("spouseName", "");
-    form.setFieldValue("spouseNumber", "");
-    form.setFieldValue("postalAddress", "");
-    form.setFieldValue("postalCode", "");
-    form.setFieldValue("cityTown", "");
-    form.setFieldValue("residentialAddress", "");
-    form.setFieldValue("emailAddress", "");
-    form.setFieldValue("rentedOwned", "");
-    form.setFieldValue("landCareAgent", "");
-    form.setFieldValue("occupationEmployer", "");
-    form.setFieldValue("employerNumber", "");
-    form.setFieldValue("businessLocation", "");
-    form.setFieldValue("businessAge", "");
-    form.setFieldValue("refereeName", "");
-    form.setFieldValue("refereeNumber", "");
-    form.setFieldValue("communityPosition", "");
-    form.setFieldValue("mpesaCode", "");
-    form.setFieldValue("membershipAmount", "");
-    form.setFieldValue("nameKin", "");
-    form.setFieldValue("relationship", "");
-    form.setFieldValue("residentialAddressKin", "");
-    form.setFieldValue("postalAddressKin", "");
-    form.setFieldValue("postalCodeKin", "");
-    form.setFieldValue("cityTownKin", "");
-    form.setFieldValue("numberKin", "");
-  };
 
   const handleSave = useCallback(() => {
     try {
@@ -319,14 +285,14 @@ const CreateMember = ({ email }: { email: string; status: string }) => {
             form.values.numberKin) ||
           form.values.maintained
         ) {
-          /* update.mutate({ */
-          console.table({
-            date: dash_today_date,
+          update.mutate({
+            id: id,
+            date: form.values.date === member?.date && form.values.date || dash_today_date,
             branchName: form.values.branchName.toUpperCase(),
             memberId: form.values.memberId.toUpperCase(),
             firstName: form.values.firstName.toUpperCase(),
             lastName: form.values.lastName.toUpperCase(),
-            dob: dash_birth_date,
+            dob: form.values.dob === member?.dob && form.values.dob || dash_birth_date,
             idPass: form.values.idPass.toUpperCase(),
             kraPin: form.values.kraPin.toUpperCase(),
             phoneNumber: form.values.phoneNumber.toUpperCase(),
@@ -391,7 +357,7 @@ const CreateMember = ({ email }: { email: string; status: string }) => {
       {/* <pre>{JSON.stringify(member, undefined, 2)}</pre> */}
       <form style={{ position: "relative" }}>
         <Group position="center" m="md">
-          <TitleText title="Member Registration" />
+          <TitleText title="Details Update" />
         </Group>
 
         <LoadingOverlay
@@ -457,7 +423,7 @@ const CreateMember = ({ email }: { email: string; status: string }) => {
             <TextInput
               mt="md"
               label="First Name"
-              placeholder="First Name"
+              placeholder={`${member?.firstName}`}
               {...form.getInputProps("firstName")}
               required
             />
@@ -466,7 +432,7 @@ const CreateMember = ({ email }: { email: string; status: string }) => {
             <TextInput
               mt="md"
               label="Last Name (other names)"
-              placeholder="Last Name (other names)"
+              placeholder={`${member?.lastName}`}
               {...form.getInputProps("lastName")}
               required
             />
@@ -475,7 +441,7 @@ const CreateMember = ({ email }: { email: string; status: string }) => {
             <TextInput
               mt="md"
               label="Phone #"
-              placeholder="Phone #"
+              placeholder={`${member?.phoneNumber}`}
               {...form.getInputProps("phoneNumber")}
               required
             />
@@ -502,7 +468,7 @@ const CreateMember = ({ email }: { email: string; status: string }) => {
             <TextInput
               mt="md"
               label="ID | Passport #"
-              placeholder="ID | Passport #"
+              placeholder={`${member?.idPass}`}
               {...form.getInputProps("idPass")}
               required
             />
@@ -511,7 +477,7 @@ const CreateMember = ({ email }: { email: string; status: string }) => {
             <TextInput
               mt="md"
               label="KRA PIN"
-              placeholder="KRA PIN"
+              placeholder={`${member?.kraPin}`}
               {...form.getInputProps("kraPin")}
               required
             />
@@ -523,10 +489,10 @@ const CreateMember = ({ email }: { email: string; status: string }) => {
             <Select
               mt="md"
               label="Gender"
-              placeholder="Gender"
+              placeholder={`${member?.gender}`}
               data={[
-                { value: "female", label: "Female" },
-                { value: "male", label: "Male" },
+                { value: "female", label: "FEMALE" },
+                { value: "male", label: "MALE" },
               ]}
               {...form.getInputProps("gender")}
               required
@@ -537,7 +503,7 @@ const CreateMember = ({ email }: { email: string; status: string }) => {
               mt="md"
               label="Age"
               value={age_result}
-              placeholder="Age"
+              placeholder={`${member?.age}`}
               {...form.getInputProps("age")}
               disabled
             />
@@ -546,12 +512,12 @@ const CreateMember = ({ email }: { email: string; status: string }) => {
             <Select
               mt="md"
               label="Religion"
-              placeholder="Religion"
+              placeholder={`${member?.religion}`}
               data={[
-                { value: "christian", label: "Christian" },
-                { value: "muslim", label: "Muslim" },
-                { value: "hindu", label: "Hindu" },
-                { value: "other", label: "Other" },
+                { value: "christian", label: "CHRISTIAN" },
+                { value: "muslim", label: "MUSLIM" },
+                { value: "hindu", label: "HINDU" },
+                { value: "other", label: "OTHER" },
               ]}
               {...form.getInputProps("religion")}
               required
@@ -564,11 +530,11 @@ const CreateMember = ({ email }: { email: string; status: string }) => {
             <Select
               mt="md"
               label="Marital Status"
-              placeholder="Marital Status"
+              placeholder={`${member?.maritalStatus}`}
               data={[
-                { value: "single", label: "Single" },
-                { value: "married", label: "Married" },
-                { value: "widowed", label: "Widowed" },
+                { value: "single", label: "SINGLE" },
+                { value: "married", label: "MARRIED" },
+                { value: "widowed", label: "WIDOWED" },
               ]}
               {...form.getInputProps("maritalStatus")}
               required
@@ -580,7 +546,7 @@ const CreateMember = ({ email }: { email: string; status: string }) => {
                 <TextInput
                   mt="md"
                   label="Names (spouse)"
-                  placeholder="Names (spouse)"
+                  placeholder={`${member?.spouseName}`}
                   {...form.getInputProps("spouseName")}
                   required
                 />
@@ -589,7 +555,7 @@ const CreateMember = ({ email }: { email: string; status: string }) => {
                 <TextInput
                   mt="md"
                   label="Phone # (spouse)"
-                  placeholder="Phone # (spouse)"
+                  placeholder={`${member?.spouseNumber}`}
                   {...form.getInputProps("spouseNumber")}
                   required
                 />
@@ -600,7 +566,7 @@ const CreateMember = ({ email }: { email: string; status: string }) => {
               <TextInput
                 mt="md"
                 label="Postal Address"
-                placeholder="Postal Address"
+                placeholder={`${member?.postalAddress}`}
                 {...form.getInputProps("postalAddress")}
                 required
               />
@@ -614,7 +580,7 @@ const CreateMember = ({ email }: { email: string; status: string }) => {
               <TextInput
                 mt="md"
                 label="Postal Address"
-                placeholder="Postal Address"
+                placeholder={`${member?.postalAddress}`}
                 {...form.getInputProps("postalAddress")}
                 required
               />
@@ -624,7 +590,7 @@ const CreateMember = ({ email }: { email: string; status: string }) => {
             <TextInput
               mt="md"
               label="Postal Code"
-              placeholder="Postal Code"
+              placeholder={`${member?.postalCode}`}
               {...form.getInputProps("postalCode")}
               required
             />
@@ -633,7 +599,7 @@ const CreateMember = ({ email }: { email: string; status: string }) => {
             <TextInput
               mt="md"
               label="City | Town"
-              placeholder="City | Town"
+              placeholder={`${member?.cityTown}`}
               {...form.getInputProps("cityTown")}
               required
             />
@@ -645,7 +611,7 @@ const CreateMember = ({ email }: { email: string; status: string }) => {
             <TextInput
               mt="md"
               label="Email Address"
-              placeholder="Email Address"
+              placeholder={`${member?.emailAddress}`}
               {...form.getInputProps("emailAddress")}
               required
             />
@@ -654,7 +620,7 @@ const CreateMember = ({ email }: { email: string; status: string }) => {
             <TextInput
               mt="md"
               label="Residential Address"
-              placeholder="Residential Address"
+              placeholder={`${member?.residentialAddress}`}
               {...form.getInputProps("residentialAddress")}
               required
             />
@@ -663,10 +629,10 @@ const CreateMember = ({ email }: { email: string; status: string }) => {
             <Select
               mt="md"
               label="Rented | Owned"
-              placeholder="Rented | Owned"
+              placeholder={`${member?.rentedOwned}`}
               data={[
-                { value: "rented", label: "Rented" },
-                { value: "owned", label: "Owned" },
+                { value: "rented", label: "RENTED" },
+                { value: "owned", label: "OWNED" },
               ]}
               {...form.getInputProps("rentedOwned")}
               required
@@ -680,7 +646,7 @@ const CreateMember = ({ email }: { email: string; status: string }) => {
               <TextInput
                 mt="md"
                 label="Landlord | Care Taker | Agent (names)"
-                placeholder="Landlord | Care Taker | Agent (names)"
+                placeholder={`${member?.landCareAgent}`}
                 {...form.getInputProps("landCareAgent")}
                 required
               />
@@ -690,7 +656,7 @@ const CreateMember = ({ email }: { email: string; status: string }) => {
               <TextInput
                 mt="md"
                 label="Occupation | Employer"
-                placeholder="Occupation | Employer"
+                placeholder={`${member?.occupationEmployer}`}
                 {...form.getInputProps("occupationEmployer")}
                 required
               />
@@ -701,7 +667,7 @@ const CreateMember = ({ email }: { email: string; status: string }) => {
               <TextInput
                 mt="md"
                 label="Occupation | Employer"
-                placeholder="Occupation | Employer"
+                placeholder={`${member?.occupationEmployer}`}
                 {...form.getInputProps("occupationEmployer")}
                 required
               />
@@ -713,7 +679,7 @@ const CreateMember = ({ email }: { email: string; status: string }) => {
                 <TextInput
                   mt="md"
                   label="Business Location"
-                  placeholder="Business Location"
+                  placeholder={`${member?.businessLocation}`}
                   {...form.getInputProps("businessLocation")}
                   required
                 />
@@ -722,7 +688,7 @@ const CreateMember = ({ email }: { email: string; status: string }) => {
                 <TextInput
                   mt="md"
                   label="Age of Business"
-                  placeholder="Age of Business"
+                  placeholder={`${member?.businessAge}`}
                   {...form.getInputProps("businessAge")}
                   required
                 />
@@ -733,7 +699,7 @@ const CreateMember = ({ email }: { email: string; status: string }) => {
               <TextInput
                 mt="md"
                 label="Employer Contacts"
-                placeholder="Employer Contacts"
+                placeholder={`${member?.employerNumber}`}
                 {...form.getInputProps("employerNumber")}
                 required
               />
@@ -744,7 +710,7 @@ const CreateMember = ({ email }: { email: string; status: string }) => {
               <TextInput
                 mt="md"
                 label="Business Location"
-                placeholder="Business Location"
+                placeholder={`${member?.businessLocation}`}
                 {...form.getInputProps("businessLocation")}
                 required
               />
@@ -758,7 +724,7 @@ const CreateMember = ({ email }: { email: string; status: string }) => {
               <TextInput
                 mt="md"
                 label="Age of Business"
-                placeholder="Age of Business"
+                placeholder={`${member?.businessAge}`}
                 {...form.getInputProps("businessAge")}
                 required
               />
@@ -768,7 +734,7 @@ const CreateMember = ({ email }: { email: string; status: string }) => {
             <TextInput
               mt="md"
               label="Referee (name)"
-              placeholder="Referee (name)"
+              placeholder={`${member?.refereeName}`}
               {...form.getInputProps("refereeName")}
               required
             />
@@ -777,7 +743,7 @@ const CreateMember = ({ email }: { email: string; status: string }) => {
             <TextInput
               mt="md"
               label="Phone # (referee)"
-              placeholder="Phone # (referee)"
+              placeholder={`${member?.refereeNumber}`}
               {...form.getInputProps("refereeNumber")}
               required
             />
@@ -787,7 +753,7 @@ const CreateMember = ({ email }: { email: string; status: string }) => {
               <TextInput
                 mt="md"
                 label="Position in Community"
-                placeholder="Position in Community"
+                placeholder={`${member?.communityPosition}`}
                 {...form.getInputProps("communityPosition")}
                 required
               />
@@ -801,7 +767,7 @@ const CreateMember = ({ email }: { email: string; status: string }) => {
               <TextInput
                 mt="md"
                 label="Position in Community"
-                placeholder="Position in Community"
+                placeholder={`${member?.communityPosition}`}
                 {...form.getInputProps("communityPosition")}
                 required
               />
@@ -811,7 +777,7 @@ const CreateMember = ({ email }: { email: string; status: string }) => {
             <TextInput
               mt="md"
               label="Membership Fee (M-PESA Code)"
-              placeholder="Membership Fee (M-PESA Code)"
+              placeholder={`${member?.mpesaCode}`}
               {...form.getInputProps("mpesaCode")}
               required
             />
@@ -820,7 +786,7 @@ const CreateMember = ({ email }: { email: string; status: string }) => {
             <TextInput
               mt="md"
               label="Membership Fee Amount"
-              placeholder="Membership Fee Amount"
+              placeholder={`${member?.membershipAmount}`}
               {...form.getInputProps("membershipAmount")}
               required
             />
@@ -837,7 +803,7 @@ const CreateMember = ({ email }: { email: string; status: string }) => {
             <TextInput
               mt="md"
               label="Names (kin)"
-              placeholder="Names (kin)"
+              placeholder={`${member?.nameKin}`}
               {...form.getInputProps("nameKin")}
               required
             />
@@ -846,7 +812,7 @@ const CreateMember = ({ email }: { email: string; status: string }) => {
             <TextInput
               mt="md"
               label="Relationship"
-              placeholder="Relationship"
+              placeholder={`${member?.relationship}`}
               {...form.getInputProps("relationship")}
               required
             />
@@ -855,7 +821,7 @@ const CreateMember = ({ email }: { email: string; status: string }) => {
             <TextInput
               mt="md"
               label="Phone # (kin)"
-              placeholder="Phone # (kin)"
+              placeholder={`${member?.numberKin}`}
               {...form.getInputProps("numberKin")}
               required
             />
@@ -867,7 +833,7 @@ const CreateMember = ({ email }: { email: string; status: string }) => {
             <TextInput
               mt="md"
               label="Residential Address"
-              placeholder="Residential Address"
+              placeholder={`${member?.residentialAddressKin}`}
               {...form.getInputProps("residentialAddressKin")}
               required
             />
@@ -876,7 +842,7 @@ const CreateMember = ({ email }: { email: string; status: string }) => {
             <TextInput
               mt="md"
               label="City | Town"
-              placeholder="City | Town"
+              placeholder={`${member?.cityTownKin}`}
               {...form.getInputProps("cityTownKin")}
               required
             />
@@ -888,7 +854,7 @@ const CreateMember = ({ email }: { email: string; status: string }) => {
             <TextInput
               mt="md"
               label="Postal Address"
-              placeholder="Postal Address"
+              placeholder={`${member?.postalAddressKin}`}
               {...form.getInputProps("postalAddressKin")}
               required
             />
@@ -897,7 +863,7 @@ const CreateMember = ({ email }: { email: string; status: string }) => {
             <TextInput
               mt="md"
               label="Postal Code"
-              placeholder="Postal Code"
+              placeholder={`${member?.postalCodeKin}`}
               {...form.getInputProps("postalCodeKin")}
               required
             />
@@ -936,8 +902,8 @@ const CreateMember = ({ email }: { email: string; status: string }) => {
               form.validate();
               showNotification({
                 id: "submit",
-                title: "Member Registration",
-                message: "Registering New Member ...",
+                title: "Update Details",
+                message: "Updating Member Details ...",
                 disallowClose: true,
                 loading: true,
               });

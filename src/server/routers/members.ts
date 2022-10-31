@@ -88,6 +88,111 @@ export const membersRouter = t.router({
       }
       return member;
     }),
+  update: t.procedure
+    .input(
+      z.object({
+        id: z.string(),
+        date: z.string(),
+        branchName: z.string(),
+        memberId: z.string(),
+        firstName: z.string(),
+        lastName: z.string(),
+        dob: z.string(),
+        idPass: z.string(),
+        kraPin: z.string(),
+        phoneNumber: z.string(),
+        gender: z.string(),
+        age: z.string(),
+        religion: z.string(),
+        maritalStatus: z.string(),
+        spouseName: z.string(),
+        spouseNumber: z.string(),
+        postalAddress: z.string(),
+        postalCode: z.string(),
+        cityTown: z.string(),
+        residentialAddress: z.string(),
+        emailAddress: z.string(),
+        rentedOwned: z.string(),
+        landCareAgent: z.string(),
+        occupationEmployer: z.string(),
+        employerNumber: z.string(),
+        businessLocation: z.string(),
+        businessAge: z.string(),
+        refereeName: z.string(),
+        refereeNumber: z.string(),
+        communityPosition: z.string(),
+        mpesaCode: z.string(),
+        membershipAmount: z.string(),
+        nameKin: z.string(),
+        relationship: z.string(),
+        residentialAddressKin: z.string(),
+        postalAddressKin: z.string(),
+        postalCodeKin: z.string(),
+        cityTownKin: z.string(),
+        numberKin: z.string(),
+        maintained: z.boolean(),
+        registrarId: z.string(),
+      })
+    )
+    .mutation(async ({ input }) => {
+      if (!input.id) return;
+
+      const member = await prisma.member.update({
+        where: {
+          id: input?.id
+        },
+        data: {
+          date: input.date,
+          branchName: input.branchName,
+          memberId: input.memberId,
+          firstName: input.firstName,
+          lastName: input.lastName,
+          dob: input.dob,
+          idPass: input.idPass,
+          kraPin: input.kraPin,
+          phoneNumber: input.phoneNumber,
+          gender: input.gender,
+          age: input.age,
+          religion: input.religion,
+          maritalStatus: input.maritalStatus,
+          spouseName: input.spouseName,
+          spouseNumber: input.spouseNumber,
+          postalAddress: input.postalAddress,
+          postalCode: input.postalCode,
+          cityTown: input.cityTown,
+          residentialAddress: input.residentialAddress,
+          emailAddress: input.emailAddress,
+          rentedOwned: input.rentedOwned,
+          landCareAgent: input.landCareAgent,
+          occupationEmployer: input.occupationEmployer,
+          employerNumber: input.employerNumber,
+          businessLocation: input.businessLocation,
+          businessAge: input.businessAge,
+          refereeName: input.refereeName,
+          refereeNumber: input.refereeNumber,
+          communityPosition: input.communityPosition,
+          mpesaCode: input.mpesaCode,
+          membershipAmount: input.membershipAmount,
+          nameKin: input.nameKin,
+          relationship: input.relationship,
+          residentialAddressKin: input.residentialAddressKin,
+          postalAddressKin: input.postalAddressKin,
+          postalCodeKin: input.postalCodeKin,
+          cityTownKin: input.cityTownKin,
+          numberKin: input.numberKin,
+          maintained: input.maintained,
+          ratings: 0,
+          registrarId: input.registrarId,
+        },
+      });
+      if (!member) {
+        throw new TRPCError({
+          code: "NOT_FOUND",
+          message: `members.register not found`,
+        });
+      }
+      return member;
+    }),
   register: t.procedure
     .input(
       z.object({
