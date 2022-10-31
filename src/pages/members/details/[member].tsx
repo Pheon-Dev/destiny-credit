@@ -1,4 +1,4 @@
-import { Group, LoadingOverlay, Table, Tabs } from "@mantine/core";
+import { Button, Group, LoadingOverlay, Table, Tabs } from "@mantine/core";
 import { Transaction } from "@prisma/client";
 import { IconCash, IconDeviceMobileMessage, IconUser } from "@tabler/icons";
 import { NextPage } from "next";
@@ -100,6 +100,7 @@ const Page: NextPage = () => {
 
     return (
       <>
+        <Button variant="outline" onClick={() => router.push(`/members/register/update/${id}`)}>Update</Button>
         <pre>{JSON.stringify(member, undefined, 2)}</pre>
       </>
     );
