@@ -38,12 +38,14 @@ export const paymentsRouter = t.router({
           },
         },
       });
+
       if (!loan) {
         throw new TRPCError({
           code: "NOT_FOUND",
           message: `payments.payment not found`,
         });
       }
+
       const transactions = await prisma.transaction.findMany({
         where: {
           firstName: loan?.member?.firstName,
@@ -131,6 +133,7 @@ export const paymentsRouter = t.router({
 
       let total_amount = 0;
 
+      /* TODO: Proper Calculations */
       transactions?.forEach(async (t) => {
         const id = t.id;
         const amount = +t.transAmount;

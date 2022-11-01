@@ -62,6 +62,28 @@ export const membersRouter = t.router({
       }
       return member;
     }),
+  delete: t.procedure
+    .input(
+      z.object({
+        id: z.string(),
+      })
+    )
+    .mutation(async ({ input }) => {
+      if (!input.id) return;
+
+      const member = await prisma.member.delete({
+        where: {
+          id: input.id,
+        },
+      });
+      if (!member) {
+        throw new TRPCError({
+          code: "NOT_FOUND",
+          message: `members.member not found`,
+        });
+      }
+      return member;
+    }),
   search: t.procedure
     .input(
       z.object({

@@ -1,12 +1,14 @@
-import { Button, Group, LoadingOverlay, Table, Tabs } from "@mantine/core";
+import { Button, Group, LoadingOverlay, Modal, Table, Tabs } from "@mantine/core";
 import { Transaction } from "@prisma/client";
-import { IconCash, IconDeviceMobileMessage, IconUser } from "@tabler/icons";
+import { IconCash, IconDeviceMobileMessage, IconEdit, IconTrash, IconUser } from "@tabler/icons";
 import { NextPage } from "next";
 import { useRouter } from "next/router";
+import { useCallback, useState } from "react";
 import { TitleText } from "../../../components";
 import { trpc } from "../../../utils/trpc";
 
 const Page: NextPage = () => {
+  const [open, setOpen] = useState(false)
   const router = useRouter();
   const id = router.query.member as string;
 
@@ -23,6 +25,21 @@ const Page: NextPage = () => {
     lastname: `${lastname}`,
     phone: `${phone}`,
   });
+
+  const delete_member = trpc.members.delete.useMutation();
+
+  const handleDelete = useCallback(() => {
+    try {
+      if (id) {
+        delete_member.mutate({
+          id: id
+        })
+      }
+
+    } catch (error) {
+
+    }
+  }, [])
 
   const TransactionsTable = () => {
     const Header = () => (
@@ -100,8 +117,9 @@ const Page: NextPage = () => {
 
     return (
       <>
-        <Button variant="outline" onClick={() => router.push(`/members/register/update/${id}`)}>Update</Button>
-        <pre>{JSON.stringify(member, undefined, 2)}</pre>
+        <Group position="center">
+          <pre>{JSON.stringify(member, undefined, 2)}</pre>
+        </Group>
       </>
     );
 
@@ -138,6 +156,10 @@ const Page: NextPage = () => {
             <Group position="left" m="md" mt="lg">
               <TitleText title="Member Details" />
             </Group>
+            <Group position="right" m="md" mt="lg">
+              <Button variant="outline" onClick={() => router.push(`/members/register/update/${id}`)}><IconEdit size={16} /></Button>
+              <Button variant="outline" color="red" onClick={() => handleDelete()}><IconTrash color="red" size={16} /></Button>
+            </Group>
             <Group position="center">
               <MemberDetails />
             </Group>
@@ -162,6 +184,7 @@ const Page: NextPage = () => {
           </Tabs.Panel>
         </Tabs>
       )}
+      {/* <Modal></Modal> */}
       {!member && (
         <LoadingOverlay overlayBlur={2} visible={status === "loading"} />
       )}
