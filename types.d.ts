@@ -312,6 +312,11 @@ export interface TransactionsLog {
   transaction: Array<Fields>;
 }
 
+type TransactionProps = "transactionType" | "transID" | "transTime" | "transAmount" | "businessShortCode" | "billRefNumber" | "invoiceNumber" | "orgAccountBalance" | "thirdPartyTransID" | "msisdn" | "firstName" | "middleName" | "lastName";
+
+export interface TransactionInterface {
+  transaction: Record<TransactionProps, string>;
+}
 export interface Payment {
   amount: number;
   total: number;

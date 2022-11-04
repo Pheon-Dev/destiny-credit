@@ -9,198 +9,41 @@ import {
   Modal,
   Radio,
   Switch,
-  Drawer,
   Table,
   Text,
-  TextInput,
-  Select,
-  Divider,
 } from "@mantine/core";
 import { DatePicker } from "@mantine/dates";
-import { useForm, zodResolver } from "@mantine/form";
-import { showNotification, updateNotification } from "@mantine/notifications";
 import type { Transaction } from "@prisma/client";
 import {
-  IconAsterisk,
   IconCheck,
   IconChecks,
   IconClock,
-  IconPlus,
 } from "@tabler/icons";
 import dayjs from "dayjs";
-import { useSession } from "next-auth/react";
 import { useRouter } from "next/router";
 import { useCallback, useEffect, useState } from "react";
 import { z } from "zod";
 import { EmptyTable, TitleText } from "../../components";
 import { trpc } from "../../utils/trpc";
+import { useForm, zodResolver } from "@mantine/form";
 
 const schema = z.object({
   id: z.string().min(1, { message: "" }),
-  transactionType: z.string().min(1, { message: "" }),
-  transID: z.string().min(1, { message: "" }),
-  transTime: z.string().min(1, { message: "" }),
-  transAmount: z.string().min(1, { message: "" }),
-  businessShortCode: z.string().min(1, { message: "" }),
-  billRefNumber: z.string(),
-  invoiceNumber: z.string(),
-  orgAccountBalance: z.string(),
-  thirdPartyTransID: z.string(),
-  msisdn: z.string().min(1, { message: "" }),
-  firstName: z.string().min(1, { message: "" }),
-  middleName: z.string().min(1, { message: "" }),
-  lastName: z.string(),
 });
 
 export const TransactionsTable = ({ call }: { call: string }) => {
-  const { data, status } = useSession();
-
-  const email = `${data?.user?.email}`;
-  const check = email.split("@")[1];
   const [time, setTime] = useState("");
   const [locale, setLocale] = useState(true);
-  const [openNew, setOpenNew] = useState(false);
 
   const router = useRouter();
   const logs = trpc.logs.logs.useQuery();
 
-  const [user, setUser] = useState({
-    id: "",
-    role: "",
-    email: "",
-    username: "",
-    firstname: "",
-    lastname: "",
-    state: "",
-  });
-
-  const user_data = trpc.users.user.useQuery({
-    email: `${email}`,
-  });
-
-  useEffect(() => {
-    let subscribe = true;
-
-    if (subscribe) {
-      setUser({
-        id: `${user_data?.data?.id}`,
-        role: `${user_data?.data?.role}`,
-        username: `${user_data?.data?.username}`,
-        firstname: `${user_data?.data?.firstName}`,
-        lastname: `${user_data?.data?.lastName}`,
-        email: `${user_data?.data?.email}`,
-        state: `${user_data?.data?.state}`,
-      });
-    }
-    return () => {
-      subscribe = false;
-    };
-  }, [
-    user_data?.data?.id,
-    user_data?.data?.role,
-    user_data?.data?.username,
-    user_data?.data?.firstName,
-    user_data?.data?.lastName,
-    user_data?.data?.email,
-    user_data?.data?.state,
-  ]);
   const { data: transactions, fetchStatus } =
     trpc.transactions.transactions.useQuery();
-  const utils = trpc.useContext()
-  const add_transaction =
-    trpc.transactions.create.useMutation({
-      onSuccess: async () => {
-        await utils.transactions.transactions.invalidate();
-        updateNotification({
-          id: "submit",
-          color: "teal",
-          title: `${form.values.firstName} ${form.values.lastName}`,
-          message: "Transaction Successfully Added",
-          icon: <IconCheck size={16} />,
-          autoClose: 5000,
-        });
-      }
-    });
-
-  /* TODO: Add Formatted Date */
-  const trans_time = new Date()
-
-  const handleTransaction = useCallback(() => {
-    try {
-      if (
-        user?.id,
-        form.values.transactionType &&
-        form.values.transID &&
-        form.values.transTime &&
-        form.values.transAmount &&
-        form.values.businessShortCode &&
-        form.values.billRefNumber &&
-        form.values.invoiceNumber &&
-        form.values.orgAccountBalance &&
-        form.values.thirdPartyTransID &&
-        form.values.msisdn &&
-        form.values.firstName &&
-        form.values.middleName &&
-        form.values.lastName
-      ) {
-        add_transaction.mutate({
-          state: "new",
-          updaterId: `${user?.id}`,
-          handlerId: `${user?.id}`,
-          payment: "",
-          transactionType: form.values.transactionType,
-          transID: form.values.transID,
-          transTime: `${trans_time.toLocaleDateString()}`,
-          transAmount: form.values.transAmount,
-          businessShortCode: form.values.businessShortCode,
-          billRefNumber: form.values.billRefNumber,
-          invoiceNumber: form.values.invoiceNumber,
-          orgAccountBalance: form.values.orgAccountBalance,
-          thirdPartyTransID: form.values.thirdPartyTransID,
-          msisdn: form.values.msisdn,
-          firstName: form.values.firstName,
-          middleName: form.values.middleName,
-          lastName: form.values.lastName,
-        })
-      }
-      updateNotification({
-        id: "submit",
-        color: "error",
-        title: `Error Adding Transaction`,
-        message: `Missing Values`,
-        icon: <IconCheck size={16} />,
-        autoClose: 5000,
-      });
-    } catch (error) {
-      updateNotification({
-        id: "submit",
-        color: "error",
-        title: `Error Adding Transaction`,
-        message: `${error}`,
-        icon: <IconCheck size={16} />,
-        autoClose: 5000,
-      });
-
-    }
-  }, [])
-
   const form = useForm({
     validate: zodResolver(schema),
     initialValues: {
       id: "",
-      transactionType: "",
-      transID: "",
-      transTime: "",
-      transAmount: "",
-      businessShortCode: "",
-      billRefNumber: "",
-      invoiceNumber: "",
-      orgAccountBalance: "",
-      thirdPartyTransID: "",
-      msisdn: "",
-      firstName: "",
-      middleName: "",
-      lastName: "",
     },
   });
 
@@ -258,7 +101,7 @@ export const TransactionsTable = ({ call }: { call: string }) => {
     return () => {
       subscribe = false;
     };
-  }, [new_date, time, value, locale, logs.data?.message, openNew]);
+  }, [new_date, time, value, locale, logs.data?.message]);
 
   let select_member: Array<any> = [];
   transactions?.map(
@@ -278,6 +121,22 @@ export const TransactionsTable = ({ call }: { call: string }) => {
       {transactions && (
         <>
           <Group position="apart" m="md" mt="lg">
+            {call === "transactions" && (
+              <TitleText title="Recent Transactions" />
+            )}
+            {call === "register" && <TitleText title="Registration List" />}
+            {call === "maintain" && <TitleText title="Maintain a New Loan" />}
+            <Switch
+              label={
+                (fetchStatus === "fetching" && <Loader />) ||
+                (locale && "Y/D/M") ||
+                "Y/M/D"
+              }
+              checked={locale}
+              onChange={(e) => {
+                setLocale(e.currentTarget.checked);
+              }}
+            />
             <DatePicker
               value={value}
               firstDayOfWeek="sunday"
@@ -286,34 +145,6 @@ export const TransactionsTable = ({ call }: { call: string }) => {
               }}
               maxDate={dayjs(new Date()).toDate()}
             />
-            {(fetchStatus === "fetching" && <Loader />) || (
-              <>
-                {call === "transactions" && (
-                  <TitleText title="Recent Transactions" />
-                )}
-              </>
-            )}
-            {call === "register" && <TitleText title="Registration List" />}
-            {call === "maintain" && <TitleText title="Maintain a New Loan" />}
-            <Button
-              variant="light"
-              onClick={() => {
-                setOpenNew(true);
-              }}
-            >
-              <IconPlus size={16} />
-            </Button>
-            {/* <Switch */}
-            {/*   label={ */}
-            {/*     (fetchStatus === "fetching" && <Loader />) || */}
-            {/*     (locale && "Y/D/M") || */}
-            {/*     "Y/M/D" */}
-            {/*   } */}
-            {/*   checked={locale} */}
-            {/*   onChange={(e) => { */}
-            {/*     setLocale(e.currentTarget.checked); */}
-            {/*   }} */}
-            {/* /> */}
           </Group>
           <Table striped highlightOnHover horizontalSpacing="md" mb="xl">
             <thead>
@@ -358,130 +189,6 @@ export const TransactionsTable = ({ call }: { call: string }) => {
           </Button>
         </Grid.Col>
       </Grid>
-      <Drawer
-        padding="md"
-        size="xl"
-        position="right"
-        opened={openNew}
-        onClose={() => setOpenNew(false)}
-        title={`New Transaction`}
-      >
-        <form>
-          <Grid grow>
-            <Grid.Col span={4}>
-              <Group position="apart" mt="lg">
-                <Text>
-                  Transaction Type <IconAsterisk color="red" size={8} />
-                </Text>
-                <Select
-                  placeholder="Transaction Type"
-                  data={[
-                    {
-                      value: "CUSTOMER MERCHANT PAYMENT",
-                      label: "Buy Goods (Till)",
-                    },
-                    { value: "PAY BILL", label: "Pay Bill" },
-                  ]}
-                  {...form.getInputProps("transactionType")}
-                  required
-                />
-              </Group>
-              <Group position="apart" mt="lg">
-                <Text>
-                  Transaction ID <IconAsterisk color="red" size={8} />
-                </Text>
-                <TextInput
-                  placeholder="Transaction ID"
-                  {...form.getInputProps("transID")}
-                  required
-                />
-              </Group>
-              <Group position="apart" mt="lg">
-                <Text>
-                  Transaction Time <IconAsterisk color="red" size={8} />
-                </Text>
-                <TextInput
-                  placeholder="Transaction Time"
-                  {...form.getInputProps("transTime")}
-                  required
-                />
-              </Group>
-
-              <Group position="apart" mt="lg">
-                <Text>
-                  Transaction Amount
-                  <IconAsterisk color="red" size={8} />
-                </Text>
-                <TextInput
-                  placeholder="Transaction Amount"
-                  {...form.getInputProps("transAmount")}
-                  required
-                />
-              </Group>
-              {form.values.transactionType === "PAY BILL" && (
-                <Group position="apart" mt="lg">
-                  <Text>
-                    Bill Ref Number
-                    <IconAsterisk color="red" size={8} />
-                  </Text>
-                  <TextInput
-                    placeholder="Bill Ref Number"
-                    {...form.getInputProps("billRefNumber")}
-                    required
-                  />
-                </Group>
-              )}
-              <Group position="apart" mt="lg">
-                <Text>
-                  Phone Number
-                  <IconAsterisk color="red" size={8} />
-                </Text>
-                <TextInput
-                  placeholder="Phone Number"
-                  {...form.getInputProps("msisdn")}
-                  required
-                />
-              </Group>
-              <Group position="apart" mt="lg">
-                <Text>
-                  First Name
-                  <IconAsterisk color="red" size={8} />
-                </Text>
-                <TextInput
-                  placeholder="First Name"
-                  {...form.getInputProps("firstName")}
-                  required
-                />
-              </Group>
-              <Group position="apart" mt="lg">
-                <Text>
-                  Last Name
-                </Text>
-                <TextInput
-                  placeholder="Last Name"
-                  {...form.getInputProps("lastName")}
-                  required
-                />
-              </Group>
-            </Grid.Col>
-          </Grid>
-        </form>
-        <Divider variant="dotted" m="lg" />
-        <Group position="center" mt="lg">
-          <Button variant="gradient"
-            onClick={() => {
-              form.validate();
-              showNotification({
-                id: "submit",
-                title: "New Transaction",
-                message: "Adding Transaction ...",
-                disallowClose: true,
-                loading: true,
-              });
-              handleTransaction()
-            }}>Submit</Button>
-        </Group>
-      </Drawer>
     </>
   );
 };
@@ -801,13 +508,6 @@ const TransactionRow = ({
                 variant="outline"
                 onClick={() => {
                   setOpen(false);
-                  showNotification({
-                    id: "submit",
-                    title: "Update Details",
-                    message: "Updating Member Details ...",
-                    disallowClose: true,
-                    loading: true,
-                  });
                   handleState();
                 }}
                 m="md"
