@@ -255,7 +255,7 @@ const Page: NextPage = () => {
             setOpenNew(true);
           }}
         >
-          <IconPlus size={16} />
+          <IconPlus size={16} /> Add Transaction
         </Button>
         <TransactionsTable call={call} />
         <Drawer

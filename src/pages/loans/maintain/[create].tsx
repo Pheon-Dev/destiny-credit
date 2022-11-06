@@ -1601,7 +1601,7 @@ const CreateLoan = ({
                         icon={<IconCalendar size={16} />}
                         dropdownType="modal"
                         firstDayOfWeek="sunday"
-                        minDate={dayjs(new Date()).toDate()}
+                        /* minDate={dayjs(new Date()).toDate()} */
                         inputFormat="DD-MM-YYYY"
                         {...form.getInputProps("startDate")}
                         required
