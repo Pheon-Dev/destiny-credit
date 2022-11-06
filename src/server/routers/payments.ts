@@ -59,10 +59,14 @@ export const paymentsRouter = t.router({
       });
 
       const roundOff = (value: number) => {
-        let v = value?.toString().split(".")[0]
-        let w = value?.toString().split(".")[1]
-        if (v && w)
-          return +w > 0 ? +v + 1 : +v + 0
+        if (value > 0) {
+          const v = `${value}`
+          const a = v.split(".")[0] ?? "0"
+          const b = v.split(".")[1] ?? "0"
+
+          return +b > 0 && +a + 1 || +a
+        }
+        return 0
       };
 
       const date = (time: string) => {
@@ -182,19 +186,21 @@ export const paymentsRouter = t.router({
         }
 
         if (+current < +start) {
-          return (
-            t.state === "new" &&
-            notification.push({
-              id: `${t.id}`,
-              title: `Transaction ${t.transID}`,
-              color: "orange",
-              disallowClose: true,
-              autoClose: 20000,
-              message: `M-PESA Payment of KSHs. ${t.transAmount
-                } via ${(t.billRefNumber === "" && "Till") || "Pay Bill"
-                } is before first installement date of ${loan?.startDate}`,
-            })
-          );
+          /* return ( */
+          /*   t.state === "new" && */
+          /*   notification.push({ */
+          /*     id: `${t.id}`, */
+          /*     title: `Transaction ${t.transID}`, */
+          /*     color: "orange", */
+          /*     disallowClose: true, */
+          /*     autoClose: 20000, */
+          /*     message: `M-PESA Payment of KSHs. ${t.transAmount */
+          /*       } via ${(t.billRefNumber === "" && "Till") || "Pay Bill" */
+          /*       } is before first installement date of ${loan?.startDate}`, */
+          /*   }) */
+          /* ); */
+
+          return;
         }
 
         let rem_amount = amount;
