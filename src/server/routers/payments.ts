@@ -1,6 +1,6 @@
 import { TRPCError } from "@trpc/server";
 import { z } from "zod";
-import { Notifications, Payment } from "../../../types";
+import { Notifications, Payment, Transactions } from "../../../types";
 import { prisma } from "../prisma";
 import { t } from "../trpc";
 
@@ -279,47 +279,45 @@ export const paymentsRouter = t.router({
         /* } */
 
         if (os_balance === 0) {
-          return;
-        }
-
-        const add = await prisma.payment.create({
-          data: {
-            amount: amount,
-            total: total_amount,
-            outsArrears: roundOff(os_arrears),
-            paidArrears: roundOff(pd_arrears),
-            outsPenalty: roundOff(os_penalty),
-            paidPenalty: roundOff(pd_penalty),
-            outsInterest: roundOff(os_interest),
-            paidInterest: roundOff(pd_interest),
-            outsPrincipal: roundOff(os_principal),
-            paidPrincipal: roundOff(pd_principal),
-            outsBalance: roundOff(os_balance),
-            currInstDate: time,
-            mpesa: mpesa,
-            type: type,
-            loanId: input.id,
-          },
-        });
-        if (add) {
-          await prisma.transaction.update({
+          const add = await prisma.payment.create({
+            data: {
+              amount: amount,
+              total: total_amount,
+              outsArrears: roundOff(os_arrears),
+              paidArrears: roundOff(pd_arrears),
+              outsPenalty: roundOff(os_penalty),
+              paidPenalty: roundOff(pd_penalty),
+              outsInterest: roundOff(os_interest),
+              paidInterest: roundOff(pd_interest),
+              outsPrincipal: roundOff(os_principal),
+              paidPrincipal: roundOff(pd_principal),
+              outsBalance: roundOff(os_balance),
+              currInstDate: time,
+              mpesa: mpesa,
+              type: type,
+              loanId: input.id,
+            },
+          });
+          if (add) {
+            await prisma.transaction.update({
+              where: {
+                id: t.id,
+              },
+              data: {
+                state: state,
+                payment: payment_state,
+              },
+            });
+          }
+          return await prisma.loan.update({
             where: {
-              id: t.id,
+              id: input.id,
             },
             data: {
-              state: state,
-              payment: payment_state,
+              cleared: true,
             },
           });
         }
-        await prisma.loan.update({
-          where: {
-            id: input.id,
-          },
-          data: {
-            cleared: true,
-          },
-        });
 
         payment.push({
           amount: amount,
