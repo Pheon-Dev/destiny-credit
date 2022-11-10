@@ -5,7 +5,7 @@ import {
   Skeleton,
   Table,
   TransferList,
-  TransferListData,
+  TransferListData
 } from "@mantine/core";
 import { showNotification } from "@mantine/notifications";
 import { Transaction } from "@prisma/client";
