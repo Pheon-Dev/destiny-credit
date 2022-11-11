@@ -4,4 +4,5 @@ export { LoansTable } from "./LoansTable";
 export { MembersTable } from "./MembersTable";
 export { TransactionsTable } from "./TransactionsTable";
 export { ProductsTable } from "./ProductsTable";
+export { PARTable } from "./PARTable";
 

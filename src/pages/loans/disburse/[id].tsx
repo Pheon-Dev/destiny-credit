@@ -17,7 +17,7 @@ import dayjs from "dayjs";
 import { NextPage } from "next";
 import { useSession } from "next-auth/react";
 import { useRouter } from "next/router";
-import React, { useCallback, useEffect, useState } from "react";
+import { useCallback, useEffect, useState } from "react";
 import { z } from "zod";
 import { Protected, TitleText } from "../../../components";
 import { trpc } from "../../../utils/trpc";
