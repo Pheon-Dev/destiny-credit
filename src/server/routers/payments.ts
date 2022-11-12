@@ -214,7 +214,6 @@ export const paymentsRouter = t.router({
           (os_arrears = total_os_arrears);
         (os_arrears > 0 && (pd_arrears += amount)) ||
           (pd_arrears += total_os_arrears);
-
         (os_arrears < 0 && (os_arrears = 0)) || (os_arrears = os_arrears);
         (pd_arrears < 0 && (pd_arrears = 0)) || (pd_arrears = pd_arrears);
 
