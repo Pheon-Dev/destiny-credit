@@ -111,7 +111,6 @@ const PARRow = ({
   role: string;
 }) => {
   const router = useRouter();
-  /* const {data: payments} = trpc.payments.payment.useQuery({ id: loan.id }); */
   return (
     <>
       {call === "payments" && loan.disbursed && (
