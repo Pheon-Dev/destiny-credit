@@ -135,6 +135,7 @@ export const paymentsRouter = t.router({
 
       let os_balance = +outsBalance;
 
+
       let total_amount = 0;
 
       /* TODO: Proper Calculations */
