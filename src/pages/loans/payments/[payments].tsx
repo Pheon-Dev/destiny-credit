@@ -177,7 +177,7 @@ const PaymentsList = ({ email }: { email: string; status: string }) => {
     return (
       <>
         <Group position="center" m="lg">
-          <TitleText title="Loading payment Payment Statement ..." />
+          <TitleText title="Loading Payment Statement ..." />
         </Group>
         <Group position="center" m="lg" style={{ position: "relative" }}>
           <Skeleton height={16} radius="xl" />
@@ -204,7 +204,7 @@ const PaymentsList = ({ email }: { email: string; status: string }) => {
       fallback={
         <>
           <Group position="center" m="lg">
-            <TitleText title="Loading payment Payment Statement ..." />
+            <TitleText title="Loading Payment Statement ..." />
           </Group>
           <Group position="center" m="lg" style={{ position: "relative" }}>
             <Skeleton height={16} radius="xl" />
