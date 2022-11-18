@@ -376,7 +376,8 @@ const PaymentsList = ({ email }: { email: string; status: string }) => {
                 </>
               )}
 
-              {payment.loan.payment.length > 0 && (
+              {payment?.loan?.cleared &&
+              payment.loan.payment.length > 0 && (
                 <tr style={{ backgroundColor: "grey", color: "white" }}>
                   <td>TOTAL</td>
                   <td>

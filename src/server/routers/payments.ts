@@ -138,6 +138,8 @@ export const paymentsRouter = t.router({
 
       let total_amount = 0;
 
+      let clear = false
+
       /* TODO: Proper Calculations */
       transactions?.forEach(async (t) => {
         const id = t.id;
@@ -163,16 +165,8 @@ export const paymentsRouter = t.router({
         }
 
         if (loan.cleared === true) {
-          return notification.push({
-            id: `${t.id}`,
-            title: `Transaction ${t.transID}`,
-            color: "green",
-            disallowClose: true,
-            autoClose: false,
-            message: `This Loan Was Successfully Cleared!`,
-          });
+          return
         }
-
         if (t.state === "handled") {
           return notification.push({
             id: `${t.id}`,
@@ -187,20 +181,6 @@ export const paymentsRouter = t.router({
         }
 
         if (+current < +start) {
-          /* return ( */
-          /*   t.state === "new" && */
-          /*   notification.push({ */
-          /*     id: `${t.id}`, */
-          /*     title: `Transaction ${t.transID}`, */
-          /*     color: "orange", */
-          /*     disallowClose: true, */
-          /*     autoClose: 20000, */
-          /*     message: `M-PESA Payment of KSHs. ${t.transAmount */
-          /*       } via ${(t.billRefNumber === "" && "Till") || "Pay Bill" */
-          /*       } is before first installement date of ${loan?.startDate}`, */
-          /*   }) */
-          /* ); */
-
           return;
         }
 
@@ -261,7 +241,16 @@ export const paymentsRouter = t.router({
 
         total_amount += amount;
 
-        /* if (t.payment === "new") { */
+        /* if (t.state === "new" && t.payment === "loan") { */
+        /*   if (t.billRefNumber !== "") return */
+        /*   await prisma.loan.update({ */
+        /*     where: { */
+        /*       id: input.id, */
+        /*     }, */
+        /*     data: { */
+        /*       cleared: false, */
+        /*     }, */
+        /*   }); */
         /*   await prisma.transaction.update({ */
         /*     where: { */
         /*       id: t.id, */
@@ -279,48 +268,49 @@ export const paymentsRouter = t.router({
         /* } */
 
         if (os_balance < 1) {
-          return
+          if (os_principal === 0) clear = true
         }
-        /* if (os_balance === 0) { */
-        /*   const add = await prisma.payment.create({ */
-        /*     data: { */
-        /*       amount: amount, */
-        /*       total: total_amount, */
-        /*       outsArrears: roundOff(os_arrears), */
-        /*       paidArrears: roundOff(pd_arrears), */
-        /*       outsPenalty: roundOff(os_penalty), */
-        /*       paidPenalty: roundOff(pd_penalty), */
-        /*       outsInterest: roundOff(os_interest), */
-        /*       paidInterest: roundOff(pd_interest), */
-        /*       outsPrincipal: roundOff(os_principal), */
-        /*       paidPrincipal: roundOff(pd_principal), */
-        /*       outsBalance: roundOff(os_balance), */
-        /*       currInstDate: time, */
-        /*       mpesa: mpesa, */
-        /*       type: type, */
-        /*       loanId: input.id, */
-        /*     }, */
-        /*   }); */
-        /*   if (add) { */
-        /*     await prisma.transaction.update({ */
-        /*       where: { */
-        /*         id: t.id, */
-        /*       }, */
-        /*       data: { */
-        /*         state: state, */
-        /*         payment: payment_state, */
-        /*       }, */
-        /*     }); */
-        /*   } */
-        /*   return await prisma.loan.update({ */
-        /*     where: { */
-        /*       id: input.id, */
-        /*     }, */
-        /*     data: { */
-        /*       cleared: true, */
-        /*     }, */
-        /*   }); */
-        /* } */
+
+        if (clear) return
+
+        const add = await prisma.payment.create({
+          data: {
+            amount: amount,
+            total: total_amount,
+            outsArrears: roundOff(os_arrears),
+            paidArrears: roundOff(pd_arrears),
+            outsPenalty: roundOff(os_penalty),
+            paidPenalty: roundOff(pd_penalty),
+            outsInterest: roundOff(os_interest),
+            paidInterest: roundOff(pd_interest),
+            outsPrincipal: roundOff(os_principal),
+            paidPrincipal: roundOff(pd_principal),
+            outsBalance: roundOff(os_balance),
+            currInstDate: time,
+            mpesa: mpesa,
+            type: type,
+            loanId: input.id,
+          },
+        });
+        if (add) {
+          await prisma.transaction.update({
+            where: {
+              id: t.id,
+            },
+            data: {
+              state: state,
+              payment: payment_state,
+            },
+          });
+        }
+        await prisma.loan.update({
+          where: {
+            id: input.id,
+          },
+          data: {
+            cleared: true,
+          },
+        });
 
         payment.push({
           amount: amount,
