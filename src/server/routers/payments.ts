@@ -278,6 +278,9 @@ export const paymentsRouter = t.router({
         /*   }); */
         /* } */
 
+        if (os_balance < 1) {
+          return
+        }
         /* if (os_balance === 0) { */
         /*   const add = await prisma.payment.create({ */
         /*     data: { */

@@ -381,52 +381,52 @@ const PaymentsList = ({ email }: { email: string; status: string }) => {
                   <td>TOTAL</td>
                   <td>
                     {`${payment.loan.payment[payment.loan.payment.length - 1]
-                        ?.total
+                      ?.total
                       }`.replace(/\B(?=(\d{3})+(?!\d))/g, ",")}
                   </td>
                   <td>
                     {`${payment.loan.payment[payment.loan.payment.length - 1]
-                        ?.outsArrears
+                      ?.outsArrears
                       }`.replace(/\B(?=(\d{3})+(?!\d))/g, ",")}
                   </td>
                   <td>
                     {`${payment.loan.payment[payment.loan.payment.length - 1]
-                        ?.paidArrears
+                      ?.paidArrears
                       }`.replace(/\B(?=(\d{3})+(?!\d))/g, ",")}
                   </td>
                   <td>
                     {`${payment.loan.payment[payment.loan.payment.length - 1]
-                        ?.outsPenalty
+                      ?.outsPenalty
                       }`.replace(/\B(?=(\d{3})+(?!\d))/g, ",")}
                   </td>
                   <td>
                     {`${payment.loan.payment[payment.loan.payment.length - 1]
-                        ?.paidPenalty
+                      ?.paidPenalty
                       }`.replace(/\B(?=(\d{3})+(?!\d))/g, ",")}
                   </td>
                   <td>
                     {`${payment.loan.payment[payment.loan.payment.length - 1]
-                        ?.outsInterest
+                      ?.outsInterest
                       }`.replace(/\B(?=(\d{3})+(?!\d))/g, ",")}
                   </td>
                   <td>
                     {`${payment.loan.payment[payment.loan.payment.length - 1]
-                        ?.paidInterest
+                      ?.paidInterest
                       }`.replace(/\B(?=(\d{3})+(?!\d))/g, ",")}
                   </td>
                   <td>
                     {`${payment.loan.payment[payment.loan.payment.length - 1]
-                        ?.outsPrincipal
+                      ?.outsPrincipal
                       }`.replace(/\B(?=(\d{3})+(?!\d))/g, ",")}
                   </td>
                   <td>
                     {`${payment.loan.payment[payment.loan.payment.length - 1]
-                        ?.paidPrincipal
+                      ?.paidPrincipal
                       }`.replace(/\B(?=(\d{3})+(?!\d))/g, ",")}
                   </td>
                   <td>
                     {`${payment.loan.payment[payment.loan.payment.length - 1]
-                        ?.outsBalance
+                      ?.outsBalance
                       }`.replace(/\B(?=(\d{3})+(?!\d))/g, ",")}
                   </td>
                   <td>TOTAL</td>
