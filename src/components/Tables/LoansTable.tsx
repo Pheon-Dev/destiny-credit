@@ -349,20 +349,7 @@ const LoansRow = ({
                 )}
               </>
             )}
-            {loan.disbursed && (
-              <Badge
-                style={{ cursor: "pointer" }}
-                onClick={() => router.push(`/loans/payments/${loan.id}`)}
-                variant="gradient"
-                gradient={{
-                  from: "blue",
-                  to: "violet",
-                }}
-              >
-                Active
-              </Badge>
-            )}
-            {loan.cleared && (
+            {loan.disbursed && loan.cleared && (
               <Badge
                 style={{ cursor: "pointer" }}
                 onClick={() => router.push(`/loans/disburse/${loan.id}`)}
@@ -373,6 +360,18 @@ const LoansRow = ({
                 }}
               >
                 Cleared
+              </Badge>
+           ) || (
+              <Badge
+                style={{ cursor: "pointer" }}
+                onClick={() => router.push(`/loans/payments/${loan.id}`)}
+                variant="gradient"
+                gradient={{
+                  from: "blue",
+                  to: "violet",
+                }}
+              >
+                Active
               </Badge>
             )}
             {loan.defaulted && (

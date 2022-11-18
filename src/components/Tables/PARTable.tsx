@@ -1,22 +1,21 @@
-import { Badge, Group, Table } from "@mantine/core";
+import React, { useEffect, useState } from "react";
 import type { Loan } from "@prisma/client";
-import { IconEdit } from "@tabler/icons";
 import { useRouter } from "next/router";
-import { useEffect, useState } from "react";
-import { EmptyTable } from "../../components";
-import { trpc } from "../../utils/trpc";
+import { IconEdit } from "@tabler/icons";
+import { Table, Badge, Group, Tooltip } from "@mantine/core";
 import { TitleText } from "../Text/TitleText";
+import { EmptyTable } from "./EmptyTable";
+import { trpc } from "../../utils/trpc";
 
 export const PARTable = ({
   call,
+  status,
   email,
 }: {
   call: string;
   status: string;
   email: string;
 }) => {
-  const { data: loans, fetchStatus } = trpc.loans.loans.useQuery();
-
   const [user, setUser] = useState({
     id: "",
     role: "",
@@ -58,6 +57,8 @@ export const PARTable = ({
     user_data?.data?.state,
   ]);
 
+  const { data: loans, fetchStatus } = trpc.loans.loans.useQuery();
+
   const Header = () => (
     <tr>
       <th>Names</th>
@@ -69,21 +70,23 @@ export const PARTable = ({
       {user?.role !== "CO" && <th>Action</th>}
     </tr>
   );
+
   return (
     <>
-      {!loans && <EmptyTable call="payments" status={fetchStatus} />}
+      {!loans && <EmptyTable call="par-table" status={fetchStatus} />}
       {loans && (
         <>
           <Group position="center" m="lg">
-            {call === "payments" && <TitleText title="Payments List" />}
+            {call === "par-report" && <TitleText title="PAR Report" />}
           </Group>
+
           <Table striped highlightOnHover horizontalSpacing="md">
             <thead>
               <Header />
             </thead>
             <tbody>
               {loans?.map((loan) => (
-                <PARRow
+                <LoansRow
                   key={loan.id}
                   loan={loan}
                   call={call}
@@ -101,7 +104,7 @@ export const PARTable = ({
   );
 };
 
-const PARRow = ({
+const LoansRow = ({
   loan,
   call,
   role,
@@ -113,7 +116,7 @@ const PARRow = ({
   const router = useRouter();
   return (
     <>
-      {call === "payments" && loan.disbursed && (
+      {call === "par-report" && (
         <tr style={{ cursor: "auto" }}>
           <td>{loan.memberName}</td>
           <td>{`${loan.principal}`.replace(/\B(?=(\d{3})+(?!\d))/g, ",")}</td>
@@ -128,17 +131,106 @@ const PARRow = ({
                 : "Months"}
           </td>
           <td>
-            <Badge
-              style={{ cursor: "pointer" }}
-              onClick={() => router.push(`/loans/payments/${loan.id}`)}
-              variant="gradient"
-              gradient={{
-                from: "teal",
-                to: "lime",
-              }}
-            >
-              Payments
-            </Badge>
+            {!loan.disbursed && !loan.approved && loan.maintained && (
+              <>
+                {role === "CO" && (
+                  <Tooltip label="Approval" color="gray" withArrow>
+                    <Badge
+                      style={{ cursor: "pointer" }}
+                      variant="gradient"
+                      gradient={{
+                        from: "grey",
+                        to: "indigo",
+                      }}
+                    >
+                      Pending
+                    </Badge>
+                  </Tooltip>
+                )}
+                {role !== "CO" && (
+                  <Badge
+                    style={{ cursor: "pointer" }}
+                    onClick={() => router.push(`/loans/approve/${loan.id}`)}
+                    variant="gradient"
+                    gradient={{
+                      from: "indigo",
+                      to: "red",
+                    }}
+                  >
+                    Approve
+                  </Badge>
+                )}
+              </>
+            )}
+            {!loan.disbursed && loan.approved && (
+              <>
+                {role === "CO" && (
+                  <Tooltip label="Disbursement" color="gray" withArrow>
+                    <Badge
+                      style={{ cursor: "pointer" }}
+                      variant="gradient"
+                      gradient={{
+                        from: "grey",
+                        to: "green",
+                      }}
+                    >
+                      Pending
+                    </Badge>
+                  </Tooltip>
+                )}
+                {role !== "CO" && (
+                  <Badge
+                    style={{ cursor: "pointer" }}
+                    onClick={() => router.push(`/loans/disburse/${loan.id}`)}
+                    variant="gradient"
+                    gradient={{
+                      from: "red",
+                      to: "blue",
+                    }}
+                  >
+                    Disburse
+                  </Badge>
+                )}
+              </>
+            )}
+            {loan.disbursed && loan.cleared && (
+              <Badge
+                style={{ cursor: "pointer" }}
+                onClick={() => router.push(`/loans/disburse/${loan.id}`)}
+                variant="gradient"
+                gradient={{
+                  from: "violet",
+                  to: "gray",
+                }}
+              >
+                Cleared
+              </Badge>
+            ) || (
+                <Badge
+                  style={{ cursor: "pointer" }}
+                  onClick={() => router.push(`/loans/payments/${loan.id}`)}
+                  variant="gradient"
+                  gradient={{
+                    from: "blue",
+                    to: "violet",
+                  }}
+                >
+                  Active
+                </Badge>
+              )}
+            {loan.defaulted && (
+              <Badge
+                style={{ cursor: "pointer" }}
+                onClick={() => router.push(`/loans/disburse/${loan.id}`)}
+                variant="gradient"
+                gradient={{
+                  from: "red",
+                  to: "orange",
+                }}
+              >
+                Defaulted
+              </Badge>
+            )}
           </td>
           {role !== "CO" && (
             <td

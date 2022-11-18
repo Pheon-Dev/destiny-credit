@@ -6,6 +6,7 @@ export {
   MembersTable,
   TransactionsTable,
   ProductsTable,
+  PARTable,
 } from "./Tables";
 export { TitleText } from "./Text/TitleText";
 export { Utilities } from "./Utilities/Utilities";

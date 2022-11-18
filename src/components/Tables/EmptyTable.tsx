@@ -57,6 +57,7 @@ export const EmptyTable = ({
               <TitleText title="No Payments Made To This Loan Yet" />
             )}
             {call === "products" && <TitleText title="No Created Products" />}
+            {call === "par-report" && <TitleText title="No PAR Reports" />}
           </Group>
           <Group position="center" m="lg">
             {/* <LoadingOverlay overlayBlur={2} visible={true} /> */}
@@ -80,6 +81,7 @@ export const EmptyTable = ({
             {call === "all-loans" && <TitleText title="All Loans List" />}
             {call === "payments" && <TitleText title="Payments List" />}
             {call === "products" && <TitleText title="Products List" />}
+            {call === "par-report" && <TitleText title="PAR Report" />}
             {call === "payment" && (
               <TitleText title="Loading Payments Made To This Loan" />
             )}
@@ -102,7 +104,7 @@ export const EmptyTable = ({
               <Skeleton height={16} radius="xl" />
             </Group>
           )}
-          {call !== "create-loan" && call !== "register" && (
+          {call !== "create-loan" && call !== "register" && call === "par-report" && (
             <Group position="center" m="lg" style={{ position: "relative" }}>
               <Skeleton height={16} radius="xl" />
               <Row />
