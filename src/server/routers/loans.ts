@@ -19,6 +19,37 @@ export const loansRouter = t.router({
     }
     return members;
   }),
+  report: t.procedure.query(async () => {
+    const loans = await prisma.loan.findMany({
+      where: {},
+      include: {
+        payment: {
+          where: {},
+          orderBy: {
+            outsBalance: "desc",
+          },
+        },
+        member: {
+          select: {
+            id: true,
+            firstName: true,
+            phoneNumber: true,
+            lastName: true,
+            memberId: true,
+            membershipAmount: true,
+            mpesaCode: true,
+          },
+        },
+      },
+    });
+    if (!loans) {
+      throw new TRPCError({
+        code: "NOT_FOUND",
+        message: `loans.loans not found`,
+      });
+    }
+    return loans;
+  }),
   loans: t.procedure.query(async () => {
     const loans = await prisma.loan.findMany({
       where: {},

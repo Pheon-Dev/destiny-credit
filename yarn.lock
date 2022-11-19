@@ -182,6 +182,13 @@
   dependencies:
     regenerator-runtime "^0.13.4"
 
+"@babel/runtime@^7.9.0":
+  version "7.20.1"
+  resolved "https://registry.yarnpkg.com/@babel/runtime/-/runtime-7.20.1.tgz#1148bb33ab252b165a06698fde7576092a78b4a9"
+  integrity sha512-mrzLkl6U9YLF8qpqI7TB82PESyEGjm/0Ly91jG575eVxMMlb8fYfOXFZIJ8XfLrJZQbm7dlKry2bJmXBUEkdFg==
+  dependencies:
+    regenerator-runtime "^0.13.10"
+
 "@babel/template@^7.18.10":
   version "7.18.10"
   resolved "https://registry.yarnpkg.com/@babel/template/-/template-7.18.10.tgz#6f9134835970d1dbf0835c0d100c9f38de0c5e71"
@@ -767,32 +774,34 @@
     "@tanstack/query-core" "4.13.4"
     use-sync-external-store "^1.2.0"
 
-"@trpc/client@^10.0.0-proxy-beta.26":
-  version "10.0.0-proxy-beta.26"
-  resolved "https://registry.yarnpkg.com/@trpc/client/-/client-10.0.0-proxy-beta.26.tgz#b8df0b7e5c75bef5021e7813da7c0f1df0a93d27"
-  integrity sha512-NTAqTtMCsB5DneoseK/oFYA9YkcIXHuYp1zojnhNpNA+HFzFvkDUHsKNmaPwd5c/KxLr7nP/jQvRzvVuZbgBng==
+"@trpc/client@^10.0.0-rc.8":
+  version "10.0.0-rc.8"
+  resolved "https://registry.yarnpkg.com/@trpc/client/-/client-10.0.0-rc.8.tgz#2b6b0db8ec41e4403b72d25d37a2cd9d6c6c1257"
+  integrity sha512-NuQl7g1tkfFYn6P6dZJJkVsxnxutYpaxmpG/w5ZKW3QVu6cY1joUOrWakunKrghh3HS+svgLaPz0Xl0PlmdSlw==
 
-"@trpc/next@^10.0.0-proxy-beta.26":
-  version "10.0.0-proxy-beta.26"
-  resolved "https://registry.yarnpkg.com/@trpc/next/-/next-10.0.0-proxy-beta.26.tgz#a244b0370836b8ec4ca655c73c4205a8379598a3"
-  integrity sha512-msyNRgBVKPI+JnJynmUdE5QK/xAFAQYFPmAH1dJdM+nAxlk8ZNeRR5ohXK4oIqK/GTSMIdcNzDPdXFVB9KiiJQ==
+"@trpc/next@^10.0.0-rc.8":
+  version "10.0.0-rc.8"
+  resolved "https://registry.yarnpkg.com/@trpc/next/-/next-10.0.0-rc.8.tgz#78a4acc4404c3a8295f0b0a8da4e2c89b21e1366"
+  integrity sha512-l2TZF22virmC3RROD7qu0dnc3sdYfVvkOhAu1qP5+8fRgs4cgHKBFdalQ+SKBnU0RNuVLYVw0CkyvU+gHo5u2w==
   dependencies:
     react-ssr-prepass "^1.5.0"
 
-"@trpc/react-query@^10.0.0-proxy-beta.26":
-  version "10.0.0-proxy-beta.26"
-  resolved "https://registry.yarnpkg.com/@trpc/react-query/-/react-query-10.0.0-proxy-beta.26.tgz#3cedbd2e3615fc3cc35f8740ae7c099b071c0642"
-  integrity sha512-8/wDnNTNsn9ULXldegpqoNCgMMepVTU66t7ynyNFuSHE9eSd8J2sWKyEzK7lxVHa1kU+NjWhYoG+iDoXrKE6Cg==
+"@trpc/react-query@^10.0.0-rc.8":
+  version "10.0.0-rc.8"
+  resolved "https://registry.yarnpkg.com/@trpc/react-query/-/react-query-10.0.0-rc.8.tgz#68957743cd99e9c97fb167fb955b00bd1f9010e2"
+  integrity sha512-LKL29llvGtwYmfKGuCYSgNNChOL8/6PInY90i+ZgI8TLO6ZCJaVrPBSvqtxKj3MSezbK3kOxWIviKVFwV35L0A==
 
-"@trpc/react@^10.0.0-proxy-beta.20":
-  version "10.0.0-proxy-beta.20"
-  resolved "https://registry.yarnpkg.com/@trpc/react/-/react-10.0.0-proxy-beta.20.tgz#985422b5a5b5ad2c280fa23ccb1714379f29538c"
-  integrity sha512-axuy3Nf71j6vVQFhc7ATSOW4gMTL92RSMTA0p93dNoNQpKqADGjjB1bFUqAmCeAjy441s+h9tqhj3g14sQ/NmA==
+"@trpc/react@^9.27.4":
+  version "9.27.4"
+  resolved "https://registry.yarnpkg.com/@trpc/react/-/react-9.27.4.tgz#0320e0cbd416506959ddc65a10758fc41d70fb65"
+  integrity sha512-bP74Tf6vWcMoWYiTAvbWrieV9cFQiKUDKRoRj0+VeGJbxdbhdJyUzv4zos0T4SiSKuhgoEm9bP4jWU2NhNhpIA==
+  dependencies:
+    "@babel/runtime" "^7.9.0"
 
-"@trpc/server@^10.0.0-proxy-beta.26":
-  version "10.0.0-proxy-beta.26"
-  resolved "https://registry.yarnpkg.com/@trpc/server/-/server-10.0.0-proxy-beta.26.tgz#0e274b6b40055490826df92b538bc5db662147c5"
-  integrity sha512-XMpsQnH5s5Mn7CbRUMq2qT8TlHWNSygAizmpKnMhk3JDuLtqQNfxqGG41JzXiKNUcDrfcWt+MEyEa18sEjLYiA==
+"@trpc/server@^10.0.0-rc.8":
+  version "10.0.0-rc.8"
+  resolved "https://registry.yarnpkg.com/@trpc/server/-/server-10.0.0-rc.8.tgz#941cb4b06a2d59419bdbcc61241f1e8946b67a1e"
+  integrity sha512-+NsQqaJGHTiiBcOesH1bIictnnSO+SXaCOy5pM/324QBnJRt9VOO8oYDLcHSwAbJpAbOA+vl6YHs8OoykW6D2g==
 
 "@types/bcryptjs@^2.4.2":
   version "2.4.2"
@@ -2922,6 +2931,11 @@ readable-stream@~1.0.17, readable-stream@~1.0.27-1:
     inherits "~2.0.1"
     isarray "0.0.1"
     string_decoder "~0.10.x"
+
+regenerator-runtime@^0.13.10:
+  version "0.13.11"
+  resolved "https://registry.yarnpkg.com/regenerator-runtime/-/regenerator-runtime-0.13.11.tgz#f6dca3e7ceec20590d07ada785636a90cdca17f9"
+  integrity sha512-kY1AZVr2Ra+t+piVaJ4gxaFaReZVH40AKNo7UCX6W+dEwBo/2oZJzqfuN1qLq1oL45o56cPaTXELwrTh8Fpggg==
 
 regenerator-runtime@^0.13.4:
   version "0.13.9"

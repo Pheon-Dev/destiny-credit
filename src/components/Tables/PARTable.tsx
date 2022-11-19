@@ -57,7 +57,7 @@ export const PARTable = ({
     user_data?.data?.state,
   ]);
 
-  const { data: loans, fetchStatus } = trpc.loans.loans.useQuery();
+  const { data: loans, fetchStatus } = trpc.loans.report.useQuery();
 
   const Header = () => (
     <tr>
