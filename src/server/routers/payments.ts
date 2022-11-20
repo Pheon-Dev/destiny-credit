@@ -76,7 +76,6 @@ export const paymentsRouter = t.router({
         const when = day + "-" + month + "-" + year;
         return when;
       };
-
       const interest = (+loan?.interest && +loan?.interest) || 0;
       const installment = (+loan?.installment && +loan?.installment) || 0;
       const sundays = (+loan?.sundays && +loan?.sundays) || 0;

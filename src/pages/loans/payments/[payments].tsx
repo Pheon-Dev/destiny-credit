@@ -10,13 +10,13 @@ import {
 import { showNotification } from "@mantine/notifications";
 import { Transaction } from "@prisma/client";
 import { IconLoader } from "@tabler/icons";
-import { NextPage } from "next";
-import { useSession } from "next-auth/react";
-import { useRouter } from "next/router";
-import { Suspense, useCallback, useEffect, useState } from "react";
-import { Payment, State } from "../../../../types";
-import { Protected, TitleText } from "../../../components";
-import { trpc } from "../../../utils/trpc";
+    import { NextPage } from "next";
+    import { useSession } from "next-auth/react";
+    import { useRouter } from "next/router";
+    import { Suspense, useCallback, useEffect, useState } from "react";
+    import { Payment, State } from "../../../../types";
+    import { Protected, TitleText } from "../../../components";
+    import { trpc } from "../../../utils/trpc";
 
 const PaymentsList = ({ email }: { email: string; status: string }) => {
   const [user, setUser] = useState({
@@ -376,8 +376,7 @@ const PaymentsList = ({ email }: { email: string; status: string }) => {
                 </>
               )}
 
-              {payment?.loan?.cleared &&
-              payment.loan.payment.length > 0 && (
+              {payment.loan.payment.length > 0 && (
                 <tr style={{ backgroundColor: "grey", color: "white" }}>
                   <td>TOTAL</td>
                   <td>
