@@ -255,6 +255,11 @@ const reports_data = [
   },
   {
     id: 1,
+    name: "Ledgers",
+    url: "/ledgers",
+  },
+  {
+    id: 2,
     name: "Schedules",
     url: "/reports/schedule-report",
   },
