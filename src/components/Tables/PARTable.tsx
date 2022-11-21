@@ -1,15 +1,13 @@
-import React, { useEffect, useState } from "react";
-import { Loan } from "../../../types";
-import { useRouter } from "next/router";
+import { Badge, Group, Table, Tooltip } from "@mantine/core";
 import { IconEdit } from "@tabler/icons";
-import { Table, Badge, Group, Tooltip } from "@mantine/core";
+import { useRouter } from "next/router";
+import { useEffect, useState } from "react";
+import { trpc } from "../../utils/trpc";
 import { TitleText } from "../Text/TitleText";
 import { EmptyTable } from "./EmptyTable";
-import { trpc } from "../../utils/trpc";
 
 export const PARTable = ({
   call,
-  status,
   email,
 }: {
   call: string;
