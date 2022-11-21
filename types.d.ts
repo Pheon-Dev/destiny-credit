@@ -225,6 +225,50 @@ export interface Guarantors {
   updaterId?: string;
 }
 
+export interface Loan {
+  id?: string;
+  createdAt?: Date;
+  updatedAt?: Date;
+  maintained: string;
+  approved: string;
+  disbursed: string;
+  principal: string;
+  interest: string;
+  installment: string;
+  penalty: string;
+  sundays: string;
+  payoff: string;
+  tenure: string;
+  grace: string;
+  cycle: string;
+  productName: string;
+  memberName: string;
+  processingFee: string;
+  loanRef: string;
+  disbursedOn?: string;
+  startDate?: string;
+  paymentCounter?: string;
+  paymentCount?: string;
+  paymentDay?: string;
+  paymentStatus?: string;
+  paymentPenalties?: string;
+  guarantor: string;
+  guarantorId?: string;
+  product: string;
+  productId: string;
+  member: string;
+  memberId: string;
+  maintainer?: string;
+  maintainerId?: string;
+  approver?: string;
+  approverId?: string;
+  disburser?: string;
+  disburserId?: string;
+  updater?: string;
+  updaterId?: string;
+  payment?: Array<Payment>;
+}
+
 export interface Loans {
   id?: string;
   createdAt?: Date;
