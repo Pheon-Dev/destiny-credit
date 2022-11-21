@@ -267,7 +267,17 @@ export const paymentsRouter = t.router({
         /* } */
 
         if (os_balance < 1) {
-          if (os_principal === 0) clear = true
+          if (os_principal === 0) {
+            await prisma.loan.update({
+              where: {
+                id: input.id,
+              },
+              data: {
+                cleared: true,
+              },
+            });
+            clear = true
+          }
         }
 
         if (clear) return
@@ -302,14 +312,6 @@ export const paymentsRouter = t.router({
             },
           });
         }
-        await prisma.loan.update({
-          where: {
-            id: input.id,
-          },
-          data: {
-            cleared: true,
-          },
-        });
 
         payment.push({
           amount: amount,

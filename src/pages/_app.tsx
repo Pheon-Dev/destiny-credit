@@ -23,8 +23,8 @@ const App = (props: AppProps & { colorScheme: ColorScheme }) => {
   const theme = useMantineTheme();
   const [opened, setOpened] = useState(false);
   const { Component, pageProps } = props;
-  /* const [colorScheme, setColorScheme] = useState<ColorScheme>(props.colorScheme); */
-  const [colorScheme, setColorScheme] = useState<ColorScheme>("dark");
+  const [colorScheme, setColorScheme] = useState<ColorScheme>(props.colorScheme);
+  /* const [colorScheme, setColorScheme] = useState<ColorScheme>("dark"); */
   const router = useRouter();
 
   const toggleColorScheme = (value?: ColorScheme) => {
