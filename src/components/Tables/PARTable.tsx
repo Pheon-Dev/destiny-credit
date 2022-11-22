@@ -115,7 +115,6 @@ export const PARTable = ({
                       }
                       <td>
                         {loan.startDate}
-                        {/* {loan.cycle.toLowerCase() === "daily" ? "Days" : loan.cycle.toLowerCase() === "weekly" ? "Weeks" : "Months"} */}
                       </td>
                       <td>
                         {!loan.disbursed && !loan.approved && loan.maintained && (
