@@ -182,13 +182,6 @@
   dependencies:
     regenerator-runtime "^0.13.4"
 
-"@babel/runtime@^7.9.0":
-  version "7.20.1"
-  resolved "https://registry.yarnpkg.com/@babel/runtime/-/runtime-7.20.1.tgz#1148bb33ab252b165a06698fde7576092a78b4a9"
-  integrity sha512-mrzLkl6U9YLF8qpqI7TB82PESyEGjm/0Ly91jG575eVxMMlb8fYfOXFZIJ8XfLrJZQbm7dlKry2bJmXBUEkdFg==
-  dependencies:
-    regenerator-runtime "^0.13.10"
-
 "@babel/template@^7.18.10":
   version "7.18.10"
   resolved "https://registry.yarnpkg.com/@babel/template/-/template-7.18.10.tgz#6f9134835970d1dbf0835c0d100c9f38de0c5e71"
@@ -774,34 +767,27 @@
     "@tanstack/query-core" "4.13.4"
     use-sync-external-store "^1.2.0"
 
-"@trpc/client@^10.0.0-rc.8":
-  version "10.0.0-rc.8"
-  resolved "https://registry.yarnpkg.com/@trpc/client/-/client-10.0.0-rc.8.tgz#2b6b0db8ec41e4403b72d25d37a2cd9d6c6c1257"
-  integrity sha512-NuQl7g1tkfFYn6P6dZJJkVsxnxutYpaxmpG/w5ZKW3QVu6cY1joUOrWakunKrghh3HS+svgLaPz0Xl0PlmdSlw==
+"@trpc/client@^10.1.0":
+  version "10.1.0"
+  resolved "https://registry.yarnpkg.com/@trpc/client/-/client-10.1.0.tgz#b45423bf32f8315940b91aaaeeb15df624ed43f1"
+  integrity sha512-E7L9l2OTa5lIdM0NYvQLJf/GLapskfiVLv0Jv7t6GVxEOFd+O4THWsWQgJVUUAz9iq805iMNkY3uqSvf4GJaWg==
 
-"@trpc/next@^10.0.0-rc.8":
-  version "10.0.0-rc.8"
-  resolved "https://registry.yarnpkg.com/@trpc/next/-/next-10.0.0-rc.8.tgz#78a4acc4404c3a8295f0b0a8da4e2c89b21e1366"
-  integrity sha512-l2TZF22virmC3RROD7qu0dnc3sdYfVvkOhAu1qP5+8fRgs4cgHKBFdalQ+SKBnU0RNuVLYVw0CkyvU+gHo5u2w==
+"@trpc/next@^10.1.0":
+  version "10.1.0"
+  resolved "https://registry.yarnpkg.com/@trpc/next/-/next-10.1.0.tgz#a5136abb8529c5a4b885796c1195081fe3f6dbb1"
+  integrity sha512-bJ3zMbrSO+udhMi/8KZ1JY5VpXsucTOat08LdU5MPXzMFEQ+d0QehoM4PoZirO39batZfM0rmbCJ8w6P5hLCow==
   dependencies:
     react-ssr-prepass "^1.5.0"
 
-"@trpc/react-query@^10.0.0-rc.8":
-  version "10.0.0-rc.8"
-  resolved "https://registry.yarnpkg.com/@trpc/react-query/-/react-query-10.0.0-rc.8.tgz#68957743cd99e9c97fb167fb955b00bd1f9010e2"
-  integrity sha512-LKL29llvGtwYmfKGuCYSgNNChOL8/6PInY90i+ZgI8TLO6ZCJaVrPBSvqtxKj3MSezbK3kOxWIviKVFwV35L0A==
+"@trpc/react-query@^10.1.0":
+  version "10.1.0"
+  resolved "https://registry.yarnpkg.com/@trpc/react-query/-/react-query-10.1.0.tgz#6abae43d6171fbe4c8c38af4b36055ec9a2a5df7"
+  integrity sha512-Xjx3m73CDuBNrpAOF6scUQedYyp4LIxthwmdjw8Y+iR193XNwFTH+C8TZn5qOLVw9u/FM5YchAJjPPgUJyXBBQ==
 
-"@trpc/react@^9.27.4":
-  version "9.27.4"
-  resolved "https://registry.yarnpkg.com/@trpc/react/-/react-9.27.4.tgz#0320e0cbd416506959ddc65a10758fc41d70fb65"
-  integrity sha512-bP74Tf6vWcMoWYiTAvbWrieV9cFQiKUDKRoRj0+VeGJbxdbhdJyUzv4zos0T4SiSKuhgoEm9bP4jWU2NhNhpIA==
-  dependencies:
-    "@babel/runtime" "^7.9.0"
-
-"@trpc/server@^10.0.0-rc.8":
-  version "10.0.0-rc.8"
-  resolved "https://registry.yarnpkg.com/@trpc/server/-/server-10.0.0-rc.8.tgz#941cb4b06a2d59419bdbcc61241f1e8946b67a1e"
-  integrity sha512-+NsQqaJGHTiiBcOesH1bIictnnSO+SXaCOy5pM/324QBnJRt9VOO8oYDLcHSwAbJpAbOA+vl6YHs8OoykW6D2g==
+"@trpc/server@^10.1.0":
+  version "10.1.0"
+  resolved "https://registry.yarnpkg.com/@trpc/server/-/server-10.1.0.tgz#e37c1f6b768b1de2ee5db51c4e97c462a7a642a0"
+  integrity sha512-UiRZPApLruhi1UKukTNsB9igFBEhEA0aMxy86Xp1OvbzuY00yoFcvDUYsBdBjp9mzIHR3yNjqrlfS/RNpPhZEw==
 
 "@types/bcryptjs@^2.4.2":
   version "2.4.2"
@@ -2931,11 +2917,6 @@ readable-stream@~1.0.17, readable-stream@~1.0.27-1:
     inherits "~2.0.1"
     isarray "0.0.1"
     string_decoder "~0.10.x"
-
-regenerator-runtime@^0.13.10:
-  version "0.13.11"
-  resolved "https://registry.yarnpkg.com/regenerator-runtime/-/regenerator-runtime-0.13.11.tgz#f6dca3e7ceec20590d07ada785636a90cdca17f9"
-  integrity sha512-kY1AZVr2Ra+t+piVaJ4gxaFaReZVH40AKNo7UCX6W+dEwBo/2oZJzqfuN1qLq1oL45o56cPaTXELwrTh8Fpggg==
 
 regenerator-runtime@^0.13.4:
   version "0.13.9"
