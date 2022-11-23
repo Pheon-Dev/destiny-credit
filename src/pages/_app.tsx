@@ -23,8 +23,8 @@ const App = (props: AppProps & { colorScheme: ColorScheme }) => {
   const theme = useMantineTheme();
   const [opened, setOpened] = useState(false);
   const { Component, pageProps } = props;
-  const [colorScheme, setColorScheme] = useState<ColorScheme>(props.colorScheme);
-  /* const [colorScheme, setColorScheme] = useState<ColorScheme>("dark"); */
+  /* const [colorScheme, setColorScheme] = useState<ColorScheme>(props.colorScheme); */
+  const [colorScheme, setColorScheme] = useState<ColorScheme>("dark");
   const router = useRouter();
 
   const toggleColorScheme = (value?: ColorScheme) => {
@@ -82,8 +82,6 @@ const App = (props: AppProps & { colorScheme: ColorScheme }) => {
                         p="xs"
                         hiddenBreakpoint="sm"
                         hidden={!opened}
-                        // height={500}
-                        /* width={{ base: 200 }} */
                         width={{ lg: 200, sm: 180 }}
                       >
                         <Navbar.Section

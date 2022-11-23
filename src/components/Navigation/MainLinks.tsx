@@ -1,19 +1,14 @@
-import React, { useState, useEffect } from "react";
-import {
-  IconHome,
-  IconUsers,
-  IconReport,
-  IconCash,
-  IconTag,
-  IconBrandAsana,
-} from "@tabler/icons";
 import { Box, NavLink, Text } from "@mantine/core";
-import { Protected } from "../Protected/Protected";
-import { useRouter } from "next/router";
+import {
+  IconBrandAsana, IconCash, IconHome, IconReport, IconTag, IconUsers
+} from "@tabler/icons";
 import { useSession } from "next-auth/react";
-import { trpc } from "../../utils/trpc";
-import { Data } from "../../../types";
 import Link from "next/link";
+import { useRouter } from "next/router";
+import React, { useEffect, useState } from "react";
+import { Data } from "../../../types";
+import { trpc } from "../../utils/trpc";
+import { Protected } from "../Protected/Protected";
 
 export const MainLinks = () => {
   const { data, status } = useSession();
@@ -21,11 +16,14 @@ export const MainLinks = () => {
   const email = `${data?.user?.email}`;
   const check = email.split("@")[1];
 
-  return (
-    <>{check && (<MainLinksComponent email={email} status={status} />)}</>
-  );
-}
-const MainLinksComponent = ({ email, status }: { email: string, status: string }) => {
+  return <>{check && <MainLinksComponent email={email} status={status} />}</>;
+};
+const MainLinksComponent = ({
+  email,
+}: {
+  email: string;
+  status: string;
+}) => {
   const router = useRouter();
 
   const [user, setUser] = useState({
@@ -79,6 +77,14 @@ const MainLinksComponent = ({ email, status }: { email: string, status: string }
     icon: React.ReactNode;
     open: boolean;
   }) => {
+
+    useEffect(() => {
+      let subscribe = true
+      return () => {
+        subscribe = false
+      }
+    }, [router.pathname])
+
     return (
       <NavLink
         defaultOpened={open}
@@ -97,18 +103,20 @@ const MainLinksComponent = ({ email, status }: { email: string, status: string }
         childrenOffset={24}
       >
         {data?.map((item: Data) => (
-          <Link href={item.url} key={item.url}>
-            <NavLink
-              styles={{
-                root: {
-                  borderRadius: 6,
-                  margin: 2,
-                },
-              }}
-              label={<Text weight={500}>{item.name}</Text>}
-              active={router.pathname === item.url}
-            />
-          </Link>
+          <>
+            <Link href={item.url} key={item.url}>
+              <NavLink
+                styles={{
+                  root: {
+                    borderRadius: 6,
+                    margin: 2,
+                  },
+                }}
+                label={<Text weight={500}>{item.name}</Text>}
+                active={router.pathname === item.url}
+              />
+            </Link>
+          </>
         ))}
       </NavLink>
     );
