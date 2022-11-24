@@ -77,14 +77,6 @@ const MainLinksComponent = ({
     icon: React.ReactNode;
     open: boolean;
   }) => {
-
-    useEffect(() => {
-      let subscribe = true
-      return () => {
-        subscribe = false
-      }
-    }, [router.pathname])
-
     return (
       <NavLink
         defaultOpened={open}
