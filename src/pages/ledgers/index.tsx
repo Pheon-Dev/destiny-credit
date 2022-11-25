@@ -7,20 +7,20 @@ const Page: NextPage = () => {
     <Tabs variant="outline" defaultValue="payments">
       <Tabs.List position="center">
         <Tabs.Tab value="payments" icon={<IconPhoto size={14} />}>Payments</Tabs.Tab>
-        <Tabs.Tab value="messages" icon={<IconMessageCircle size={14} />}>Transactions</Tabs.Tab>
-        <Tabs.Tab value="settings" icon={<IconSettings size={14} />}>P&L</Tabs.Tab>
+        <Tabs.Tab value="transactions" icon={<IconMessageCircle size={14} />}>Transactions</Tabs.Tab>
+        <Tabs.Tab value="pnl" icon={<IconSettings size={14} />}>P&L</Tabs.Tab>
       </Tabs.List>
 
       <Tabs.Panel value="payments" pt="xs">
         payments ledger
       </Tabs.Panel>
 
-      <Tabs.Panel value="messages" pt="xs">
+      <Tabs.Panel value="transactions" pt="xs">
         Transactions
       </Tabs.Panel>
 
-      <Tabs.Panel value="settings" pt="xs">
-        P&L
+      <Tabs.Panel value="pnl" pt="xs">
+        Profit & Loss
       </Tabs.Panel>
     </Tabs>
   );
