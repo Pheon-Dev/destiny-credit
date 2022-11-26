@@ -1,29 +1,29 @@
 import { Badge, Group, Table, Tooltip } from "@mantine/core";
 import { IconEdit } from "@tabler/icons";
 import { useRouter } from "next/router";
-import { useEffect, useState } from "react";
-import { trpc } from "../../utils/trpc";
+import { useCallback, useEffect, useState } from "react";
+import { trpc } from '../../utils/trpc';
 import { TitleText } from "../Text/TitleText";
 import { EmptyTable } from "./EmptyTable";
 
-export const PARTable = ({
-  call,
-  email,
-}: {
-  call: string;
-  status: string;
-  email: string;
-}) => {
-  const router = useRouter();
-  const [user, setUser] = useState({
-    id: "",
-    role: "",
-    email: "",
-    username: "",
-    firstname: "",
-    lastname: "",
-    state: "",
-  });
+  export const PARTable = ({
+    call,
+    email,
+  }: {
+    call: string;
+    status: string;
+    email: string;
+  }) => {
+    const router = useRouter();
+    const [user, setUser] = useState({
+      id: "",
+      role: "",
+      email: "",
+      username: "",
+      firstname: "",
+      lastname: "",
+      state: "",
+    });
 
   const user_data = trpc.users.user.useQuery({
     email: `${email}`,
@@ -70,11 +70,11 @@ export const PARTable = ({
       {user?.role !== "CO" && <th>Action</th>}
     </tr>
   );
-  const role = user?.role
+  const role = user?.role;
 
   return (
     <>
-      {!loans && <EmptyTable call="par-table" status={fetchStatus} />}
+      {!loans && <EmptyTable call='par-table' status={fetchStatus} />}
       {loans && (
         <>
           <Group position="center" m="lg">
@@ -91,31 +91,42 @@ export const PARTable = ({
                   {call === "par-report" && (
                     <tr style={{ cursor: "auto" }}>
                       <td>{loan.memberName}</td>
-                      <td>{`${loan.principal}`.replace(/\B(?=(\d{3})+(?!\d))/g, ",")}</td>
-                      {
-                        loan?.payment.length > 0 && (
-                          <td>{`${loan?.payment[loan?.payment.length - 1]?.outsBalance}`.replace(/\B(?=(\d{3})+(?!\d))/g, ",")}</td>
-                        ) || (
-                          <td>{`${+loan.installment + +loan.principal}`.replace(/\B(?=(\d{3})+(?!\d))/g, ",")}</td>
-                        )
-                      }
-                      {
-                        loan?.payment.length > 0 && (
-                          <td>{`${loan?.payment[loan?.payment.length - 1]?.outsArrears}`.replace(/\B(?=(\d{3})+(?!\d))/g, ",")}</td>
-                        ) || (
-                          <td>{`${0}`.replace(/\B(?=(\d{3})+(?!\d))/g, ",")}</td>
-                        )
-                      }
-                      {
-                        loan?.payment.length > 0 && (
-                          <td>{`${loan?.payment[loan?.payment.length - 1]?.outsPenalty}`.replace(/\B(?=(\d{3})+(?!\d))/g, ",")}</td>
-                        ) || (
-                          <td>{`${0}`.replace(/\B(?=(\d{3})+(?!\d))/g, ",")}</td>
-                        )
-                      }
                       <td>
-                        {loan.startDate}
+                        {`${loan.principal}`.replace(
+                          /\B(?=(\d{3})+(?!\d))/g,
+                          ","
+                        )}
                       </td>
+                      {(loan?.payment.length > 0 && (
+                        <td>
+                          {`${loan?.payment[loan?.payment.length - 1]?.outsBalance
+                            }`.replace(/\B(?=(\d{3})+(?!\d))/g, ",")}
+                        </td>
+                      )) || (
+                          <td>
+                            {`${+loan.installment + +loan.principal}`.replace(
+                              /\B(?=(\d{3})+(?!\d))/g,
+                              ","
+                            )}
+                          </td>
+                        )}
+                      {(loan?.payment.length > 0 && (
+                        <td>
+                          {`${loan?.payment[loan?.payment.length - 1]?.outsArrears
+                            }`.replace(/\B(?=(\d{3})+(?!\d))/g, ",")}
+                        </td>
+                      )) || (
+                          <td>{`${0}`.replace(/\B(?=(\d{3})+(?!\d))/g, ",")}</td>
+                        )}
+                      {(loan?.payment.length > 0 && (
+                        <td>
+                          {`${loan?.payment[loan?.payment.length - 1]?.outsPenalty
+                            }`.replace(/\B(?=(\d{3})+(?!\d))/g, ",")}
+                        </td>
+                      )) || (
+                          <td>{`${0}`.replace(/\B(?=(\d{3})+(?!\d))/g, ",")}</td>
+                        )}
+                      <td>{loan.startDate}</td>
                       <td>
                         {!loan.disbursed && !loan.approved && loan.maintained && (
                           <>
@@ -136,7 +147,9 @@ export const PARTable = ({
                             {role !== "CO" && (
                               <Badge
                                 style={{ cursor: "pointer" }}
-                                onClick={() => router.push(`/loans/approve/${loan.id}`)}
+                                onClick={() =>
+                                  router.push(`/loans/approve/${loan.id}`)
+                                }
                                 variant="gradient"
                                 gradient={{
                                   from: "indigo",
@@ -151,7 +164,11 @@ export const PARTable = ({
                         {!loan.disbursed && loan.approved && (
                           <>
                             {role === "CO" && (
-                              <Tooltip label="Disbursement" color="gray" withArrow>
+                              <Tooltip
+                                label="Disbursement"
+                                color="gray"
+                                withArrow
+                              >
                                 <Badge
                                   style={{ cursor: "pointer" }}
                                   variant="gradient"
@@ -167,7 +184,9 @@ export const PARTable = ({
                             {role !== "CO" && (
                               <Badge
                                 style={{ cursor: "pointer" }}
-                                onClick={() => router.push(`/loans/disburse/${loan.id}`)}
+                                onClick={() =>
+                                  router.push(`/loans/disburse/${loan.id}`)
+                                }
                                 variant="gradient"
                                 gradient={{
                                   from: "red",
@@ -179,10 +198,12 @@ export const PARTable = ({
                             )}
                           </>
                         )}
-                        {loan.disbursed && loan.cleared && (
+                        {(loan.disbursed && loan.cleared && (
                           <Badge
                             style={{ cursor: "pointer" }}
-                            onClick={() => router.push(`/loans/disburse/${loan.id}`)}
+                            onClick={() =>
+                              router.push(`/loans/disburse/${loan.id}`)
+                            }
                             variant="gradient"
                             gradient={{
                               from: "violet",
@@ -191,10 +212,12 @@ export const PARTable = ({
                           >
                             Cleared
                           </Badge>
-                        ) || (
+                        )) || (
                             <Badge
                               style={{ cursor: "pointer" }}
-                              onClick={() => router.push(`/loans/payments/${loan.id}`)}
+                              onClick={() =>
+                                router.push(`/loans/payments/${loan.id}`)
+                              }
                               variant="gradient"
                               gradient={{
                                 from: "blue",
@@ -207,7 +230,9 @@ export const PARTable = ({
                         {loan.defaulted && (
                           <Badge
                             style={{ cursor: "pointer" }}
-                            onClick={() => router.push(`/loans/disburse/${loan.id}`)}
+                            onClick={() =>
+                              router.push(`/loans/disburse/${loan.id}`)
+                            }
                             variant="gradient"
                             gradient={{
                               from: "red",
