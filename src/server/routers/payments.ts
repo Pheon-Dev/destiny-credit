@@ -60,13 +60,13 @@ export const paymentsRouter = t.router({
 
       const roundOff = (value: number) => {
         if (value > 0) {
-          const v = `${value}`
-          const a = v.split(".")[0] ?? "0"
-          const b = v.split(".")[1] ?? "0"
+          const v = `${value}`;
+          const a = v.split(".")[0] ?? "0";
+          const b = v.split(".")[1] ?? "0";
 
-          return +b > 0 && +a + 1 || +a
+          return (+b > 0 && +a + 1) || +a;
         }
-        return 0
+        return 0;
       };
 
       const date = (time: string) => {
@@ -134,10 +134,9 @@ export const paymentsRouter = t.router({
 
       let os_balance = +outsBalance;
 
-
       let total_amount = 0;
 
-      let clear = false
+      let clear = false;
 
       /* TODO: Proper Calculations */
       transactions?.forEach(async (t) => {
@@ -157,14 +156,14 @@ export const paymentsRouter = t.router({
           const start_month = loan?.startDate?.split("-")[1];
           const start_year = loan?.startDate?.split("-")[2];
 
-          const year = start_year && start_year || ""
-          const month = start_month && start_month || ""
+          const year = (start_year && start_year) || "";
+          const month = (start_month && start_month) || "";
           const str = year + month + start_day + "000000";
           start = +str;
         }
 
         if (loan.cleared === true) {
-          return
+          return;
         }
         if (t.state === "handled") {
           return notification.push({
@@ -173,9 +172,9 @@ export const paymentsRouter = t.router({
             color: "blue",
             disallowClose: true,
             autoClose: 10000,
-            message: `M-PESA Payment of KSHs. ${t.transAmount
-              } via ${(t.billRefNumber === "" && "Till") || "Pay Bill"
-              } is already paid for ${t?.payment}`,
+            message: `M-PESA Payment of KSHs. ${t.transAmount} via ${
+              (t.billRefNumber === "" && "Till") || "Pay Bill"
+            } is already paid for ${t?.payment}`,
           });
         }
 
@@ -276,11 +275,11 @@ export const paymentsRouter = t.router({
                 cleared: true,
               },
             });
-            clear = true
+            clear = true;
           }
         }
 
-        if (clear) return
+        if (clear) return;
 
         const add = await prisma.payment.create({
           data: {

@@ -1,29 +1,30 @@
 import { Badge, Group, Table, Tooltip } from "@mantine/core";
+import { Tab } from "@mantine/core/lib/Tabs/Tab/Tab";
 import { IconEdit } from "@tabler/icons";
 import { useRouter } from "next/router";
 import { useCallback, useEffect, useState } from "react";
-import { trpc } from '../../utils/trpc';
+import { trpc } from "../../utils/trpc";
 import { TitleText } from "../Text/TitleText";
 import { EmptyTable } from "./EmptyTable";
 
-  export const PARTable = ({
-    call,
-    email,
-  }: {
-    call: string;
-    status: string;
-    email: string;
-  }) => {
-    const router = useRouter();
-    const [user, setUser] = useState({
-      id: "",
-      role: "",
-      email: "",
-      username: "",
-      firstname: "",
-      lastname: "",
-      state: "",
-    });
+export const PARTable = ({
+  call,
+  email,
+}: {
+  call: string;
+  status: string;
+  email: string;
+}) => {
+  const router = useRouter();
+  const [user, setUser] = useState({
+    id: "",
+    role: "",
+    email: "",
+    username: "",
+    firstname: "",
+    lastname: "",
+    state: "",
+  });
 
   const user_data = trpc.users.user.useQuery({
     email: `${email}`,
@@ -74,7 +75,7 @@ import { EmptyTable } from "./EmptyTable";
 
   return (
     <>
-      {!loans && <EmptyTable call='par-table' status={fetchStatus} />}
+      {!loans && <EmptyTable call="par-table" status={fetchStatus} />}
       {loans && (
         <>
           <Group position="center" m="lg">
@@ -94,73 +95,86 @@ import { EmptyTable } from "./EmptyTable";
                       <td>
                         {`${loan.principal}`.replace(
                           /\B(?=(\d{3})+(?!\d))/g,
-                          ","
+                          ",",
                         )}
                       </td>
                       {(loan?.payment.length > 0 && (
                         <td>
-                          {`${loan?.payment[loan?.payment.length - 1]?.outsBalance
-                            }`.replace(/\B(?=(\d{3})+(?!\d))/g, ",")}
+                          {`${loan?.payment[loan?.payment.length - 1]
+                            ?.outsBalance}`.replace(
+                              /\B(?=(\d{3})+(?!\d))/g,
+                              ",",
+                            )}
                         </td>
                       )) || (
                           <td>
                             {`${+loan.installment + +loan.principal}`.replace(
                               /\B(?=(\d{3})+(?!\d))/g,
-                              ","
+                              ",",
                             )}
                           </td>
                         )}
                       {(loan?.payment.length > 0 && (
                         <td>
-                          {`${loan?.payment[loan?.payment.length - 1]?.outsArrears
-                            }`.replace(/\B(?=(\d{3})+(?!\d))/g, ",")}
+                          {`${loan?.payment[loan?.payment.length - 1]
+                            ?.outsArrears}`.replace(
+                              /\B(?=(\d{3})+(?!\d))/g,
+                              ",",
+                            )}
                         </td>
                       )) || (
                           <td>{`${0}`.replace(/\B(?=(\d{3})+(?!\d))/g, ",")}</td>
                         )}
                       {(loan?.payment.length > 0 && (
                         <td>
-                          {`${loan?.payment[loan?.payment.length - 1]?.outsPenalty
-                            }`.replace(/\B(?=(\d{3})+(?!\d))/g, ",")}
+                          {`${loan?.payment[loan?.payment.length - 1]
+                            ?.outsPenalty}`.replace(
+                              /\B(?=(\d{3})+(?!\d))/g,
+                              ",",
+                            )}
                         </td>
                       )) || (
                           <td>{`${0}`.replace(/\B(?=(\d{3})+(?!\d))/g, ",")}</td>
                         )}
                       <td>{loan.startDate}</td>
                       <td>
-                        {!loan.disbursed && !loan.approved && loan.maintained && (
-                          <>
-                            {role === "CO" && (
-                              <Tooltip label="Approval" color="gray" withArrow>
+                        {!loan.disbursed && !loan.approved && loan.maintained &&
+                          (
+                            <>
+                              {role === "CO" && (
+                                <Tooltip
+                                  label="Approval"
+                                  color="gray"
+                                  withArrow
+                                >
+                                  <Badge
+                                    style={{ cursor: "pointer" }}
+                                    variant="gradient"
+                                    gradient={{
+                                      from: "grey",
+                                      to: "indigo",
+                                    }}
+                                  >
+                                    Pending
+                                  </Badge>
+                                </Tooltip>
+                              )}
+                              {role !== "CO" && (
                                 <Badge
                                   style={{ cursor: "pointer" }}
+                                  onClick={() =>
+                                    router.push(`/loans/approve/${loan.id}`)}
                                   variant="gradient"
                                   gradient={{
-                                    from: "grey",
-                                    to: "indigo",
+                                    from: "indigo",
+                                    to: "red",
                                   }}
                                 >
-                                  Pending
+                                  Approve
                                 </Badge>
-                              </Tooltip>
-                            )}
-                            {role !== "CO" && (
-                              <Badge
-                                style={{ cursor: "pointer" }}
-                                onClick={() =>
-                                  router.push(`/loans/approve/${loan.id}`)
-                                }
-                                variant="gradient"
-                                gradient={{
-                                  from: "indigo",
-                                  to: "red",
-                                }}
-                              >
-                                Approve
-                              </Badge>
-                            )}
-                          </>
-                        )}
+                              )}
+                            </>
+                          )}
                         {!loan.disbursed && loan.approved && (
                           <>
                             {role === "CO" && (
@@ -185,8 +199,7 @@ import { EmptyTable } from "./EmptyTable";
                               <Badge
                                 style={{ cursor: "pointer" }}
                                 onClick={() =>
-                                  router.push(`/loans/disburse/${loan.id}`)
-                                }
+                                  router.push(`/loans/disburse/${loan.id}`)}
                                 variant="gradient"
                                 gradient={{
                                   from: "red",
@@ -202,8 +215,7 @@ import { EmptyTable } from "./EmptyTable";
                           <Badge
                             style={{ cursor: "pointer" }}
                             onClick={() =>
-                              router.push(`/loans/disburse/${loan.id}`)
-                            }
+                              router.push(`/loans/disburse/${loan.id}`)}
                             variant="gradient"
                             gradient={{
                               from: "violet",
@@ -216,8 +228,7 @@ import { EmptyTable } from "./EmptyTable";
                             <Badge
                               style={{ cursor: "pointer" }}
                               onClick={() =>
-                                router.push(`/loans/payments/${loan.id}`)
-                              }
+                                router.push(`/loans/payments/${loan.id}`)}
                               variant="gradient"
                               gradient={{
                                 from: "blue",
@@ -231,8 +242,7 @@ import { EmptyTable } from "./EmptyTable";
                           <Badge
                             style={{ cursor: "pointer" }}
                             onClick={() =>
-                              router.push(`/loans/disburse/${loan.id}`)
-                            }
+                              router.push(`/loans/disburse/${loan.id}`)}
                             variant="gradient"
                             gradient={{
                               from: "red",
