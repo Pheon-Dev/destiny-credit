@@ -7,10 +7,7 @@ import { trpc } from "../../utils/trpc";
 import { TitleText } from "../Text/TitleText";
 import { EmptyTable } from "./EmptyTable";
 
-export const PARTable = ({
-  call,
-  email,
-}: {
+export const PARTable = ({ call, email, }: {
   call: string;
   status: string;
   email: string;

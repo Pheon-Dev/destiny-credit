@@ -172,9 +172,8 @@ export const paymentsRouter = t.router({
             color: "blue",
             disallowClose: true,
             autoClose: 10000,
-            message: `M-PESA Payment of KSHs. ${t.transAmount} via ${
-              (t.billRefNumber === "" && "Till") || "Pay Bill"
-            } is already paid for ${t?.payment}`,
+            message: `M-PESA Payment of KSHs. ${t.transAmount} via ${(t.billRefNumber === "" && "Till") || "Pay Bill"
+              } is already paid for ${t?.payment}`,
           });
         }
 
