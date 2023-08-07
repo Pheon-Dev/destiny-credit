@@ -95,8 +95,7 @@ const MainLinksComponent = ({
         childrenOffset={24}
       >
         {data?.map((item: Data) => (
-          <>
-            <Link href={item.url} key={item.url}>
+            <Link href={item.url} key={item.url} key={item.url}>
               <NavLink
                 styles={{
                   root: {
@@ -108,7 +107,6 @@ const MainLinksComponent = ({
                 active={router.pathname === item.url}
               />
             </Link>
-          </>
         ))}
       </NavLink>
     );
