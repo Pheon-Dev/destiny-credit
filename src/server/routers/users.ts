@@ -88,6 +88,7 @@ export const usersRouter = t.router({
       })
     )
     .query(async ({ input }) => {
+    try {
       if (!input.email) return;
 
       const user = await prisma.user.findFirst({
@@ -115,6 +116,12 @@ export const usersRouter = t.router({
         });
       }
       return user;
+      
+    } catch (error) {
+      return {
+        message: error
+      }
+    }
     }),
   signout: t.procedure
     .input(
